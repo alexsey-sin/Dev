@@ -1,0 +1,137 @@
+Работа с миграциями
+
+В прошлом уроке мы создали модель Post в приложении Posts.
+Пока что эта модель — просто код, связи с базой данных у неё нет.
+Да и самой БД тоже нет. Сейчас мы создадим её и подключим к проекту.
+
+В файле yatube/settings.py есть опция DATABASES:
+
+	# Database
+	# https://docs.djangoproject.com/en/2.2/ref/settings/#databases
+
+	DATABASES = {
+		'default': {
+			'ENGINE': 'django.db.backends.sqlite3',
+			'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+		}
+	} 
+
+В свойстве ENGINE указано, какой драйвер баз данных использует проект.
+Django умеет работать с разными базами данных, в нашем проекте это будет SQLite.
+Она была автоматически установлена на вашем компьютере вместе с Python.
+
+Свойство NAME указывает, что файл с базой данных будет создан в головной директории
+проекта и будет называться db.sqlite3.
+
+При первом запуске сервера Django пытался прочитать содержимое базы данных,
+не нашёл её и предупредил, что БД не подготовлена для работы. Мы тогда собирались
+поговорить о семнадцати «недоделках». Пришло время сдержать обещание: теперь вы
+понимаете, что означает системное сообщение "You have N unapplied migration(s)".
+
+Оно информирует, что файл БД пуст или в нём не созданы необходимые таблицы.
+С этим нужно что-то делать.
+
+В командной строке из директории Yatube/yatube выполните команду
+(venv) $ python manage.py runserver:
+
+	(venv) $ python manage.py runserver
+	Watching for file changes with StatReloader
+	Performing system checks...
+
+	System check identified no issues (0 silenced).
+
+	You have 17 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): admin, auth, contenttypes, sessions.
+	Run 'python manage.py migrate' to apply them.
+
+	October 01, 2019 - 10:59:42
+	Django version 2.2, using settings 'yatube.settings'
+	Starting development server at http://127.0.0.1:8000/
+	Quit the server with CONTROL-C.
+
+Миграция данных
+
+В Django изначально есть некоторое количество встроенных моделей, которые нужны
+для работы системы, но таблицы для них ещё не созданы. Можно создать таблицы
+«ручками»: написать SQL-запрос на создание таблиц, указать имена и типы полей
+для каждой таблицы, etc.
+
+А можно командой из терминала запустить миграцию — автоматический процесс
+обновления базы данных на основании определённых правил.
+
+При запуске миграции Django проверит все модели в коде и сопоставит их с
+существующими таблицами в БД.
+
+Если для какой-то модели таблицы нет, Django создаст её. А если таблица не
+соответствует модели, то будет изменена и согласована с этой моделью.
+
+Добавление приложения в проект
+
+Пока что Django не знает о приложении Posts: каждый новый app нужно
+зарегистрировать в проекте, иначе при запуске миграций Django не заглянет
+в директорию приложения в поисках модели.
+
+Отредактируйте файл yatube/settings.py — найдите в файле переменную
+INSTALLED_APPS и впишите в неё имя приложения Posts. Должно получиться
+примерно так:
+
+	INSTALLED_APPS = [
+		'posts',  # наше приложение posts**
+		'django.contrib.admin',
+		'django.contrib.auth',
+		'django.contrib.contenttypes',
+		'django.contrib.sessions',
+		'django.contrib.messages',
+		'django.contrib.staticfiles',
+	] 
+
+Порядок перечисления приложений имеет значение — в некоторых особых случаях.
+Сейчас для простоты будем добавлять все свои приложения в начало списка.
+
+Создание и запуск скриптов миграции
+
+Теперь Django знает о приложении Posts, можно создавать миграцию.
+Из директории Yatube/yatube запустите команду создания скрипта миграций
+makemigrations, получите следующий ответ:
+
+	(venv) $ python manage.py makemigrations
+	Migrations for 'posts':
+	  posts/migrations/0001_initial.py
+	   - Create model Post 
+
+В приложении Posts в папке migrations будет создан файл со скриптом миграции:
+в нём сохранено описание моделей, найденных в этом приложении.
+Для встроенных моделей такие скрипты были созданы при установке Django.
+
+Теперь нужно запустить все миграции. Выполните команду migrate:
+
+	(venv) $ python manage.py migrate       
+	Operations to perform:
+		Apply all migrations: admin, auth, contenttypes, posts, sessions
+	Running migrations:
+		Applying contenttypes.0001_initial... OK
+		Applying auth.0001_initial... OK
+		Applying admin.0001_initial... OK
+		Applying admin.0002_logentry_remove_auto_add... OK
+		Applying admin.0003_logentry_add_action_flag_choices... OK
+		Applying contenttypes.0002_remove_content_type_name... OK
+		Applying auth.0002_alter_permission_name_max_length... OK
+		Applying auth.0003_alter_user_email_max_length... OK
+		Applying auth.0004_alter_user_username_opts... OK
+		Applying auth.0005_alter_user_last_login_null... OK
+		Applying auth.0006_require_contenttypes_0002... OK
+		Applying auth.0007_alter_validators_add_error_messages... OK
+		Applying auth.0008_alter_user_username_max_length... OK
+		Applying auth.0009_alter_user_last_name_max_length... OK
+		Applying auth.0010_alter_group_name_max_length... OK
+		Applying auth.0011_update_proxy_permissions... OK
+		Applying posts.0001_initial... OK
+		Applying sessions`.0001_initial... OK
+
+OK обозначает, что операция успешно завершена. Вот они, те 17 исправлений,
+которых недоставало при запуске проекта.
+
+Теперь к проекту Yatube подключена база данных, в неё добавлены таблицы
+служебных приложений и создана таблица для приложения Posts.
+
+Создали модель, запустили миграцию — и всё готово для сохранения постов
+пользователей.

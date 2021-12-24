@@ -1,0 +1,223 @@
+Добавление формы регистрации
+
+Сейчас будет немного теории, цепочка классов — и вы научитесь создавать формы
+для работы с данными в базе.
+
+Вот план дальнейшей работы:
+
+    На основе встроенного класса UserCreationForm напишем класс CreationForm,
+		он создаст объект формы регистрации, данные из которой будут передаваться
+		в модель User.
+    На основе Generic Views CreateView создадим view-класс SignUp, который
+		вызовет шаблон и передаст в него форму CreationForm.
+    Создадим HTML-шаблон, он примет объект form из view-класса CreateView.
+    Добавим вызов view-класса SignUp в urls.py.
+
+Создание формы на основе класса UserCreationForm
+
+С технической точки зрения «процесс регистрации» — это создание нового объекта
+модели User. Пользователь отправляет через форму свои данные, после проверки
+эти данные передаются в модель User и сохраняются в базе.
+
+Регистрация пользователя — стандартная и востребованная процедура, и авторы Django
+сделали за нас основную работу. В модуле django/contrib/auth/forms.py для создания
+формы регистрации заготовлен класс UserCreationForm (наследник знакомого вам
+встроенного класса ModelForm), на основе которого создаётся форма регистрации.
+
+django/contrib/auth/forms.py
+
+	class UserCreationForm(forms.ModelForm):
+		"""
+		A form that creates a user, with no privileges, from the given username and
+		password.
+		"""
+		# ...
+
+В исходном коде класса UserCreationForm
+(https://github.com/django/django/blob/35396a7f243eceec42cc90725ab573a7d9ac3b4c/django/contrib/auth/forms.py#L72)
+видно, что форма создается на основе модели User. Класс UserCreationForm
+(как и любые наследники класса ModelForm) считывает и добавляет свойства модели
+как поля формы.
+
+Сейчас мы создадим класс CreationForm, наследника класса UserCreationForm.
+Классу ModelForm он будет приходиться внуком: ModelForm → UserCreationForm →
+CreationForm.
+
+Класс CreationForm можно было бы и не создавать, а напрямую подключить встроенный
+класс UserCreationForm из пакета django.contrib.auth, но для нашей работы нужно
+внести изменения в работу предустановленного класса: хочется вывести на страницу
+не все поля, а лишь те, которые нужны для регистрации именно на нашем сайте.
+
+    В Django принято хранить формы в отдельном файле, и мы последуем этому правилу.
+
+Создайте шаблон страницы регистрации users/forms.py и добавьте в него код. 
+
+	from django.contrib.auth.forms import UserCreationForm
+	from django.contrib.auth import get_user_model
+
+
+	User = get_user_model()
+
+
+	#создадим собственный класс для формы регистрации
+	#сделаем его наследником предустановленного класса UserCreationForm
+	class CreationForm(UserCreationForm):
+		class Meta(UserCreationForm.Meta):
+			# укажем модель, с которой связана создаваемая форма
+			model = User
+			# укажем, какие поля должны быть видны в форме и в каком порядке
+			fields = ('first_name', 'last_name', 'username', 'email')
+
+Согласно рекомендациям разработчиков Django
+(https://docs.djangoproject.com/en/2.2/topics/auth/customizing/#referencing-the-user-model)
+, к модели User лучше обращаться через функцию get_user_model(). Это нужно для того,
+чтобы разработчик без труда мог переопределить модель, которая будет хранить данные
+пользователей. По умолчанию это модель User, она создаётся при установке Django.
+Но если она вас не устраивает — вы можете дополнить базовую модель, унаследовавшись
+от User, описать свойства новой модели и зарегистрировать её в системе в качестве
+модели пользователей.
+
+Функция get_user_model() обращается именно к той модели, которая зарегистрирована
+в качестве основной модели пользователей в конфиге проекта.
+
+Если разработчик заменит эту модель на собственную, вносить изменения по всему
+проекту ему не придётся, будет достаточно изменить лишь одно значение в конфиге.
+Но это в случае, если он повсюду предусмотрительно применял get_user_model().
+
+Наследственность в классе Meta
+
+В классе CreationForm описан вложенный класс Meta: он унаследован от родительских
+классов. В нём настраивается форма, и именно в нём мы переопределяем некоторые её
+параметры.
+
+Конструкция class Meta(UserCreationForm.Meta) описывает обычное наследование,
+только наследуется не основной класс, а вложенный:
+
+	#наследуется класс UserCreationForm:
+	class CreationForm(UserCreationForm):
+	#наследуется класс Meta, вложенный в класс UserCreationForm:
+		class Meta(UserCreationForm.Meta):
+	#...
+
+В результате класс Meta, вложенный в класс CreationForm, унаследует все ключи
+UserCreationForm.Meta, но теперь мы получаем возможность переопределить их.
+Копировать целиком код класса Meta из UserCreationForm в свой код было бы не
+лучшей идеей, такой подход грозит проблемами: если в следующей версии Django
+в UserCreationForm.Meta добавят что-то новое — придется искать и исправлять места,
+где возникла несовместимость. Наследование всегда лучше.
+
+Обратите внимание: в исходном классе UserCreationForm
+(https://github.com/django/django/blob/35396a7f243eceec42cc90725ab573a7d9ac3b4c/django/contrib/auth/forms.py#L72)
+в классе Meta есть строка model = User 
+
+Ссылка идёт прямо на модель User, без посредства функции get_user_model().
+В своём коде, в классе CreationForm, мы переопределяем переменную model,
+присвоив ей значение get_user_model() (передав его через переменную User).
+
+Отображение формы
+
+Создайте в файле users/views.py view-класс SignUp, унаследовав его от
+Generic View CreateView:
+
+	#импортируем CreateView, чтобы создать ему наследника
+	from django.views.generic import CreateView
+
+	#функция reverse_lazy позволяет получить URL по параметру "name" функции path()
+	#берём, тоже пригодится
+	from django.urls import reverse_lazy
+
+	#импортируем класс формы, чтобы сослаться на неё во view-классе
+	from .forms import CreationForm
+
+
+	class SignUp(CreateView):
+		form_class = CreationForm
+		success_url = reverse_lazy('login') #  где login — это параметр "name" в path()
+		template_name = "signup.html"
+
+Нам остаётся только определить некоторые параметры конфигурации, и view-класс
+CreateView сам отрисует форму.
+
+    form_class — из какого класса взять форму
+    success_url — куда перенаправить пользователя после успешной отправки формы
+    template_name — имя шаблона, куда будет передана переменная form с объектом
+		HTML-формы. Всё это чем-то похоже на вызов функции render() во view-функции.
+
+Теперь в шаблон signup.html будет выведена форма, описанная в классе CreationForm.
+После отправки этой формы пользователь будет переадресован на страницу, для которой
+в urls.py указано имя name="signup". Данные, отправленные через форму, будут
+переданы в модель User и сохранены в БД.
+
+Готово всё, кроме шаблона signup.html.
+
+Добавление шаблона
+
+Для удобства организации кода создайте директорию users/templates. Это будет
+директория шаблонов приложения Users.
+
+Django будет работать с такими директориями, если в settings.py в директиве
+TEMPLATES для ключа APP_DIRS установить True.
+
+После установки этого ключа Django будет искать шаблоны не только в головной
+директории templates, но и в папках templates в директориях приложений (если
+такие папки там есть).
+
+В users/templates создайте файл signup.html и добавьте в него код для отображения
+формы:
+
+	{% extends "base.html" %}
+	{% block title %}Зарегистрироваться{% endblock %}
+	{% block content %}
+
+	<form method="post" action="{% url 'signup' %}">
+	  {% csrf_token %}
+	  {{ form.as_p }}
+	  <input type="submit" value="Зарегистрироваться">
+	</form>
+	{% endblock %}
+
+Добавление страницы регистрации в urls.py
+
+Для адресов страниц, относящихся к регистрации и входу на сайт, мы будем
+использовать префикс auth/.
+
+Подключите файлы urls.py приложений Users и Auth к головному urls.py по аналогии
+с уже подключённым posts.urls.
+
+После изменений ваш файл yatube/urls.py должен выглядеть так:
+
+	from django.contrib import admin
+	from django.urls import include, path
+
+	urlpatterns = [
+		#регистрация и авторизация
+		path('auth/', include('users.urls')),
+
+		#если нужного шаблона для /auth не нашлось в файле users.urls — 
+		#ищем совпадения в файле django.contrib.auth.urls
+		path('auth/', include('django.contrib.auth.urls')),
+
+		#раздел администратора
+		path('admin/', admin.site.urls),
+
+		# обработчик для главной страницы ищем в urls.py приложения posts
+		path("", include('posts.urls')),
+	]
+
+Теперь добавьте в файл users/urls.py адрес страницы регистрации пользователей:
+
+	from django.urls import path
+	from . import views
+
+	urlpatterns = [
+		# path() для страницы регистрации нового пользователя
+		# её полный адрес будет auth/signup/, но префикс auth/ обрабатывется в головном urls.py
+		path('signup/', views.SignUp.as_view(), name='signup')
+	]
+
+Всё!
+
+Зайдите на страницу http://127.0.0.1:8000/auth/signup/.
+
+Готово, всё работает, хоть и выглядит не очень нарядно.
+Следующий урок посвятим наведению красоты.

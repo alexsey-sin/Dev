@@ -1,0 +1,65 @@
+
+    <nav class="pcoded-navbar navbar-collapsed">
+        <div class="navbar-wrapper">
+            <div class="navbar-brand header-logo">
+                <a href="{% url 'app:home' %}" class="b-brand">
+                    <div class="b-bg">
+                        <i class="feather icon-trending-up"></i>
+                    </div>
+                    <span class="b-title">Dj-DomConnect</span>
+                </a>
+                <a class="mobile-menu" id="mobile-collapse" href="javascript:"><span></span></a>
+            </div>
+            <div class="navbar-content scroll-div">
+                <ul class="nav pcoded-inner-navbar">
+                    <li class="nav-item pcoded-menu-caption">
+                        <label>Навигация</label>
+                    </li>
+                    <li data-username="dashboard Default Ecommerce CRM Analytics Crypto Project" 
+                        class="nav-item {% if 'index' in segment %} active {% endif %}">
+                        <a href="https://domconnect.ru" class="nav-link "><span class="pcoded-micon"><i class="feather icon-home"></i></span><span class="pcoded-mtext">domconnect.ru</span></a>
+                    </li>
+                    <li><hr style="border: 1px solid gray;"></li>
+                    <li class="nav-item pcoded-menu-caption">
+                        <label>Голосовые роботы</label>
+                    </li>
+                    <li data-username="Table bootstrap datatable footable" 
+                        class="nav-item {% if 'people_names' in segment %} active {% endif %}">
+                        <a href="{% url 'app:names' %}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-server"></i></span><span class="pcoded-mtext">Имена людей</span></a>
+                    </li>
+                    <li data-username="Table bootstrap datatable footable" 
+                        class="nav-item {% if 'phrasesLiza' in segment %} active {% endif %}">
+                        <a href="{% url 'app:lizagroup' %}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-server"></i></span><span class="pcoded-mtext">Фразы Лиза</span></a>
+                    </li>
+                    <li data-username="Table bootstrap datatable footable" 
+                        class="nav-item {% if 'phrasesGerman' in segment %} active {% endif %}">
+                        <a href="{% url 'app:germangroup' %}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-server"></i></span><span class="pcoded-mtext">Фразы Герман</span></a>
+                    </li>
+                    <li><hr style="border: 1px solid gray;"></li>
+                    <li class="nav-item pcoded-menu-caption">
+                        <label>Мобильная связь</label>
+                    </li>
+                    <li data-username="Table bootstrap datatable footable" 
+                        class="nav-item {% if 'numsetting' in segment %} active {% endif %}">
+                        <a href="{% url 'mobile:numsetting' %}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-server"></i></span><span class="pcoded-mtext">Настройки</span></a>
+                    </li>
+                    <li data-username="Table bootstrap datatable footable" 
+                        class="nav-item {% if 'numcondition' in segment %} active {% endif %}">
+                        <a href="{% url 'mobile:numcondition' %}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-server"></i></span><span class="pcoded-mtext">Состояние</span></a>
+                    </li>
+                    <li><hr style="border: 1px solid gray;"></li>
+                    <li class="nav-item pcoded-menu-caption">
+                        <label>Пользователь:</label>
+                    </li>
+                    <li style="text-align: right; margin-right: 25px; color: #a389d4;">
+                        <label>{{ u_name }}</label>
+                    </li>
+					<li data-username="Disabled Menu" class="nav-item">
+                        <a href="{% url 'logout' %}" class="nav-link">
+                            <span class="pcoded-micon"><i class="feather icon-power"></i></span><span class="pcoded-mtext">Выйти</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>

@@ -1,0 +1,152 @@
+Управление пользователями
+
+Нашему сайту необходима система для регистрации и авторизации пользователей.
+В Django есть встроенные инструменты для работы с пользователями, и мы задействуем
+эту часть фреймворка в нашем проекте.
+
+В интерфейсе администратора уже есть подраздел управления пользователями. Через
+командную строку вы создали суперпользователя, а при обновлении БД в системе
+появился пользователь leo. Но было бы странно добавлять остальных пользователей
+вручную. Дадим им возможность регистрироваться самостоятельно.
+
+Модуль django.contrib.auth
+
+Исходный код модулей, пакетов и библиотек вашего проекта сохранён в папке /venv.
+В ней находится виртуальное окружение проекта. Если вы хотите узнать, как работает
+проект — почитайте исходный код и документацию.
+
+В состав исходного кода фреймворка Django входит директория /contrib — «склад
+полезных вещей», набор готовых приложений для решения стандартных задач:
+поддержки мультисайтовости, страниц flatpages, работы с ГИС, системы site map,
+публикации RSS-лент etc. Любое из этих приложений можно подключить по определённым
+правилам к проекту — и оно заработает «из коробки».
+
+Приложение django.contrib.auth было установлено автоматически вместе с Django
+при подготовке окружения. Именно оно отвечает за работу с пользователями.
+Посмотрим, как оно устроено и как с ним работать.
+
+Для начала найдём основные элементы этого приложения.
+
+Поиск URL-шаблонов
+
+В модуле django.contrib.auth есть файл urls.py. Посмотрите, какие адреса станут
+доступны на нашем сайте после подключения этого модуля:
+
+	from django.contrib.auth import views
+	from django.urls import path
+
+	urlpatterns = [
+		path('login/', views.LoginView.as_view(), name='login'),
+		path('logout/', views.LogoutView.as_view(), name='logout'),
+
+		path('password_change/', views.PasswordChangeView.as_view(), name='password_change'),
+		path('password_change/done/', views.PasswordChangeDoneView.as_view(), name='password_change_done'),
+
+		path('password_reset/', views.PasswordResetView.as_view(), name='password_reset'),
+		path('password_reset/done/', views.PasswordResetDoneView.as_view(), name='password_reset_done'),
+		path('reset/<uidb64>/<token>/', views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+		path('reset/done/', views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
+	]
+
+Обратите внимание на имена (параметр name) для URL-шаблонов списка urlpatterns.
+По этим именам можно будет обращаться к страницам, в дальнейшем нам это пригодится.
+
+View-классы приложения Auth
+
+Если посмотреть исходный код модуля django/contrib/auth/views.py (локально этот
+файл доступен в директории виртуального окружения проекта
+venv/lib/python3.8/site-packages/django/contrib/auth/views.py),
+то мы найдём множество Class Based View.
+
+Class Based View — это классы, по своему назначению аналогичные view-функциям,
+они так же обрабатывают запросы и возвращают ответ.
+
+Поищите в файле названия классов, в имени которых есть слово "View", и найдите
+в них свойство template_name: это предустановленные названия шаблонов, необходимых
+для работы с пользователями
+
+	class LoginView(SuccessURLAllowedHostsMixin, FormView):
+		template_name = 'registration/login.html'
+	class LogoutView(SuccessURLAllowedHostsMixin, TemplateView):
+		template_name = 'registration/logged_out.html'
+	class PasswordResetView(PasswordContextMixin, FormView):
+		template_name = 'registration/password_reset_form.html'
+	class PasswordResetDoneView(PasswordContextMixin, TemplateView):
+		template_name = 'registration/password_reset_done.html'
+	class PasswordResetConfirmView(PasswordContextMixin, FormView):
+		template_name = 'registration/password_reset_confirm.html'
+	class PasswordResetCompleteView(PasswordContextMixin, TemplateView):
+	   template_name = 'registration/password_reset_complete.html'
+	class PasswordChangeView(PasswordContextMixin, FormView):
+		template_name = 'registration/password_change_form.html'
+	class PasswordChangeDoneView(PasswordContextMixin, TemplateView):
+		template_name = 'registration/password_change_done.html'
+
+Давайте разберёмся, какими страницами управляют эти view-классы:
+
+    LoginView — страница с формой авторизации;
+    LogoutView — страница выхода, дающая пользователю возможность прекратить
+		работу с сайтом;
+    PasswordResetView — страница восстановления пароля, здесь можно ввести
+		свой email и получить ссылку для восстановления доступа;
+    PasswordResetDoneView — страница уведомления о том, что ссылка на
+		восстановление пароля отправлена;
+    PasswordChangeView — эта страница будет доступна по ссылке при восстановлении
+		пароля, здесь пользователь сможет задать новый пароль;
+    PasswordChangeDoneView — страница уведомления о том, что пароль изменён.
+
+В этом списке не хватает страницы регистрации, её мы создадим отдельно.
+
+В директории для шаблонов модуля Auth,
+venv/lib/python3.8/site-packages/django/contrib/auth/templates/ этих файлов нет,
+их нужно создать самостоятельно.
+
+Надо будет создать такие шаблоны для нашего проекта Yatube в users/templates/:
+
+    registration/login.html
+    registration/logged_out.html
+    registration/password_reset_form.html
+    registration/password_reset_done.html
+    registration/password_reset_confirm.html
+    registration/password_change_form.html
+    registration/password_change_done.html
+    И еще signup.html для регистрации новых пользователей
+
+Создание отдельного приложения users
+
+Для того чтобы собрать весь код для управления регистрацией пользователей в одном
+месте, самостоятельно создайте новое приложение users и добавьте его в начало
+списка INSTALLED_APPS в конфиге сайта.
+
+Скорее всего, вам пригодится консольная команда
+
+	$ python manage.py startapp 
+
+===============================================================================
+Тренажер - проект
+
+Задача:
+
+Вам дана модель Contact в файле models.py. На её основе создайте форму для отправки
+сообщений администратору сайта.
+
+Поля формы должны быть такими:
+
+    Имя (name)
+    Адрес электронной почты для связи (email)
+    Тема сообщения (subject)
+    Текст сообщения (body)
+
+Подсказка:
+
+В файле forms.py допишите класс ContactForm. В классе:
+
+    сошлитесь на модель, на основе которой создаётся форма;
+    укажите список полей, которые должны быть доступны пользователю
+
+Синтаксис можно подсмотреть в теоретической части урока
+
+
+
+Проект в папке progect_4
+===============================================================================

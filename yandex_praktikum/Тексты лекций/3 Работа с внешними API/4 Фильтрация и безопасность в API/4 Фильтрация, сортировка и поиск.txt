@@ -1,0 +1,227 @@
+Фильтрация, сортировка и поиск
+
+Ваш API стал более безопасен, но пока что он не особо удобен в работе:
+на любой GET-запрос он возвращает либо отдельный объект, либо все объекты ресурса.
+Вы научились разбивать выдачу на порции, но хочется добавить гибкости к запросам:
+фильтровать выдачу по каким-то признакам, сортировать, искать объекты по ключевым
+словам.
+
+Фильтрация
+
+Мы можем разрешить клиенту фильтровать ресурсы по определённому полю.
+Для фильтрации списка аккаунтов по username дадим пользователям возможность
+делать GET-запросы такого вида:
+http://localhost:8000/api/v1/users/?username=some_user_name.
+
+Код, который обработает этот запрос, может выглядеть так:
+
+urls.py
+
+    path('api/v1/users/<str:username>', UserList.as_view())
+
+views.py
+
+    from rest_framework.views import APIView
+    from rest_framework.response import Response
+    from .models import User
+    from .serializers import UserSerializer
+        
+    
+    class UserList(APIView):
+        def get(self, request, username):
+            #  через ORM отфильтровать объекты модели User
+            #  по значению параметра username, полученнго в запросе 
+            users = User.objects.filter(username=username)
+            #  передать в сериалайзер результаты фильтрации
+            serializer = UserSerializer(users, many=True)
+            #  вернуть результат сериализации
+            return Response(serializer.data)
+
+В Generic-классах и Viewsets нужно переопределить их встроенный метод
+get_queryset(), а параметр запроса получить из свойства self.request.query_params.
+Всё остальное работает так же, как и во view-классах:
+
+    from .models import User
+    from .serializers import UserSerializer
+    from rest_framework import generics
+    
+    
+    class UserList(generics.ListAPIView):
+        serializer_class = UserSerializer
+    
+        def get_queryset(self):
+    
+            queryset = User.objects.all()
+            #  добыть параметр username из GET-запроса
+            username = self.request.query_params.get('username', None)
+            if username is not None:
+                #  через ORM отфильтровать объекты модели User
+                #  по значению параметра username, полученнго в запросе
+                queryset = queryset.filter(username=username)
+            return queryset
+
+Django REST Framework предоставляет фильтрующие бэкенды для упрощения работы с
+фильтрацией и поиском. Backend («бэкенд») — это механизм, который можно подключить
+к проекту, чтобы получить дополнительную функциональность. В курсе по Django
+отправку e-mail вы настраивали именно через специализированный бэкенд.
+
+Для подключения бэкенда фильтрации на уровне всего проекта в settings.py нужно
+добавить ключ DEFAULT_FILTER_BACKENDS в словарь настроек REST_FRAMEWORK:
+
+    REST_FRAMEWORK = {
+        'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+    }
+
+Для подключения бэкенда на уровне отдельного Generic-класса можно добавить
+поле filter_backends в тело view-класса. 
+
+    from rest_framework import generics
+    import django_filters.rest_framework
+    from .models import Post
+    from .serializers import PostSerializer
+    
+    class PostList(generics.ListCreateAPIView):
+        queryset = Post.objects.all()
+        serializer_class = PostSerializer
+        filter_backends = [django_filters.rest_framework.DjangoFilterBackend]
+    
+        def perform_create(self, serializer):
+            serializer.save(author=self.request.user)
+
+Обратите внимание: для бэкенда фильтрации нужна сторонняя библиотека django-filter.
+Установите её через менеджер пакетов pip и зарегистрируйте в списке приложений
+INSTALLED_APPS:
+
+settings.py
+
+    INSTALLED_APPS = [
+        ...
+        'rest_framework',
+        'django_filters', 
+        #  да, библиотека django-filter действительно регистрируется как django_filterS
+    ]
+
+Фильтрующий бэкенд передаёт параметры GET-запроса в Django ORM, а тот преобразует
+их в SQL-запросы.
+
+Сделать SQL-запрос через GET? Легко!
+
+Чтобы разрешить фильтрацию «по точному совпадению», во view-класс добавляют
+свойство filterset_fields, и в нём указывают поля модели, по которым можно
+фильтровать. 
+
+    from rest_framework import generics, permissions
+    from django_filters.rest_framework import DjangoFilterBackend
+    from .models import Post
+    from .serializers import PostSerializer
+    
+    #  filterset_fields — подключаем
+    class PostList(generics.ListCreateAPIView):
+        queryset = Post.objects.all()
+        serializer_class = PostSerializer
+        filter_backends = [DjangoFilterBackend]
+        filterset_fields = ['text',]
+
+Теперь можно сделать, например, такой GET-запрос:
+http://localhost:8000/api/v1/posts/?text=Краткость%20%E2%80%94%20сестра%20таланта
+
+Если у какого-то объекта модели Post содержимое поля text полностью совпадает
+со значением параметра text GET-запроса — этот объект будет добавлен в выдачу API.
+
+    [
+        {
+            "id": 293,
+            "text": "Краткость — сестра таланта",
+            "author": "toha",
+            "image": null,
+            "pub_date": "1889-04-11T10:11:20.056969Z"
+        }
+    ]
+
+Последовательности символов, начинающиеся со знака «процент» % — это URL encoding
+(«кодировка символов для URL»): способ закодировать и передать через URL те
+спецсимволы, которые нельзя включать в URL и в GET-параметры. Например,
+в URL encoding пробел записывается как %20 (обычные пробелы в URL запрещены).
+Таблицу символов и их кодировок можно посмотреть здесь.
+(https://www.w3schools.com/tags/ref_urlencode.ASP)
+
+Популярная задача в приложениях — фильтрация объектов по диапазону значений
+какого-то поля: подбор товаров в выбранном диапазоне цен или поиск записей
+в блоге за определённый период.
+
+Создайте файл filters.py и опишите класс фильтра, расширяющего класс FilterSet :
+
+    from django_filters import rest_framework as filters
+    from .models import Numbers
+    
+    class NumberRangeFilter(filters.FilterSet):
+        min_number = filters.NumericRangeFilter(field_name="number", lookup_expr='gte')
+        max_number = filters.NumericRangeFilter(field_name="number", lookup_expr='lte')
+    
+        class Meta:
+            model = Numbers
+            fields = ['min_number', 'max_number']
+
+Документация по фильтрам полезна и доступна, читайте обязательно:
+https://django-filter.readthedocs.io/
+
+Поиск
+
+DRF даёт разработчикам инструменты и для поиска.
+
+Поисковый фильтр SearchFilter можно подключить к view-классу, а в поле
+search_fields указать поля модели, по которым разрешён поиск. Поля должны быть
+текстовыми: CharField или TextField.
+
+    from rest_framework import generics, filters
+    from .models import Post
+    from .serializers import PostSerializer
+    
+    class PostList(generics.ListAPIView):
+        queryset = Post.objects.all()
+        serializer_class = PostSerializer
+        filter_backends = [filters.SearchFilter]
+        search_fields = ['text',]
+
+По умолчанию включен поиск по частичным совпадениям без учёта регистра.
+Например, при запросе с параметром ?text=кол в выдачу попадёт пост,
+в котором есть слово «Колбаса» (даже с большой буквы).
+
+Можно искать по нескольким совпадениям: в запросе их надо разделить запятыми,
+без пробелов: http://localhost:8000/api/v1/posts?search=ночь,улица,фонарь
+
+При таком запросе в выдачу попадут только те объекты, где есть одновременно
+все совпадения. Примеры можно посмотреть здесь, в официальной документации:
+https://www.django-rest-framework.org/api-guide/filtering/
+
+Сортировка выдачи
+
+Результат выдачи можно сортировать, подключив к классу фильтр OrderingFilter
+и добавив поле ordering_fields: 
+
+    class PostList(generics.ListAPIView):
+            queryset = Post.objects.all()
+            serializer_class = PostSerializer
+            filter_backends = [filters.OrderingFilter]
+            ordering_fields = ['pub_date', 'username']
+  
+?ordering=username — сортировка выдачи по пользователям в алфавитном порядке.
+?ordering=-username — сортировка выдачи по пользователям в обратном алфавитном
+порядке.
+
+===============================================================================
+Тренажер - проект
+
+Задача:
+
+Напишите фильтр по диапазону дат публикаций, date_from и date_to .
+Подключите этот фильтр к view-классу публикаций.
+
+Подсказка:
+
+В любой непонятной ситуации читайте мануалы по django-filter, там всё есть:
+https://django-filter.readthedocs.io/en/latest/ref/filters.html
+
+Проект в папке progect_4
+
+===============================================================================

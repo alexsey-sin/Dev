@@ -1,0 +1,178 @@
+Полезные функции
+
+Жизнь слишком коротка, чтобы постоянно рыться в проекте в поиске нужных функций.
+В Django есть место, где можно найти наиболее востребованные функции:
+django.shortcuts
+
+Расположение модулей, их имена и удобство обращения к ним — это тоже дизайн.
+Многие вещи в старых версиях Django делались сильно сложнее, чем сейчас.
+
+Часть функций из директории django.shortcuts вам уже знакома.
+
+render()
+
+render(request, template_name, context=None, content_type=None, status=None,
+using=None)
+
+Вы уже не раз применяли эту функцию для генерации страниц на основе шаблона
+и списка переменных context. В render() можно указать MIME-тип
+(https://ru.wikipedia.org/wiki/%D0%A1%D0%BF%D0%B8%D1%81%D0%BE%D0%BA_MIME-%D1%82%D0%B8%D0%BF%D0%BE%D0%B2)
+отдаваемогоn документа content_type, по умолчанию это text/html. Параметр status — это
+код HTTP-ответа сервера
+(https://ru.wikipedia.org/wiki/%D0%A1%D0%BF%D0%B8%D1%81%D0%BE%D0%BA_%D0%BA%D0%BE%D0%B4%D0%BE%D0%B2_%D1%81%D0%BE%D1%81%D1%82%D0%BE%D1%8F%D0%BD%D0%B8%D1%8F_HTTP#%D0%9E%D0%B1%D0%B7%D0%BE%D1%80%D0%BD%D1%8B%D0%B9_%D1%81%D0%BF%D0%B8%D1%81%D0%BE%D0%BA)
+; чаще всего используются коды 200 и 404. В параметре
+using можно указать имя движка языка шаблонов, это нужно на сайтах, где
+применяется несколько разных движков.
+
+Пример:
+
+	from django.shortcuts import render
+
+
+	def my_index(request):
+		# какой-то код
+		return render(request, 'index.html', {'elki': 'palki'}, content_type='text/html', status=200)
+
+redirect()
+
+redirect(to, *args, permanent=False, **kwargs)
+
+Чтобы view-функция ответила переадресацией на другую страницу сайта, применяют
+redirect(). Аргумент permanent=True сообщит браузеру и поисковым системам,
+что редирект постоянный и это надо запомнить.
+
+Редирект может быть полезен при попытке неавторизованного доступа к определённой
+странице или в случае, если структура адресов сайта была изменена, а пользователь
+запросил устаревший адрес.
+
+Примеры использования:
+
+	# models.py
+
+	from django.db import models
+
+
+	class MyModel():
+		# тут свойства модели
+		def get_absolute_url(self):
+			return f"/item/{self.id}/"
+
+
+	# views.py
+	from django.shortcuts import redirect
+
+
+	def my_obj_view(request):
+		# ...
+		# редирект на объект работает, если в модели есть 
+		# метод get_absolute_url(), который возвращает путь
+		obj = MyModel.objects.get(...)
+		return redirect(obj)
+
+	def my_name_view(request):
+		# ...
+		# редирект на страницу по имени, с указанием переменной 
+		# path("<var>/", views.other, name="path-name"),
+		return redirect('path-name', var='any-value')
+
+	def my_str_view(request):
+		# ...
+		# редирект на относительный путь на сайте
+		return redirect('/some/url/')
+
+	def my_url_view(request):
+		# ...
+		# редирект на любой другой ресурс в сети
+		return redirect('https://example.com/')
+
+get_object_or_404()
+
+get_object_or_404(klass, *args, **kwargs)
+
+Функция ищет объект в базе, и если не находит — прерывает работу view-функции
+и возвращает страницу с ошибкой 404.
+
+Аргумент klass — это имя модели, у которой вызывается метод .get().
+
+Слово class — это зарезервированное слово в Python, потому даже в описании
+функций его не применяют. Пришлось выкручиваться и писать klass.
+
+Также в аргумент klass может быть передан объект QuerySet (результат запроса),
+содержащий один объект.
+
+Именованные аргументы kwargs — те же, что используются в методах get() и filter().
+
+Пример:
+
+	from django.shortcuts import get_object_or_404
+
+
+	def my_view(request):
+		obj = get_object_or_404(MyModel, pk=1)
+
+Без функции get_object_or_404() код выглядел бы так:
+
+	from django.http import Http404
+
+
+	def my_view(request):
+		try:
+			obj = MyModel.objects.get(pk=1)
+		except MyModel.DoesNotExist:
+			raise Http404("Объект не найден.")
+
+Примеры get_object_or_404() с QuerySet-объектами:
+
+	queryset = Post.objects.filter(text__startswith='M')
+	get_object_or_404(queryset, pk=1)
+
+	# то же самое, что и 
+	get_object_or_404(Post, text__startswith='M', pk=1)
+
+Если в аргумент klass передать QuerySet с несколькими объектами, будет вызвано
+исключение MultipleObjectsReturned.
+(https://docs.djangoproject.com/en/3.0/ref/exceptions/#django.core.exceptions.MultipleObjectsReturned)
+То же самое случится, если запрос к модели get_object_or_404(MyModel, filter=...)
+вернёт несколько объектов.
+
+get_list_or_404()
+
+get_list_or_404(klass, *args, **kwargs)
+
+Функция ищет список объектов в базе. Если не находит — прерывает работу
+view-функции и возвращает страницу с ошибкой 404. Аргументы и принцип работы
+те же, что и у get_object_or_404(), но при получении нескольких объектов не
+вызывается исключение.
+
+Пример:
+
+	from django.shortcuts import get_list_or_404
+
+
+	def group_posts(request, slug):
+		group = get_object_or_404(Group, slug=slug)        
+		posts = get_list_or_404(Post, group=group)
+		# ...
+
+reverse()
+
+reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None)
+
+Эта функция позволяет обратиться к view-функции по её имени, указанному в path()
+
+В коде эта функция делает то же самое, что и тег {% url %} в шаблонах.
+
+Пример:
+
+	from django.urls import reverse
+
+	def myview(request):
+		# для пути 
+		# path("<username>/<int:post_id>/", views.post_view, name="post"),
+		
+		path = reverse('post', kwargs={'username': 'leo', 'post_id': 42})        
+		# или 
+		path = reverse('post', args=('leo', 42))
+
+		return HttpResponseRedirect(path)
+

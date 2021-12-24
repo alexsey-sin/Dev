@@ -1,0 +1,244 @@
+{% extends "app/layouts/base.html" %}
+
+{% block title %} Фразы {% endblock %} 
+
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+{% if error_mess %}
+<div class="alert alert-danger" role="alert">
+    {{ error_mess }}
+</div>
+{% endif %}
+
+<div class="pcoded-content">
+    <div class="pcoded-inner-content">
+        <div class="main-body">
+            <div class="page-wrapper">
+                <!-- [ Main Content ] start -->
+                <div class="row">
+
+                    <!-- [ Hover-table ] start -->
+                    <div class="col-xl-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Фразы</h5>
+                                <!-- <span class="d-block m-t-5">use class <code>table-hover</code> inside table element</span> -->
+                            </div>
+                            <div class="card-block table-border-style">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                {% for row in page %}
+                                                    <th>{{ row.text }}</th>
+                                                {% endfor %}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                {% for row in page %}
+                                                    <td>Группа: &nbsp;&nbsp;&nbsp;{{ row.num_group }}</td>
+                                                {% endfor %}
+                                            </tr>
+                                            <tr>
+                                                {% for row in page %}
+                                                    <td>
+                                                        <div data-toggle="modal" data-target="#openModalGroupPriority" onclick="editPriority('{{ row.id }}','{{ row.text }}','{{ row.priority }}');">
+                                                            <a href="#">Приоритет: {{ row.priority }}</a>
+                                                        </div>
+                                                    </td>
+                                                {% endfor %}
+                                            </tr>
+                                            <tr>
+                                                {% for row in page %}
+                                                    <td>{{ row.cnt_phrases }} фраз</td>
+                                                {% endfor %}
+                                            </tr>
+                                            <tr>
+                                                {% for row in page %}
+                                                    <td>
+                                                        <a href="{% url 'app:germanphrases' row.id %}">
+                                                            {% for phrase in row.phrases %}
+                                                            {{ phrase }}<br>
+                                                            {% endfor %}
+                                                        </a>
+                                                    </td>
+                                                {% endfor %}
+                                            </tr>
+                                            <tr>
+                                                {% for row in page %}
+                                                    <td>Посл. изм</td>
+                                                {% endfor %}
+                                            </tr>
+                                            <tr>
+                                                {% for row in page %}
+                                                    <td>{{ row.last_date_phrase }}</td>
+                                                {% endfor %}
+                                            </tr>
+                                            <tr>
+                                                {% for row in page %}
+                                                    <td>{{ row.author_phrase }}</td>
+                                                {% endfor %}
+                                            </tr>
+                                            <tr>
+                                                {% for row in page %}
+                                                    <td>
+                                                        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#openModalNewPhrase" onclick="newPhrase('{{ row.id }}','{{ row.text }}');">Добавить фразу</button>
+                                                    </td>
+                                                {% endfor %}
+                                            </tr>
+                                            <tr>
+                                                {% for row in page %}
+                                                    <td>
+                                                        <a href="{% url 'app:germananswers' row.id %}">
+                                                            {% for ansver in row.answers %}
+                                                            {{ ansver }}<br>
+                                                            {% endfor %}
+                                                        </a>
+                                                    </td>
+                                                {% endfor %}
+                                            </tr>
+                                            <tr>
+                                                {% for row in page %}
+                                                    <td>Посл. изм</td>
+                                                {% endfor %}
+                                            </tr>
+                                            <tr>
+                                                {% for row in page %}
+                                                    <td>{{ row.last_date_answer }}</td>
+                                                {% endfor %}
+                                            </tr>
+                                            <tr>
+                                                {% for row in page %}
+                                                    <td>{{ row.author_answer }}</td>
+                                                {% endfor %}
+                                            </tr>
+                                            <tr>
+                                                {% for row in page %}
+                                                    <td>
+                                                        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#openModalNewAnswer" onclick="newAnswer('{{ row.id }}','{{ row.text }}');">Добавить ответ</button>
+                                                    </td>
+                                                {% endfor %}
+                                            </tr>
+                                       </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                   </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="openModalGroupPriority" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="openModalGroupPriorityTitle">Приоритет фразы:</h5>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <h3 id="priorityGroupPhraseName"></h3>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="text" id="priorityGroupPhraseValue" name="priority_value" value="">
+                </div>
+                <div class="modal-body">
+                    <p> * Изменение приоритета влияет на порядок проверки роботом 
+                        списка фраз по очередности. При фразе от клиента робот откроет
+                        вначале список с самым приоритетным столбцом и будет искать
+                        совпадение с ним. например, фраза "переключи на оператора"
+                        будет с приоритетом 80, а подключение 100.
+                        При фразе "переключи на оператора, я хочу подключить интернет"
+                        бот вначале найдет подключение.
+                    </p>
+                </div>
+                <input type="hidden" id="groupPhraseId" name="group_id">
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-warning">Сохранить</button>
+                </div>
+            </form>
+      </div>
+    </div>
+</div>
+<div id="openModalNewPhrase" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="openModalNewPhraseTitle">Добавление фразы к группе:</h5>
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          <h3 id="openModalNewPhraseNamePhrase"></h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="text" id="newPhraseValue" name="newphrase_value" value="">
+                </div>
+                <input type="hidden" id="newPhraseGroupId" name="group_id">
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-warning">Добавить</button>
+                </div>
+            </form>
+      </div>
+    </div>
+</div>
+<div id="openModalNewAnswer" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="openModalNewAnswerTitle">Добавление ответа к группе фразы:</h5>
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          <h3 id="openModalNewPhraseNameAnswer"></h3>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div align="center">
+                    <p>(Не боле 3-х за раз.)</p>
+                </div>
+                <div class="modal-body">
+                    <input type="file" id="newAnswerFile" name="newAnswerFile" multiple accept="audio/*,audio/wav">
+                </div>
+                <div class="modal-footer">
+                    <input type="hidden" id="newAnswerGroupId" name="group_answer_id" value="">
+                    <button type="submit" class="btn btn-warning">Добавить</button>
+                </div>
+            </form>
+      </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script language="javascript">
+    if (window.history.replaceState){  // предотвращает повторную отправку формы при обновлении страницы если перед этим была отправка
+        window.history.replaceState(null, null, window.location.href);
+    }
+    function editPriority(i,t,p){
+        $('#groupPhraseId').val(i);
+        $('#priorityGroupPhraseName').text(t);
+        $('#priorityGroupPhraseValue').val(p);
+    }
+    function newPhrase(i,t){
+        $('#newPhraseGroupId').val(i);
+        $('#openModalNewPhraseNamePhrase').text(t);
+    }
+    function newAnswer(i,t){
+        $('#newAnswerGroupId').val(i);
+        $('#openModalNewPhraseNameAnswer').text(t);
+    }
+
+</script>
+{% endblock javascripts %}

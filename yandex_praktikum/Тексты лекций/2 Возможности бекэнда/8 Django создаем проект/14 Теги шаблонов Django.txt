@@ -1,0 +1,339 @@
+Теги шаблонов Django: наследование и переопределение
+
+Создадим несложный HTML-шаблон и препарируем его. Называться он будет base.html,
+«базовый, основной».
+
+	<!DOCTYPE html>
+	<html>
+	  <head>
+		<title>
+		  {% block title %}
+			The Last Social Media You'll Ever Need | Yatube
+		  {% endblock %}
+		</title>
+		<link rel="stylesheet" href="style.css">
+	  </head>
+	  <body>
+		{% include "header.html" %}
+		<nav id="sidebar">
+		  {% block sidebar %}
+			<ul>
+			  <li><a href="/">Главная</a></li>
+			  <li><a href="/about/">О сайте</a></li>
+			  <li><a href="/list/">Сообщения</a></li>
+			</ul>
+		  {% endblock %}
+		</nav>
+		<div id="content">
+		  {% block content %}
+			Контент не подвезли :(
+		  {% endblock %}
+		</div>
+		{% include "footer.html" %}
+	  </body>
+	</html>
+
+Шаблоны обычно не пишут целиком в одном файле: их разделяют на части и сохраняют
+в отдельных файлах. При рендеринге шаблон страницы монтируется из этих отдельных
+частей, получает контекст — и страница отправляется пользователю.
+
+Для такой практики есть несколько веских причин.
+
+    Как правило, разные страницы проекта содержат повторяющиеся фрагменты:
+	шапка сайта, подвал, блок навигации, карточка товара в интернет-магазине
+	или анонс статьи на информационном ресурсе. Эти элементы присутствуют на всех
+	(или на большинстве) страниц. Код каждого такого элемента сохраняют в
+	отдельный файл, а при рендеринге они встраиваются в общий шаблон.
+    
+	Если, например, потребуется изменить шапку сайта — изменения вносятся в один
+	файл (его традиционно называют header.html). Иначе пришлось бы редактировать
+	десятки шаблонов, исправляя шапку в каждом из них. То же и с любым другим
+	элементом.
+    
+	Шаблон для нового типа страницы можно подготовить за считанные минуты,
+	собрав его из готовых фрагментов.
+
+Тег include
+
+Тег include включает в код шаблона содержимое другого шаблона, адрес которого
+указан в качестве аргумента.
+
+	<!DOCTYPE html>
+	<html>
+	  <head>
+		<title>
+		  {% block title %}
+			The Last Social Media You'll Ever Need | Yatube
+		  {% endblock %}
+		</title>
+		<link rel="stylesheet" href="style.css">
+	  </head>
+	  <body>
+		{% include "header.html" %} {# сюда будет включен код из header.html #}
+		<nav id="sidebar">
+		  {% block sidebar %}
+			<ul>
+			  <li><a href="/">Главная</a></li>
+			  <li><a href="/about/">О сайте</a></li>
+			  <li><a href="/list/">Сообщения</a></li>
+			</ul>
+		  {% endblock %}
+		</nav>
+		<div id="content">
+		  {% block content %}
+			Контент не подвезли :(
+		  {% endblock %}
+		</div>
+		{% include "footer.html" %} {# сюда будет включен код из footer.html #}
+	  </body>
+	</html>
+
+В той же директории, где сохранён base.html, лежат ещё два файла:
+header.html
+
+	<div id="top-of-site">
+	  {# здесь описана шапка сайта, она повторяется на всех страницах проекта #}
+	  <img src="images/logo.jpg" alt="Yatube">
+	  <div id="site-name">Yatube</div>
+	</div> 
+
+footer.html
+
+	<div id="bottom-of-site">
+	  {# здесь описан «подвал» сайта, он одинаков для всех страниц проекта #}
+	  <img src="images/logo.jpg" alt="Yatube"> Yatube
+	  <div id="copyright">© Все права принадлежат всем</div>
+	</div> 
+
+В результате обработки шаблона base.html на место тегов {% include "header.html" %}
+и {% include "footer.html" %} будет вставлен код из соответствующих файлов.
+
+В тег include можно передать дополнительные параметры. Например, для вывода
+контактов можно создать шаблон card.html:
+
+	div class="card">
+	  {{ name }} <br>
+	  <a href="mailto:{{ email }}">Отправить сообщение</a>
+	</div>
+
+При включении шаблона card.html в шаблон base.html в теге include передаём в код
+нужные данные:
+
+	<!DOCTYPE html>
+	<html>
+	  <head>
+		<title>
+		  {% block title %}
+			The Last Social Media You'll Ever Need | Yatube
+		  {% endblock %}
+		</title>
+		<link rel="stylesheet" href="style.css">
+	  </head>
+	  <body>
+		{% include "header.html" %}
+		<nav id="sidebar">
+		  {% block sidebar %}
+			<ul>
+			  <li><a href="/">Главная</a></li>
+			  <li><a href="/about/">О сайте</a></li>
+			  <li><a href="/list/">Сообщения</a></li>
+			</ul>
+		  {% endblock %}
+		</nav>
+		<div id="content">
+		  {% include "card.html" with name="Иван Васильевич" email="iv@example.com" %}
+		  {# а можно сделать иначе: передать значения переменных #}
+		  {% include "card.html" with name=user.name email=user.mail %}
+		</div>
+		{% include "footer.html" %}
+	  </body>
+	</html><!DOCTYPE html>
+	<html>
+	  <head>
+		<title>
+		  {% block title %}
+			The Last Social Media You'll Ever Need | Yatube
+		  {% endblock %}
+		</title>
+		<link rel="stylesheet" href="style.css">
+	  </head>
+	  <body>
+		{% include "header.html" %}
+		<nav id="sidebar">
+		  {% block sidebar %}
+			<ul>
+			  <li><a href="/">Главная</a></li>
+			  <li><a href="/about/">О сайте</a></li>
+			  <li><a href="/list/">Сообщения</a></li>
+			</ul>
+		  {% endblock %}
+		</nav>
+		<div id="content">
+		  {% block content %}Контент не подвезли :({% endblock %}
+		</div>
+		{% include "footer.html" %}
+	  </body>
+	</html>
+
+Все шаблоны, подключенные через include, могут напрямую работать со словарём context.
+
+Тег block
+
+Содержимое для любого тега block может быть передано из другого шаблона.
+Если в тег block ничего не передано — на страницу будет выведено значение,
+которое предустановлено в шаблоне (это значение может быть и пустым).
+
+После названия тега block указывается его идентификатор:
+{% block title %}, {% block sidebar %} или {% block content %}.
+Идентификатор разработчик придумывает сам.
+
+В шаблоне base.html описано несколько блоков:
+
+    блок title в HTML-теге <title>: здесь указано название страницы,
+		отображаемое в заголовке окна браузера;
+    блок sidebar — навигация по сайту, боковое меню;
+    блок content — основной блок страницы, её содержание.
+		Если этот блок не переопределён, на страницу будет выведено сообщение
+		«Контент не подвезли :(».
+
+	<!DOCTYPE html>
+	<html>
+	  <head>
+		<title>
+		  {% block title %}
+			The Last Social Media You'll Ever Need | Yatube
+		  {% endblock %}
+		</title>
+		<link rel="stylesheet" href="style.css">
+	  </head>
+	  <body>
+		{% include "header.html" %}
+		<nav id="sidebar">
+		  {% block sidebar %}
+			<ul>
+			  <li><a href="/">Главная</a></li>
+			  <li><a href="/about/">О сайте</a></li>
+			  <li><a href="/list/">Сообщения</a></li>
+			</ul>
+		  {% endblock %}
+		</nav>
+		<div id="content">
+		  {% block content %}Контент не подвезли :({% endblock %}
+		</div>
+		{% include "footer.html" %}
+	  </body>
+	</html>
+
+Для переопределения содержимого в теге block применяют тег extends.
+
+Тег extends
+
+Одиночный тег extends сообщает системе, в каком шаблоне нужно переопределить
+блоки, описанные следом за этим тегом.
+
+Предположим, срабатывает view-функция messages():
+
+	from django.shortcuts import render
+
+	def messages(request):
+		# какой-то код
+		title = 'Ваши сообщения'
+		messages = [
+			'Вы почти разобрались с шаблонами!', 
+			'Сломалось? Бывает, не беда.',
+			'У вас получится!', 
+
+		]
+		# Сгенерированные во view-функции данные сохраняем в словарь
+		context = {'title': title, 'messages': messages}
+
+		# вызов функции render():
+		# первый параметр — это всегда request, объект запроса
+		# второй параметр - имя шаблона, в который будут "обёрнуты" данные
+		# третий параметр - словарь с переменными, которые передаются  в шаблон
+		return render(request, 'messages.html', context)
+
+Из view-функции вызван шаблон messages.html. В самом начале этого шаблона стоит
+тег {% extends "base.html" %}, а в коде определены блоки title, sidebar и content:
+блоки с такими же названиями есть и в шаблоне base.html.
+
+	{# шаблон messages.html #}
+
+	{% extends "base.html" %}
+
+	{# Задали заголовок в блоке title, текст заголовка взяли из словаря context #}
+	{% block title %}
+	  {{ title }}
+	{% endblock %}
+
+	{% block sidebar %}
+	  <ul>
+		<li><a href="/">Главная</a></li>
+		<li><a href="/about/">О сайте</a></li>
+		{# Ссылку на страницу "Сообщения" сделали простым текстом и покрасили в красный #}
+		<li><span style="color: red;">Сообщения</span></li>
+	  </ul>
+	{% endblock %}
+
+	{% block content %}
+	  {# Вывели все сообщения из списка context, как в Python #}
+	  {% for msg in messages %}
+		<p>{{ msg }}</p>
+	  {% endfor %}
+	{% endblock %}
+
+Когда Django вызывает какой-то шаблон и видит в нём тег extends "any_template.html",
+то
+
+    будет вызван шаблон any_template.html; при необходимости в нём будут выполнены
+		все инструкции из тегов {% include ... %};
+    в шаблоне any_template.html будут заменены все одноимённые блоки, которые в
+		вызванном шаблоне перечислены по именам после тега extends.
+
+В примере с view-функцией message() и шаблонами messages.html и base.html
+пользователю будет возвращена HTML-страница с кодом из шаблона base.html и с
+контентом, сгенерированном в файле messages.html:
+
+    в HTML-тег <title> будет вставлен текст «Ваши сообщения»,
+    в сайдбаре будет подсвечен пункт меню «Сообщения»,
+    в блок content будет построчно выведен список сообщений:
+        Вы почти разобрались с шаблонами!
+        Сломалось? Бывает, не беда.
+        У вас получится!
+
+===============================================================================
+Тренажер - проект
+
+Задача:
+
+Доделайте страницу выбора тарифных планов.
+
+Три тарифных плана описаны в файле practice/views.py в функции index().
+
+Фронтендер подготовил для вас шаблон practice/templates/index.html.
+В нем есть одна колонка с примером тарифа.
+
+Вам надо сделать страницу сравнения тарифных планов для пользователя в 3 колонки
+и настроить проект так, чтобы эта страница была видна по адресу
+http://127.0.0.1:8000/plans/.
+
+Подсказка:
+
+В файле urls.py приложения practice создайте правило:
+«при обращении к странице plans/ вызвать view-функцию index()»
+
+Импортируйте правила urls.py приложения practice в головной urls.py проекта.
+
+Из view-функции index() верните функцию render(), в ней вызовите шаблон index.html
+и передайте в него список plans
+
+В шаблоне index.html пройдите циклом {% for %} по списку plans: при каждой итерации
+цикла создавайте колонку, а на месте статичного текста выводите соответствующие
+значения переменных из списка plans.
+
+Не забудьте вывести переменную с названием тарифного плана в код кнопки-ссылки
+<a href="mailto:... subject=Услуга ***">
+
+
+Проект в папке progect_14
+===============================================================================

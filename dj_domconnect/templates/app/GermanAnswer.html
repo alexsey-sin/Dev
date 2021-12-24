@@ -1,0 +1,178 @@
+{% extends "app/layouts/base.html" %}
+
+{% block title %} Группы фраз {% endblock %} 
+
+{% block stylesheets %}
+<style>
+table {
+    counter-reset: count;
+}
+table td:first-child:before {
+    content: counter(count);
+    counter-increment: count;
+}
+
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+{% if error_mess %}
+<div class="alert alert-danger" role="alert">
+    {{ error_mess }}
+</div>
+{% endif %}
+
+<div class="pcoded-content">
+    <div class="pcoded-inner-content">
+        <div class="main-body">
+            <div class="page-wrapper">
+                <!-- [ Main Content ] start -->
+                <div class="row">
+
+                    <!-- [ Hover-table ] start -->
+                    <div class="col-xl-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Ответы группы:</h5>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <h3>{{ group_name }}</h3>
+                                <span class="d-block m-t-5">Всего в группе: {{ cnt_answers }} ответа.</span>
+                            </div>
+                            <div class="card-block table-border-style">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Файл ответа</th>
+                                                <th>Автор</th>
+                                                <th>Дата добавления/исправления</th>
+                                                <th>Действия</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for row in page %}
+                                            <tr>
+                                                <td></td>
+                                                <td><div style="width: 300px; overflow: hidden; text-overflow: ellipsis">{{ row.filename }}</div></td>
+                                                <td>{{ row.author }}</td>
+                                                <td>{{ row.pub_date }}</td>
+                                                <td>
+                                                    <img src="/static/assets/images/icons8-speaker-medium-volume-30.png" alt="Редактировать" title="Редактировать" data-toggle="modal" data-target="#openPlayAnswer" onclick="playAnswer('{{ row.id }}','{{ row.filename }}','{{ row.file_url}}');"></img>
+                                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                                    <img src="/static/assets/images/icons8-delete-30.png" alt="Удалить" title="Удалить" data-toggle="modal" data-target="#openModaDeleteAnswer" onclick="deleteRowAnswer('{{ row.id }}','{{ row.filename }}');"></img>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                    {% include "app/paginator.html" with items=page paginator=paginator %}
+                                </div>
+                            </div>
+                        </div>
+                        <div width="200px" align="center">
+                            <button type="button" class="btn btn-secondary" title="Добавить файл" data-toggle="modal" data-target="#openModalNewAnswer" onclick="newAnswer('{{ id_group }}','{{ group_name }}');">Добавить ответ</button>
+                        </div>
+                   </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="openModaDeleteAnswer" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="openModaDeleteAnswerTitle">Удаление файла ответа</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <h4 id="deleteAnswer"></h4>
+        </div>
+        <div class="modal-footer">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" id="id_delete" name="delete">
+                <button type="submit" class="btn btn-danger">Удалить</button>
+            </form>
+        </div>
+      </div>
+    </div>
+</div>
+<div id="openPlayAnswer" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+				<h5 class="modal-title" id="openModalPlayAnswerTitle">Воспроизведение файла</h5>
+				<h3 class="modal-title" id="nameFileAnswer"></h3>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+            <div>
+                <audio id="id_play" controls="controls">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+                    
+            <div class="bd-example">
+			</div>
+		</div>
+	</div>
+</div>
+<div id="openModalNewAnswer" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="openModalNewAnswerTitle">Добавление ответа к группе фразы:</h5>
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          <h3 id="openModalNewPhraseNameAnswer"></h3>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div align="center">
+                    <p>(Не боле 3-х за раз.)</p>
+                </div>
+                <div class="modal-body">
+                    <input type="file" id="newAnswerFile" name="newAnswerFile" multiple accept="audio/*,audio/wav">
+                </div>
+                <div class="modal-footer">
+                    <input type="hidden" id="newAnswerGroupId" name="group_answer_id" value="">
+                    <button type="submit" class="btn btn-warning">Добавить</button>
+                </div>
+            </form>
+      </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block javascripts %}
+<script language="javascript">
+    if (window.history.replaceState){  // предотвращает повторную отправку формы при обновлении страницы если перед этим была отправка
+        window.history.replaceState(null, null, window.location.href);
+    }
+    function playAnswer(i,n,u){
+        $('#nameFileAnswer').text(n);
+        $('#id_play').attr("src", u);
+        // alert(f.file.name);
+        // // $('#id_sex').val(s);
+        // // $('#id_short_names').val(d);
+        // $('#id_edit').val(i);
+        // $('#openModalPhraseButton').text("Изменить");
+    }
+    function deleteRowAnswer(i,t){
+        $('#id_delete').val(i);
+        $('#deleteAnswer').text(t);
+    }
+    function newAnswer(i,t){
+        $('#newAnswerGroupId').val(i);
+        $('#openModalNewPhraseNameAnswer').text(t);
+    }
+</script>
+{% endblock javascripts %}

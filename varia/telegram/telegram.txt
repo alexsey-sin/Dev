@@ -1,0 +1,52 @@
+Client_API_bot
+api_id: 4413039
+api_hash: 507813929cf20863405f3db451b88784
+============================================================================
+Bot_API_bot
+Сделанный! Поздравляю с приобретением нового бота. Вы найдете это на t.me/my_yandexbot.
+Теперь вы можете добавить описание, раздел и изображение профиля для вашего бота, см.
+/help для получения списка команд. Кстати, когда вы закончите создавать своего крутого бота,
+обратитесь в нашу службу поддержки ботов, если вы хотите получить для него лучшее
+имя пользователя. Просто убедитесь, что бот полностью работает, прежде чем делать это.
+
+my_yandexbot
+Use this token to access the HTTP API:
+1790736632:AAGq16DCLzFepGxxq1CId7Cswugp4OE_ZNc
+Держите свой токен в безопасности и храните его, он может быть использован кем угодно
+для управления вашим ботом.
+
+Для описания Bot API , see this page: https://core.telegram.org/bots/api
+pip install python-telegram-bot  # Устанавливаем библиотеку
+
+установка dotenv
+pip install python-dotenv
+
+Теперь можно отправить сообщение от имени бота в свой аккаунт. Самый простой способ — отправить GET-запрос из браузера, обратившись к методу API sendMessage и передав необходимые параметры:
+
+    chat_id — это ID того чата, в который бот должен отправить сообщение;
+    text — текст сообщения.
+https://api.telegram.org/bot<ваш-токен>/sendMessage?chat_id=<id_чата_получателя>&text=<текст_сообщения>
+
+Мой аккаунт
+Id: 1740645090
+First: Алексей
+Lang: ru
+
+Для отправки сообщений
+https://api.telegram.org/bot1790736632:AAGq16DCLzFepGxxq1CId7Cswugp4OE_ZNc/sendMessage?chat_id=1740645090&text=Привет!
+
+Для просмотра присланных соощений боту
+https://api.telegram.org/bot1790736632:AAGq16DCLzFepGxxq1CId7Cswugp4OE_ZNc/getUpdates 
+
+====================================================================================
+Итоговый проект
+Токен можно получить по адресу: https://oauth.yandex.ru/authorize?response_type=token&client_id=1d0b9dd4d652455a9eb710d450ff456a
+
+AQAAAAAFpoFtAAYckUtPHzv8g0z7tmnhYdTp7j4
+
+
+API домашки доступно по адресу:
+https://praktikum.yandex.ru/api/user_api/homework_statuses/
+
+
+https://praktikum.yandex.ru/api/user_api/homework_statuses/?Authorization=AQAAAAAFpoFtAAYckUtPHzv8g0z7tmnhYdTp7j4&from_date=0

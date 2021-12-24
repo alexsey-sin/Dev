@@ -1,0 +1,424 @@
+Unittest в Django. Models
+
+Тестовая база данных
+
+Всё, что происходит в тестах — остаётся в тестах.
+
+При тестировании проекта (и, в частности, моделей) бывает необходимо
+записывать и считывать данные из базы.
+
+Чтобы не замусоривать базу данных тестовыми записями, при тестировании
+создаётся виртуальная база: её структура полностью повторяет структуру
+реальной базы Django-проекта, однако никаких данных в этой базе нет: ни постов,
+ни пользователей — ничего.
+
+Все данные в этой временной базе нужно создавать в процессе тестирования.
+Запросы при тестировании делаются именно к ней, основная база не затрагивается.
+
+По окончании тестирования виртуальная база автоматически удаляется.
+
+Проект Todo
+
+Для тестирования моделей мы подготовили новый Django-проект Todo: это небольшая
+программа для записи и просмотра запланированных дел.
+
+    На главной странице проекта есть форма для сохранения задания в базе данных;
+    
+	на страницу /task/ выводится полный список запланированных дел
+	(страница доступна только авторизованному пользователю);
+    
+	на страницах с адресом вида /task/<slug:slug>/ показывается полное
+	описание определённой задачи (страница доступна только авторизованному
+	пользователю);
+    
+	а на статичной странице /about/ выводится описание проекта.
+
+А больше ничего нет, даже стилей.
+
+Склонируйте проект Todo из репозитория(https://github.com/Capwell/todo)
+и запустите его на своём компьютере.
+
+Приложение static_pages
+
+В этом приложении нет моделей, есть одна небольшая view-функция,
+которая отвечает за отображение страницы /about/
+
+Приложение deals
+
+Это приложение управляет добавлением и отображением запланированных дел.
+
+View-классы приложения:
+
+    Home() отвечает за отображение главной страницы с формой для добавления
+	задач: страница /
+    
+	TaskList() отвечает за отображение списка запланированных дел:
+	страница /task/
+    
+	TaskDetail() отвечает за вывод подробной информации о задаче:
+	страница /task/<slug:slug>/
+    
+	TaskAddSuccess() выводит сообщение об успешном добавлении задачи через форму:
+	страница /added/
+
+Модели приложения deals:
+
+	# deals/models.py
+	from django.db import models
+	# pip3 install pytils не забыть установить!
+	from pytils.translit import slugify
+
+
+	class Task(models.Model):
+		title = models.CharField(
+			'Заголовок',
+			max_length=100,
+			help_text='Дайте короткое название задаче',
+		)
+		text = models.TextField(
+			'Текст',
+			help_text='Опишите суть задачи',
+		)
+		slug = models.SlugField(
+			'Адрес для страницы с задачей',
+			max_length=100,
+			unique=True,
+			blank=True,
+			help_text=('Укажите адрес для страницы задачи. Используйте только '
+					   'латиницу, цифры, дефисы и знаки подчёркивания'),
+		)
+		image = models.ImageField(
+			'Картинка',
+			upload_to='tasks/',
+			blank=True,
+			null=True,
+			help_text='Загрузите картинку',
+		)
+
+		def __str__(self):
+			return self.title
+
+		# Расширение встроенного метода save(): если поле slug не заполнено -
+		# транслитерировать в латиницу содержимое поля title, обрезать 
+		# до ста знаков 
+		# и сохранить в поле slug
+		def save(self, *args, **kwargs):
+			if not self.slug:
+				self.slug = slugify(self.title)[:100]
+			super().save(*args, **kwargs)
+
+Поля CharField, TextField и SlugField вам знакомы. Поле ImageField нужно
+для хранения картинки.
+(https://docs.djangoproject.com/en/3.1/ref/models/fields/#imagefield)
+
+Если при создании экземпляра класса Task поле slug не было заполнено
+— его значение будет сгенерировано из содержимого поля title.
+За это отвечает доработанный метод save().
+(https://docs.djangoproject.com/en/3.1/topics/db/models/#overriding-predefined-model-methods)
+
+Хозяйке на заметку: стандартный метод slugify из модуля django.utils.text
+не умеет работать с кириллицей. Нужно установить в виртуальное окружение
+пакет pytils (pip3 install pytils) и импортировать slugify именно из него,
+как это сделано в листинге deals/models.py.
+
+Тесты модели
+
+Тесты моделей приложения удобно хранить в одноимённом файле:
+
+	└── deals
+		├── __init__.py
+		├── tests
+		│   ├── __init__.py  
+		│   ├── test_forms.py  
+		│   ├── test_models.py  # Тесты моделей        
+		│   ├── test_urls.py  
+		│   └── test_views.py   
+		├── admin.py
+		├── forms.py
+		├── models.py
+		└── views.py
+
+Что не нужно тестировать
+
+    Работу Python: он сотни раз протестирован и работает.
+    Функциональность, предоставляемую Django: фреймворк уже проверен разработчиками.
+    Подключаемые библиотеки и приложения.
+
+Не нужно проверять, что данные поля title сохранены в базу данных как CharField
+или slug — как SlugField: это часть реализации Django. Если для полей CharField
+или SlugField в модели указана максимальная длина поля — не стоит тестировать
+результат: вы потратите время на проверку того, что уже отлажено при разработке
+Django.
+
+Что тестировать можно, но не обязательно
+
+Для моделей пользовательских форм удобно указать человекочитаемое имя:
+проект будет выглядеть неопрятно, если на странице с формой возле поля ввода
+будет стоять лейбл title или text.
+
+Будет правильным проверить, что вы не забыли указать читаемое название для всех
+полей на основании которых генерируются формы.
+
+Указать человекочитаемое имя для поля можно так:
+
+	class Task(models.Model):
+		title = models.CharField(
+			'Заголовок',  # Человекочитаемое имя (verbose) для поля
+			max_length=100,
+			help_text='Дайте короткое название задаче',
+		)
+		... 
+
+или так:
+
+	class Task(models.Model):
+		title = models.CharField(
+		verbose_name='Заголовок',  # Человекочитаемое имя (verbose) для поля
+		max_length=100,
+		help_text='Дайте короткое название задаче',
+		)
+	   ... 
+
+Это имя будет отображаться и в админке Django, и во всех формах, связанных
+с моделью Task
+
+Документация по verbose_name доступна на официальном сайте Django.
+(https://docs.djangoproject.com/en/3.1/topics/db/models/#verbose-field-names)
+
+Аналогичная ситуация с help_text: если это поле важно — стоит проверить,
+что про него не забыли в коде.
+
+Полезно проверить, что __str__ возвращает ожидаемый результат. Это мелочь,
+но она может быть удобна в дальнейшей разработке и поднимет code coverage.
+Содержимое поля __str__ отображается, например, при выводе объектов в админ-зоне
+или при запросе объекта из queryset.
+
+Для тестирования моделей веб-клиент не нужен: достаточно создать запись
+в тестовой базе данных и проверять её через ORM.
+
+	# deals/tests/tests_models.py
+	from django.test import TestCase
+	from deals.models import Task
+
+
+	class TaskModelTest(TestCase):
+		@classmethod
+		def setUpClass(cls):
+			super().setUpClass()
+			# Создаём тестовую запись в БД
+			# и сохраняем ее в качестве переменной класса                
+			cls.task = Task.objects.create(
+				title='Заголовок тестовой задачи',
+				text='Тестовый текст',
+				slug='test-task'
+			)
+
+		def test_title_label(self):
+			"""verbose_name поля title совпадает с ожидаемым."""
+			task = TaskModelTest.task
+			# Получаем из свойста класса Task значение verbose_name для title
+			verbose = task._meta.get_field('title').verbose_name
+			self.assertEqual(verbose, 'Заголовок')
+
+		def test_title_help_text(self):
+			"""help_text поля title совпадает с ожидаемым."""
+			task = TaskModelTest.task
+			# Получаем из свойста класса Task значение help_text для title
+			help_text = task._meta.get_field('title').help_text
+			self.assertEqual(help_text, 'Дайте короткое название задаче')
+
+		# Аналогичным образом можно протестировать мета полей text, slug, image  
+
+		def test_object_name_is_title_field(self):
+			"""__str__  task - это строчка с содержимым task.title."""
+			task = TaskModelTest.task
+			expected_object_name = task.title
+			self.assertEqual(expected_object_name, str(task))
+
+Получить поле verbose_name напрямую, через task.title.verbose_name,
+не получится. Ведь поле task.title содержит только строку
+"Заголовок тестовой задачи".
+
+Для доступа до verbose_name есть другой синтаксис
+
+	task._meta.get_field('title').verbose_name
+
+Таким же образом можно получить другие параметры, задаваемые при создании поля.
+
+Если в тестах Django вы применяете методы класса setUpClass() и tearDownClass()
+— обязательно вызывайте в них super(): super().setUpClass()
+и super().tearDownClass().
+
+Без вызова super() все тесты сработают нормально, но вы получите ошибку: 
+
+AttributeError: type object '<имя_класса>' has no attribute 'cls_atomics'
+
+Эта ошибка возникает именно в Django: в Unittest для Python такой проблемы нет.
+Обратите внимание, что к объектам, созданным в методах класса
+(таких как setUpClass()), синтаксически правильно обращаться через имя класса,
+а не через self.
+(https://docs.python.org/3/library/functions.html#classmethod)
+
+    Правильно: StaticURLTests.guest_client.get(...)
+    
+	Неправильно: self.guest_client.get(...) (так тоже будет работать,
+		но возможны неприятные сюрпризы).
+
+Проверять field_label лучше через метод assertEqual(field_label, 'Заголовок'),
+а не через  assertTrue(field_label == 'Заголовок').
+Разница в том, что в случае провала теста при тестировании через assertTrue()
+в отчёте будет просто сказано, что тест провален, а при assertEqual()
+в консоли будет указано и актуальное значение field_label.
+Это облегчит задачу по отладке кода.
+
+Циклом по тестам: стандартный метод subTest()
+
+Тестирование каждого поля модели может превратиться в ад: в большом проекте
+для этого придётся писать очень много похожих тестов.
+
+Писать долго, читать неудобно, принцип DRY (Don’t repeat yourself, «Не повторяйся!»)
+нарушен — всё плохо.
+
+В подобных ситуациях принято использовать метод subTest. Вместо написания
+большого количества однотипных тестов можно собрать все проверки и ожидаемые
+результаты в словарь — и пройти по ним циклом. Очень удобно. Много интересного
+о subTest можно узнать в официальной документации.
+(https://docs.python.org/3/library/unittest.html?highlight=subtest#distinguishing-test-iterations-using-subtests)
+
+Проверка verbose_name и help_text для нескольких полей будет выглядеть так:
+
+	# deals/tests/tests_models.py
+	from django.test import TestCase
+	from deals.models import Task
+
+	class TaskModelTest(TestCase):
+		@classmethod
+		def setUpClass(cls):
+			super().setUpClass()
+			# Создаём тестовую запись в БД
+			# и сохраняем созданную запись в качестве переменной класса
+			cls.task = Task.objects.create(
+				title='Заголовок тестовой задачи',
+				text='Тестовый текст',
+				slug='test-task'
+			)
+
+		def test_verbose_name(self):
+			"""verbose_name в полях совпадает с ожидаемым."""
+			task = TaskModelTest.task
+			field_verboses = {
+				'title': 'Заголовок',
+				'text': 'Текст',
+				'slug': 'Адрес для страницы с задачей',
+				'image': 'Картинка',
+			}
+			for field, expected_value in field_verboses.items():
+				with self.subTest(field=field):
+					self.assertEqual(
+						task._meta.get_field(field).verbose_name, expected_value)
+
+		def test_help_text(self):
+			"""help_text в полях совпадает с ожидаемым."""
+			task = TaskModelTest.task
+			field_help_texts = {
+				'title': 'Дайте короткое название задаче',
+				'text': 'Опишите суть задачи',
+				'slug': ('Укажите адрес для страницы задачи. Используйте только '
+						 'латиницу, цифры, дефисы и знаки подчёркивания'),
+				'image': 'Загрузите картинку',
+			}
+			for field, expected_value in field_help_texts.items():
+				with self.subTest(field=field):
+					self.assertEqual(
+						task._meta.get_field(field).help_text, expected_value)
+
+Конструкция for field, expected_value in field_help_texts.items() «распаковывает»
+словарь field_help_texts с помощью метода items() — создаёт из него два кортежа,
+доступных для итерации с помощью цикла:
+
+    кортеж field содержит ключи исходного словаря field_help_texts;
+    кортеж expected_value содержит значения исходного словаря field_help_texts.
+
+Значения из кортежа field передаются как параметр в self.subTest(field=field);
+subTest() устроен так, что при падении вложенного теста в отчёт будет выведен
+этот параметр, то есть имя поля, на котором упал тест.
+Если не передать этот параметр — в отчёте будет лишь информация
+«какой-то subTest() упал», и искать ошибку будет неудобно.
+Для лучшего понимания обязательно посмотрите документацию по subTest()
+(https://docs.python.org/3/library/unittest.html#distinguishing-test-iterations-using-subtests)
+
+Если вам платят за каждую строчку кода, как индийским разработчикам из анекдотов
+— subTest лучше не использовать, разумеется.
+
+Что в моделях нужно тестировать обязательно
+
+В обязательном порядке тестами должен быть покрыт весь код, который вы написали сами:
+
+    валидации полей моделей,
+    методы по работе с моделями,
+
+и всё, что может сломать логику работы программы.
+
+В приложении deals обязательно нужно проверить, что при автоматическом создании
+содержимого поля slug из title текст будет правильно преобразован,
+а его длина будет не больше ста символов.
+
+При тестировании лучше использовать данные, похожие на настоящие.
+Например, для тестирования метода save() лучше создать объект,
+в котором поле title будет заполнено кириллицей.
+
+	# deals/tests/tests_models.py
+	from django.test import TestCase
+	from deals.models import Task
+
+
+	class TaskModelTest(TestCase):
+		@classmethod
+		def setUpClass(cls):
+			super().setUpClass()
+			# Создаём тестовую запись в БД
+					# и сохраняем ее в качестве переменной класса                
+			# Не указываем значение slug, ждем, что при создании
+			# оно создастся автоматически из title.
+			# А title сделаем таким, чтобы после транслитерации он стал более 
+			# 100 символов 
+			# (буква "ж" транслитерируется в два символа: "zh")
+			# Создаём тестовую запись в БД
+			# 
+			cls.task = Task.objects.create(
+				title='ж'*100,
+				text='Тестовый текст' 
+			)
+
+		def test_text_convert_to_slug(self):
+			"""save преобразует в slug содержимое поля title."""
+			task = TaskModelTest.task
+			slug = task.slug
+			self.assertEqual(slug, 'zh'*50)
+
+		def test_text_slug_max_length_not_exceed(self):
+			"""Длинный slug обрезается и не превышает max_length поля slug в модели."""
+			task = TaskModelTest.task
+			max_length_slug = task._meta.get_field('slug').max_length
+			length_slug = len(task.slug)
+			self.assertEqual(max_length_slug, length_slug)
+
+Очевидные бонусы
+
+Теперь любое изменение в классе Task, затрагивающее verbose_name или max_length
+у полей title или slug, обрушит тесты. Если нужно внести изменения
+— сначала надо будет исправить тесты под новые требования,
+как и положено в Test-driven Development.
+
+Задание
+
+Протестируйте модели приложения posts в Yatube.
+
+Добавьте в классы Post и Group метод __str__ (если его ещё нет):
+- для класса Post — первые пятнадцать символов поста: post.text[:15];
+- для класса Group — название группы.
+
+Протестируйте, правильно ли отображается значение поля __str__ в объектах моделей.
+
+Это задание будет проверено в конце спринта вместе с домашней работой.
+

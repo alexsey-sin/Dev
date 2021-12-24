@@ -1,0 +1,68 @@
+
+Сохранение базы
+python3 manage.py dumpdata --exclude auth.permission --exclude contenttypes  --exclude admin.LogEntry --exclude sessions --indent 2 > db.json
+
+pg_dump -U alex -Fc django --exclude-table=django_migrations > /var/www/dj_domconnect/backup/db.dump
+dropdb django
+pg_restore -C -d django /var/www/dj_domconnect/backup/db.dump
+
+
+
+pg_dump -U alex django -t > /var/www/dj_domconnect/backup/db.dump
+
+psql -U alex django < /var/www/dj_domconnect/backup/db.dump
+
+
+
+psql -U alex -t -d django -c \
+"SELECT 'DROP TABLE ' || n.nspname || '.' || c.relname || ' CASCADE;' \
+FROM pg_catalog.pg_class AS c LEFT JOIN pg_catalog.pg_namespace AS n \
+ON n.oid = c.relnamespace WHERE relkind = 'r' AND n.nspname NOT IN \
+('pg_catalog', 'pg_toast') AND pg_catalog.pg_table_is_visible(c.oid)"
+
+
+
+
+SELECT truncate_tables('alex');
+
+app_phrase 
+app_groupphrase  
+app_name   
+
+
+pg_dump -U alex django -t app_phrase > /var/www/dj_domconnect/backup/phrase.dump
+pg_dump -U alex django -t app_groupphrase > /var/www/dj_domconnect/backup/groupphrase.dump
+pg_dump -U alex django -t app_name > /var/www/dj_domconnect/backup/name.dump
+
+psql django
+
+DROP TABLE app_phrase, app_groupphrase, app_name CASCADE;
+pg_restore -a -t app_phrase /var/www/dj_domconnect/backup/name.dump
+
+
+
+DROP TABLE app_phrase, app_groupphrase, app_name, auth_group, auth_group_permissions, auth_permission, auth_user, auth_user_groups,  auth_user_user_permissions, django_admin_log, django_content_type, django_migrations, django_session CASCADE;
+
+
+
+
+DROP TABLE app_file, app_germangroupphrase, app_germanphrase, app_lizagroupphrase, app_lizaphrase, app_name, mobile_mobiledata, mobile_mobilenumber, auth_group, auth_group_permissions, auth_permission, auth_user, auth_user_groups, auth_user_user_permissions, django_admin_log, django_content_type, django_migrations, django_session CASCADE;
+
+ public | app_file                          | table    | alex
+ public | app_germangroupphrase             | table    | alex
+ public | app_germanphrase                  | table    | alex
+ public | app_lizagroupphrase               | table    | alex
+ public | app_lizaphrase                    | table    | alex
+ public | app_name                          | table    | alex
+ public | auth_group                        | table    | alex
+ public | auth_group_permissions            | table    | alex
+ public | auth_permission                   | table    | alex
+ public | auth_user                         | table    | alex
+ public | auth_user_groups                  | table    | alex
+ public | auth_user_user_permissions        | table    | alex
+ public | django_admin_log                  | table    | alex
+ public | django_content_type               | table    | alex
+ public | django_migrations                 | table    | alex
+ public | django_session                    | table    | alex
+ public | mobile_mobiledata                 | table    | alex
+ public | mobile_mobilenumber               | table    | alex

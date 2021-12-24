@@ -1,0 +1,145 @@
+Доработка базового шаблона
+
+Изменим основной шаблон: добавим в него шапку сайта с названием проекта и
+навигацией. В качестве основы мы будем использовать примеры, которые предлагает
+сайт с документацией по Bootstrap.
+(https://getbootstrap.com/docs/4.3/)
+
+В интернете есть много бесплатных тем оформления, расширяющих стандартные
+возможности Bootstrap. Будет хорошо, если вы найдёте время и оформите сайт
+по своему вкусу, а заодно немного разберётесь с HTML.
+
+Формирование контекста шаблона
+
+Если пользователь ещё не залогинился, в шапке сайта предложим ему ссылки на
+страницы входа и регистрации. А если он уже вошёл — дадим ему ссылки на страницы
+смены пароля и выхода. Для этого надо передать в шаблон переменную с информацией
+о том, авторизирован ли пользователь.
+
+Обратите внимание на переменную TEMPLATES в конфигурационном файле settings.py:
+
+	TEMPLATES = [
+	  {
+		"BACKEND": "django.template.backends.django.DjangoTemplates",
+		"DIRS": [TEMPLATES_DIR],
+		"APP_DIRS": True,
+		"OPTIONS": {
+		  "context_processors": [
+			"django.template.context_processors.debug",
+			"django.template.context_processors.request",
+			"django.contrib.auth.context_processors.auth", # вот это интересно
+			"django.contrib.messages.context_processors.messages",
+		  ]
+		},
+	  }
+	]
+
+Перед обработкой шаблона вызываются функции из списка context_processors.
+По мере исполнения эти функции могут добавлять переменные, доступные при
+обработке шаблона. Другими словами, эти функции изменяют контекст шаблона.
+
+Функция django.contrib.auth.context_processors.auth добавит в контекст шаблона
+переменную user. Она может быть либо объектом типа AnonymousUser, либо
+экземпляром модели User.
+
+Если заглянуть в файл django/contrib/auth/context_processors.py и найти там
+функцию auth, то видно, что она возвращает словарь с ключами user и perms.
+
+Добавление шапки и подвала сайта
+
+Теперь понятно, как изменять шапку сайта в зависимости от того, залогинен ли
+пользователь: надо проверить состояние переменной user.
+
+Создайте файл templates/nav.html с таким содержимым:
+
+	<nav class="navbar navbar-light" style="background-color: #e3f2fd;">
+	  <a class="navbar-brand" href="/"><span style="color:red">Ya</span>tube</a>
+	  <nav class="my-2 my-md-0 mr-md-3">
+		{% if user.is_authenticated %}
+		Пользователь: {{ user.username }}.
+		<a class="p-2 text-dark" href="{% url 'password_change' %}">Изменить пароль</a>
+		<a class="p-2 text-dark" href="{% url 'logout' %}">Выйти</a>
+		{% else %}
+		<a class="p-2 text-dark" href="{% url 'login' %}">Войти</a> |
+		<a class="p-2 text-dark" href="{% url 'signup' %}">Регистрация</a>
+		{% endif %}
+	  </nav>
+	</nav>
+
+Подключите файл templates/nav.html к базовому шаблону templates/base.html
+тегом {% include %}:
+
+	<!doctype html>
+	<html>
+	  <head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		  <title>{% block title %}The Last Social Media You'll Ever Need{% endblock %} | Yatube</title>
+		<!-- Загрузка статики -->
+		{% load static %}
+		<link rel="stylesheet" href="{% static 'bootstrap/dist/css/bootstrap.min.css' %}">
+		<script src="{% static 'jquery/dist/jquery.min.js' %}"></script>
+		<script src="{% static 'bootstrap/dist/js/bootstrap.min.js' %}"></script>
+	  </head>
+	  <body>
+		{% include 'nav.html' %}
+		<main>
+		  <div class="container">
+			{% block content %}
+			<!-- Содержимое страницы -->
+			{% endblock content %}
+		  </div>
+		</main>
+
+		</body>
+	</html>
+
+Тем же способом добавьте файл шаблона для блока, отображаемого внизу страницы,
+его называют «подвал» или "footer". Назовём его footer.html:
+
+	<footer class="pt-4 my-md-5 pt-md-5 border-top">
+	  <p class="m-0 text-dark text-center ">Социальная сеть <span style="color:red">Ya</span>tube </p>
+	</footer> 
+
+Добавьте вызов этого блока после закрывающего тега <main> базового шаблона.
+Обновите страницу в браузере. Страница должна измениться.
+
+Ссылка «Войти» пока что будет выдавать ошибку: шаблон для страницы входа ещё не
+создан. Ссылка «Регистрация» должна сработать нормально: она отправит вас
+на страницу /signup.
+
+===============================================================================
+Тренажер
+
+Задача:
+
+Напишите такой процессор контекста, чтобы в шаблон можно было бы вывести текущий
+год в переменной year:
+
+	© {{ year }}, все права защищены.
+
+После выполнения задания в тренажёре добавьте этот код в подвал вашего локального
+проекта Yatube. В результате на возвращаемой странице код футера должен выглядеть
+так:
+
+	<footer class="pt-4 my-md-5 pt-md-5 border-top">
+		<p class="m-0 text-dark text-center ">Социальная сеть <span style="color:red">Ya</span>tube © 2020, все права защищены.</p>
+	</footer>
+
+Подсказка:
+
+Проверьте, какие параметры получает функция на вход.
+
+	import datetime as dt
+
+
+	def year(request):
+		"""
+		Добавляет переменную с текущим годом.
+		"""
+		date = dt.datetime.now()
+		year = date.year
+		return {
+			'year': year
+		}
+===============================================================================

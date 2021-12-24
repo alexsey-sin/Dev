@@ -1,0 +1,268 @@
+Unittest в Django. Forms
+
+При тестировании форм общий подход остаётся прежним:
+не стоит тратить время на проверку Python, Django, подключаемых библиотек
+и приложений. Можно принять за аксиому, что поле для картинки примет только
+картинку, а поле электронной почты — только почтовый адрес: разработчики
+фреймворка уже протестировали это.
+
+Тестировать следует лишь собственноручно написанный код.
+
+Тестирование форм
+
+Все тесты для форм будет удобно сложить в отдельный файл:
+
+	└── my_app
+		├── __init__.py
+		├── tests
+		│   ├── __init__.py  
+		│   ├── test_forms.py  # Тесты форм
+		│   ├── test_models.py        
+		│   ├── test_urls.py 
+		│   └── test_views.py   
+		├── admin.py
+		├── forms.py
+		├── models.py 
+		└── views.py 
+
+В проекте Todo форма создана на основе модели:
+
+	# deals/forms.py
+	from django.core.exceptions import ValidationError
+	from django import forms
+	from pytils.translit import slugify
+
+	from .models import Task
+
+
+	class TaskCreateForm(forms.ModelForm):
+		"""Форма для создания задания."""
+		class Meta:
+			model = Task
+			# Магия Джанго: через '__all__' создаётся кортеж 
+			# из всех полей модели
+			# labels и help_texts берутся из полей модели
+			fields = '__all__'
+
+		# Валидация поля slug
+		def clean_slug(self):
+			"""Обрабатывает случай, если slug не уникален."""
+			cleaned_data = super().clean()
+			slug = cleaned_data['slug']
+			if not slug:
+				title = cleaned_data['title']
+				slug = slugify(title)[:100]
+			if Task.objects.filter(slug=slug).exists():
+				raise ValidationError(f'{slug} уже существует')
+			return slug
+
+Тест стандартного поведения формы
+
+Обычно форма работает по такому сценарию:
+
+    Пользователь заполняет форму и отправляет её; данные из формы уходят
+		POST-запросом на сервер.
+    Данные проходят валидацию на сервере.
+    Если данные валидны — выполняется какое-то полезное действие:
+		данные записываются в базу, или отправляется письмо, или пользователь,
+		отправивший данные, авторизуется на сайте.
+    В проекте Todo заполнение формы приводит к созданию новой записи в модели Task.
+    После отправки формы пользователь редиректится на страницу с сообщением
+		об успешной отправке формы.
+
+Имеет смысл протестировать, что
+
+    после успешной валидации в модели Task появится новая запись;
+    после отправки валидной формы происходит переадресация на страницу /added/
+
+Сохранение картинки можно не тестировать: это делает Django, пока что ему можно
+доверять.
+
+	# deals/tests/tests_form.py
+	import shutil
+	import tempfile
+
+	from django.conf import settings
+	from django.core.files.uploadedfile import SimpleUploadedFile
+	from django.test import Client, TestCase
+	from django.urls import reverse
+
+	from deals.forms import TaskCreateForm
+	from deals.models import Task
+
+
+	class TaskCreateFormTests(TestCase):
+		@classmethod
+		def setUpClass(cls):
+			super().setUpClass()
+			# Создаем временную папку для медиа-файлов;
+			# на момент теста медиа папка будет переопределена
+			settings.MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
+
+			# Создаем запись в базе данных для проверки сушествующего slug
+			Task.objects.create(
+				title='Тестовый заголовок',
+				text='Тестовый текст',
+				slug='first'
+			)
+			# Создаем форму, если нужна проверка атрибутов
+			cls.form = TaskCreateForm()
+
+		@classmethod
+		def tearDownClass(cls):
+			# Модуль shutil - библиотека Python с прекрасными инструментами
+			# для управления файлами и директориями:
+			# создание, удаление, копирование, перемещение, изменение папок|файлов
+			# Метод shutil.rmtree удаляет директорию и всё её содержимое
+			shutil.rmtree(settings.MEDIA_ROOT, ignore_errors=True)
+			super().tearDownClass()
+
+		def setUp(self):
+			# Создаем неавторизованный клиент
+			self.guest_client = Client()
+
+		def test_create_task(self):
+			"""Валидная форма создает запись в Task."""
+			# Подсчитаем количество записей в Task
+			tasks_count = Task.objects.count()
+			# Для тестирования загрузки изображений
+			# берём байт-последовательность картинки,
+			# состоящей из двух пикселей: белого и чёрного
+			small_gif = (
+				b'\x47\x49\x46\x38\x39\x61\x02\x00'
+				b'\x01\x00\x80\x00\x00\x00\x00\x00'
+				b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
+				b'\x00\x00\x00\x2C\x00\x00\x00\x00'
+				b'\x02\x00\x01\x00\x00\x02\x02\x0C'
+				b'\x0A\x00\x3B'
+			)
+			uploaded = SimpleUploadedFile(
+				name='small.gif',
+				content=small_gif,
+				content_type='image/gif'
+			)
+			form_data = {
+				'title': 'Тестовый заголовок',
+				'text': 'Тестовый текст',
+				'image': uploaded,
+			}
+			# Отправляем POST-запрос
+			response = self.guest_client.post(
+				reverse('deals:home'),
+				data=form_data,
+				follow=True
+			)
+			# Проверяем, сработал ли редирект
+			self.assertRedirects(response, reverse('deals:task_added'))
+			# Проверяем, увеличилось ли число постов
+			self.assertEqual(Task.objects.count(), tasks_count+1)
+			# Проверяем, что создалась запись с нашим слагом
+			self.assertTrue(
+				Task.objects.filter(
+					slug='testovyij-zagolovok',
+					text='Тестовый текст',
+					image='tasks/small.gif'
+					).exists()
+			)
+
+При подготовке данных для тестирования не стоит применять картинки,
+документы или какие-то иные файлы с вашего компьютера. Все данные для тестов
+должны быть в фикстурах.
+
+Самый простой подход — использовать байт-строки
+(неизменяемые последовательности отдельных байтов)
+(https://docs.python.org/3/reference/lexical_analysis.html#string-and-bytes-literals)
+и эмулировать файл картинки с помощью встроенной в Django библиотеки
+SimpleUploadedFile,
+(https://docs.djangoproject.com/en/3.0/_modules/django/core/files/uploadedfile/)
+как это и сделано в листинге.
+
+Удаление тестовых картинок
+
+При тестировании загрузки картинок модуль SimpleUploadFile не эмулирует сохранение
+файлов, а на самом деле сохраняет их в директорию media/tasks. В результате после
+каждого теста в этой директории будет добавляться по картинке. Лучше прибраться
+за собой и не оставлять никакого мусора после тестов.
+
+При запуске тестов можно создавать временную директорию для сохранения файлов.
+(https://docs.python.org/3.7/library/tempfile.html#tempfile.TemporaryDirectory)
+Эта операция описана в методе setUpClass.
+
+Метод tearDownClass выполняется по окончании всех тестов класса, и в нём через
+метод shutil.rmtree() временная папка удаляется — вместе с загруженными в неё
+файлами. Теперь всё чистенько, как будто ничего и не было.
+
+Тест дополнительных сценариев формы
+
+Запись в поле slug должна быть уникальной, однако при заполнении поля
+(ручном или автоматическом) может быть создано неуникальное значение.
+
+В такой ситуации запись в базе данных не должна создаваться, а сайт не должен упасть. 
+
+	# deals/tests/tests_form.py
+	from django.core.files.uploadedfile import SimpleUploadedFile
+	from django.test import Client, TestCase
+	from django.urls import reverse
+
+	from deals.forms import TaskCreateForm
+	from deals.models import Task
+
+
+	class TaskCreateFormTests(TestCase):
+		@classmethod
+		def setUpClass(cls):
+			super().setUpClass()
+			# Создаем запись в базе данных
+			Task.objects.create(
+				title='Тестовый заголовок',
+				text='Тестовый текст',
+				slug='first'
+			)
+
+		def setUp(self):
+			# Создаем неавторизованный клиент
+			self.guest_client = Client()
+
+		def test_cant_create_existing_slug(self):
+			tasks_count = Task.objects.count() # Подсчитаем количество записей в Task
+			form_data = {
+				'title': 'Заголовок из формы',
+				'text': 'Текст из формы',
+				'slug': 'first', # отправим в форму slug, который уже есть в БД
+			}
+			response = self.guest_client.post(
+				reverse('deals:home'),
+				data=form_data,
+				follow=True
+			)
+			# Убедимся, что запись в базе данных не создалась: 
+			# сравним количество записей в Task до и после отправки формы
+			self.assertEqual(Task.objects.count(), tasks_count)
+			# Проверим, что форма вернула ошибку с ожидаемым текстом:
+			# из объекта responce берём словарь 'form', 
+			# указываем ожидаемую ошибку для поля 'slug' этого словаря
+			self.assertFormError(
+				response, 'form', 'slug', 'first уже существует'
+			)
+			# Проверим, что ничего не упало и страница отдаёт код 200
+			self.assertEqual(response.status_code, 200)
+
+В тесте появился незнакомый метод assertFormError(). Его назначение — проверить,
+возвращают ли поля формы ожидаемые ошибки.
+
+В аргументах метода, кроме объекта response, указывается
+
+    имя формы (как оно указано в словаре context),
+    имя поля, ошибку которого нужно протестировать,
+    ожидаемый текст ошибки.
+
+Официальное описание метода assertFormError() можно посмотреть в документации.
+(https://docs.djangoproject.com/en/3.1/topics/testing/tools/#django.test.SimpleTestCase.assertFormError)
+
+Задание
+
+В проекте Yatube напишите тест для проверки формы создания нового поста
+(страница /new/): убедитесь, что при отправке формы создаётся новая запись
+в базе данных.
+
+Это задание будет проверено в конце спринта вместе с домашней работой.

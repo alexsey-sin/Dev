@@ -1,0 +1,298 @@
+Доработка шаблона формы
+
+В этом уроке мы продолжим работу с формой регистрации.
+Шаблон users/templates/signup.html сейчас выглядит так:
+
+	{% extends "base.html" %}
+	{% block title %}Зарегистрироваться{% endblock %}
+	{% block content %}
+
+	<form method="post" action="{% url 'signup' %}">
+	  {% csrf_token %}
+	  {{ form.as_p }}
+	  <input type="submit" value="Зарегистрироваться">
+	</form>
+	{% endblock %} 
+
+Переменная form передаётся в шаблон, на её основе генерируется HTML-код формы.
+Метод as_p() выводит код формы, обрамляя каждую строку формы в HTML-тег <p>.
+Аналогичные методы as_ul() и as_table() выведут форму, обернув её в HTML-код
+маркированного списка <ul> или таблицы <table> соответственно. Чуть ниже мы
+покажем примеры.
+
+Что такое {% csrf_token %} ?
+
+CSRF (от англ. cross-site request forgery — межсайтовая подделка запроса)
+— вид атаки на сайт или на аккаунт пользователя на сайте, где пользователь
+авторизован. Логика подобной атаки довольно проста:
+
+    предположим, пользователь залогинен на сайте своего банка
+    пользователь заходит на некую стороннюю веб-страницу и нажимает на заражённую
+		ссылку
+    при клике отправляется запрос на сайт банка (и так совпало, что это именно
+		банк нашего пользователя)
+    браузер помнит данные пользователя, и поэтому отправленный запрос будет
+		воспринят сайтом банка как запрос авторизованного пользователя
+    посредством такого запроса злоумышленники могут вывести деньги с аккаунта
+		пользователя или сделать заказ от его имени
+
+Конечно, в этом сценарии должен присутствовать элемент невезения: запрос должен
+отправляться на сайт именно того банка, где залогинен пользователь. Но если банк
+популярен, а число пользователей, кликающих на хакерскую ссылку, велико — такая
+схема сработает.
+
+Для защиты от таких атак сайты генерируют специальный csrf-токен (или csrf-ключ),
+который встраивается в «доверенную» веб-страницу и отправляется вместе с каждым
+запросом от пользователя к серверу. Этот ключ — уникальная для каждого пользователя
+строка, последовательность символов. Угадать её практически невозможно.
+
+При получении запроса сервер сравнивает ключ, полученный с запросом, с образцом,
+сохранённым на сервере, и обрабатывает запрос только в случае совпадения.
+
+Django серьёзно относится к безопасности, и все формы с POST-запросами
+по умолчанию должны быть защищены таким ключом.
+
+Работа с формами
+
+Обычно HTML-форма выглядит приблизительно так:
+
+	<form action="/example-action" method="POST">
+	  Введите имя:<br>
+	  <input type="text" name="firstname">
+	  <br>
+	  Введите фамилию:<br>
+	  <input type="text" name="lastname">
+	  <br><br>
+	  <input type="submit" value="Отправить">
+	</form>
+
+В этой форме есть два поля (Имя, Фамилия) и кнопка «Отправить». При нажатии на
+кнопку браузер отправит данные из формы на страницу, указанную в атрибуте action,
+в нашем примере это /example-action.
+
+Атрибут method определяет способ отправки данных. Если Лев Николаевич Толстой
+решит заполнить форму и будет честен, то при отправке данных методом GET браузер
+обратится к странице /action?firstname=Лев&lastname=Толстой, а метод POST отправит
+значение полей в теле HTTP запроса.
+
+Валидация форм
+
+При отправке форм могут возникнуть разнообразные ошибки. Пользователь может
+случайно нажать кнопку отправки формы до её заполнения, может ввести почтовый
+адрес с ошибкой и обязательно найдётся человек, который сделает опечатку при
+вводе пароля — не зря при регистрации сайты просят ввести пароль дважды.
+Проверка форм на корректность заполнения называется валидация.
+
+Устройство форм в Django
+
+Чтобы было проще понимать примеры и код, разберём устройство форм на высоком уровне.
+
+Форма в Django описывается в классе, похожем на модель. Класс должен быть
+унаследован от встроенного класса Form:
+
+	from django import forms
+
+	class ContactForm(forms.Form):
+		name = forms.CharField(label='Введите имя')
+		sender = forms.EmailField(label='Email для ответа')
+		subject = forms.CharField(label='Тема сообщения', initial='Письмо администратору', max_length=100)
+		message = forms.CharField(widget=forms.Textarea)
+		cc_myself = forms.BooleanField(label='Отправить себе копию', required=False)
+
+Форма состоит из полей разных типов, все они описаны в документации.
+(https://docs.djangoproject.com/en/2.2/ref/forms/fields/#built-in-field-classes)
+Когда в шаблоне поле превращается в HTML-код, то используется виджет,
+определённый параметром widget. Виджет — это шаблон, по которому генерируется
+HTML-код поля формы.
+
+Основные типы полей, которые вам будут встречаться:
+
+    BooleanField — соответствует типу bool. Виджет по умолчанию отрисовывает
+	чекбокс <input type="checkbox">
+    
+	CharField — поле для ввода текста, по умолчанию используется виджет
+	однострочного поля ввода <input type="text">. Виджет можно заменить:
+	если указать в параметрах widget=forms.Textarea, будет отрисовано поле
+	многострочного ввода, <textarea>
+    
+	ChoiceField — поле выбора из выпадающего списка, <select>
+    
+	EmailField — однострочное поле ввода текста, но с обязательной проверкой
+	введённой строки на соответствие формату email
+    
+	FileField — поле для отправки файла, в шаблоне отрисует тег
+	<input type="file">. Есть аналогичное поле для отправки только файлов
+	изображений: ImageField
+    
+	IntegerField — поле для ввода чисел: <input type="number">
+
+Можно самостоятельно создавать новые типы полей и новые виджеты. В Django есть
+множество готовых виджетов, например, для превращения поля ввода в визуальный
+редактор.
+
+Работа с формами из кода
+
+Запустите в консоли интерактивный режим Django, дальше работать будем в нём:
+(venv) $ python manage.py shell
+
+Импортируем модуль forms и создадим класс формы с двумя полями:
+
+	>>> from django import forms
+	>>> class Registration(forms.Form):
+	...     firstname = forms.CharField(label="Введите имя", initial='Лев')
+	...     lastname = forms.CharField(label="Введите фамилию", initial='Толстой')
+	... 
+	>>> form = Registration()
+	>>> #напечатаем результат, чтобы увидеть HTML-код, который выведет метод as_p()
+	>>> print(form.as_p())
+	<p><label for="id_firstname">Введите имя:</label> <input type="text" name="firstname" value="Лев" required id="id_firstname"></p>
+	<p><label for="id_lastname">Введите фамилию:</label> <input type="text" name="lastname" value="Толстой" required id="id_lastname"></p>
+
+Сгенерированный HTML-код содержит код полей ввода <input type="text" ...>
+с необходимыми атрибутами и теги <label> — заголовки полей, видимые пользователям.
+
+Метод as_p(), унаследованный от класса Form, обрамляет каждую пару тегов
+«label + поле» в HTML-тег <p>
+
+По умолчанию форма выводится в HTML-таблицу, в элемент <table>.
+Такой же код будет выведен и методом as_table():
+
+	>>> print(form.as_table())
+	<tr><th><label for="id_firstname">Введите имя:</label></th><td><input type="text" name="firstname" value="Лев" required id="id_firstname"></td></tr>
+	<tr><th><label for="id_lastname">Введите фамилию:</label></th><td><input type="text" name="lastname" value="Толстой" required id="id_lastname"></td></tr>
+
+Вывод списком, методом as_ul():
+
+	>>> print(form.as_ul())
+	<li><label for="id_firstname">Введите имя:</label> <input type="text" name="firstname" value="Лев" required id="id_firstname"></li>
+	<li><label for="id_lastname">Введите фамилию:</label> <input type="text" name="lastname" value="Толстой" required id="id_lastname"></li>
+
+Каждый из этих методов можно вызывать из шаблона командами form.as_table ,
+form.as_p или form.as_ul .
+
+Когда форма заполнена и отправлена, Django получит данные и проверит их на
+корректность. В случае, если отправленная информация не прошла валидацию,
+то объект form получит список ошибок в атрибуте {{ form.errors }}.
+
+Работа с полями формы
+
+С объектом формы можно работать через цикл for:
+
+	>>> for field in form:
+	...     print(field)
+	... 
+	# поля формы будут напечатаны по очереди
+	<input type="text" name="firstname" value="Лев" required id="id_firstname">
+	<input type="text" name="lastname" value="Толстой" required id="id_lastname">
+
+В шаблоне этот же код выглядит так:
+
+	{% for field in form %}
+	  {{ field }}
+	{% endfor %} 
+
+Доступ к полям формы по именам
+
+Иногда удобно вывести в шаблон поля формы не циклом, а отдельным кодом.
+
+В шаблоне для доступа к полю применяют точечную нотацию: form.field_name
+
+	<form method="post">{% csrf_token %}
+	  {{ form.firstname }}
+	  {{ form.lastname }}
+	  <input type="submit" value="Send message">
+	</form>
+
+В Python-коде доступ к полям можно получить, обратившись к объекту form как
+к словарю, где ключом является имя поля.
+
+	>>> print(form['firstname'])
+	<input type="text" name="firstname" value="Лев" required id="id_firstname"> 
+
+Атрибуты полей формы
+
+При выводе формы в шаблон доступны атрибуты объекта field:
+
+    field.label — метка поля, параметр label из описания поля в классе:
+		label="Введите имя"
+    field.label_tag — этот атрибут формирует полный тег label для поля:
+		<label for="id_firstname">Введите имя:</label>
+    field.id_for_label — здесь хранится значение, которое в HTML-теге label
+		указывает, для какого именно поля формы создан этот label.
+		В примере <label for="id_firstname">Введите имя:</label> значением
+		тега field.id_for_label будет id_firstname
+    field.value — значение, которое ввёл пользователь
+    field.html_name — атрибут name тега input
+    field.help_text — текст подсказки, который можно передать в коде
+    field.errors — этот атрибут будет заполнен, если при проверке отправленных
+		данных произошла ошибка
+
+Создание нового шаблона
+В документации по Bootstrap даётся такой пример HTML-кода формы:
+
+	<form>
+	  <div class="form-group">
+		<label for="exampleInputEmail1">Email address</label>
+		<input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+		<small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+	  </div>
+	  <div class="form-group">
+		<label for="exampleInputPassword1">Password</label>
+		<input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+	  </div>
+	  <div class="form-group form-check">
+		<input type="checkbox" class="form-check-input" id="exampleCheck1">
+		<label class="form-check-label" for="exampleCheck1">Check me out</label>
+	  </div>
+	  <button type="submit" class="btn btn-primary">Submit</button>
+	</form>
+
+Измените код шаблона users/templates/signup.html так, чтобы он соответствовал
+стандарту Bootstrap.
+
+	{% extends "base.html" %}
+	{% block title %}Зарегистрироваться{% endblock %}
+	{% block content %}
+
+	<div class="row justify-content-center">
+	  <div class="col-md-8 p-5">
+		<div class="card">
+		  <div class="card-header">Зарегистрироваться</div>
+		  <div class="card-body">
+
+			{% for error in form.errors %}
+			<div class="alert alert-danger" role="alert">
+			  {{ error }}
+			</div>
+			{% endfor %}
+
+
+			<form method="post" action="{% url 'signup' %}">
+			  {% csrf_token %}
+
+			  {% for field in form %}
+				<div class="form-group row" aria-required={% if field.field.required %}"true"{% else %}"false"{% endif %}>
+				  <label for="{{ field.id_for_label }}" class="col-md-4 col-form-label text-md-right">{{ field.label }}{% if field.field.required %}<span class="required">*</span>{% endif %}</label>
+				  <div class="col-md-6">
+					{{ field }}
+					{% if field.help_text %}
+					<small id="{{ field.id_for_label }}-help" class="form-text text-muted">{{ field.help_text|safe }}</small>
+					{% endif %}
+				  </div>
+				</div>
+			  {% endfor %}
+
+			  <div class="col-md-6 offset-md-4">              
+				  <button type="submit" class="btn btn-primary">
+					Зарегистрироваться
+				  </button>
+			  </div>
+			</form>
+		  </div> <!-- card body -->
+		</div> <!-- card -->
+	  </div> <!-- col -->
+	</div> <!-- row -->
+
+	{% endblock %}
+
+Форма регистрации теперь выглядит гораздо лучше.

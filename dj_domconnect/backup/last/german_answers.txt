@@ -1,0 +1,7 @@
+audio/wav/zvuk-koshachego.wav;2;12:49 20.09.2021;alex
+audio/wav/zvuk-loshadinogo.wav;2;12:49 20.09.2021;alex
+audio/wav/rjanie-loshadi.wav;1;12:49 20.09.2021;alex
+audio/wav/sobaka-jalobno.wav;1;12:49 20.09.2021;alex
+audio/wav/zvuk1.wav;1;12:49 20.09.2021;alex
+audio/wav/jutkoe-sobaki.wav;3;12:50 20.09.2021;alex
+audio/wav/krik-kota.wav;3;12:50 20.09.2021;alex

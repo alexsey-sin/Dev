@@ -1,0 +1,322 @@
+Библиотека Unittest
+
+Писать код с нуля или использовать существующую библиотеку?
+
+Тестировать код через assert — весело и здорово, но такое тестирование не очень
+подходит для серьёзных проектов. Писать тесты с нуля, самостоятельно их
+отлаживать, создавать документацию или объяснять новым разработчикам,
+что и как устроено в ваших тестах — дорогое удовольствие.
+
+Как это уже бывало — поможет библиотека.
+
+    Качество популярных библиотек проверено множеством пользователей.
+    
+	Возникла проблема — поисковик поможет найти решение и покажет,
+	что именно сделано неправильно.
+    
+	Новый сотрудник включается в работу с ходу: или он уже работал
+	с библиотекой, или тимлид сажает его за чтение документации — и новичок
+	включается в работу.
+
+В Python есть несколько популярных библиотек для тестирования.
+
+    nose2(https://docs.nose2.io/en/latest/)
+    pytest(https://docs.pytest.org/en/stable/)
+    unittest — стандартная библиотека Python, с ней и будем работать.
+	(https://docs.python.org/3/library/unittest.html)
+
+При работе с Unittest код должен быть устроен по определённым правилам:
+
+    Вместо инструкций assert в Unittest применяют методы встроенного
+	класса unittest.TestCase
+    
+	Тесты помещаются в классы, наследующиеся от unittest.TestCase.
+    
+	Тесты — это методы класса.
+    
+	Имена тестов должны начинаться с префикса test_.
+    
+	Для тестирования запускается специально обученный скрипт
+	(такие скрипты называются test runner), он подготавливает условия
+	для проведения тестов и вызывает все методы, начинающиеся с test_.
+
+В коде это выглядит понятнее, чем в текстовом описании. Пора что-нибудь
+потестировать.
+
+Сохраните в любой директории два файла: file.py и test_one.py.
+
+Код программы: file.py
+
+В файле file.py будет тестируемая функция series_sum():
+
+	# file.py
+
+	def series_sum(incoming):
+		"""Конкатенирует все элементы списка, приводя их к строкам."""
+		result = ''
+		for i in incoming:
+			result += str(i)
+		return result
+
+Можно написать и более лаконичный вариант этой функции:
+
+	# file.py
+
+	def series_sum(incoming):
+		"""Конкатенирует все элементы списка, приводя их к строкам."""
+		return ''.join(str(i) for i in incoming)
+
+Скопируйте один из вариантов series_sum в file.py.
+
+Тесты: test_one.py
+
+В начале кода в файл импортируется библиотека Unittest и тестируемая функция;
+затем создаётся класс TestSeriesSum — наследник встроенного класса TestCase.
+
+В классе создаются несколько методов, «тестов» (по-английски они называются
+test case, но в русском языке прижился перевод «тест»).
+
+В каждом test case проверяются разные варианты работы функции series_sum():
+она вызывается с различными аргументами, и результат вызова сравнивается с
+ожидаемым результатом. Для сравнения применяется встроенный метод assertEqual
+(аналог assert a == b):
+
+	# test_one.py
+
+	import unittest
+	from file import series_sum  # Импорт тестируемой функции
+
+
+	class TestSeriesSum(unittest.TestCase):
+		"""Тестируем series_sum."""
+		def test_mixed_numbers(self):  # Это - test case
+			# Вызов тестируемой функции
+			call = series_sum([1, 2.5, 3, 4])
+			# Ожидаемый результат
+			result = '12.534'
+			# Проверка: идентичен ли результат вызова ожидаемому результату
+			self.assertEqual(call, result,
+							 'Функция series_sum() не работает '
+							 'со списком чисел')
+
+		def test_mixed_numbers_strings(self):  # И это - test case
+			call = series_sum([1, 'fff', 3, 4])
+			result = '1fff34'
+			self.assertEqual(call, result,
+							 'Функция series_sum не работает со смешанным списком')
+
+		def test_empty(self):  # И это - тоже test case
+			call = series_sum([])
+			result = ''
+			self.assertEqual(call, result,
+							 'Функция series_sum не работает с пустым списком')
+
+	if __name__ == '__main__':
+		unittest.main()
+
+Сохраните этот код в файле test_one.py.
+
+Топ-дюжина методов класса TestCase
+
+Кроме метода assertEqual в Unittest есть множество других методов
+на все случаи жизни.
+
+Вот несколько самых популярных:
+
+Метод	Что проверяет
+assertEqual(a, b)	a == b
+assertNotEqual(a, b)	a != b
+assertTrue(x)	bool(x) is True
+assertFalse(x)	bool(x) is False
+assertIs(a, b)	a is b
+assertIsNot(a, b)	a is not b
+assertIsNone(x)	x is None
+assertIsNotNone(x)	x is not None
+assertIn(a, b)	a in b
+assertNotIn(a, b)	a not in b
+assertIsInstance(a, b)	isinstance(a, b)
+assertNotIsInstance(a, b)	not isinstance(a, b)
+
+Эти методы могут в качестве необязательного последнего аргумента содержать
+текст сообщения об ошибке.
+
+Другие методы (их список постоянно пополняется) можно найти в официальной
+документации: в официальной документации библиотеки Unittest.
+(https://docs.python.org/3/library/unittest.html#unittest.TestCase.debug)
+
+Запуск тестов из консоли
+
+Для запуска тестов в консоли перейдите в директорию с файлом test_one.py и
+выполните команду
+
+	python3 -m unittest test_one.py
+
+Будет вызван test runner, который найдёт в файле все методы, начинающиеся
+с test_ и выполнит инструкции в них.
+
+	>>> python3 -m unittest test_one.py
+	...
+	----------------------------------------------------------------------
+	Ran 3 tests in 0.000s
+
+	OK 
+
+Для получения подробного отчёта команда выполняется с флагом -v
+(--verbose, «подробно»).
+	python3 -m unittest -v test_one.py
+
+	>>> python3 -m unittest -v test_one.py
+	test_empty (test_one.TestSeriesSum) ... ok
+	test_mixed_numbers (test_one.TestSeriesSum) ... ok
+	test_mixed_numbers_strings (test_one.TestSeriesSum) ... ok
+
+	----------------------------------------------------------------------
+	Ran 3 tests in 0.000s
+
+	OK
+
+Запуск тестов из Visual Studio Code
+
+В VSC поддержка Unittest встроена в плагин Python. Откройте Command Palette
+(горячие клавиши Ctrl+Shift+P) и в строке поиска наберите “Python tests”.
+
+Выберите Debug All Unit Tests.
+
+После этого VSCode предложит настроить пакет тестирования.
+
+Выберите фреймворк: unittest и домашнюю директорию: (.)
+
+Укажите формат, в котором будут называться файлы с тестами. Мы будем работать
+с именами вида test_any_name.py, так что укажите маску test_*.py
+
+По завершении настройки в интерфейсе VSC появится несколько дополнительных
+элементов для управления тестами.
+
+Запустите тесты из файла test_one.py.
+
+Попробуйте испортить тест. Например, измените ожидаемое значение и посмотрите,
+как изменится вывод.
+
+Управление тестами
+
+Unittest позволяет пропускать (не выполнять) классы тестов и отдельные тесты. Для этого в библиотеке есть специальные декораторы:
+
+    @unittest.skip(reason) — пропустить тест. В параметре reason описывается
+	причина пропуска.
+    
+	@unittest.skipIf(condition, reason) — пропустить тест, если условие
+	condition истинно.
+    
+	@unittest.skipUnless(condition, reason) — пропустить тест, если
+	условие condition ложно.
+
+Можно отмаркировать тест меткой «тест не работает, но это так и задумано».
+
+    @unittest.expectedFailure — ставит на тесте отметку «ожидаемая ошибка».
+
+Пример листинга с пропущенными тестами:
+
+	import unittest
+	import sys
+
+
+	class TestExample(unittest.TestCase):
+		"""Демонстрирует возможности по пропуску тестов."""
+		@unittest.skip('Этот тест мы просто пропускаем')
+		def test_show_msg(self):
+			self.assertTrue(False, 'Значение должно быть истинным')
+
+		@unittest.skipIf(sys.version_info.major == 3 and sys.version_info.minor == 9,
+						 'Пропускаем, если питон 3.9')
+		def test_python3_9(self):
+			# Тест будет запущен, только если версия питона отлична от 3.9.
+			# В условиях можно проверять версии библиотек, доступность внешних сервисов,
+			# время или дату - любые данные
+			pass
+
+		@unittest.skipUnless(sys.platform.startswith('linux'), 'Тест только для Linux')
+		def test_linux_support(self):
+			# Тест будет запущен только в Linux
+			pass
+
+		@unittest.expectedFailure
+		def test_fail(self):
+			self.assertTrue(False, 'Ожидаем истинное значение')
+
+
+	if __name__ == '__main__':
+		unittest.main()
+
+При запуске этого теста в OC Linux с Python3.9 будет такой вывод в консоль:
+
+	test_fail (skip_test.TestExample) ... expected failure
+	test_linux_support (skip_test.TestExample) ... ok
+	test_python3_9 (skip_test.TestExample) ... skipped 'Пропускаем, если питон 3.9'
+	test_show_msg (skip_test.TestExample) ... skipped 'Этот тест мы просто пропускаем'
+
+	----------------------------------------------------------------------
+	Ran 4 tests in 0.000s
+
+	OK (skipped=2, expected failures=1)
+
+А в OC Windows с Python3.8 картина будет иная:
+
+	test_fail (skip_test.TestExample) ... expected failure
+	test_linux_support (skip_test.TestExample) ... skipped 'Тест только для Linux'
+	test_python3_9 (skip_test.TestExample) ... ok
+	test_show_msg (skip_test.TestExample) ... skipped 'Этот тест мы просто пропускаем'
+
+	----------------------------------------------------------------------
+	Ran 4 tests in 0.000s
+
+	OK (skipped=2, expected failures=1)
+
+===============================================================================
+Тренажер
+
+Задача:
+
+Напишите тест на функцию bubble_sort(), которая сортирует полученный список
+по возрастанию.
+Проверьте работу функции:
+
+    С несортированным списком чисел, состоящим из int и float.
+    С пустым списком.
+
+Подсказка:
+
+Несортированный список может быть любым. Например [1, 3, 2.5] или [1, -3, 10, 2.5].
+Пустота ума есть состояние Будды, а сортированный пустой список — это пустой список.
+
+******************************************
+	import unittest
+	from typing import List
+
+
+	def bubble_sort(array: List[float]) -> List[float]:
+		"""Сортировка списка методом пузырька по возрастанию."""
+		length = len(array)
+		for bypass in range(1, length):
+			for k in range(0, length - bypass):
+				if array[k] > array[k + 1]:
+					array[k], array[k + 1] = array[k + 1], array[k]
+		return array
+
+
+	class TestBubbleSort(unittest.TestCase):
+		"""Тестируем bubble_sort."""
+		def test_int_float(self):
+			# С несортированым списком чисел
+			call = bubble_sort([5, 2.6, 8, 1.56, 10, 3])
+			result = [1.56, 2.6, 3, 5, 8, 10]
+			self.assertEqual(call, result, 
+							 'Функция bubble_sort не работает со списком чисел')
+
+		def test_empty(self):
+			# С пустым списком
+			call = bubble_sort([])
+			result = []
+			self.assertEqual(call, result, 
+							 'Функция bubble_sort не работает с пустым списком')
+******************************************
+===============================================================================

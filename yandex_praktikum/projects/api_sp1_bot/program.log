@@ -1,0 +1,20 @@
+2021-04-28 20:32:09,091, INFO, У вас проверили работу "alexsey-sin__hw05_final.zip"!
+
+Ревьюеру всё понравилось, можно приступать к следующему уроку., __main__
+2021-04-28 20:38:24,310, DEBUG, Бот запущен., __main__
+2021-04-28 22:12:30,105, DEBUG, Бот запущен., __main__
+2021-04-28 22:12:30,235, INFO, У вас проверили работу "alexsey-sin__hw05_final.zip"!
+
+Ревьюеру всё понравилось, можно приступать к следующему уроку., __main__
+2021-04-28 22:12:30,235, DEBUG, Entering: send_message, telegram.bot
+2021-04-28 22:12:30,235, DEBUG, Starting new HTTPS connection (1): api.telegram.org, telegram.vendor.ptb_urllib3.urllib3.connectionpool
+2021-04-28 22:12:30,475, DEBUG, https://api.telegram.org:443 "POST /bot1790736632:AAGq16DCLzFepGxxq1CId7Cswugp4OE_ZNc/sendMessage HTTP/1.1" 200 740, telegram.vendor.ptb_urllib3.urllib3.connectionpool
+2021-04-28 22:12:30,475, DEBUG, {'message_id': 52, 'date': 1619637151, 'chat': {'id': 1740645090, 'type': 'private', 'first_name': 'Алексей'}, 'text': 'У вас проверили работу "alexsey-sin__hw05_final.zip"!\n\nРевьюеру всё понравилось, можно приступать к следующему уроку.', 'entities': [], 'caption_entities': [], 'photo': [], 'new_chat_members': [], 'new_chat_photo': [], 'delete_chat_photo': False, 'group_chat_created': False, 'supergroup_chat_created': False, 'channel_chat_created': False, 'from': {'id': 1790736632, 'first_name': 'my_yandexbot', 'is_bot': True, 'username': 'my_yandexbot'}}, telegram.bot
+2021-04-28 22:12:30,475, DEBUG, Exiting: send_message, telegram.bot
+2021-04-28 22:17:30,746, INFO, У вас проверили работу "alexsey-sin__hw05_final.zip"!
+
+Ревьюеру всё понравилось, можно приступать к следующему уроку., __main__
+2021-04-28 22:17:30,746, DEBUG, Entering: send_message, telegram.bot
+2021-04-28 22:17:30,826, DEBUG, https://api.telegram.org:443 "POST /bot1790736632:AAGq16DCLzFepGxxq1CId7Cswugp4OE_ZNc/sendMessage HTTP/1.1" 200 740, telegram.vendor.ptb_urllib3.urllib3.connectionpool
+2021-04-28 22:17:30,826, DEBUG, {'message_id': 53, 'date': 1619637451, 'chat': {'id': 1740645090, 'type': 'private', 'first_name': 'Алексей'}, 'text': 'У вас проверили работу "alexsey-sin__hw05_final.zip"!\n\nРевьюеру всё понравилось, можно приступать к следующему уроку.', 'entities': [], 'caption_entities': [], 'photo': [], 'new_chat_members': [], 'new_chat_photo': [], 'delete_chat_photo': False, 'group_chat_created': False, 'supergroup_chat_created': False, 'channel_chat_created': False, 'from': {'id': 1790736632, 'first_name': 'my_yandexbot', 'is_bot': True, 'username': 'my_yandexbot'}}, telegram.bot
+2021-04-28 22:17:30,826, DEBUG, Exiting: send_message, telegram.bot

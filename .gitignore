@@ -1,0 +1,11 @@
+# Ignore IDE specific files
+.idea/
+.vscode/
+*.sw*
+
+# cash
+__pycache__/
+
+venv/
+build/
+

@@ -1,0 +1,149 @@
+Декоратор @login_required
+
+При работе с Django вам не придётся писать все декораторы самостоятельно: в этом
+фреймворке есть набор готовых декораторов; среди них есть и декоратор
+@login_required, предназначенный для проверки авторизации пользователя.
+(https://docs.djangoproject.com/en/2.2/_modules/django/contrib/auth/decorators/#login_required)
+
+Этот декоратор устроен несколько сложнее, чем тот, что мы написали: он умеет
+принимать параметры и работать с Class Based Views.
+
+Декоратор @login_required импортируется из django.contrib.auth.decorators:
+
+	from django.contrib.auth.decorators import login_required
+
+	@login_required
+	def my_view(request):
+		...
+
+Декоратор @login_required и шаблон login.html
+
+Если незалогиненный пользователь обратится к странице, доступной только для
+авторизованных пользователей, то декоратор @login_required перенаправит его на
+страницу авторизации. Если пользователь авторизуется — он вернётся на ту страницу,
+с которой он пришёл. Адрес этой страницы будет передан в GET-параметре в
+переменной next : /auth/login?next=any-page-url
+
+Измените шаблон users/templates/registration/login.html — добавьте блок с
+проверкой переменной next.
+
+Текст из блока {% if next %} будет показан только тем пользователям,
+которые переадресованы на страницу авторизации с других страниц. 
+
+	{% extends "base.html" %}
+	{% block title %}Войти{% endblock %}
+	{% block content %}
+	{% load user_filters %}
+
+	<div class="row justify-content-center">
+	  <div class="col-md-8 p-5">
+		<div class="card">
+		  <div class="card-header">Войти на сайт</div>
+		  <div class="card-body">
+			{% if form.errors %}
+			<div class="alert alert-danger" role="alert">
+			  Имя пользователя и пароль не совпадают. Введите правильные данные.
+			</div>
+			{% endif %}
+
+			{% if next %}            
+			<div class="alert alert-info" role="alert">
+				Вы обратились к странице, доступ к которой возможен только для залогиненных пользователей.<br>
+				Пожалуйста, авторизуйтесь.
+			</div>
+			{% else %}
+			<div class="alert alert-info" role="alert">
+				Пожалуйста, авторизуйтесь.
+			</div>
+			{% endif %}
+
+			<form method="post" action="{% url 'login' %}">
+			  {% csrf_token %}
+			  <input type="hidden" name="next" value="{{ next }}">
+			  <div class="form-group row">
+				<label for="{{ form.username.id_for_label }}" class="col-md-4 col-form-label text-md-right">Имя пользователя</label>
+				<div class="col-md-6">
+				  {{ form.username|addclass:"form-control" }}
+				</div>
+			  </div>
+
+			  <div class="form-group row">
+				<label for="{{ form.password.id_for_label }}" class="col-md-4 col-form-label text-md-right">Пароль</label>
+				<div class="col-md-6">
+				  {{ form.password|addclass:"form-control" }}
+				</div>
+			  </div>
+
+			  <div class="col-md-6 offset-md-4">              
+				<button type="submit" class="btn btn-primary">
+				  Войти
+				</button>
+				<a href="{% url 'password_reset' %}" class="btn btn-link">
+				  Забыли пароль?
+				</a>
+			  </div>
+			</form>
+		  </div> <!-- card body -->
+		</div> <!-- card -->
+	  </div> <!-- col -->
+	</div> <!-- row -->
+
+	{% endblock %}
+
+Теперь view-функции тех страниц, куда разрешён доступ только под логином
+(это, например, страница создания нового поста), можно обернуть декоратором
+@login_required; после этого проверка и переадресация неавторизованных
+пользователей на страницу логина будет происходить автоматически.
+
+===============================================================================
+Тренажер
+
+Задача:
+
+Напишите декоратор, оптимизирующий работу декорируемой функции.
+Декоратор должен сохранять результат работы функции на ближайшие 3 запуска
+и вместо выполнения функции возвращать сохранённый результат.
+
+Подсказка:
+
+Создайте в декораторе переменную-кеш, сохраните в ней результат выполнения
+декорируемой функции. Создайте в декораторе переменную, хранящую счётчик запросов.
+Пока значение счётчика ниже предельного — отдавайте результат, сохранённый в кеше.
+Когда число запросов к функции превысит предел и пора будет снова высчитывать
+результат выполнения функции — сбросьте счётчик, выполните декорируемую функцию
+и заново сохраните результат её выполнения в переменную-кеш.
+В предыдущем уроке мы рассказывали, как создавать переменные в декораторах,
+этот пример пригодится и здесь.
+
+	def cache3(func):
+		count = {'num': 3, 'rez': 0}
+		def wrapper():
+			if count['num'] == 3:
+				count['rez'] = func()
+			count['num'] -= 1
+			if count['num'] == 0:
+				count['num'] = 3
+			return count['rez']
+		return wrapper
+
+
+	@cache3
+	def heavy():
+		print('Сложные вычисления')
+		return 1
+
+
+	print(heavy())
+	# Сложные вычисления
+	# 1
+	print(heavy())
+	# 1
+	print(heavy())
+	# 1
+
+	# Опять кеш устарел, надо вычислять заново
+	print(heavy())
+	# Сложные вычисления
+	# 1
+
+===============================================================================

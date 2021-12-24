@@ -1,0 +1,481 @@
+Unittest и TDD
+
+Перед вами заготовка для класса Calculator. Класс пока не написан,
+но по docstring можно понять, что он будет делать:
+
+	class Calculator:
+		"""Производит арифметические действия."""
+		def summ(self, *args):
+			"""Возвращает сумму значений любого количества принятых аргументов."""
+			pass
+
+		def square(self, num):
+			"""Возвращает квадратный корень из аргумента."""
+			pass
+
+Этого достаточно, что бы написать тесты.
+
+Структура папок проекта
+
+Можно сохранить тесты в том же файле, что и тестируемая программа,
+но лучше разместить их в отдельной директории в отдельном файле.
+Для этого есть несколько причин:
+
+    модуль с тестом может быть запущен автономно из командной строки;
+    код тестов легко отделить от программы;
+    тестируемый код может быть легче переработан.
+
+├── code
+│   ├── __init.py__         
+│   └── calculator.py       # Тестируемые функции живут тут
+└── test
+    ├── __init__.py   
+    └── test_calculator.py  # Тесты лежат здесь 
+
+Паттерн тестирования AAA (Arrange, Act, Assert)
+
+Большинство тестов можно разделить на три части:
+
+Arrange (настройка) — в этом блоке кода мы подготавливаем данные для теста.
+Обычно это создание экземпляра класса тестируемого юнита.
+
+Act — выполнение или вызов тестируемого сценария.
+
+Assert — проверка того, что тестируемый вызов ведёт себя ожидаемо.
+
+Такой подход называется «паттерн AAA». Считается, что он улучшает структуру
+теста и его читабельность.
+
+Теперь можно посмотреть на тесты для класса Calculator:
+
+	import sys
+	import os
+	import unittest
+	# Добавим возможность импорта из директории calculator в наш тест
+	sys.path.append(os.path.abspath('../calculator'))
+	from calculator import Calculator
+
+
+	class TestCalc(unittest.TestCase):
+		"""Тестируем Calculator."""
+		def test_summ(self):
+			# summ возвращает сумму принятых аргументов
+			# Arrange - подготавливаем данные для теста.
+			# Создаем экземпляр класса Calculator()
+			calc = Calculator()
+
+			# Act - выполнение тестируемого сценария.
+			# Вызываем метод summ
+			act = calc.summ(3, -3, 5)
+
+			# Assert - проверяем, что метод работает
+			self.assertEqual(act, 5, 'Метод summ работает неправильно')
+
+		def test_square(self):
+			# square() возвращает квадратный корень аргумента
+			calc = Calculator()
+			act = calc.square(4)
+			self.assertEqual(act, 2, 'Метод square работает неправильно')
+
+		# Корень из отрицательного числа не является действительным числом
+		def test_square_negative_value(self):
+			calc = Calculator()
+			# Проверяем, что при вызове с отрицательным числом 
+			# выбрасывается исключение ValueError
+			# assertRaises обрабатывается с помощью менеджера контекста with
+			with self.assertRaises(ValueError):
+				act = calc.square(-1)
+
+Ожидаемый фейл
+
+После запуска тестов командой python3 -m unittest -v test_calculator.py
+в консоль будет выведено несколько сообщений о проваленных тестах:
+
+	test_square (test.TestCalc) ... FAIL
+	test_square_negative_value (test.TestCalc) ... FAIL
+	test_summ (test.TestCalc) ... FAIL
+
+	======================================================================
+	FAIL: test_square (test.TestCalc)
+	----------------------------------------------------------------------
+	Traceback (most recent call last):
+	  File ".../project/test/test.py", line 22, in test_square
+		self.assertEqual(act, 2, 'Метод square работает неправильно')
+	AssertionError: None != 2 : Метод square работает неправильно
+
+	======================================================================
+	FAIL: test_square_negative_value (test.TestCalc)
+	----------------------------------------------------------------------
+	Traceback (most recent call last):
+	  File ".../project/test/test.py", line 27, in test_square_negative_value
+		act = calc.square(-1)
+	AssertionError: ValueError not raised
+
+	======================================================================
+	FAIL: test_summ (test.TestCalc)
+	----------------------------------------------------------------------
+	Traceback (most recent call last):
+	  File ".../project/test/test.py", line 17, in test_summ
+		self.assertEqual(act, 5, 'Метод summ работает неправильно')
+	AssertionError: None != 5 : Метод summ работает неправильно
+
+	----------------------------------------------------------------------
+	Ran 3 tests in 0.001s
+
+	FAILED (failures=3)
+
+Этого и следовало ожидать: тесты ожидают, что методы summ() и square() работают,
+а на самом-то деле они ничего не возвращают и не выбрасывают исключений:
+эти методы ещё не написаны.
+
+По методологии TDD так и должно быть. Теперь можно написать методы,
+соответствующие тестам.
+
+	class Calculator:
+		"""Производит арифметические действия."""
+		def summ(self, *args):
+			"""Возвращает сумму принятых аргументов."""       
+			sum = 0
+			for i in args:
+				sum += i
+			return sum
+
+		def square(self, num):
+			"""Возвращает квадратный корень аргумента."""       
+			if num < 0:
+				raise ValueError('Не могу извлечь корень из отрицательного числа')
+			return num ** 0.5
+
+Новый запуск тестов: python3 -m unittest -v test_calculator.py :
+
+	test_square (test.TestCalc) ... ok
+	test_square_negative_value (test.TestCalc) ... ok
+	test_summ (test.TestCalc) ... ok
+
+	----------------------------------------------------------------------
+	Ran 3 tests in 0.000s
+
+	OK
+
+Фикстуры
+
+При тестировании класса Calculator в каждом тесте создавался экземпляр этого
+класса. Такой подход работает приемлемо, но нарушает принцип DRY:
+Don’t repeat yourself!, «Не повторяйся!».
+
+Чтобы упростить код и не повторяться — в Unittest есть встроенные методы фикстур.
+
+    test fixtures (на сленге — «фикстуры») — это фиксированные объекты
+	и данные для выполнения тестов. Перед началом теста в коде создаются
+	объекты и данные, на которых будет проведено тестирование. Например:
+
+        состояние базы данных,
+        набор переменных среды,
+        набор файлов с необходимым содержанием.
+
+Встроенный метод setUp()
+
+Для создания фикстур чаще всего используют метод setUp().
+Это встроенный метод Unittest, он автоматически вызывается перед запуском
+каждого test case:
+
+	...
+
+	class TestCalc(unittest.TestCase):
+		"""Тестируем Calculator."""
+		def setUp(self):
+			"""Подготовка прогона теста. Вызывается перед каждым тестом."""
+			# Arrange - подготавливаем данные для теста
+			self.calc = Calculator()
+
+		def test_summ(self):
+			act = self.calc.summ(3, -3, 5)
+			self.assertEqual(act, 5, 'Метод summ работает неправильно')
+		
+		# Другие test case
+		...
+
+	...
+
+Встроенный метод setUpClass()
+
+Метод setUpClass также предназначен для установки фикстур, но он вызывается лишь
+один раз, перед запуском всех test case класса.
+
+Обратите внимание: setUpClass — это «метод класса» (class method), его
+обязательно декорировать, а его первый аргумент должен называться cls.
+Для вызова метода класса не требуется создавать объект, такой метод можно
+вызвать напрямую из класса.
+
+	...
+
+	class TestCalc(unittest.TestCase):
+		"""Тестируем Calculator."""
+		@classmethod
+		def setUpClass(cls):
+			"""Вызывается однажды перед запуском всех тестов класса."""
+			# Arrange - подготавливаем данные для теста
+			cls.calc = Calculator()
+
+		def test_summ(self):
+			act = TestCalc.calc.summ(3, -3, 5)
+			self.assertEqual(act, 5, 'Метод summ работает неправильно')
+
+		def test_square(self):
+			act = TestCalc.calc.square(4)
+			self.assertEqual(act, 2, 'Метод square работает неправильно')
+
+		# Корень из отрицательного числа не является действительным числом
+		def test_square_negative_value(self):
+			with self.assertRaises(ValueError):
+			   TestCalc.calc.square(-1)
+
+Очевидно, что в примере с тестированием класса Calculator будет правильнее
+и проще один раз задать условия для тестов, чем заново создавать экземпляр
+перед каждым тестом.
+
+Но работать будут оба варианта.
+
+Встроенные методы unittest
+
+Запустите приведённый ниже код на компьютере: он покажет, в каком порядке
+выполняются встроенные методы юниттест для фикстур.
+
+	import unittest
+
+
+	def setUpModule():
+		"""Вызывается один раз перед всеми классами, которые есть в файле."""
+		print('> setUpModule')
+
+
+	def tearDownModule():
+		"""Вызывается один раз после всех классов, которые есть в файле."""
+		print('> tearDownModule')
+
+
+	class TestExample(unittest.TestCase):
+		"""Демонстрирует принцип работы тестов."""
+
+		@classmethod
+		def setUpClass(cls):
+			"""Вызывается один раз перед запуском всех тестов класса."""
+			print('>> setUpClass')
+
+		@classmethod
+		def tearDownClass(cls):
+			"""Вызывается один раз после запуска всех тестов класса."""
+			print('>> tearDownClass')
+
+		def setUp(self):
+			"""Подготовка прогона теста. Вызывается перед каждым тестом."""
+			print('>>> setUp')
+
+		def tearDown(self):
+			"""Вызывается после каждого теста."""
+			print('>>> tearDown')
+
+		def test_one(self): # это -- test case 
+			print('>>>> test_simple')
+
+		def test_one_more(self): # это -- еще один test case
+			print('>>>> test_simple')
+
+
+	if __name__ == '__main__':
+		unittest.main()
+
+Названия setUp, tearDownClass и других встроенных методов Unittest непривычны
+глазу (в Python не принято давать методам названия в стиле camelCase и mixedCase),
+но эти названия соответствуют PEP8. 
+
+===============================================================================
+Тренажер
+
+Задача 1/4:
+
+Напишите тесты на метод divider() класса Calculator. Сам метод пока не написан,
+но есть docstring с его описанием.
+
+Проверьте:
+
+    правильно ли работает деление;
+    выбрасывается ли исключение при делении на 0.
+
+Подсказка:
+
+    Подготовьте данные для теста методом setUpClass или setUp.
+    Делить на ноль нельзя. При попытке разделить на ноль метод должен выбрасывать
+		исключение ZeroDivisionError.
+    Один тест — одна проверка. Не включайте все проверки в один test case.
+
+******************************************
+	import unittest
+
+
+	class Calculator:
+		"""Производит различные арифметические действия."""
+		def divider(self, num1, num2):
+			"""Возвращает результат деления num1 / num2."""
+			pass
+
+	class TestCalc(unittest.TestCase):
+		"""Тестируем Calculator."""
+		# Подготовьте данные для теста
+		@classmethod
+		def setUpClass(cls):
+			"""Вызывается однажды перед запуском всех тестов класса."""
+			# Arrange - подготавливаем данные для теста
+			cls.calc = Calculator()
+			
+		def test_divider(self):
+			act = TestCalc.calc.divider(5, 3)  # вызовите метод divider с аргументом
+			self.assertEqual(act, 1, 'текст, если проверка провалена')
+
+
+		def test_divider_zero_division(self):
+			# Проверьте, что деление на 0 выбрасывает исключение 
+			with self.assertRaises(ZeroDivisionError):
+				act = TestCalc.calc.divider(1, 0)
+******************************************
+
+Задача 2/4:
+
+Напишите метод divider. Решение будет засчитано, если метод пройдёт ваши тесты.
+
+Подсказка:
+
+    Делить на ноль по-прежнему нельзя.
+    Настроить исключение можно инструкцией raise НазваниеИсключения()
+    Тесты должны возвращать ОК.
+
+******************************************
+	import unittest
+
+
+	class Calculator:
+		"""Производит различные арифметические действия."""
+		def divider(self, num1, num2):
+			"""Возвращает результат деления num1 / num2."""
+			if num2 < 0:
+				raise ZeroDivisionError('Не могу делить на отрицательное числа')
+			return num1 / num2
+
+	class TestCalc(unittest.TestCase):
+		"""Тестируем Calculator."""
+		# Подготовьте данные для теста
+		@classmethod
+		def setUpClass(cls):
+			"""Вызывается однажды перед запуском всех тестов класса."""
+			# Arrange - подготавливаем данные для теста
+			cls.calc = Calculator()
+			
+		def test_divider(self):
+			act = TestCalc.calc.divider(6, 3)  # вызовите метод divider с аргументом
+			self.assertEqual(act, 2, 'текст, если проверка провалена')
+
+
+		def test_divider_zero_division(self):
+			# Проверьте, что деление на 0 выбрасывает исключение 
+			with self.assertRaises(ZeroDivisionError):
+				act = TestCalc.calc.divider(1, 0)
+******************************************
+
+Задача 3/4:
+
+В коде задания описан метод summ.
+
+Если вызвать этот метод без аргументов, он вернёт ноль, а если передать
+в метод summ один аргумент — он вернёт значение этого аргумента.
+
+Это не лучшее поведение для калькулятора, надо его изменить. Методика
+TDD подразумевает, что сначала пишутся тесты, а потом код.
+
+В этом задании напишите тесты, которые проверяют, что summ возвращает None,
+если количество переданных аргументов меньше двух.
+
+Подсказка:
+
+В Unittest есть встроенный метод для проверки на None: assertIsNone(x)
+Маленькие тесты — это всегда хорошо. Одна проверка — один тест:
+
+    test_summ_no_argument — что будет, если функция вызвана без аргументов
+    test_summ_one_argument — что будет, если функция вызвана с одним аргументом.
+
+******************************************
+	import unittest
+
+
+	class Calculator:
+		def summ(self, *args):
+			"""Возвращает сумму принятых аргументов."""       
+			sum = 0
+			for i in args:
+				sum += i
+			return sum
+
+
+	class TestCalc(unittest.TestCase):
+		"""Тестируем Calculator."""
+		@classmethod
+		def setUpClass(cls):
+			"""Вызывается однажды перед запуском всех тестов класса."""
+			cls.calc = Calculator()
+
+		def test_summ(self):
+			act = TestCalc.calc.summ(3, -3, 5)
+			self.assertEqual(act, 5, 'summ работает неправильно')
+
+		def test_summ_no_argument(self):
+			act = TestCalc.calc.summ()
+			self.assertIsNone(act, 'summ работает неправильно')
+
+		def test_summ_one_argument(self):
+			act = TestCalc.calc.summ(3)
+			self.assertIsNone(act, 'summ работает неправильно')
+******************************************
+
+Задача 4/4:
+
+Доработайте метод summ: он должен возвращать None, если вызывается с одним
+аргументом или без аргументов.
+
+Подсказка:
+
+Количество переданных аргументов можно узнать с помощью len(args).
+
+******************************************
+	import unittest
+
+
+	class Calculator:
+		def summ(self, *args):
+			"""Возвращает сумму принятых аргументов."""  
+			if len(args) < 2:
+				return None
+			sum = 0
+			for i in args:
+				sum += i
+			return sum
+
+
+	class TestCalc(unittest.TestCase):
+		"""Тестируем Calculator."""
+		@classmethod
+		def setUpClass(cls):
+			"""Вызывается однажды перед запуском всех тестов класса."""
+			cls.calc = Calculator()
+
+		def test_summ(self):
+			act = TestCalc.calc.summ(3, -3, 5)
+			self.assertEqual(act, 5, 'summ работает неправильно')
+
+		def test_summ_no_argument(self):
+			act = TestCalc.calc.summ()
+			self.assertIsNone(act, 'summ работает неправильно')
+
+		def test_summ_one_argument(self):
+			act = TestCalc.calc.summ(3)
+			self.assertIsNone(act, 'summ работает неправильно')
+******************************************
+===============================================================================

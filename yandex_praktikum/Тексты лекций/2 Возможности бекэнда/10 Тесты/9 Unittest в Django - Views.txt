@@ -1,0 +1,277 @@
+Unittest в Django. Views
+
+В приложении deals есть четыре view-класса.
+Нужно удостовериться, что в каждом из этих классов:
+
+    при обращении к определённому имени (указанному в path() в аргументе name)
+		для отображения страниц вызывается ожидаемый HTML-шаблон;
+    в шаблон передан правильный контекст.
+
+Тесты для views сохранены в директории deals/tests.
+
+	└── deals
+		├── __init__.py
+		├── tests
+		│   ├── __init__.py  
+		│   ├── test_forms.py   
+		│   ├── test_models.py      
+		│   ├── test_views.py   # Тесты отображений 
+		│   └── test_urls.py     
+		├── admin.py
+		├── forms.py
+		├── models.py
+		└── views.py
+
+Проверка 1: view-классы используют ожидаемые HTML-шаблоны
+
+Обратиться из кода к адресам приложения по имени name можно через метод reverse():
+
+	self.client.get(reverse('имя_приложения:name')) 
+
+Для тестирования страницы deals:task_detail нужно создать запись в базе данных.
+Все остальные страницы проекта можно тестировать без предварительной подготовки.
+
+Дальше всё просто: берём все страницы по очереди и тестируем.
+
+Чтобы проверить, какой шаблон использует view-класс или view-функция,
+в django.test есть утверждение assertTemplateUsed:
+
+	#deals/tests/test_views.py
+	from django.contrib.auth import get_user_model
+	from django.test import Client, TestCase
+	from django.urls import reverse
+
+	from deals.models import Task
+
+	User = get_user_model()
+
+
+	class TaskPagesTests(TestCase):
+		@classmethod
+		def setUpClass(cls):
+			super().setUpClass()
+			# Создадим запись в БД:
+			# она понадобится для тестирования страницы deals:task_detail
+			Task.objects.create(
+				title='Заголовок',
+				text='Текст',
+				slug='test-slug',
+			)
+
+		def setUp(self):
+			# Создаем авторизованный клиент        
+			self.user = User.objects.create_user(username='StasBasov')
+			self.authorized_client = Client()
+			self.authorized_client.force_login(self.user)
+
+		def test_added_page_uses_correct_template(self):
+			"""URL-адрес использует шаблон deals/added.html."""
+			response = self.authorized_client.get(reverse('deals:task_added'))
+			self.assertTemplateUsed(response, 'deals/added.html')
+
+		def test_home_page_uses_correct_template(self):
+			"""URL-адрес использует шаблон deals/home.html."""
+			response = self.authorized_client.get(reverse('deals:home'))
+			self.assertTemplateUsed(response, 'deals/home.html')
+
+		def test_task_list_page_authorized_uses_correct_template(self):
+			"""URL-адрес использует шаблон deals/task_list.html."""
+			response = self.authorized_client.get(reverse('deals:task_list'))
+			self.assertTemplateUsed(response, 'deals/task_list.html')
+
+		def test_task_detail_pages_authorized_use_correct_template(self):
+			"""URL-адреса используют шаблон deals/task_detail.html."""
+			response = self.authorized_client.get(
+				reverse('deals:task_detail', kwargs={'slug': 'test-slug'})
+			)
+			self.assertTemplateUsed(response, 'deals/task_detail.html')
+
+Четыре теста проверяют код по одинаковому алгоритму. Разумеется, такие тесты
+можно написать лаконичнее, через subTest:
+
+	#deals/tests/test_views.py
+	from django.contrib.auth import get_user_model
+	from django.test import Client, TestCase
+	from django.urls import reverse
+
+	from deals.models import Task
+
+	User = get_user_model()
+
+
+	class TaskPagesTests(TestCase):
+		@classmethod
+		def setUpClass(cls):
+			super().setUpClass()
+			# Создадим запись в БД
+			Task.objects.create(
+				title='Заголовок',
+				text='Текст',
+				slug='test-slug',
+			)
+
+		def setUp(self):
+			# Создаем авторизованный клиент        
+			self.user = User.objects.create_user(username='StasBasov')
+			self.authorized_client = Client()
+			self.authorized_client.force_login(self.user)
+
+		# Проверяем используемые шаблоны
+		def test_pages_use_correct_template(self):
+			"""URL-адрес использует соответствующий шаблон."""
+			# Собираем в словарь пары "имя_html_шаблона: name"
+			templates_pages_names = {
+				'deals/home.html': reverse('deals:home'),
+				'deals/added.html': reverse('deals:task_added'),
+				'deals/task_list.html': reverse('deals:task_list'),
+				'deals/task_detail.html': (
+					reverse('deals:task_detail', kwargs={'slug': 'test-slug'})
+				),
+			}
+			# Проверяем, что при обращении к name вызывается 
+			# соответствующий HTML-шаблон
+			for template, reverse_name in templates_pages_names.items():
+				with self.subTest(reverse_name=reverse_name):
+					response = self.authorized_client.get(reverse_name)
+					self.assertTemplateUsed(response, template)
+
+Проверка 2: в шаблон передан правильный контекст
+
+При создании страницы в неё передаётся словарь с контекстом.
+При обращении к странице можно получить этот словарь из свойства context
+объекта response, после чего проверить содержимое полей словаря response.context
+на совпадение с ожидаемым результатом.
+
+	#deals/tests/test_views.py
+	from django.contrib.auth import get_user_model
+	from django.test import Client, TestCase
+	from django.urls import reverse
+	from django import forms  
+
+	from deals.models import Task
+
+	User = get_user_model()
+
+
+	class TaskPagesTests(TestCase):
+		@classmethod
+		def setUpClass(cls):
+			super().setUpClass()
+			# Создадим запись в БД
+			Task.objects.create(
+				title='Заголовок',
+				text='Текст',
+				slug='test-slug',
+			)
+
+		def setUp(self): 
+			# Создаем авторизованный клиент        
+			self.user = User.objects.create_user(username='StasBasov')
+			self.authorized_client = Client()
+			self.authorized_client.force_login(self.user)
+
+		# Проверка словаря контекста главной страницы (в нём передаётся форма)
+		def test_home_page_shows_correct_context(self):
+			"""Шаблон home сформирован с правильным контекстом."""
+			response = self.authorized_client.get(reverse('deals:home'))
+			# Словарь ожидаемых типов полей формы:
+			# указываем, объектами какого класса должны быть поля формы
+			form_fields = {
+				'title': forms.fields.CharField,
+				# При создании формы поля модели типа TextField 
+				# преобразуются в CharField с виджетом forms.Textarea           
+				'text': forms.fields.CharField,
+				'slug': forms.fields.SlugField,
+				'image': forms.fields.ImageField,
+			}        
+
+			# Проверяем, что типы полей формы в словаре context 
+			# соответствуют ожиданиям
+			for value, expected in form_fields.items():
+				with self.subTest(value=value):
+					form_field = response.context['form'].fields[value]
+					# Проверяет, что поле формы является экземпляром
+					# указанного класса
+					self.assertIsInstance(form_field, expected)
+
+		# Проверяем, что словарь context страницы /task
+		# в первом элементе списка object_list содержит ожидаемые значения 
+		def test_task_list_page_shows_correct_context(self):
+			"""Шаблон task_list сформирован с правильным контекстом."""
+			response = self.authorized_client.get(reverse('deals:task_list'))
+			# Взяли первый элемент из списка и проверили, что его содержание
+			# совпадает с ожидаемым
+			first_object = response.context['object_list'][0]
+			task_title_0 = first_object.title
+			task_text_0 = first_object.text
+			task_slug_0 = first_object.slug
+			self.assertEqual(task_title_0, 'Заголовок')
+			self.assertEqual(task_text_0, 'Текст')
+			self.assertEqual(task_slug_0, 'test-slug')
+
+		# Проверяем, что словарь context страницы task/test-slug
+		# содержит ожидаемые значения 
+		def test_task_detail_pages_show_correct_context(self):
+			"""Шаблон task_detail сформирован с правильным контекстом."""
+			response = self.authorized_client.get(
+					reverse('deals:task_detail', kwargs={'slug': 'test-slug'})
+			)
+			self.assertEqual(response.context['task'].title, 'Заголовок')
+			self.assertEqual(response.context['task'].text, 'Текст')
+			self.assertEqual(response.context['task'].slug, 'test-slug')
+
+Тестирование static_pages
+
+В проекте Todo у приложения static_pages есть лишь одна страница: page/about/.
+Тестирование URL и views этой страницы отличается от тестов приложения deals
+только простотой. Тесты приложения есть в проекте. Посмотрите, вам понравится.
+
+Тестирование паджинатора
+
+Для тестирования паджинатора Yatube можно создать в фикстурах несколько
+объектов Post, а затем проверить, сколько записей передаётся на страницу
+в словаре context. Объектов в фикстурах должно быть больше, чем выводится на
+одну страницу паджинатора.
+
+	# Здесь импорт необходимых библиотек для тестов.
+	...
+	class PaginatorViewsTest(TestCase):
+		# Здесь создаются фикстуры: клиент и 13 тестовых записей.
+		...
+		def test_first_page_contains_ten_records(self):
+			response = self.client.get(reverse('index'))
+			# Проверка: количество постов на первой странице равно 10.       
+			self.assertEqual(response.context.get('page').object_list.count(), 10)
+
+		def test_second_page_contains_three_records(self):
+			# Проверка: на второй странице должно быть три поста.
+			response = self.client.get(reverse('index') + '?page=2')
+			self.assertEqual(response.context.get('page').object_list.count(), 3)
+
+Дополнительно можно проверить, что содержимое постов на странице соответствует
+ожиданиям — подобную проверку вы проводили, тестируя views.
+
+Получить содержимое страницы поможет запрос
+response.context.get('page').object_list
+
+Задание
+
+    Напишите тесты, проверяющие, какой шаблон будет вызван при обращении
+	к view-классам через соответствующий name для:
+        главной страницы,
+        страницы группы,
+        страницы создания поста.
+    Проверьте, соответствует ли ожиданиям словарь context, передаваемый в шаблон
+	при вызове
+        главной страницы,
+        страницы группы,
+        страница создания поста,
+        пажинатор работает корректно.
+    Проверьте, что если при создании поста указать группу, то этот пост появляется
+        на главной странице сайта,
+        на странице выбранной группы.
+    Проверьте, что этот пост не попал в группу, для которой не был предназначен.
+
+Избегайте дублирующихся тестов.
+
+Это задание будет проверено в конце спринта вместе с домашней работой.

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <meta charset="UTF-8">
+  </head>
+  <body>
+      <h1>Анфиса для друзей</h1>
+       <img src="https://pictures.s3.yandex.net/resources/anfisa_1594642601.png">
+       <br>
+      <p>
+        {{ friend_output }}
+      </p>
+      <p>
+        {{ city_weather }}
+      </p>
+      <!-- Укажите в теге тип запроса и адрес, куда должен уйти запрос -->
+      <form method="post" action="/">
+        <h2>Выберите друга</h2>
+          {{ friends|safe }}
+        <br>
+          <input type="submit" value="Узнать город и погоду">
+          <!-- Тут — кнопку с надписью "Узнать город и погоду". -->
+
+      </form>
+      <p>
+        {{ icecreams|safe }}
+      </p>
+  </body>
+</html>

@@ -1,0 +1,223 @@
+{% extends "app/layouts/base.html" %}
+
+{% block title %} Номера {% endblock %} 
+
+{% block stylesheets %}
+<style>
+.table{
+	border: 1px solid #eee;
+	/* table-layout: fixed; */
+	width: 100%;
+	margin-bottom: 20px;
+}
+.table th {
+	font-weight: bold;
+	padding: 5px;
+	background: #efefef;
+	border: 1px solid #dddddd;
+	text-align: center;
+    vertical-align: middle;
+}
+.table td{
+	padding: 5px 10px;
+	border: 1px solid #eee;
+	text-align: center;
+    vertical-align: middle;
+}
+.table tbody tr:nth-child(odd){
+	background: #fff;
+}
+.table tbody tr:nth-child(even){
+	background: #F7F7F7;
+}
+/* .table {
+	width: 100%;
+	margin-bottom: 20px;
+	border: 1px solid #dddddd;
+	border-collapse: collapse; 
+}
+.table th {
+	font-weight: bold;
+	padding: 5px;
+	background: #efefef;
+	border: 1px solid #dddddd;
+}
+.table td {
+	border: 1px solid #dddddd;
+	padding: 5px;
+} */
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+{% if error_mess %}
+<div class="alert alert-danger" role="alert">
+    {{ error_mess }}
+</div>
+{% endif %}
+
+<div class="pcoded-content">
+    <div class="pcoded-inner-content">
+        <div class="main-body">
+            <div class="page-wrapper">
+                <!-- [ Main Content ] start -->
+                <div class="row">
+
+                    <!-- [ Hover-table ] start -->
+                    <div class="col-xl-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Текущее состояние</h5>
+                            </div>
+                            <!-- <div class="card-block table-border-style"> -->
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th rowspan="2">id<br>Номера</th>
+                                                <th rowspan="2">Оператор</th>
+                                                <th rowspan="2">Тип<br>канала</th>
+                                                <th rowspan="2">Тип<br>транка</th>
+                                                <th rowspan="2">Тип<br>тарифа</th>
+                                                <th rowspan="2">Название<br>тарифа</th>
+                                                <th rowspan="2">Описание<br>тарифа</th>
+                                                <th rowspan="2">Описание<br>ОАТС/ВАТС</th>
+                                                <th rowspan="2">Безлимит<br>внутри сети</th>
+                                                <th rowspan="2">Безлимит<br>внутри сети<br>не расходует<br>пакет</th>
+                                                <th rowspan="2">Стоимость<br>пакета</th>
+                                                <th rowspan="2">Стоимость<br>ВАТС/ОАТС<br>в пересчете<br>на 1 номер</th>
+                                                <th rowspan="2">Цена<br>минуты</th>
+                                                <th rowspan="2">Цена<br>мин/смс</th>
+                                                <th rowspan="2">Номер</th>
+                                                <th rowspan="2">Дата</th>
+                                                <th colspan="3">Минуты</th>
+                                                <th colspan="3">СМС</th>
+                                                <th rowspan="2">Коментарий</th>
+                                            </tr>
+                                            <tr>
+                                                <th>Пакет</th>
+                                                <th>Расход</th>
+                                                <th>Остаток</th>
+                                                <th>Пакет</th>
+                                                <th>Расход</th>
+                                                <th>Остаток</th>
+                                           </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for row in data %}
+                                            <tr>
+                                                <td>{{ row.id_data_mob }}</td>
+                                                <td>{{ row.opsos }}</td>
+                                                <td>{{row.type_channel}}</td>
+                                                <td>{{row.type_trunk}}</td>
+                                                <td>{{row.type_tariff}}</td>
+                                                <td>{{row.name_tariff}}</td>
+                                                <td>{{row.tariff_description}}</td>
+                                                <td>{{row.oatc_batc_description}}</td>
+                                                <td>{{row.unlimited_on_net}}</td>
+                                                <td>{{row.unlimited_on_net_not_consume_package}}</td>
+                                                <td>{% if row.package_cost %}{{row.package_cost}}{% else %} --- {% endif %}</td>
+                                                <td>{% if row.oatc_batc_cost %}{{row.oatc_batc_cost}}{% else %} --- {% endif %}</td>
+                                                <td>{{row.price_min}}</td>
+                                                <td>{{row.price_min_sms}}</td>
+                                                <td>{{ row.number }}</td>
+                                                <td>{{ row.num_date }}</td>
+                                                <td>{% if row.mobile_packet %}{{row.mobile_packet}}{% else %} --- {% endif %}</td>
+                                                <td>{% if row.mobile_spent %}{{row.mobile_spent}}{% else %} --- {% endif %}</td>
+                                                <td>{% if row.mobile_available %}{{row.mobile_available}}{% else %} --- {% endif %}</td>
+                                                <td>{% if row.sms_packet %}{{row.sms_packet}}{% else %} --- {% endif %}</td>
+                                                <td>{% if row.sms_spent %}{{row.sms_spent}}{% else %} --- {% endif %}</td>
+                                                <td>{% if row.sms_available %}{{row.sms_available}}{% else %} --- {% endif %}</td>
+                                                <td>{% if row.comment %}{{row.comment}}{% else %} --- {% endif %}</td>
+                                            </tr>
+                                            {% endfor %}
+                                            <tr>
+                                                <td colspan="2">Итог:</td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td>{{ total.total_packet_min }}</td>
+                                                <td>{{ total.total_spent_min }}</td>
+                                                <td>{{ total.total_avlbl_min }}</td>
+                                                <td>{{ total.total_packet_sms }}</td>
+                                                <td>{{ total.total_spent_sms }}</td>
+                                                <td>{{ total.total_avlbl_sms }}</td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2">Среднее:</td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td>мин/день</td>
+                                                <td>{{ average.avrg_min|floatformat:2 }}</td>
+                                                <td></td>
+                                                <td>смс/день</td>
+                                                <td>{{ average.avrg_sms|floatformat:2 }}</td>
+                                                <td></td>
+                                                <td></td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2">Прогноз на месяц</td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td>мин/мес</td>
+                                                <td>{{ forecast.min_month|floatformat:2 }}</td>
+                                                <td></td>
+                                                <td>смс/мес</td>
+                                                <td>{{ forecast.sms_month|floatformat:2 }}</td>
+                                                <td></td>
+                                                <td></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <!-- paginator -->
+                                </div>
+                            <!-- </div> -->
+                        </div>
+                   </div>
+                    <!-- [ Hover-table ] end -->
+
+                </div>
+                <!-- [ Main Content ] end -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+{% block javascripts %}
+{% endblock javascripts %}

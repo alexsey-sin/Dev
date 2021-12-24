@@ -1,0 +1,321 @@
+Шаблоны страниц входа и восстановления доступа
+
+Мы составили список страниц, необходимых для входа, регистрации и восстановления
+пароля. Этот список есть в django/contrib/auth/views.py:
+
+	class LoginView(SuccessURLAllowedHostsMixin, FormView):
+		template_name = 'registration/login.html'
+	class LogoutView(SuccessURLAllowedHostsMixin, TemplateView):
+		template_name = 'registration/logged_out.html'
+	class PasswordResetView(PasswordContextMixin, FormView):
+		template_name = 'registration/password_reset_form.html'
+	class PasswordResetDoneView(PasswordContextMixin, TemplateView):
+		template_name = 'registration/password_reset_done.html'
+	class PasswordResetConfirmView(PasswordContextMixin, FormView):
+		template_name = 'registration/password_reset_confirm.html'
+	class PasswordResetCompleteView(PasswordContextMixin, TemplateView):
+		template_name = 'registration/password_reset_complete.html'
+	class PasswordChangeView(PasswordContextMixin, FormView):
+		template_name = 'registration/password_change_form.html'
+	class PasswordChangeDoneView(PasswordContextMixin, TemplateView):
+		template_name = 'registration/password_change_done.html'
+
+Пришло время добавить эти шаблоны в проект.
+В папке users/templates создайте директорию registration, а в ней — файлы
+с перечисленными именами. У вас получится такая структура:
+
+	users
+	├── __init__.py
+	├── admin.py
+	├── apps.py
+	├── forms.py
+	├── migrations
+	│   └── __init__.py
+	├── models.py
+	├── templates
+	│   ├── registration
+	│   │   ├── logged_out.html
+	│   │   ├── login.html
+	│   │   ├── password_change_done.html
+	│   │   ├── password_change_form.html
+	│   │   ├── password_reset_complete.html
+	│   │   ├── password_reset_confirm.html
+	│   │   ├── password_reset_done.html
+	│   │   └── password_reset_form.html
+	│   └── signup.html
+	├── templatetags
+	│   ├── __init__.py
+	│   └── user_filters.py
+	├── tests.py
+	├── urls.py
+	└── views.py
+
+Когда Django ищет запрошенный шаблон, то проходит по каждой директории templates в приложениях из списка INSTALLED_APPS, ищет там файл, чей путь и имя совпадают с template_name.
+
+Давайте разберёмся с назначением этих файлов:
+
+    login.html — форма входа, пользователь вводит username и пароль.
+		После отправки форма проверяется, и если пользователь с таким именем
+		и паролем найден, то он авторизуется и перенаправляется на главную страницу
+    logged_out.html — в навигации сайта мы показываем ссылку на страницу «Выйти».
+		Когда пользователь переходит на эту страницу, то он разлогинивается
+		и ему показывается прощальная страница
+    password_change_form.html — если залогиненному пользователю надо изменить
+		пароль, то на этой странице он может указать текущий пароль и ввести новый.
+		Если пользователь правильно ввёл текущий пароль и новый соответствует
+		требованиям безопасности, то показывается страница password_change_done.html.
+    password_reset_form.html — даёт восстановить доступ к сайту. С этой страницы
+		пользователь отправляет через форму свой логин или email.
+    На почту пользователю отправляется письмо со ссылкой на страницу восстановления
+		пароля. Об отправке письма уведомляет страница password_reset_done.html
+    Пользователь переходит по ссылке из письма и попадает на страницу
+		password_reset_confirm.html. На этой странице пользователь указывает
+		новый пароль, отправляет форму и, после валидации нового пароля,
+		попадает на страницу password_reset_complete.html.
+
+login.html
+Добавьте код в шаблон users/templates/registration/login.html
+
+	{% extends "base.html" %}
+	{% block title %}Войти{% endblock %}
+	{% block content %}
+	{% load user_filters %}
+
+	<div class="row justify-content-center">
+	  <div class="col-md-8 p-5">
+		<div class="card">
+		  <div class="card-header">Войти на сайт</div>
+		  <div class="card-body">
+			{% if form.errors %}
+			<div class="alert alert-danger" role="alert">
+			  Имя пользователя и пароль не совпадают. Введите правильные данные.
+			</div>
+			{% endif %}
+
+			<div class="alert alert-info" role="alert">
+			  Пожалуйста, авторизуйтесь.
+			</div>
+
+			<form method="post" action="{% url 'login' %}">
+			  {% csrf_token %}
+			  <input type="hidden" name="next" value="{{ next }}">
+			  <div class="form-group row">
+				<label for="{{ form.username.id_for_label }}" class="col-md-4 col-form-label text-md-right">Имя пользователя</label>
+				<div class="col-md-6">
+				  {{ form.username|addclass:"form-control" }}
+				</div>
+			  </div>
+
+			  <div class="form-group row">
+				<label for="{{ form.password.id_for_label }}" class="col-md-4 col-form-label text-md-right">Пароль</label>
+				<div class="col-md-6">
+				  {{ form.password|addclass:"form-control" }}
+				</div>
+			  </div>
+
+			  <div class="col-md-6 offset-md-4">              
+				<button type="submit" class="btn btn-primary">
+				  Войти
+				</button>
+				<a href="{% url 'password_reset' %}" class="btn btn-link">
+				  Забыли пароль?
+				</a>
+			  </div>
+			</form>
+		  </div> <!-- card body -->
+		</div> <!-- card -->
+	  </div> <!-- col -->
+	</div> <!-- row -->
+
+	{% endblock %}
+
+Страницы с сообщениями о завершении операций
+Это простые страницы для вывода сообщений о том, что операция прошла успешно:
+
+    password_change_done.html,
+    password_reset_done.html,
+    password_reset_complete.html и
+    logged_out.html
+
+password_change_done.html:
+
+	{% extends "base.html" %}
+	{% block title %}Пароль изменён{% endblock %}
+
+	{% block content %}
+	<div class="row justify-content-center">
+	  <div class="col-md-8 p-5">
+		<div class="card">
+		  <div class="card-header">Пароль изменён</div>
+		  <div class="card-body">
+			<p>Пароль изменён успешно</p>
+		  </div> <!-- card body -->
+		</div> <!-- card -->
+	  </div> <!-- col -->
+	</div> <!-- row -->
+
+	{% endblock %}
+
+Остальные шаблоны создайте самостоятельно на основе шаблона
+password_change_done.html
+
+Текст в password_reset_done.html поставьте такой:
+
+    Заголовок: Ссылка на восстановление пароля отправлена
+    Сообщение: Проверьте свою почту, вам должно прийти письмо со ссылкой для
+		восстановления пароля.
+
+Страница password_reset_complete.html:
+
+    Заголовок: Сброс пароля выполнен
+    Сообщение: Пароль изменён, всё получилось.
+
+Страницу logged_out.html наполните таким текстом:
+
+    Заголовок: Вы вышли из системы
+    Сообщение: Вы вышли из своей учётной записи. Ждём вас снова!
+
+Шаблоны форм изменения пароля
+В файл password_change_form.html добавьте такой код:
+
+	{% extends "base.html" %}
+	{% block title %}Изменение пароля{% endblock %}
+	{% block content %}
+	{% load user_filters %}
+
+	<div class="row justify-content-center">
+	  <div class="col-md-8 p-5">
+		<div class="card">
+		  <div class="card-header">Изменить пароль</div>
+		  <div class="card-body">
+
+			<form method="post">
+			  {% csrf_token %}
+
+			  {% for field in form %}
+						{# TODO: Добавьте сюда код отображения поля #}
+			  {% endfor %}
+
+			  <div class="col-md-6 offset-md-4">              
+				<button type="submit" class="btn btn-primary">
+					Изменить пароль
+				</button>
+			  </div>
+			</form>
+
+		  </div> <!-- card body -->
+		</div> <!-- card -->
+	  </div> <!-- col -->
+	</div> <!-- row -->
+
+	{% endblock %}
+
+Допишите этот шаблон: выведите поля формы в цикле {% for field in form %}.
+Форма сброса пароля password_reset_form.html очень похожа на
+password_change_form.html:
+
+	{% extends "base.html" %}
+	{% block title %}Сброс пароля{% endblock %}
+	{% block content %}
+	{% load user_filters %}
+
+	<div class="row justify-content-center">
+	  <div class="col-md-8 p-5">
+		<div class="card">
+		  <div class="card-header">Чтобы сбросить старый пароль — введите адрес электронной почты, под которым вы регистрировались</div>
+		  <div class="card-body">
+
+			<form method="post">
+			  {% csrf_token %}
+
+			  {% for field in form %}
+			  {# TODO: Добавьте сюда код отображения поля #}
+			  {% endfor %}
+
+			  <div class="col-md-6 offset-md-4">              
+				<button type="submit" class="btn btn-primary">
+					Сбросить пароль
+				</button>
+			  </div>
+			</form>
+
+		  </div> <!-- card body -->
+		</div> <!-- card -->
+	  </div> <!-- col -->
+	</div> <!-- row -->
+
+	{% endblock %}
+
+Доработайте и этот шаблон: выведите поля формы в цикле {% for field in form %}
+
+Шаблон password_reset_confirm.html почти полностью соответствует
+password_change_form.html, за одним исключением. Ссылка в письме может
+сработать только один раз. Если пользователь перейдёт по ней, ссылка устареет.
+Для проверки «дееспособности» ссылки добавим проверку переменной validlink.
+Доработайте эту заготовку шаблона:
+
+	{% extends "base.html" %}
+	{% block title %}Новый пароль{% endblock %}
+	{% block content %}
+	{% load user_filters %}
+
+	{% if validlink %}
+
+	<div class="row justify-content-center">
+	  <div class="col-md-8 p-5">
+		<div class="card">
+		  <div class="card-header">Введите новый пароль</div>
+		  <div class="card-body">
+
+			<form method="post">
+			  {% csrf_token %}
+
+			  {% for field in form %}
+				{# TODO: Добавьте сюда код отображения поля #}
+			  {% endfor %}
+
+			  <div class="col-md-6 offset-md-4">              
+				<button type="submit" class="btn btn-primary">
+				  Назначить новый пароль
+				</button>
+			  </div>
+			</form>
+
+		  </div> <!-- card body -->
+		</div> <!-- card -->
+	  </div> <!-- col -->
+	</div> <!-- row -->
+
+	{% else %}
+	<div class="row justify-content-center">
+	  <div class="col-md-8 p-5">
+		<div class="card">
+		  <div class="card-header">Ошибка</div>
+		  <div class="card-body">
+			<p>Ссылка сброса пароля содержит ошибку или устарела.</p>
+		  </div> <!-- card body -->
+		</div> <!-- card -->
+	  </div> <!-- col -->
+	</div> <!-- row -->
+	{% endif %}
+
+	{% endblock %}
+
+Финальные настройки
+
+Осталось объяснить Django, какие страницы надо показывать пользователю после входа
+в аккаунт и выхода из него. Добавьте в yatube/settings.py такие настройки:
+
+	# Login
+
+	LOGIN_URL = '/auth/login/'
+	LOGIN_REDIRECT_URL = 'index'
+	# LOGOUT_REDIRECT_URL = 'index' 
+
+Значениями параметров LOGIN_REDIRECT_URL и LOGOUT_REDIRECT_URL могут быть имена
+URL-шаблонов из urls.py или обычные URL страниц.
+
+Параметр LOGOUT_REDIRECT_URL заменяет адрес страницы, указанный в файле
+logged_out.html. Уберите комментарий с этой строки, если хотите перенаправлять
+пользователя на главную страницу после того, как он разлогинится.
+

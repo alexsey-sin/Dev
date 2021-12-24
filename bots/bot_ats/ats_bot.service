@@ -1,0 +1,16 @@
+[Unit]
+Description=ATS domconnect bot
+After=network.target
+[Service]
+User=root
+Group=root
+WorkingDirectory=/var/www/bot_ats/
+EnvironmentFile=/etc/environment
+ExecStart=/var/www/bot_ats/venv/bin/python3 main.py
+ExecReload=/var/www/bot_ats/venv/bin/python3 main.py
+StandardOutput=syslog
+StandardError=syslog
+Restart=always
+RestartSec=15
+[Install]
+WantedBy=multi-user.target

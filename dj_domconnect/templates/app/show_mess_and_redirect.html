@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta id="refreshtag" http-equiv="refresh" content="3;{% url 'app:home' %}">
+        
+        <link rel="icon" href="/static/assets/images/favicon.ico" type="image/x-icon">
+        <link rel="stylesheet" href="/static/assets/css/style.css">
+    </head>
+    <body>
+
+        <div class="alert alert-{{ result_style }}" role="alert">
+            <h1><center>{{ result }}</center></h1>
+        </div>
+        <p style="padding: 50px;">{{ message|safe }}</p>
+        <center><button type="button" class="btn btn-secondary" onclick="window.stop();">Задержаться</button></center>
+    </body>
+</html>

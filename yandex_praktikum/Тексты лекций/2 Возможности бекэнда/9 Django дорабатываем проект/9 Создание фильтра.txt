@@ -1,0 +1,166 @@
+Создание фильтра
+
+В прошлом уроке мы почти сделали форму регистрации. Но наш код не выводит
+HTML-атрибута class в тегах input. Вот наш код:
+
+	<div class="form-group row" aria-required="false">
+	  <label for="id_first_name" class="col-md-4 col-form-label text-md-right">Имя</label>
+	  <div class="col-md-6">
+		<input type="text" name="first_name" maxlength="30" id="id_first_name"> 
+	  </div>
+	</div>
+
+А вот код, который должен быть:
+
+	<div class="form-group row" aria-required="false">
+	  <label for="id_first_name" class="col-md-4 col-form-label text-md-right">Имя</label>
+	  <div class="col-md-6">
+		<input type="text" class="form-control" name="first_name" maxlength="30" id="id_first_name"> 
+	  </div>
+	</div>
+
+Без атрибута class фронтендеры не смогут правильно оформить отображение формы на
+странице. Надо им помочь.
+
+В этом нам поможет система фильтров в шаблонах, вы уже работали с ней. Создадим
+собственный фильтр для Django-шаблонов.
+
+Создайте папку users/templatetags, а в ней — два пустых файла:
+__init__.py и user_filters.py.
+
+У вас должна получится такая структура:
+
+	users
+	├── __init__.py
+	├── admin.py
+	├── apps.py
+	├── migrations
+	│   └── __init__.py
+	├── forms.py
+	├── models.py
+	├── templates
+	│   └── signup.html
+	├── templatetags
+	│   ├── __init__.py
+	│   └── user_filters.py
+	├── tests.py
+	├── urls.py
+	└── views.py 
+
+Файл __init__.py сообщает системе, что директория templatetags — это пакет,
+который можно импортировать в код. А в файле user_filters.py мы сейчас напишем
+код фильтра.
+
+Фильтр даст нам возможность указывать CSS-класс в HTML-коде любого поля формы.
+
+У объекта field есть метод as_widget(). Ему можно передать параметр с перечнем
+HTML-атрибутов, которые мы хотим изменить.
+
+Финальный код фильтра будет выглядеть так: 
+
+	from django import template
+	# В template.Library зарегистрированы все теги и фильтры шаблонов
+	# добавляем к ним и наш фильтр
+	register = template.Library()
+
+
+	@register.filter 
+	def addclass(field, css):
+		return field.as_widget(attrs={"class": css})
+
+	# синтаксис @register... , под который описана функция addclass() - 
+	# это применение "декораторов", функций, обрабатывающих функции
+	# мы скоро про них расскажем. Не бойтесь соб@к
+
+Теперь в коде шаблона можно указать фильтр addclass с параметром form-control:
+{{ field|addclass:"form-control" }} .
+
+Чтобы фильтр был доступен в шаблоне — предварительно загрузите его в шаблон
+тегом {% load user_filters %}.
+
+Финальный код шаблона формы регистрации будет выглядеть так:
+
+	{% extends "base.html" %}
+	{% block title %}Зарегистрироваться{% endblock %}
+	{% block content %}
+	{# загружаем фильтр #}
+	{% load user_filters %}
+
+	<div class="row justify-content-center">
+	  <div class="col-md-8 p-5">
+		<div class="card">
+		  <div class="card-header">Зарегистрироваться</div>
+		  <div class="card-body">
+
+			{% for error in form.errors %}
+			<div class="alert alert-danger" role="alert">
+			  {{ error|escape }}
+			</div>
+			{% endfor %}
+
+			<form method="post" action="{% url 'signup' %}">
+			  {% csrf_token %}
+
+			  {% for field in form %}
+			  <div class="form-group row" aria-required={% if field.field.required %}"true"{% else %}"false"{% endif %}>
+				<label for="{{ field.id_for_label }}" class="col-md-4 col-form-label text-md-right">{{ field.label }}{% if field.field.required %}<span class="required">*</span>{% endif %}</label>
+				<div class="col-md-6">
+
+				  {# подключаем фильтр и указываем класс #}
+				  {{ field|addclass:"form-control" }}
+
+				  {% if field.help_text %}
+				  <small id="{{ field.id_for_label }}-help" class="form-text text-muted">{{ field.help_text|safe }}</small>
+				  {% endif %}
+				</div>                
+			  </div>
+			  {% endfor %}
+
+			  <div class="col-md-6 offset-md-4">              
+				<button type="submit" class="btn btn-primary">
+				  Зарегистрироваться
+				</button>
+			  </div>
+			</form>
+		  </div> <!-- card body -->
+		</div> <!-- card -->
+	  </div> <!-- col -->
+	</div> <!-- row -->
+
+	{% endblock %}
+
+Внимание: обычно Django видит, что файлы проекта изменились, когда вы запускаете
+проект командой $ python manage.py runserver. Но иногда он может не заметить
+изменений. Перезапустите Django-проект: в окне терминала нажмите Ctrl+C для
+остановки и выполните команду $ python manage.py runserver для старта.
+
+Откройте или обновите страницу регистрации. Форма выглядит чисто, красиво и
+профессионально.
+
+===============================================================================
+Тренажер - проект
+
+Задача:
+
+Создайте файл uglify.py в папке templatetags; в этом файле напишите фильтр
+uglify, который превращает текст в нечитаемый по такому принципу: каждый нечётный
+символ переводится в нижний регистр, а чётный — в верхний.
+Пример вызова фильтра:
+
+	{{ "Привет мир!!"|uglify }} 
+
+Пример результата:
+
+	пРиВеТ МиР!! 
+
+Подсказка:
+
+Вам помогут методы upper() и lower() Искать чётные и нечётные символы удобно
+по условию if x % 2 == 0 А перебрать строку по символам можно точно так же,
+как обычный список.
+
+Фильтр надо зарегистрировать в template.Library()
+
+
+Проект в папке progect_9
+===============================================================================
