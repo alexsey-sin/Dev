@@ -8,10 +8,13 @@ from api import views_domru, views_ttk, views_onlime, views_txv
 app_name = 'api'
 
 urlpatterns = [
-    path('get_liza_phrases/<int:num_group>', views.get_liza_phrases),
+    path('get_liza_phrases/<int:num_group>', views.get_liza_phrases, name='liza_phrases'),
     path('get_liza_files/<str:filename>', views.get_liza_files),
     path('get_name_files/<str:filename>', views.get_name_files),
-    path('get_names', views.get_names),
+    path('get_names', views.get_names, name='names'),
+
+    path('get_ndz_phrases/<int:num_group>', views.get_ndz_phrases, name='ndz_phrases'),
+    path('get_pz_phrases/<int:num_group>', views.get_pz_phrases, name='pz_phrases'),
 
     path('set_bid_domru2', views_domru2.set_bid_domru2),
     path('get_bid_domru2', views_domru2.get_bid_domru2),

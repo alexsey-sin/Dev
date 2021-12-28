@@ -1,6 +1,6 @@
 {% extends "app/layouts/base.html" %}
 
-{% block title %} Группы фраз {% endblock %} 
+{% block title %} {{ page_title }} {% endblock %} 
 
 {% block stylesheets %}
 <style>
@@ -33,7 +33,7 @@ table td:first-child:before {
                     <div class="col-xl-12">
                         <div class="card">
                             <div class="card-header">
-                                <h5>Фразы группы:</h5>
+                                <h5>Фразы группы: </h5>
                                 &nbsp;&nbsp;&nbsp;&nbsp;
                                 <h3>{{ group_name }}</h3>
                                 <span class="d-block m-t-5">Всего в группе: {{ cnt_phrases }} фраз.</span>

@@ -1,6 +1,7 @@
 from django.http import HttpResponse, FileResponse
 from django.shortcuts import get_object_or_404
 from app.models import LizaGroupPhrase, LizaPhrase, Name
+from app.models import NdzGroupPhrase, NdzPhrase, PzGroupPhrase, PzPhrase
 from django.contrib.auth import get_user_model
 import json
 
@@ -97,6 +98,32 @@ def get_names(request):
 
         data = json.dumps(out_data)
         return HttpResponse(data, content_type='application/json; charset=utf-8')
+    else:
+        return HttpResponse('Use GET request, please.', content_type='text/plain; charset=utf-8')
+
+
+def get_ndz_phrases(request, num_group):
+    if request.method == 'GET':
+        group = get_object_or_404(NdzGroupPhrase, num_group=num_group)
+        phrases = NdzPhrase.objects.filter(group=group).order_by('text')
+        lst = []
+        for phr in phrases:
+            lst.append(phr.text)
+        
+        return HttpResponse('/(' + '|'.join(lst) + ')/')
+    else:
+        return HttpResponse('Use GET request, please.', content_type='text/plain; charset=utf-8')
+
+
+def get_pz_phrases(request, num_group):
+    if request.method == 'GET':
+        group = get_object_or_404(PzGroupPhrase, num_group=num_group)
+        phrases = PzPhrase.objects.filter(group=group).order_by('text')
+        lst = []
+        for phr in phrases:
+            lst.append(phr.text)
+        
+        return HttpResponse('/(' + '|'.join(lst) + ')/')
     else:
         return HttpResponse('Use GET request, please.', content_type='text/plain; charset=utf-8')
 

@@ -1,4 +1,4 @@
-from .models import Name, LizaPhrase, GermanPhrase
+from .models import Name, LizaPhrase, GermanPhrase, NdzPhrase, PzPhrase
 from django import forms
 
 
@@ -18,3 +18,17 @@ class GermanPhraseForm(forms.ModelForm):
     class Meta:
         model = GermanPhrase
         fields = ('text',)
+
+
+class NdzPhraseForm(forms.ModelForm):
+    class Meta:
+        model = NdzPhrase
+        fields = ('text',)
+
+
+class PzPhraseForm(forms.ModelForm):
+    class Meta:
+        model = PzPhrase
+        fields = ('text',)
+
+

@@ -29,12 +29,26 @@
                     </li>
                     <li data-username="Table bootstrap datatable footable" 
                         class="nav-item {% if 'phrasesLiza' in segment %} active {% endif %}">
-                        <a href="{% url 'app:lizagroup' %}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-server"></i></span><span class="pcoded-mtext">Фразы Лиза</span></a>
+                        <a href="{% url 'app:lizagroup' %}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-server"></i></span><span class="pcoded-mtext">Бот Лиза</span></a>
                     </li>
                     <li data-username="Table bootstrap datatable footable" 
                         class="nav-item {% if 'phrasesGerman' in segment %} active {% endif %}">
-                        <a href="{% url 'app:germangroup' %}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-server"></i></span><span class="pcoded-mtext">Фразы Герман</span></a>
+                        <a href="{% url 'app:germangroup' %}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-server"></i></span><span class="pcoded-mtext">Бот Герман</span></a>
                     </li>
+                    <li><hr style="border: 1px solid gray;"></li>
+                    <li class="nav-item pcoded-menu-caption">
+                        <label>Автоответчик</label>
+                    </li>
+                    <li data-username="Table bootstrap datatable footable" 
+                        class="nav-item {% if 'phrasesNdz' in segment %} active {% endif %}">
+                        <a href="{% url 'app:ndzgroup' %}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-server"></i></span><span class="pcoded-mtext">Бот НДЗ</span></a>
+                    </li>
+                    <li data-username="Table bootstrap datatable footable" 
+                        class="nav-item {% if 'phrasesPz' in segment %} active {% endif %}">
+                        <a href="{% url 'app:pzgroup' %}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-server"></i></span><span class="pcoded-mtext">Бот ПЗ</span></a>
+                    </li>
+
+
                     <li><hr style="border: 1px solid gray;"></li>
                     <li class="nav-item pcoded-menu-caption">
                         <label>Мобильная связь</label>

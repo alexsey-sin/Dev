@@ -3,8 +3,9 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 from django.core.paginator import Paginator
-from app.forms import NameForm, LizaPhraseForm, GermanPhraseForm
+from app.forms import NameForm, LizaPhraseForm, GermanPhraseForm, NdzPhraseForm, PzPhraseForm
 from app.models import LizaGroupPhrase, LizaPhrase, GermanGroupPhrase, GermanPhrase, File, Name
+from app.models import NdzGroupPhrase, NdzPhrase, PzGroupPhrase, PzPhrase
 from datetime import datetime as dt
 from django.contrib.auth import get_user_model
 import os
@@ -82,7 +83,7 @@ def lizagroup(request):
     u_name = user.get_full_name()
     if u_name.strip() == '':
         u_name = user.username
-    context = {'u_name': u_name}
+    context = {'u_name': u_name, 'page_title': 'Лиза'}
 
     data = []
     if request.method == 'POST':
@@ -141,12 +142,13 @@ def lizagroup(request):
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
 
+    context['url_phrases'] = 'app:lizaphrases'
     context['segment'] = 'phrasesLiza'
     context['page_number'] = page_number
     context['page'] = page
     context['paginator'] = paginator
 
-    return render(request,'app/LizaGroup.html', context)
+    return render(request,'app/GroupPhrases.html', context)
 
 
 @login_required(login_url="/login/")
@@ -155,7 +157,7 @@ def lizaphrases(request, id_group):
     u_name = user.get_full_name()
     if u_name.strip() == '':
         u_name = user.username
-    context = {'u_name': u_name}
+    context = {'u_name': u_name, 'page_title': 'Лиза'}
 
     group = get_object_or_404(LizaGroupPhrase, id=id_group)
     context['group_name'] = group.text
@@ -197,7 +199,7 @@ def lizaphrases(request, id_group):
     context['page'] = page
     context['paginator'] = paginator
 
-    return render(request, 'app/LizaPhrase.html', context)
+    return render(request, 'app/PhrasesTable.html', context)
 
 
 @login_required(login_url="/login/")
@@ -407,6 +409,257 @@ def germananswers(request, id_group):
     context['paginator'] = paginator
 
     return render(request, 'app/GermanAnswer.html', context)
+
+
+@login_required(login_url="/login/")
+def ndzgroup(request):
+    user = request.user
+    u_name = user.get_full_name()
+    if u_name.strip() == '':
+        u_name = user.username
+    context = {'u_name': u_name, 'page_title': ' Недозвон'}
+
+    data = []
+    if request.method == 'POST':
+        id_group = request.POST.get('group_id', None)
+        new_priority = request.POST.get('priority_value', None)
+        newphrase = request.POST.get('newphrase_value', None)
+
+        if new_priority and id_group:
+            group = get_object_or_404(NdzGroupPhrase, id=id_group)
+            group.priority = new_priority
+            group.save()
+        elif newphrase and id_group:
+            try:
+                n_phrase = NdzPhrase()
+                n_phrase.text = newphrase
+                group = get_object_or_404(NdzGroupPhrase, id=id_group)
+                n_phrase.group = group
+                n_phrase.author = user
+                n_phrase.save()
+            except:
+                context['error_mess'] = 'Ошибка, возможно такая фраза уже существует.'
+        else:
+            context['error_mess'] = 'Ошибка редактирования/добавления.'
+
+    gr_phrases = NdzGroupPhrase.objects.order_by('num_group')
+    if gr_phrases:
+        for gr in gr_phrases:
+            group = {}
+            group['id'] = gr.id
+            group['num_group'] = gr.num_group
+            group['priority'] = gr.priority
+            group['text'] = gr.text
+            phrase = NdzPhrase.objects.filter(group=gr.id).order_by('-pub_date')
+            last = NdzPhrase.objects.filter(group=gr.id).order_by('pub_date').last()
+            author = ''
+            if last:
+                str_date = last.pub_date.strftime('%H:%M %d.%m.%Y')
+                author = last.author.get_full_name()
+                if author.strip() == '':
+                    author = last.author.username
+                group['last_date'] = str_date
+            group['author'] = author
+            group['cnt_phrases'] = phrase.count()
+            group['phrases'] = []
+            c = 5
+            for ptr in phrase:
+                group['phrases'].insert(0, ptr.text)
+                c -= 1
+                if c == 0:
+                    break
+            data.append(group)
+    else:
+        context['error_mess'] = 'Нет групп фраз.'
+
+    paginator = Paginator(data, 20)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+
+    context['url_phrases'] = 'app:ndzphrases'
+    context['segment'] = 'phrasesNdz'
+    context['page_number'] = page_number
+    context['page'] = page
+    context['paginator'] = paginator
+
+    return render(request,'app/GroupPhrases.html', context)
+
+
+@login_required(login_url="/login/")
+def ndzphrases(request, id_group):
+    user = request.user
+    u_name = user.get_full_name()
+    if u_name.strip() == '':
+        u_name = user.username
+    context = {'u_name': u_name, 'page_title': 'Недозвон'}
+
+    group = get_object_or_404(NdzGroupPhrase, id=id_group)
+    context['group_name'] = group.text
+    
+    if request.method == 'POST':
+        form = NdzPhraseForm(request.POST or None)
+        id_edit = request.POST.get('edit', None)
+        id_delete = request.POST.get('delete', None)
+
+        if id_edit:  # редактирование
+            try:
+                rec = get_object_or_404(NdzPhrase, id=id_edit)
+                rec.text = request.POST.get("text")
+                rec.author = user
+                rec.save()
+            except:
+                context['error_mess'] = 'Ошибка редактирования, возможно такая фраза уже существует.'
+        elif id_delete:
+            rec = get_object_or_404(NdzPhrase, id=id_delete)
+            rec.delete()
+        elif form.is_valid():
+            new_form = form.save(commit=False)
+            new_form.group = group
+            new_form.author = user
+            new_form.save()
+        else:
+            context['error_mess'] = 'Ошибка заполнения формы, возможно такая фраза уже существует.'
+
+    form = NdzPhraseForm()
+    context['form'] = form
+
+    data = NdzPhrase.objects.filter(group=group.id).order_by('pub_date')
+    context['cnt_phrases'] = data.count()
+    paginator = Paginator(data, 20)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+
+    context['page_number'] = page_number
+    context['page'] = page
+    context['paginator'] = paginator
+
+    return render(request, 'app/PhrasesTable.html', context)
+
+
+@login_required(login_url="/login/")
+def pzgroup(request):
+    user = request.user
+    u_name = user.get_full_name()
+    if u_name.strip() == '':
+        u_name = user.username
+    context = {'u_name': u_name, 'page_title': 'Пропущенные звонки'}
+
+    data = []
+    if request.method == 'POST':
+        id_group = request.POST.get('group_id', None)
+        new_priority = request.POST.get('priority_value', None)
+        newphrase = request.POST.get('newphrase_value', None)
+
+        if new_priority and id_group:
+            group = get_object_or_404(PzGroupPhrase, id=id_group)
+            group.priority = new_priority
+            group.save()
+        elif newphrase and id_group:
+            try:
+                n_phrase = PzPhrase()
+                n_phrase.text = newphrase
+                group = get_object_or_404(PzGroupPhrase, id=id_group)
+                n_phrase.group = group
+                n_phrase.author = user
+                n_phrase.save()
+            except:
+                context['error_mess'] = 'Ошибка, возможно такая фраза уже существует.'
+        else:
+            context['error_mess'] = 'Ошибка редактирования/добавления.'
+
+    gr_phrases = PzGroupPhrase.objects.order_by('num_group')
+    if gr_phrases:
+        for gr in gr_phrases:
+            group = {}
+            group['id'] = gr.id
+            group['num_group'] = gr.num_group
+            group['priority'] = gr.priority
+            group['text'] = gr.text
+            phrase = PzPhrase.objects.filter(group=gr.id).order_by('-pub_date')
+            last = PzPhrase.objects.filter(group=gr.id).order_by('pub_date').last()
+            author = ''
+            if last:
+                str_date = last.pub_date.strftime('%H:%M %d.%m.%Y')
+                author = last.author.get_full_name()
+                if author.strip() == '':
+                    author = last.author.username
+                group['last_date'] = str_date
+            group['author'] = author
+            group['cnt_phrases'] = phrase.count()
+            group['phrases'] = []
+            c = 5
+            for ptr in phrase:
+                group['phrases'].insert(0, ptr.text)
+                c -= 1
+                if c == 0:
+                    break
+            data.append(group)
+    else:
+        context['error_mess'] = 'Нет групп фраз.'
+
+    paginator = Paginator(data, 20)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+
+    context['url_phrases'] = 'app:pzphrases'
+    context['segment'] = 'phrasesPz'
+    context['page_number'] = page_number
+    context['page'] = page
+    context['paginator'] = paginator
+
+    return render(request,'app/GroupPhrases.html', context)
+
+
+@login_required(login_url="/login/")
+def pzphrases(request, id_group):
+    user = request.user
+    u_name = user.get_full_name()
+    if u_name.strip() == '':
+        u_name = user.username
+    context = {'u_name': u_name, 'page_title': 'Пропущенные звонки'}
+
+    group = get_object_or_404(PzGroupPhrase, id=id_group)
+    context['group_name'] = group.text
+    
+    if request.method == 'POST':
+        form = PzPhraseForm(request.POST or None)
+        id_edit = request.POST.get('edit', None)
+        id_delete = request.POST.get('delete', None)
+
+        if id_edit:  # редактирование
+            try:
+                rec = get_object_or_404(PzPhrase, id=id_edit)
+                rec.text = request.POST.get("text")
+                rec.author = user
+                rec.save()
+            except:
+                context['error_mess'] = 'Ошибка редактирования, возможно такая фраза уже существует.'
+        elif id_delete:
+            rec = get_object_or_404(PzPhrase, id=id_delete)
+            rec.delete()
+        elif form.is_valid():
+            new_form = form.save(commit=False)
+            new_form.group = group
+            new_form.author = user
+            new_form.save()
+        else:
+            context['error_mess'] = 'Ошибка заполнения формы, возможно такая фраза уже существует.'
+
+    form = PzPhraseForm()
+    context['form'] = form
+
+    data = PzPhrase.objects.filter(group=group.id).order_by('pub_date')
+    context['cnt_phrases'] = data.count()
+    paginator = Paginator(data, 20)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+
+    context['page_number'] = page_number
+    context['page'] = page
+    context['paginator'] = paginator
+
+    return render(request, 'app/PhrasesTable.html', context)
+
 
 ###############################################################################
 ###############################################################################

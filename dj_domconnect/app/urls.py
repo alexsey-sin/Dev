@@ -18,6 +18,12 @@ urlpatterns = [
     path('germanphrases/<str:id_group>', views.germanphrases, name='germanphrases'),
     path('germananswers/<str:id_group>', views.germananswers, name='germananswers'),
 
+    path('ndzgroup', views.ndzgroup, name='ndzgroup'),
+    path('ndzphrases/<str:id_group>', views.ndzphrases, name='ndzphrases'),
+
+    path('pzgroup', views.pzgroup, name='pzgroup'),
+    path('pzphrases/<str:id_group>', views.pzphrases, name='pzphrases'),
+
     path('backup', views.backup, name='backup'),
     path('restore', views.restore, name='restore'),
 

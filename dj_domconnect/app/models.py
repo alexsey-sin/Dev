@@ -181,3 +181,106 @@ class Name(models.Model):
     def __str__(self):
         return self.text
 
+
+class NdzGroupPhrase(models.Model):  # группы фраз Недозвоны
+    text = models.CharField(
+        unique = True,  # Если True, это поле должно быть уникальным во всей таблице.
+        verbose_name = 'Название группы',  # Удобочитаемое имя поля
+        max_length = 200,
+        help_text = 'Дайте короткое название группе',  # Дополнительный текст «справки», отображаемый в виджете формы.
+        blank = False,  # Если True, поле может быть пустым. По умолчанию False.
+    )
+    num_group = models.IntegerField(
+        unique = True,  # Если True, это поле должно быть уникальным во всей таблице.
+        blank = False,  # Если True, поле может быть пустым. По умолчанию False.
+        verbose_name='номер группы',
+        help_text='Укажите номер группы',
+    )
+    priority = models.IntegerField(
+        blank = False,  # Если True, поле может быть пустым. По умолчанию False.
+        verbose_name='Приоритет',
+        help_text='Укажите приоритет от 0 до 100',
+    )
+
+    def __str__(self):
+        return self.text
+
+
+class NdzPhrase(models.Model):  # фразы Недозвоны
+    text = models.CharField(
+        unique = True,  # Если True, это поле должно быть уникальным во всей таблице.
+        verbose_name = 'Фраза',  # Удобочитаемое имя поля
+        max_length = 200,
+        help_text = 'Введите текст фразы',  # Дополнительный текст «справки», отображаемый в виджете формы.
+        blank = False,  # Если True, поле может быть пустым. По умолчанию False.
+    )
+    group = models.ForeignKey(
+        NdzGroupPhrase,
+        on_delete=models.CASCADE,
+        verbose_name='Принадлежность фразы к группе',
+        )
+    pub_date = models.DateTimeField(
+        auto_now=True,
+        verbose_name='Дата создания/изменения',
+        help_text='Текущее время (авто)',
+        )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='Автор',
+        )
+
+    def __str__(self):
+        return self.text
+
+
+class PzGroupPhrase(models.Model):  # группы фраз Пропущенные звонки
+    text = models.CharField(
+        unique = True,  # Если True, это поле должно быть уникальным во всей таблице.
+        verbose_name = 'Название группы',  # Удобочитаемое имя поля
+        max_length = 200,
+        help_text = 'Дайте короткое название группе',  # Дополнительный текст «справки», отображаемый в виджете формы.
+        blank = False,  # Если True, поле может быть пустым. По умолчанию False.
+    )
+    num_group = models.IntegerField(
+        unique = True,  # Если True, это поле должно быть уникальным во всей таблице.
+        blank = False,  # Если True, поле может быть пустым. По умолчанию False.
+        verbose_name='номер группы',
+        help_text='Укажите номер группы',
+    )
+    priority = models.IntegerField(
+        blank = False,  # Если True, поле может быть пустым. По умолчанию False.
+        verbose_name='Приоритет',
+        help_text='Укажите приоритет от 0 до 100',
+    )
+
+    def __str__(self):
+        return self.text
+
+
+class PzPhrase(models.Model):  # фразы Пропущенные звонки
+    text = models.CharField(
+        unique = True,  # Если True, это поле должно быть уникальным во всей таблице.
+        verbose_name = 'Фраза',  # Удобочитаемое имя поля
+        max_length = 200,
+        help_text = 'Введите текст фразы',  # Дополнительный текст «справки», отображаемый в виджете формы.
+        blank = False,  # Если True, поле может быть пустым. По умолчанию False.
+    )
+    group = models.ForeignKey(
+        PzGroupPhrase,
+        on_delete=models.CASCADE,
+        verbose_name='Принадлежность фразы к группе',
+        )
+    pub_date = models.DateTimeField(
+        auto_now=True,
+        verbose_name='Дата создания/изменения',
+        help_text='Текущее время (авто)',
+        )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='Автор',
+        )
+
+    def __str__(self):
+        return self.text
