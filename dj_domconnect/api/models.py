@@ -879,6 +879,7 @@ class TxV(models.Model):
         (4, 'Ростелеком'),
         (5, 'ТТК'),
         (6, 'ОнЛайм'),
+        (7, 'МГТС'),
     )
     pv_code = models.PositiveSmallIntegerField(
         choices = PV_VAR,
@@ -892,9 +893,20 @@ class TxV(models.Model):
         verbose_name = 'Пароль',
         max_length = 200,
     )
+    login_2 = models.CharField(
+        verbose_name = 'Логин_2',
+        max_length = 200,
+        blank = True,
+    )
+    password_2 = models.CharField(
+        verbose_name = 'Пароль_2',
+        max_length = 200,
+        blank = True,
+    )
     id_lid = models.CharField(
         max_length=50,
         verbose_name = 'ID лида',
+        blank = True,
     )
     region = models.CharField(
         verbose_name = 'Область',

@@ -1,0 +1,44 @@
+pip install djangorestframework
+
+добавить приложение rest_framework в INSTALLED_APPS).
+
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'cats.apps.CatsConfig',
+] 
+
+
+В settings.py в настройках REST_FRAMEWORK объявить новый способ аутентификации TokenAuthentication
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated', 
+    ],
+
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ]
+} 
+
+потребуется сделать миграции
+
+В головном urls.py
+from rest_framework.authtoken import views
+
+
+urlpatterns = [
+
+    ...
+
+    path('api-token-auth/', views.obtain_auth_token),
+] 
+
+

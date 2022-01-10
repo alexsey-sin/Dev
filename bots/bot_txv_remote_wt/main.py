@@ -8,6 +8,7 @@ from txv_domru import run_txv_domru
 from txv_rostelecom import run_txv_rostelecom
 from txv_ttk import run_txv_ttk
 from txv_onlime import run_txv_onlime
+from txv_mgts import run_txv_mgts
 
 # личный бот @infra     TELEGRAM_CHAT_ID, TELEGRAM_TOKEN
 TELEGRAM_CHAT_ID = '1740645090'
@@ -23,6 +24,7 @@ PERIOD_SCAN_TXV_DOMRU = 10  # Периодичность работы скрип
 PERIOD_SCAN_TXV_ROSTELECOM = 10  # Периодичность работы скрипта запроса тхв ROSTELECOM
 PERIOD_SCAN_TXV_TTK = 10  # Периодичность работы скрипта запроса тхв TTK
 PERIOD_SCAN_TXV_ONLIME = 10  # Периодичность работы скрипта запроса тхв ONLIME
+PERIOD_SCAN_TXV_MGTS = 10  # Периодичность работы скрипта запроса тхв MGTS
 PERIOD_BETWEEN = 1  # в секундах, Пауза
 
 
@@ -33,6 +35,7 @@ if __name__ == '__main__':
     start_time_txv_rostelecom = None
     start_time_txv_ttk = None
     start_time_txv_onlime = None
+    start_time_txv_mgts = None
     
     while True:
         time.sleep(PERIOD_BETWEEN)
@@ -109,6 +112,18 @@ if __name__ == '__main__':
             print(f'start txv_onlime {str_time}')
             run_txv_onlime(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
             # run_txv_onlime(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN)
+            continue
+
+        #===============================================#
+
+        # Скрипт Проверка ТхВ mgts
+        if start_time_txv_mgts:
+            passed = (cur_time - start_time_txv_mgts).seconds
+        if start_time_txv_mgts == None or passed >= PERIOD_SCAN_TXV_MGTS:
+            start_time_txv_mgts = cur_time
+            print(f'start txv_mgts {str_time}')
+            # run_txv_mgts(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
+            run_txv_mgts(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN)
             continue
 
         #===============================================#

@@ -1,0 +1,88 @@
+import time
+from selenium import webdriver  # $ pip install selenium
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.select import Select
+from selenium.webdriver.common.keys import Keys
+
+# Создание драйвера
+EXE_PATH = 'driver/chromedriver.exe'  # Это сам драйвер, лежит уровнем выше в папке driver
+driver = webdriver.Chrome(executable_path=EXE_PATH)
+
+# Страница которую разбираем
+base_url = 'https://oao.mgts.ru'
+# Если на сайте требуется аутентификация на уровне доменного имени
+# то логин/пароль вставляем в урл
+base_url = f'https://{login}:{password}@oao.mgts.ru'
+
+# Настройка времени ожидания html элементов если их пока нет
+driver.implicitly_wait(10)
+# Загружаем страницу
+driver.get(base_url)
+time.sleep(3)
+
+
+
+# Поиск по названию тега
+els = driver.find_elements(By.TAG_NAME, 'li')
+# Поиск по id
+els = driver.find_elements(By.ID, 'loginform-password')
+# Поиск по атрибутам элементов
+els = driver.find_elements(By.XPATH, '//div[@class="panel-body"]')
+# Так можно взять вложенные div`ы первого уровня
+els = driver.find_elements(By.XPATH, '//div[@class="panel-body"]/div')
+
+# Поиск по вхождению фразы в атрибут элемента
+els = driver.find_elements(By.XPATH, '//button[contains(@onclick, "saveManualFlat")]')
+
+# Поиск элементов внутри родительского элемента
+els = els_parent.find_elements(By.XPATH, './/button[contains(@onclick, "saveManualFlat")]')
+
+
+
+
+# Кликнуть мышкой
+try: els[0].click()
+except: raise Exception('Ошибка клика')
+
+# Ввести слово с клавиатуры (если элемент типа input и это действие допускает)
+try: els[0].send_keys('Введенная фраза')
+except: raise Exception('Ошибка ввода фразы')
+
+# Имитация стрелок клавиатуры, Enter
+try: els[0].send_keys(Keys.ENTER)       # Keys.ARROW_DOWN
+except: raise Exception('Ошибка ENTER')
+
+# Кликнуть мышкой javascript
+# Если Обычным способом чекбокс не отмечается - element not interactable
+driver.execute_script("arguments[0].click();", els[0])
+
+# Передвинем страницу чтоб элемент стал видимым
+driver.execute_script("arguments[0].scrollIntoView();", els[0])
+time.sleep(1)
+# прокручивает страницу относительно её текущего положения
+driver.execute_script('window.scrollBy(-100, -100)')
+time.sleep(1)
+
+# Перемещение страницы на координаты левого верхнего угла
+driver.execute_script('window.scrollTo(-500, 500)')
+time.sleep(1)
+
+# Прокрутка страницы до конца
+driver.execute_script('window.scrollTo(0, document.body.scrollHeight)')
+
+# Развернуть страницу на весь экран
+driver.fullscreen_window()
+
+# Изменить размеры окна
+driver.set_window_size(300,800)
+
+
+# Сохранить содержимое страницы для исследования
+#===========
+time.sleep(10)
+with open('out.html', 'w', encoding='utf-8') as outfile:
+    outfile.write(driver.page_source)
+raise Exception('Финиш.')
+#===========
+
+

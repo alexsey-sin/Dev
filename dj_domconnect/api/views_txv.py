@@ -35,9 +35,14 @@ def set_txv(request):
             if password == None or len(password) == 0: raise ValueError('password is absent')
             txv.password = password
             
+            login_2 = request.GET.get('login_2')
+            if login_2: txv.login_2 = login_2
+            
+            password_2 = request.GET.get('password_2')
+            if password_2: txv.password_2 = password_2
+            
             id_lid = request.GET.get('id_lid')
-            if id_lid == None or len(id_lid) == 0: raise ValueError('id_lid is absent')
-            txv.id_lid = id_lid
+            if id_lid: txv.id_lid = id_lid
 
             region = request.GET.get('region')
             if region: txv.region = region
