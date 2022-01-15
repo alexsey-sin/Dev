@@ -1,0 +1,170 @@
+{% extends "app/layouts/base.html" %}
+
+{% block title %} {{ page_title }} {% endblock %} 
+
+{% block stylesheets %}
+<style>
+table {
+    counter-reset: count;
+}
+table td:first-child:before {
+    content: counter(count);
+    counter-increment: count;
+}
+
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+{% if error_mess %}
+<div class="alert alert-danger" role="alert">
+    {{ error_mess }}
+</div>
+{% endif %}
+
+<div class="pcoded-content">
+    <div class="pcoded-inner-content">
+        <div class="main-body">
+            <div class="page-wrapper">
+                <!-- [ Main Content ] start -->
+                <div class="row">
+
+                    <!-- [ Hover-table ] start -->
+                    <div class="col-xl-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Фразы группы: </h5>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <h3>{{ group_name }}</h3>
+                                <span class="d-block m-t-5">Всего в группе: {{ cnt_phrases }} фраз.</span>
+                            </div>
+                            <div class="card-block table-border-style">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Фраза</th>
+                                                <th>Автор</th>
+                                                <th>Дата добавления/исправления</th>
+                                                <th>Действия</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for row in page %}
+                                            <tr>
+                                                <td></td>
+                                                <td><div style="width: 300px; overflow: hidden; text-overflow: ellipsis">{{ row.text }}</div></td>
+                                                <td>{{ row.author }}</td>
+                                                <td>{{ row.pub_date }}</td>
+                                                <td>
+                                                    <img src="/static/assets/images/icons8-edit-30.png" alt="Редактировать" title="Редактировать" data-toggle="modal" data-target="#openModalPhrase" onclick="editRowPhrase('{{ row.id }}','{{ row.text }}');"></img>
+                                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                                    <img src="/static/assets/images/icons8-delete-30.png" alt="Удалить" title="Удалить" data-toggle="modal" data-target="#openModaDeletePhrase" onclick="deleteRowPhrase('{{ row.id }}','{{ row.text }}');"></img>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                    {% include "app/paginator.html" with items=page paginator=paginator %}
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <div class="card"> -->
+							<div width="200px" align="center">
+								<button type="button" class="btn btn-secondary" title="Добавить новое имя" data-toggle="modal" data-target="#openModalPhrase">Добавить</button>
+							</div>
+                        <!-- </div> -->
+                   </div>
+                    <!-- [ Hover-table ] end -->
+
+                </div>
+                <!-- [ Main Content ] end -->
+            </div>
+        </div>
+    </div>
+</div>
+<div id="openModaDeletePhrase" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="openModaDeletePhraseTitle">Удаление фразы</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="deletePhraseId" value="">
+            <h4 id="deletePhrase"></h4>
+        </div>
+        <div class="modal-footer">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" id="id_delete" name="delete">
+                <button type="submit" class="btn btn-danger">Удалить</button>
+            </form>
+        </div>
+      </div>
+    </div>
+</div>
+<div id="openModalPhrase" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+				<h5 class="modal-title" id="openModalPhraseTitle">Добавление фразы</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="bd-example">
+				<form id="id_form" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div class="form-group row" aria-required={% if field.field.required %}"true"{% else %}"false"{% endif %}>
+                            <label for="{{ field.id_for_label }}" class="col-md-4 col-form-label text-md-right">
+                                {{ field.label }}
+                                {% if field.field.required %}
+                                    <span class="required">*</span>
+                                {% endif %}
+                            </label>
+                            <div class="col-md-6">
+
+                                {{ field }}
+
+                                {% if field.help_text %}
+                                <small id="{{ field.id_for_label }}-help" class="form-text text-muted">{{ field.help_text|safe }}</small>
+                                {% endif %}
+                            </div>                
+                    </div>
+                    {% endfor %}
+                    <input type="hidden" id="id_edit" name="edit">
+                    <div class="modal-footer">
+                        <button id="openModalPhraseButton" type="submit" class="btn btn-primary">Добавить</button>
+                    </div>
+                </form>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock content %}
+
+{% block javascripts %}
+<script language="javascript">
+    if (window.history.replaceState){  // предотвращает повторную отправку формы при обновлении страницы если перед этим была отправка
+        window.history.replaceState(null, null, window.location.href);
+    }
+    function editRowPhrase(i,t){
+        $('#openModalPhraseTitle').text("Редактирование фразы");
+        $('#id_text').val(t);
+        // $('#id_sex').val(s);
+        // $('#id_short_names').val(d);
+        $('#id_edit').val(i);
+        $('#openModalPhraseButton').text("Изменить");
+    }
+    function deleteRowPhrase(i,t){
+        $('#id_delete').val(i);
+        $('#deletePhrase').text(t);
+    }
+</script>
+{% endblock javascripts %}

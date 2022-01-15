@@ -1,0 +1,86 @@
+{% extends "office/layouts/base.html" %}
+
+{% block title %} Dj-DomConnect {% endblock %} 
+
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="pcoded-content">
+        <div class="pcoded-inner-content">
+            <!-- [ breadcrumb ] start -->
+            <div class="page-header">
+                <div class="page-block">
+                    <div class="row align-items-center">
+                        <div class="col-md-12">
+                            <div class="page-header-title">
+                                <h5 class="m-b-10">Здесь живут боты: Лиза, Герман, НДЗ, ПЗ и еще порядка 15 приблудившихся :)))</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- [ breadcrumb ] end -->
+            <div class="main-body">
+                <div class="page-wrapper">
+                    <!-- [ Main Content ] start -->
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Доступные АПИ</h5>
+                                </div>
+                                <div class="card-block">
+                                    <p>
+                                        Фразы Лиза: http://django.domconnect.ru/api/get_liza_phrases/номер_группы <br>
+                                        Например: <a href="">http://django.domconnect.ru/api/get_liza_phrases/1</a>
+                                    </p>
+                                    <p>
+                                        Фразы НДЗ: http://django.domconnect.ru/api/get_ndz_phrases/номер_группы <br>
+                                        Например: <a href="">http://django.domconnect.ru/api/get_ndz_phrases/1</a>
+                                    </p>
+                                    <p>
+                                        Фразы ПЗ: http://django.domconnect.ru/api/get_pz_phrases/номер_группы  <br>
+                                        Например: <a href="">http://django.domconnect.ru/api/get_pz_phrases/1</a>
+                                    </p>
+                                    <p>
+                                        Имена: <a href="">http://django.domconnect.ru/api/get_names</a>
+                                    </p>
+                                    <!-- <p>
+                                        Имена файлом: <a href="http://django.domconnect.ru/api/get_name_files/any">http://django.domconnect.ru/api/get_name_files/any</a> <br>
+                                        any - любое имя желаемого файла латиницей
+                                    </p> -->
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Блок Мобильная связь</h5>
+                                </div>
+                                <div class="card-block">
+                                    <p>Инструкция по заполнению таблиц на стадии разработки
+                                    </p>
+                                </div>
+                            </div>
+                             <div class="card">
+                                <div class="card-header">
+                                    <h5>Примечание</h5>
+                                </div>
+                                <div class="card-block">
+                                    <p>Сохранена возможность просмотра исходного <a href='demo/'>шаблона сайта</a>
+                                    </p>
+                                    <p>Управление пользователями и всем контентом: &nbsp;<a href='admin/'>Тыц...</a> &nbsp;&nbsp; (admin)
+                                    </p>
+                                </div>
+                            </div>
+                       </div>
+                    </div>
+                    <!-- [ Main Content ] end -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

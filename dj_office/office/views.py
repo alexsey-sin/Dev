@@ -15,5 +15,5 @@ def index(request):
     context = {'u_name': u_name}
 
     # return render(request, 'app/index.html', context)
-    return render(request, 'index.html', context)
+    return render(request, 'office/index.html', context)
     
