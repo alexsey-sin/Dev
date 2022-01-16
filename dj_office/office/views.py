@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.contrib.auth import get_user_model
 # from django.http import HttpResponse
+from django.http import JsonResponse
  
 User = get_user_model()
 
@@ -67,6 +68,13 @@ def moexbond(request):
     # context['paginator'] = paginator
 
     return render(request, 'office/moexbond.html', context)
+
+
+def download_moex(request):
+    response = {
+        'is_taken': 5,
+    }
+    return JsonResponse(response)
 
 
 # https://pythonru.com/primery/django-ajax

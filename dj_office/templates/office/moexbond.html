@@ -39,17 +39,18 @@ table td:first-child:before {
                                             <h5 class="mb-0">ММВБ Облигации</h5>
                                         </div>
                                         <div class="col">
-                                            <label class="form-check-label">Загружено:</label>
+                                            <label id="id_lbl_moex" class="form-check-label">Загружено:</label>
                                         </div>
                                         <div class="col">
-                                            <div hidden>
-                                                <label class="form-check-label">7500</label>
+                                            <div id="id_div_val_moex">
+                                                <label id="id_val_moex" class="form-check-label">7500</label>
                                             </div>
-                                            <div class="progress">
-                                                <div class="progress-bar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="width: 30%; height: 30px;">50%</div>
-                                            </div>
+											<div id="id_div_prgs_moex"">
+												<progress id="id_prgs_moex" value="20" max="100">
+                                            </progress>
+											</div>
                                         </div>
-                                        <div class="col"><button class="btn btn-primary" type="button">Обновить</button></div>
+                                        <div class="col"><button class="btn btn-primary" id="id_btn_moex" type="button" onclick="download_moex();">Обновить</button></div>
                                     </div>
                                     <div class="input-group"></div>
                                 </div>
@@ -62,19 +63,19 @@ table td:first-child:before {
                                     <div class="row">
                                         <div class="col">
                                             <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-1"><label class="form-check-label" for="formCheck-1">Номинал от:</label></div>
-                                            <div class="input-group"><input class="form-control" type="number"></div>
+                                            <div class="input-group"><input style="width: 160px;" type="number"></div>
                                         </div>
                                         <div class="col">
                                             <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-2"><label class="form-check-label" for="formCheck-2">Номинал до:</label></div>
-                                            <div class="input-group"><input class="form-control" type="number"></div>
+                                            <div class="input-group"><input style="width: 160px;" type="number"></div>
                                         </div>
                                         <div class="col">
-                                            <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-3"><label class="form-check-label" for="formCheck-3">Дата погашения от:</label></div>
-                                            <div class="input-group"><input class="form-control" type="date"></div>
+                                            <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-3"><label class="form-check-label" for="formCheck-3">Погашение от:</label></div>
+                                            <div class="input-group"><input style="width: 160px;" type="date"></div>
                                         </div>
                                         <div class="col">
-                                            <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-4"><label class="form-check-label" for="formCheck-4">Дата погашения до:</label></div>
-                                            <div class="input-group"><input class="form-control" type="date"></div>
+                                            <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-4"><label class="form-check-label" for="formCheck-4">Погашение до:</label></div>
+                                            <div class="input-group"><input style="width: 160px;" type="date"></div>
                                         </div>
                                         <div class="col">
                                             <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-5"><label class="form-check-label" for="formCheck-5">Тип облигации:</label></div>
@@ -86,7 +87,9 @@ table td:first-child:before {
                                                 </optgroup>
                                             </select>
                                         </div>
-                                        <div class="col"><button class="btn btn-primary btn-sm" type="button">Обновить</button></div>
+                                        <div class="col">
+											<button class="btn btn-primary btn-sm" type="button">Обновить</button>
+										</div>
                                     </div>
                                     <div class="input-group"></div>
                                 </div>
@@ -111,11 +114,14 @@ table td:first-child:before {
                                     <table class="table table-hover">
                                         <thead>
                                             <tr>
-                                                <th>#</th>
-                                                <th>Фраза</th>
-                                                <th>Автор</th>
-                                                <th>Дата добавления/исправления</th>
-                                                <th>Действия</th>
+                                                <th>Тикер</th>
+                                                <th>Название</th>
+                                                <th>Погашение</th>
+                                                <th>Номинал</th>
+                                                <th>Куп./год</th>
+                                                <th>Купон</th>
+                                                <th>Тип</th>
+                                                <th>Доходность %</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -218,21 +224,33 @@ table td:first-child:before {
 {% endblock content %}
 
 {% block javascripts %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script language="javascript">
-    if (window.history.replaceState){  // предотвращает повторную отправку формы при обновлении страницы если перед этим была отправка
-        window.history.replaceState(null, null, window.location.href);
-    }
-    function editRowPhrase(i,t){
-        $('#openModalPhraseTitle').text("Редактирование фразы");
-        $('#id_text').val(t);
+    // if (window.history.replaceState){  // предотвращает повторную отправку формы при обновлении страницы если перед этим была отправка
+    //     window.history.replaceState(null, null, window.location.href);
+    // }
+    // function editRowPhrase(i,t){
+    //     $('#openModalPhraseTitle').text("Редактирование фразы");
+    //     $('#id_text').val(t);
         // $('#id_sex').val(s);
         // $('#id_short_names').val(d);
-        $('#id_edit').val(i);
-        $('#openModalPhraseButton').text("Изменить");
-    }
-    function deleteRowPhrase(i,t){
-        $('#id_delete').val(i);
-        $('#deletePhrase').text(t);
-    }
+    //     $('#id_edit').val(i);
+    //     $('#openModalPhraseButton').text("Изменить");
+    // }
+    // function deleteRowPhrase(i,t){
+    //     $('#id_delete').val(i);
+    //     $('#deletePhrase').text(t);
+    // }
+	function download_moex(){
+        $('#id_btn_moex').attr('disabled', true);
+        $('#id_lbl_moex').text('Загрузка:');
+		
+        $('#id_val_moex').hide();
+        $('#id_prgs_moex').show();
+        // $('#id_val_moex').style.visibility = "hidden";
+        // $('#id_prgs_moex').style.visibility = "visible";
+		// removeAttribute('disabled');
+		alert('ggg');
+	}
 </script>
 {% endblock javascripts %}
