@@ -22,7 +22,8 @@ def index(request):
         u_name = user.username
     context = {'u_name': u_name}
 
-
+    # lid = DomconnectCrmLid.objects.get_or_create(id_lid='123')
+    # print(lid)
 
 
     context['segment'] = 'statseo'
@@ -31,9 +32,10 @@ def index(request):
 
 @login_required(login_url='/login/')
 def downloadLidsFromCRM(request, from_date):
-    thread_name = 'DownLoadLidsFromCRM'
     if not request.POST:
         return redirect(reverse('app:home'))
+    
+    thread_name = 'DownLoadLidsFromCRM'
 
     # Проверим - закончен ли процесс предыдущей загрузки
     for thread in threading.enumerate():
@@ -55,8 +57,9 @@ def fix_result_download_crm(mess):
 def append_lids(lids):
     for new_lid in lids:
         # try:
-        # print(new_lid)
-        lid = DomconnectCrmLid.objects.get_or_create(id_lid=new_lid.get('ID'))
+        print('before lid:')
+        lid = DomconnectCrmLid.objects.get_or_create(id_lid=int(new_lid.get('ID')))
+        print('after lid:', lid)
         lid.title = new_lid.get('TITLE')
         lid.status_id = new_lid.get('STATUS_ID')
         lid.create_date = dt.strptime(new_lid.get('DATE_CREATE'), '%Y-%m-%dT%H:%M:%S%z')  # "2022-01-01T04:43:22+03:00"
@@ -89,7 +92,7 @@ def thread_download_crm(from_date):
     gvar, created = GlobalVariable.objects.get_or_create(key='url_download_crm')
     url = gvar.val_str
     if not url:
-        print('Not url address')
+        fix_result_download_crm('Not url address')
         return   # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.list'
     
     print(f'start thread {from_date}')
