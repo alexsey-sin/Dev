@@ -39,13 +39,18 @@ table td:first-child:before {
                                             <h5 class="mb-0">ММВБ Облигации</h5>
                                         </div>
                                         <div class="col">
-                                            <label id="id_lbl_moex" class="form-check-label">Загружено:</label>
+                                            <label id="id_lbl_moex" class="form-check-label">Загружено облигаций:</label>
                                         </div>
                                         <div class="col">
                                             <div id="id_div_val_moex">
                                                 <label id="id_val_moex" class="form-check-label">7500</label>
                                             </div>
-											<div id="id_div_prgs_moex"">
+                                            <div id="id_div_upgrade_moex">
+                                                <label class="form-check-label">Обновлено:&nbsp</label>
+                                                <label id="id_val_upgrade_moex" class="form-check-label">4 дня</label>
+                                                <label class="form-check-label">&nbsp назад</label>
+                                            </div>
+											<div id="id_div_prgs_moex" style="display: none">
 												<progress id="id_prgs_moex" value="20" max="100">
                                             </progress>
 											</div>
@@ -226,6 +231,7 @@ table td:first-child:before {
 {% block javascripts %}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script language="javascript">
+	let prgs_val = 0;
     // if (window.history.replaceState){  // предотвращает повторную отправку формы при обновлении страницы если перед этим была отправка
     //     window.history.replaceState(null, null, window.location.href);
     // }
@@ -237,20 +243,36 @@ table td:first-child:before {
     //     $('#id_edit').val(i);
     //     $('#openModalPhraseButton').text("Изменить");
     // }
-    // function deleteRowPhrase(i,t){
-    //     $('#id_delete').val(i);
-    //     $('#deletePhrase').text(t);
-    // }
+    function cickle_query_download_moex(){
+		prgs_val += 2;
+		$('#id_prgs_moex').val(prgs_val);
+		if(prgs_val < 100){setTimeout(cickle_query_download_moex, 200);}
+		else{dwnld_moex_stop()}
+    }
 	function download_moex(){
+		dwnld_moex_start()
+		// alert($('#id_prgs_moex').val());
+		// {
+
+		// }
+		cickle_query_download_moex()
+    }
+	function dwnld_moex_start(){
+		prgs_val = 0;
         $('#id_btn_moex').attr('disabled', true);
         $('#id_lbl_moex').text('Загрузка:');
-		
-        $('#id_val_moex').hide();
-        $('#id_prgs_moex').show();
-        // $('#id_val_moex').style.visibility = "hidden";
-        // $('#id_prgs_moex').style.visibility = "visible";
-		// removeAttribute('disabled');
-		alert('ggg');
+        $('#id_div_val_moex').hide();
+        $('#id_div_prgs_moex').show();
+        $('#id_div_upgrade_moex').hide();
+        $('#id_prgs_moex').val(prgs_val);
+	}
+	function dwnld_moex_stop(){
+        $('#id_btn_moex').attr('disabled', false);
+        $('#id_lbl_moex').text('Загружено облигаций:');
+        $('#id_div_val_moex').show();
+        $('#id_div_prgs_moex').hide();
+        $('#id_div_upgrade_moex').show();
+        $('#id_prgs_moex').val(prgs_val);
 	}
 </script>
 {% endblock javascripts %}
