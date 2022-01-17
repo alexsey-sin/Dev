@@ -246,41 +246,27 @@ def get_txv(data):
             raise Exception(f'Ошибка много вариантов дома: {";".join(f_lst)}')
         time.sleep(3)
 
-        # Квартира
+        # Квартира (ручной ввод - карандаш)
         apartment = data.get('apartment').strip()
         if not apartment: raise Exception('Ошибка не задана квартира')
         # Активируем поле ввода номера дома
-        els = driver.find_elements(By.XPATH, '//span[@aria-labelledby="select2-getFlat-container"]')
-        if len(els) != 1: raise Exception('Ошибка нет поля квартира')
+        els = driver.find_elements(By.XPATH, '//span[@class="pencilFlat glyphicon glyphicon-pencil"]')
+        if len(els) != 1: raise Exception('Ошибка нет поля ручной ввод квартира')
         try: els[0].click()
         except: raise Exception('Ошибка активации поля ввода квартира')
         time.sleep(1)
         # Вводим квартира
-        els = driver.find_elements(By.XPATH, '//input[@class="select2-search__field"]')
+        els = driver.find_elements(By.XPATH, '//input[@id="manualFlatInput"]')
         if len(els) != 1: raise Exception('Ошибка нет поля ввода квартира')
         try: els[0].send_keys(apartment)
         except: raise Exception('Ошибка ввода квартира')
-        time.sleep(3)
-        # Смотрим подсказку
-        els = driver.find_elements(By.XPATH, '//ul[@id="select2-getFlat-results"]')
-        if len(els) != 1: raise Exception('Ошибка нет поля ввода квартира')
-        els_li = els[0].find_elements(By.TAG_NAME, 'li')
-        f_lst = []
-        el_lst = []
-        for el_li in els_li:
-            name_flat = el_li.text
-            # print(name_flat)
-            if name_flat == apartment:
-                el_lst.append(el_li)
-                f_lst.append(name_flat)
-        if len(f_lst) == 0: raise Exception(f'Ошибка нет вариантов квартира {apartment}')
-        if len(f_lst) == 1:
-            try: el_lst[0].click()
-            except: raise Exception('Ошибка выбора квартира')
-        else:
-            # Множественный выбор
-            raise Exception(f'Ошибка много вариантов квартира: {";".join(f_lst)}')
         time.sleep(1)
+        # Жмем кнопку подтверждения ввода квартиры
+        els = driver.find_elements(By.XPATH, '//button[contains(@onclick, "saveManualFlat")]')
+        if len(els) != 1: raise Exception('Ошибка нет кнопки подтверждения ввода квартира')
+        try: els[0].click()
+        except: raise Exception('Ошибка клика кнопки подтверждения ввода квартира')
+        time.sleep(2)
 
         # Жмем кнопку поиск клиента
         els = driver.find_elements(By.XPATH, '//button[@onclick="saveAddress();"]')
@@ -291,36 +277,41 @@ def get_txv(data):
         
         # Ждем спинер
         wait_spiner(driver)
+        time.sleep(3)
 
-        # Жмем кнопку Продажа/Допродажа МГТС
-        els = driver.find_elements(By.XPATH, '//button[@preorder_type_name="Mgts_Sale"]')
-        if len(els) != 1: raise Exception('Ошибка нет кнопки Продажа/Допродажа МГТС')
-        try: els[0].click()
-        except: raise Exception('Ошибка нажатия кнопки Продажа/Допродажа МГТС')
-        time.sleep(2)
-        
-        # Ждем спинер
-        wait_spiner(driver)
-        
-        driver.fullscreen_window()
-        els = driver.find_elements(By.XPATH, '//div[@class="bs-callout bs-callout-mgts"]')
-        # Смотрим определившийся адрес и ТхВ
+        # Смотрим возможность подключения
+        # Если в строке таблицы "Новый абонент" есть VIRT - то не заводим
+        # А если PON или FTTX - то заводим
+        f_techn = False
+        els = driver.find_elements(By.XPATH, '//div[@class="panel-body"]/div')
         for el in els:
             content = el.text
-            phr1 = 'Адрес:'
-            i1 = content.find(phr1)
-            if i1 >= 0:
-                data['pv_address'] = content[i1+len(phr1):].strip()
-            phr2 = 'Доступность подключения МГТС:'
-            i2 = content.find(phr2)
-            phr3 = 'Способ подключения:'
-            i3 = content.find(phr3)
-            phr4 = 'Зона доступности подключения'
-            i4 = content.find(phr4)
-            if i2 >= 0 and i3 >= 0 and i4 >= 0:
-                txv = content[i2+len(phr2):i3].strip()
-                texn = content[i3+len(phr3):i4].strip()
-                data['available_connect'] = f'ТхВ {txv}. {texn}'
+            if content.find('Новый абонент') >= 0:
+                if content.find('PON') >= 0 or content.find('FTTX') >= 0:
+                    f_techn = True
+                    el_radio = el.find_elements(By.XPATH, './/input[@type="radio"]')
+                    if el_radio:
+                        try: el_radio[0].click()
+                        except: raise Exception('Ошибка выбора нового клиента')
+                        time.sleep(1)
+                    else: raise Exception('Ошибка нет радиокнопки выбора нового клиента')
+                
+        if not f_techn:
+            data['available_connect'] = 'Нет ТхВ'
+            raise Exception('Ошибка нет ТхВ')  # Для бота ТхВ
+        else: data['available_connect'] = 'Есть ТхВ'
+        
+        # Смотрим адрес (для бота ТхВ) если нет адреса - ошибку не выкидываем - просто выходим
+        els_1 = driver.find_elements(By.XPATH, '//div[contains(@class, "customer bs-callout bs-callout-mgts")]')
+        print('customer', len(els_1))
+        for el_1 in els_1:
+            els_2 = el_1.find_elements(By.XPATH, './/div[contains(@class, "rowCustomer")]')
+            print('rowCustomer', len(els_2))
+            for el_2 in els_2:
+                if el_2.text.find('Адрес установки') >= 0:
+                    els_3 = el_2.find_elements(By.XPATH, './/div[contains(@class, "rowDataCustomer")]')
+                    if len(els_3): data['pv_address'] = els_3[0].text.strip()
+                        
 
         time.sleep(2)
        
@@ -578,7 +569,7 @@ if __name__ == '__main__':
     # print('available_connect', data['available_connect'])
     
     
-    set_txv_to_dj_domconnect(pv_code)
+    # set_txv_to_dj_domconnect(pv_code)
     # rez, txv_list = get_txv_in_dj_domconnect(pv_code)
     # for txv_dict in txv_list:
         # for k, v in txv_dict.items():

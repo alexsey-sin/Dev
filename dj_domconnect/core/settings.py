@@ -131,12 +131,12 @@ SIMPLE_JWT = {
 STATIC_URL = '/static/'
 
 # для сервера
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-# для локального компьютера
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
-)
+# # для локального компьютера
+# STATICFILES_DIRS = (
+    # os.path.join(BASE_DIR, 'static'),
+# )
 #############################################################
 MEDIA_URL = '/media/'
 

@@ -2,7 +2,7 @@
 from django.urls import path
 from api import views, views_domru2, views_beeline, views_mts
 from api import views_beeline2, views_rostelecom2, views_rostelecom
-from api import views_domru, views_ttk, views_onlime, views_txv
+from api import views_domru, views_ttk, views_onlime, views_mgts, views_txv
 
 
 app_name = 'api'
@@ -51,6 +51,10 @@ urlpatterns = [
     path('set_bid_onlime', views_onlime.set_bid_onlime),
     path('get_bid_onlime', views_onlime.get_bid_onlime),
     path('set_bid_onlime_status', views_onlime.set_bid_onlime_status),
+
+    path('set_bid_mgts', views_mgts.set_bid_mgts),
+    path('get_bid_mgts', views_mgts.get_bid_mgts),
+    path('set_bid_mgts_status', views_mgts.set_bid_mgts_status),
 
     path('set_txv', views_txv.set_txv),
     path('get_txv', views_txv.get_txv),

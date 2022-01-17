@@ -53,19 +53,27 @@ def run_lk_megafon():
 
         # переходим на страницу абоненты
         driver.get(base_url + '/subscribers/mobile')
-        time.sleep(10)
+        time.sleep(30)
         ###################### Абоненты ######################
-        need_rows = 18  # (кол-во номеров + строка заголовка)
-        cnt = 0
-        while(1):
-            els = driver.find_elements(By.XPATH, '//div[@data-col-name="msisdn"]')
-            if len(els) >= need_rows:
-                break
-            else:
-                time.sleep(1)
-            if cnt > 25: raise Exception(6)
-            cnt += 1
+        # #===========
+        # # time.sleep(10)
+        # with open('out_lk.html', 'w', encoding='utf-8') as outfile:
+            # outfile.write(driver.page_source)
+        # raise Exception('Финиш.')
+        # #===========
+        # need_rows = 18  # (кол-во номеров + строка заголовка)
+        # cnt = 0
+        # while(1):
+            # els = driver.find_elements(By.XPATH, '//div[@data-col-name="msisdn"]')
+            # if len(els) >= need_rows:
+                # break
+            # else:
+                # time.sleep(1)
+            # if cnt > 25: raise Exception(6)
+            # cnt += 1
         
+        els = driver.find_elements(By.XPATH, '//div[@data-col-name="msisdn"]')
+        if len(els) < 2: raise Exception(6)
         dct_nums = {}
         for i in range(1, len(els)):
             el = els[i].find_elements(By.TAG_NAME, 'a')

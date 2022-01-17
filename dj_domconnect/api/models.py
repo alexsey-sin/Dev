@@ -865,6 +865,135 @@ class BidOnlime(models.Model):
     )
 
 
+class BidMGTS(models.Model):
+    STATUS_VAR = (
+        (0, 'Заявка поступила'),
+        (1, 'Бот забрал заявку'),
+        (2, 'Ошибка отправки заявки, передано оператору'),
+        (3, 'Заявка принята МГТС'),
+    )
+    TYPE_GRAFIC_VAR = (
+        (0, 'Без назначения'),
+        (1, 'На ближайший таймслот'),
+        (2, 'На заданное время'),
+        (3, 'Запрос таймслотов'),
+    )
+    login = models.CharField(
+        verbose_name = 'Логин',
+        max_length = 200,
+    )
+    password = models.CharField(
+        verbose_name = 'Пароль',
+        max_length = 200,
+    )
+    login2 = models.CharField(
+        verbose_name = 'Логин2',
+        max_length = 200,
+    )
+    password2 = models.CharField(
+        verbose_name = 'Пароль2',
+        max_length = 200,
+    )
+    id_lid = models.CharField(
+        max_length=50,
+        verbose_name = 'ID лида',
+    )
+    city = models.CharField(
+        verbose_name = 'Город',
+        max_length = 200,
+    )
+    street = models.CharField(
+        max_length=200,
+        verbose_name = 'Адрес',
+    )
+    house = models.CharField(
+        max_length=50,
+        verbose_name = 'Дом',
+    )
+    apartment = models.CharField(
+        max_length=50,
+        verbose_name = 'Кв.',
+    )
+    wifi_router = models.CharField(
+        max_length=100,
+        verbose_name = 'wifi Роутер',
+        default = '',
+        blank = True,
+    )
+    count_tv = models.CharField(
+        max_length=50,
+        verbose_name = 'Кол-во ТВ',
+        default = '0',
+    )
+    tv_adapter = models.CharField(
+        max_length=100,
+        verbose_name = 'ТВ приставка',
+        default = '',
+        blank = True,
+    )
+    tarif = models.CharField(
+        max_length=100,
+        verbose_name = 'Тариф',
+    )
+    tp_grafic = models.PositiveSmallIntegerField(
+        choices = TYPE_GRAFIC_VAR,
+        verbose_name = 'Тип в график',
+        default = 0,
+    )
+    dt_grafic = models.CharField(
+        max_length=100,
+        blank = True,
+        verbose_name = 'В график',
+    )
+    firstname = models.CharField(
+        max_length=100,
+        verbose_name = 'Имя',
+        default = '',
+        blank = True,
+    )
+    patronymic = models.CharField(
+        max_length=100,
+        verbose_name = 'Отчество',
+        default = '',
+        blank = True,
+    )
+    lastname = models.CharField(
+        max_length=100,
+        verbose_name = 'Фамилия',
+        default = '',
+        blank = True,
+    )
+    phone = models.CharField(
+        max_length=11,
+        verbose_name = 'Телефон',
+    )
+    comment = models.TextField(
+        blank = True,
+        verbose_name='Комментарий',
+    )
+    bid_number = models.CharField(
+        max_length=100,
+        blank = True,
+        verbose_name = 'Номер заявки',
+    )
+    status = models.IntegerField(
+        choices = STATUS_VAR,
+        verbose_name = 'Статус',
+    )
+    change_date = models.DateTimeField(
+        auto_now=True,
+        verbose_name='Изменено',
+    )
+    pub_date = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Создано',
+    )
+    bot_log = models.TextField(
+        blank = True,
+        verbose_name='Лог бота',
+    )
+
+
 class TxV(models.Model):
     STATUS_VAR = (
         (0, 'Запрос поступил'),

@@ -1,6 +1,7 @@
 from django.contrib import admin
 from api.models import BidDomRu2, BidBeeline, BidMTS, BidBeeline2
-from api.models import BidRostelecom2, BidRostelecom, BidDomRu, BidTtk, BidOnlime, TxV
+from api.models import BidRostelecom2, BidRostelecom, BidDomRu, BidTtk
+from api.models import  BidOnlime, BidMGTS, TxV
 from django.db import models
 from django.forms import NumberInput
 
@@ -110,6 +111,18 @@ class BidTtkAdmin(admin.ModelAdmin):
 @admin.register(BidOnlime)
 class BidOnlimeAdmin(admin.ModelAdmin):
     list_display = [field.name for field in BidOnlime._meta.get_fields()]
+    search_fields = ('change_date',)
+    list_filter = ('id', 'phone', 'change_date')
+    empty_value_display = '-пусто-'
+    date_hierarchy = 'pub_date'
+    formfield_overrides = {
+        models.IntegerField: {'widget': NumberInput(attrs={'size':'150'})},
+    }
+
+
+@admin.register(BidMGTS)
+class BidMGTSAdmin(admin.ModelAdmin):
+    list_display = [field.name for field in BidMGTS._meta.get_fields()]
     search_fields = ('change_date',)
     list_filter = ('id', 'phone', 'change_date')
     empty_value_display = '-пусто-'

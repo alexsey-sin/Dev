@@ -21,6 +21,19 @@ driver.get(base_url)
 time.sleep(3)
 
 
+# Преключиться на всплывающее окно alert javascript
+driver.switch_to.alert
+            element = driver.switch_to.active_element
+            alert = driver.switch_to.alert
+            driver.switch_to.default_content()
+            driver.switch_to.frame('frame_name')
+            driver.switch_to.frame(1)
+            driver.switch_to.frame(driver.find_elements_by_tag_name("iframe")[0])
+            driver.switch_to.parent_frame()
+            driver.switch_to.window('main')
+# Подробнее C:\Users\al-si\AppData\Local\Programs\Python\Python39\Lib\site-packages\selenium\webdriver\remote
+
+
 
 # Поиск по названию тега
 els = driver.find_elements(By.TAG_NAME, 'li')
@@ -28,7 +41,7 @@ els = driver.find_elements(By.TAG_NAME, 'li')
 els = driver.find_elements(By.ID, 'loginform-password')
 # Поиск по атрибутам элементов
 els = driver.find_elements(By.XPATH, '//div[@class="panel-body"]')
-# Так можно взять вложенные div`ы первого уровня
+# Так можно взять вложенные дочерние div`ы первого уровня
 els = driver.find_elements(By.XPATH, '//div[@class="panel-body"]/div')
 
 # Поиск по вхождению фразы в атрибут элемента
@@ -37,7 +50,8 @@ els = driver.find_elements(By.XPATH, '//button[contains(@onclick, "saveManualFla
 # Поиск элементов внутри родительского элемента
 els = els_parent.find_elements(By.XPATH, './/button[contains(@onclick, "saveManualFlat")]')
 
-
+# Взять значение атрибута у элемента
+attr = els[0].get_attribute('value')
 
 
 # Кликнуть мышкой
@@ -51,6 +65,10 @@ except: raise Exception('Ошибка ввода фразы')
 # Имитация стрелок клавиатуры, Enter
 try: els[0].send_keys(Keys.ENTER)       # Keys.ARROW_DOWN
 except: raise Exception('Ошибка ENTER')
+        els[0].send_keys(Keys.CONTROL + 'a')
+        time.sleep(2)
+        els[0].send_keys(Keys.DELETE)
+
 
 # Кликнуть мышкой javascript
 # Если Обычным способом чекбокс не отмечается - element not interactable

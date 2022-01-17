@@ -14,6 +14,7 @@ from bid_mts import run_bid_mts
 from bid_domru import run_bid_domru
 from bid_ttk import run_bid_ttk
 from bid_onlime import run_bid_onlime
+from bid_mgts import run_bid_mgts
 
 # личный бот @infra     TELEGRAM_CHAT_ID, TELEGRAM_TOKEN
 TELEGRAM_CHAT_ID = '1740645090'
@@ -37,6 +38,7 @@ PERIOD_SCAN_BID_ROSTELECOM = TIME_30_SECONDS  # Периодичность ра�
 PERIOD_SCAN_BID_DOMRU = TIME_30_SECONDS  # Периодичность работы скрипта заведение заявок DOMRU
 PERIOD_SCAN_BID_TTK = TIME_30_SECONDS  # Периодичность работы скрипта заведение заявок TTK
 PERIOD_SCAN_BID_ONLIME = TIME_30_SECONDS  # Периодичность работы скрипта заведение заявок ONLIME
+PERIOD_SCAN_BID_MGTS = TIME_30_SECONDS  # Периодичность работы скрипта заведение заявок MGTS
 PERIOD_SCAN_LK_MEGAFON = TIME_1_HOUR  # Периодичность работы парсинг ЛК MEGAFON
 PERIOD_SCAN_LK_BEELINE = TIME_1_HOUR  # Периодичность работы парсинг ЛК BEELINE
 PERIOD_BETWEEN = 1  # в секундах, Пауза
@@ -111,6 +113,7 @@ if __name__ == '__main__':
     start_time_bid_domru = None
     start_time_bid_ttk = None
     start_time_bid_onlime = None
+    start_time_bid_mgts = None
     start_time_lk_megafon = None
     start_time_lk_beeline = None
     
@@ -121,76 +124,87 @@ if __name__ == '__main__':
         if cur_time.hour < 6 or cur_time.hour >= 23: continue
         str_time = cur_time.strftime('%H:%M:%S %d-%m-%Y')
         
-        # #===============================================#
-        # # Скрипт Заведение заявок beeline
-        # if start_time_bid_beeline:
-            # passed = (cur_time - start_time_bid_beeline).seconds
-        # if start_time_bid_beeline == None or passed >= PERIOD_SCAN_BID_BEELINE:
-            # start_time_bid_beeline = cur_time
-            # print(f'start bid_beeline {str_time}')
-            # # run_bid_beeline(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
-            # run_bid_beeline(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN)
-            # continue
+        #===============================================#
+        # Скрипт Заведение заявок beeline
+        if start_time_bid_beeline:
+            passed = (cur_time - start_time_bid_beeline).seconds
+        if start_time_bid_beeline == None or passed >= PERIOD_SCAN_BID_BEELINE:
+            start_time_bid_beeline = cur_time
+            print(f'start bid_beeline {str_time}')
+            # run_bid_beeline(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
+            run_bid_beeline(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN)
+            continue
+
+        #===============================================#
+        # Скрипт Заведение заявок mts
+        if start_time_bid_mts:
+            passed = (cur_time - start_time_bid_mts).seconds
+        if start_time_bid_mts == None or passed >= PERIOD_SCAN_BID_MTS:
+            start_time_bid_mts = cur_time
+            print(f'start bid_mts {str_time}')
+            run_bid_mts(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
+            continue
+
+        #===============================================#
+        # Скрипт Заведение заявок rostelecom2
+        if start_time_bid_rostelecom2:
+            passed = (cur_time - start_time_bid_rostelecom2).seconds
+        if start_time_bid_rostelecom2 == None or passed >= PERIOD_SCAN_BID_ROSTELECOM2:
+            start_time_bid_rostelecom2 = cur_time
+            print(f'start bid_rostelecom2 {str_time}')
+            run_bid_rostelecom2(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
+            continue
+
+        #===============================================#
+        # Скрипт Заведение заявок rostelecom
+        if start_time_bid_rostelecom:
+            passed = (cur_time - start_time_bid_rostelecom).seconds
+        if start_time_bid_rostelecom == None or passed >= PERIOD_SCAN_BID_ROSTELECOM:
+            start_time_bid_rostelecom = cur_time
+            print(f'start bid_rostelecom {str_time}')
+            run_bid_rostelecom(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
+            continue
+
+        #===============================================#
+        # Скрипт Заведение заявок domru
+        if start_time_bid_domru:
+            passed = (cur_time - start_time_bid_domru).seconds
+        if start_time_bid_domru == None or passed >= PERIOD_SCAN_BID_DOMRU:
+            start_time_bid_domru = cur_time
+            print(f'start bid_domru {str_time}')
+            run_bid_domru(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
+            continue
+
+        #===============================================#
+        # Скрипт Заведение заявок ttk
+        if start_time_bid_ttk:
+            passed = (cur_time - start_time_bid_ttk).seconds
+        if start_time_bid_ttk == None or passed >= PERIOD_SCAN_BID_TTK:
+            start_time_bid_ttk = cur_time
+            print(f'start bid_ttk {str_time}')
+            run_bid_ttk(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
+            continue
 
         # #===============================================#
-        # # Скрипт Заведение заявок mts
-        # if start_time_bid_mts:
-            # passed = (cur_time - start_time_bid_mts).seconds
-        # if start_time_bid_mts == None or passed >= PERIOD_SCAN_BID_MTS:
-            # start_time_bid_mts = cur_time
-            # print(f'start bid_mts {str_time}')
-            # run_bid_mts(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
-            # continue
-
-        # #===============================================#
-        # # Скрипт Заведение заявок rostelecom2
-        # if start_time_bid_rostelecom2:
-            # passed = (cur_time - start_time_bid_rostelecom2).seconds
-        # if start_time_bid_rostelecom2 == None or passed >= PERIOD_SCAN_BID_ROSTELECOM2:
-            # start_time_bid_rostelecom2 = cur_time
-            # print(f'start bid_rostelecom2 {str_time}')
-            # run_bid_rostelecom2(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
-            # continue
-
-        # #===============================================#
-        # # Скрипт Заведение заявок rostelecom
-        # if start_time_bid_rostelecom:
-            # passed = (cur_time - start_time_bid_rostelecom).seconds
-        # if start_time_bid_rostelecom == None or passed >= PERIOD_SCAN_BID_ROSTELECOM:
-            # start_time_bid_rostelecom = cur_time
-            # print(f'start bid_rostelecom {str_time}')
-            # run_bid_rostelecom(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
-            # continue
-
-        # #===============================================#
-        # # Скрипт Заведение заявок domru
-        # if start_time_bid_domru:
-            # passed = (cur_time - start_time_bid_domru).seconds
-        # if start_time_bid_domru == None or passed >= PERIOD_SCAN_BID_DOMRU:
-            # start_time_bid_domru = cur_time
-            # print(f'start bid_domru {str_time}')
-            # run_bid_domru(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
-            # continue
-
-        # #===============================================#
-        # # Скрипт Заведение заявок ttk
-        # if start_time_bid_ttk:
-            # passed = (cur_time - start_time_bid_ttk).seconds
-        # if start_time_bid_ttk == None or passed >= PERIOD_SCAN_BID_TTK:
-            # start_time_bid_ttk = cur_time
-            # print(f'start bid_ttk {str_time}')
-            # run_bid_ttk(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
+        # # Скрипт Заведение заявок onlime
+        # if start_time_bid_onlime:
+            # passed = (cur_time - start_time_bid_onlime).seconds
+        # if start_time_bid_onlime == None or passed >= PERIOD_SCAN_BID_ONLIME:
+            # start_time_bid_onlime = cur_time
+            # print(f'start bid_onlime {str_time}')
+            # # run_bid_onlime(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
+            # run_bid_onlime(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN)
             # continue
 
         #===============================================#
-        # Скрипт Заведение заявок onlime
-        if start_time_bid_onlime:
-            passed = (cur_time - start_time_bid_onlime).seconds
-        if start_time_bid_onlime == None or passed >= PERIOD_SCAN_BID_ONLIME:
-            start_time_bid_onlime = cur_time
-            print(f'start bid_onlime {str_time}')
-            # run_bid_onlime(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
-            run_bid_onlime(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN)
+        # Скрипт Заведение заявок mgts
+        if start_time_bid_mgts:
+            passed = (cur_time - start_time_bid_mgts).seconds
+        if start_time_bid_mgts == None or passed >= PERIOD_SCAN_BID_MGTS:
+            start_time_bid_mgts = cur_time
+            print(f'start bid_mgts {str_time}')
+            # run_bid_mgts(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
+            run_bid_mgts(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN)
             continue
 
         # #===============================================#

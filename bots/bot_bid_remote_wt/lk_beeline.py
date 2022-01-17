@@ -226,10 +226,10 @@ def run_lk_beeline() -> int:
 
 if __name__ == '__main__':
     pass
-    # rez = run_lk_beeline()
-    # if rez:
-        # str_rez = 'Парсинг ЛК Билайн: ERROR - ' + str(rez)
-        # print(str_rez)
+    rez = run_lk_beeline()
+    if rez:
+        str_rez = 'Парсинг ЛК Билайн: ERROR - ' + str(rez)
+        print(str_rez)
         # send_telegram(str_rez)
 
 
