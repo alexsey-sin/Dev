@@ -79,6 +79,12 @@ def downloadLidsFromCRM(request):
         gvar_cur.val_int = 0
         gvar_cur.save()
 
+        # Очистим лог
+        gvar, _ = GlobalVariable.objects.get_or_create(key='log_download')
+        gvar.val_datetime = None
+        gvar.descriptions = None
+        gvar.save()
+
         # Запустим поток загрузки
         th = Thread(target=thread_download_crm, name=thread_name, args=(str_from_modify, ))
         th.start()
@@ -87,9 +93,9 @@ def downloadLidsFromCRM(request):
 
 
 def fix_result_download_crm(mess):
-    gvar, _ = GlobalVariable.objects.get_or_create(key='last_download_crm')
+    gvar, _ = GlobalVariable.objects.get_or_create(key='log_download_crm')
     gvar.val_datetime = datetime.now()
-    gvar.val_str = mess
+    gvar.descriptions += mess
     gvar.save()
 
 def append_lids(lids):
@@ -215,7 +221,7 @@ def thread_download_crm(str_from_modify):
     gvar_go.val_bool = False
     gvar_go.save()
     mess = f'Обработано лидов: {go_total}. Ошибок: {cnt_err}'
-    fix_result_download_crm(mess)  # Зафиксируем время загрузки с пустым сообщением
+    fix_result_download_crm(mess)
     print('stop thread')
 
 

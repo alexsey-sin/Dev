@@ -2,13 +2,17 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 # from django.contrib.auth import get_user_model
 # from django.http import HttpResponse
-from django.http import JsonResponse
-from datetime import datetime as dt
+from office.models import MoexBOND, GlobalVariable
+from datetime import datetime
+from datetime import timedelta
 import requests
 import time
+from django.http import JsonResponse
 import json
 import threading
 from threading import Thread
+from django.http import JsonResponse
+from datetime import datetime as dt
  
 # User = get_user_model()
 
@@ -77,28 +81,84 @@ def moexbond(request):
 
 
 def download_moex(request):
-    if not request.POST: return JsonResponse({})
-    
     thread_name = 'DownLoadBondFromMOEX'
+    if not request.GET: return JsonResponse({})
 
-    # Проверим - закончен ли процесс предыдущей загрузки
+    # str_from_modify = ''
+    # last_modify_lid = DomconnectCrmLid.objects.order_by('modify_date').last()
+    # if last_modify_lid:
+        # from_modify = last_modify_lid.modify_date
+        # from_modify = from_modify - timedelta(seconds=1)
+        # str_from_modify = from_modify.strftime('%Y-%m-%dT%H:%M:%S')
+
+
+    # return JsonResponse({'is_run': False})
+
+    # Проверим идет ли загрузка
+    is_run = False
     for thread in threading.enumerate():
-        if thread.getName() == thread_name:
-            return HttpResponse('Процесс загрузки.', content_type='text/plain; charset=utf-8')
+        if thread.getName() == thread_name: is_run = True; break
+    response = {'is_run': is_run}
+    
+    # Посмотрим нужны ли данные по загрузке
+    get_state = request.GET.get('get_state')
+    if get_state:
+        gvar_cur, _ = GlobalVariable.objects.get_or_create(key='cur_num_download')
+        gvar_tot, _ = GlobalVariable.objects.get_or_create(key='tot_num_download')
+        response['val_current'] = gvar_cur.val_int
+        response['val_total'] = gvar_tot.val_int
+        
+    is_stop = request.GET.get('stop')
+    if is_stop:
+        gvar_go, _ = GlobalVariable.objects.get_or_create(key='go_download')
+        gvar_go.val_bool = False
+        gvar_go.save()
 
-    th = Thread(target=thread_download_bond_moex, name=thread_name, args=())
-    th.start()
+    is_start = request.GET.get('start')
+    if is_start and not is_run:
+        # Разрешим загрузку в глобальной переменной
+        gvar_go, _ = GlobalVariable.objects.get_or_create(key='go_download')
+        gvar_go.val_bool = True
+        gvar_go.save()
 
-    # return HttpResponse('Загрузка началась.', content_type='text/plain; charset=utf-8')
-    response = {
-        'is_taken': 25,
-    }
+        # Обнулим глоб. переменную текущей позиции
+        gvar_cur, _ = GlobalVariable.objects.get_or_create(key='cur_num_download')
+        gvar_cur.val_int = 0
+        gvar_cur.save()
+        
+        # Очистим лог
+        gvar, _ = GlobalVariable.objects.get_or_create(key='log_download')
+        gvar.val_datetime = None
+        gvar.descriptions = None
+        gvar.save()
+
+        # Запустим поток загрузки
+        th = Thread(target=thread_download_bond_moex, name=thread_name, args=())
+        th.start()
+        response['is_run'] = True
     return JsonResponse(response)
+    # if not request.POST: return JsonResponse({})
+    
+    # thread_name = 'DownLoadBondFromMOEX'
+
+    # # Проверим - закончен ли процесс предыдущей загрузки
+    # for thread in threading.enumerate():
+        # if thread.getName() == thread_name:
+            # return HttpResponse('Процесс загрузки.', content_type='text/plain; charset=utf-8')
+
+    # th = Thread(target=thread_download_bond_moex, name=thread_name, args=())
+    # th.start()
+
+    # # return HttpResponse('Загрузка началась.', content_type='text/plain; charset=utf-8')
+    # response = {
+        # 'is_taken': 25,
+    # }
+    # return JsonResponse(response)
 
 def fix_result(mess):
-    gvar, _ = GlobalVariable.objects.get_or_create(key='last_download_crm')
+    gvar, _ = GlobalVariable.objects.get_or_create(key='log_download')
     gvar.val_datetime = dt.today()
-    gvar.val_str = mess
+    gvar.descriptions += mess
     gvar.save()
 
 def append_bond_moex(lids):
@@ -135,7 +195,7 @@ def append_bond_moex(lids):
         #     lid.delete()
         #     return str(e)
 
-def GetMOEXsecidBonds()
+def GetMOEXsecidBonds():
     str_url = "http://iss.moex.com/iss/securities.json"
     outList = []
     start = 7600
@@ -145,8 +205,12 @@ def GetMOEXsecidBonds()
         'group_by': 'group',
         'group_by_filter': 'stock_bonds',
     }
-
+    
+    cnt_err = 0
     while(True):
+        gvar_go, _ = GlobalVariable.objects.get_or_create(key='go_download')
+        if gvar_go.val_bool == False: break
+        print('list')
         try:
             search_parameters['limit'] = limit
             search_parameters['start'] = start
@@ -158,96 +222,87 @@ def GetMOEXsecidBonds()
             cnt = len(res['securities']['data'])
             if cnt == 0:
                 break
-            self.message_value.emit(f'Загружаем предварительный список: {len(outList)+cnt}')
             for i in range(cnt):
                 sec_id = res['securities']['data'][i][ind_sec_id]
                 outList.append(sec_id)
-                self.message_value.emit(sec_id)
         except Exception as exc:
-            self.message_value.emit(f'Ошибка загрузки списка: {exc}')
-            print(exc)
-            break
+            cnt_err += 1
 
         start += limit
+    if cnt_err: fix_result(f'Ошибок загрузки списка: {cnt_err}')
     return outList
 
+def GetMOEXBonds(listSecId):
+    # For example can be substituted RU000A101PV6.json
+    str_url_tmp = "http://iss.moex.com/iss/securities/"
+    
+    cnt_err = 0
+    total = len(listSecId)
+    for i in range(total):
+        gvar_go, _ = GlobalVariable.objects.get_or_create(key='go_download')
+        if gvar_go.val_bool == False: break
+        try:
+            str_url = f'{str_url_tmp}{listSecId[i]}.json'
+            response = requests.get(str_url)
+            if response.status_code != 200:
+                raise Exception(f'Ответ сервера: {response.status_code}')
+            res = response.json()
+            
+            print(listSecId[i])
+            cnt_field = 0
+            dict_bond = {}
+            dict_bond['SECID'] = listSecId[i]
+            # перелистаем поля бумаги
+            for fldBond in res['description']['data']:
+                if fldBond[0] == 'SECID' and listSecId[i] == fldBond[2]:
+                    cnt_field += 1
+                if fldBond[0] == 'NAME':
+                    dict_bond['NAME'] = fldBond[2]
+                    cnt_field += 1
+                if fldBond[0] == 'MATDATE':
+                    dict_bond['MATDATE'] = fldBond[2]
+                    cnt_field += 1
+                if fldBond[0] == 'FACEVALUE':
+                    dict_bond['FACEVALUE'] = fldBond[2]
+                    cnt_field += 1
+                if fldBond[0] == 'COUPONFREQUENCY':
+                    dict_bond['COUPONFREQUENCY'] = fldBond[2]
+                    cnt_field += 1
+                if fldBond[0] == 'COUPONVALUE':
+                    dict_bond['COUPONVALUE'] = fldBond[2]
+                    cnt_field += 1
+                if fldBond[0] == 'TYPE':
+                    dict_bond['TYPE'] = fldBond[2]
+                    cnt_field += 1
 
-def thread_download_bond_moex(from_date):
+            if cnt_field == 7:
+                lid, _ = MoexBOND.objects.get_or_create(secid=dict_bond['SECID'])
+                lid.name = dict_bond['TITLE']
+                # lid.matdate = dict_bond['MATDATE']
+                # lid.facevalue = dict_bond['FACEVALUE']
+                # lid.couponfrequency = dict_bond['COUPONFREQUENCY']
+                # lid.couponvalue = dict_bond['COUPONVALUE']
+                lid.typename = dict_bond['TYPE']
+                lid.save()
+                print('Ok')
+
+
+        except Exception as exc:
+            cnt_err += 1
+        gvar_cur, _ = GlobalVariable.objects.get_or_create(key='cur_num_download')
+        gvar_cur.val_int = i
+        gvar_cur.save()
+        gvar_tot, _ = GlobalVariable.objects.get_or_create(key='tot_num_download')
+        gvar_tot.val_int = total
+        gvar_tot.save()
+
+    if cnt_err: fix_result(f'Ошибок загрузки бумаг: {cnt_err}')
+
+def thread_download_bond_moex():
+    MoexBOND.objects.all().delete()
     listSecIdBonds = GetMOEXsecidBonds()  # []
+    GetMOEXBonds(listSecIdBonds)
     
-    
-    # gvar, created = GlobalVariable.objects.get_or_create(key='url_download_moex')
-    # url = gvar.val_str
-    # if not url:
-        # fix_result('Not url address')
-        # return   # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.list'
-    
-    # print('start thread')
-
-    # # dt_start = dt.strptime(from_date, '%d.%m.%Y')
-    # # str_dt_start = dt_start.strftime('%Y-%m-%dT%H:%M:%S')
-    # go_next = 0
-    # # go_total = 0
-    # # out_lst = []
-
-    # headers = {
-        # 'Content-Type': 'application/json',
-        # 'Connection': 'Keep-Alive',
-        # 'User-Agent': 'Apache-HttpClient/4.1.1 (java 1.5)',
-    # }
-    # # print(str_dt_start)
-    # # return '', []
-    # while True:
-        # data = {
-            # 'start': go_next,
-            # 'order': {'DATE_MODIFY': 'ASC'},  # Если нужно с сортировкой
-            # 'filter': {
-                # '>DATE_CREATE': str_dt_start,  # '2021-10-01T00:00:00'
-                # # '<DATE_CREATE': '2021-10-31T23:59:59',
-            # },
-            # 'select': [
-                # 'ID', 
-                # 'TITLE', 
-                # 'STATUS_ID', 
-                # 'DATE_CREATE',
-                # 'DATE_MODIFY',
-                # 'SOURCE_ID',
-                # 'ASSIGNED_BY_ID',
-                # 'UF_CRM_1493416385',  # Сумма тарифа
-                # 'UF_CRM_1499437861',  # ИНН/Организация
-                # 'UF_CRM_1580454770',  # Звонок?
-                # 'UF_CRM_1534919765',  # Группы источников
-                # 'UF_CRM_1571987728429',  # Провайдеры ДК
-                # 'UF_CRM_1592566018',  # ТИп лида
-                # 'UF_CRM_1493413514',  # Провайдер
-                # 'UF_CRM_1492017494',  # Область
-                # 'UF_CRM_1492017736',  # Город
-                # 'UF_CRM_1498756113',  # Юр. лицо
-
-                # 'UF_CRM_1615982450',  # utm_source
-                # 'UF_CRM_1615982567',  # utm_medium
-                # 'UF_CRM_1615982644',  # utm_campaign
-                # 'UF_CRM_1615982716',  # utm_term                
-                # 'UF_CRM_1615982795',  # utm_content                
-                # 'UF_CRM_1640267556',  # utm_group 
-            # ]
-        # }
-        # try:
-            # responce = requests.post(url, headers=headers, json=data)
-            # if responce.status_code == 200:
-                # answer = json.loads(responce.text)
-                # result = answer.get('result')
-                # go_next = answer.get('next')
-                # go_total = answer.get('total')
-                # print(go_next, go_total)
-                # append_bond_moex(result)
-                # if not go_next: break
-            # else: return fix_result(f'Ошибка get_lids: responce.status_code: {responce.status_code}\n{responce.text}')
-        # except Exception as e: fix_result(f'Ошибка get_lids: try: requests.post {e}')
-
-        # time.sleep(1)
-    
-    # fix_result('')  # Зафиксируем время загрузки с пустым сообщением
 
     # print('stop thread')
 

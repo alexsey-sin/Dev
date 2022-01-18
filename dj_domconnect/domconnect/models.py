@@ -147,20 +147,19 @@ class GlobalVariable(models.Model):
     key = models.CharField(  # Название переменной
         max_length = 100,
         unique = True,  # Если True, это поле должно быть уникальным во всей таблице.
-        blank = False,  # Если True, поле может быть пустым. По умолчанию False.
     )
     val_str = models.CharField(
         max_length = 100,
         blank = True,
-        default = '',
+        null = True,
     )
     val_bool = models.BooleanField(
         blank = True,
-        default = False,
+        null = True,
     )
     val_int = models.IntegerField(
         blank = True,
-        default = 0,
+        null = True,
     )
     val_datetime = models.DateTimeField(
         blank = True,
@@ -170,11 +169,11 @@ class GlobalVariable(models.Model):
         max_digits = 10,
         decimal_places = 2,
         blank = True,
-        default = 0.00,
+        null = True,
     )
     descriptions = models.TextField(
         blank = True,
-        default = '',
+        null = True,
         verbose_name='Описание',
     )
 

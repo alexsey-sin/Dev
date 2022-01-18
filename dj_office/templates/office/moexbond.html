@@ -39,15 +39,13 @@ table td:first-child:before {
                                             <h5 class="mb-0">ММВБ Облигации</h5>
                                         </div>
                                         <div class="col">
-                                            <label id="id_lbl_moex" class="form-check-label">Загружено облигаций:</label>
+                                            <label id="id_lbl_moex" class="form-check-label">Всего облигаций:</label>
                                         </div>
                                         <div class="col" id="id_div_val_moex">
                                             <label id="id_val_moex" class="form-check-label">7500</label>
                                         </div>
                                         <div class="col" id="id_div_upgrade_moex">
-                                            <label class="form-check-label">Обновлено:&nbsp</label>
-                                            <label id="id_val_upgrade_moex" class="form-check-label">4 дня</label>
-                                            <label class="form-check-label">&nbsp назад</label>
+                                            <label class="form-check-label">Обновлено: 20.01.2022</label>
                                         </div>
                                         <div class="col" id="id_div_prgs_moex" style="display: none">
                                             <progress id="id_prgs_moex" value="20" max="100"></progress>
@@ -230,61 +228,98 @@ table td:first-child:before {
 {% block javascripts %}
 <script src="/static/assets/js/jquery.min.js"></script>
 <script language="javascript">
-	let prgs_val = 0;
-    // if (window.history.replaceState){  // предотвращает повторную отправку формы при обновлении страницы если перед этим была отправка
-    //     window.history.replaceState(null, null, window.location.href);
-    // }
-    // function editRowPhrase(i,t){
-    //     $('#openModalPhraseTitle').text("Редактирование фразы");
-    //     $('#id_text').val(t);
-        // $('#id_sex').val(s);
-        // $('#id_short_names').val(d);
-    //     $('#id_edit').val(i);
-    //     $('#openModalPhraseButton').text("Изменить");
-    // }
-    function cickle_query_download_moex(){
-		prgs_val += 2;
-		$('#id_prgs_moex').val(prgs_val);
-		if(prgs_val < 100){setTimeout(cickle_query_download_moex, 200);}
-		else{dwnld_moex_stop()}
-    }
+    let is_download = false;
 	function download_moex(){
-		dwnld_moex_start()
-		// alert($('#id_prgs_moex').val());
-		// {
-        go_ajax()
-		// }
-		// cickle_query_download_moex()
-        dwnld_moex_stop()
+        if (is_download){  // Включен режим загрузки
+            is_download = false;
+			$('#id_lbl_moex').show();
+			$('#id_div_val_moex').show();
+			$('#id_div_upgrade_moex').show();
+            $('#id_div_prgs_moex').hide();
+            $('#id_btn_moex').text('Обновить');
+            ajax_data = {'stop': true};
+            go_ajax(ajax_data)
+        }else{
+            is_download = true;
+			$('#id_lbl_moex').hide();
+			$('#id_div_val_moex').hide();
+			$('#id_div_upgrade_moex').hide();
+            $('#id_prgs_moex').val(0);
+            $('#id_div_prgs_moex').show();
+            $('#id_btn_moex').text('Остановить');
+            ajax_data = {'start': true};
+            go_ajax(ajax_data)
+            setTimeout(cickle_query_download, 500);
+        }
     }
-	function dwnld_moex_start(){
-		prgs_val = 0;
-        $('#id_btn_moex').attr('disabled', true);
-        $('#id_lbl_moex').text('Загрузка:');
-        $('#id_div_val_moex').hide();
-        $('#id_div_prgs_moex').show();
-        $('#id_div_upgrade_moex').hide();
-        $('#id_prgs_moex').val(prgs_val);
-	}
-	function dwnld_moex_stop(){
-        $('#id_btn_moex').attr('disabled', false);
-        $('#id_lbl_moex').text('Загружено облигаций:');
-        $('#id_div_val_moex').show();
-        $('#id_div_prgs_moex').hide();
-        $('#id_div_upgrade_moex').show();
-        $('#id_prgs_moex').val(prgs_val);
-	}
-    function go_ajax(){
+    function cickle_query_download(){
+        ajax_data = {'get_state': true};
+        go_ajax(ajax_data)
+		if(is_download){setTimeout(cickle_query_download, 500);}
+    }
+    function go_ajax(ajax_data){
         $.ajax({
-            data: {'check': 25}, // получаяем данные формы
+            data: ajax_data, // отсылаемые данные
             url: "{% url 'office:dwnldmoexbond' %}",
-            success: function (response){  // если успешно
-                // if (response.is_taken == true){
-                console.log('error')
-                alert(response.is_taken);
-            },
+            success: function (response){
+                is_run = response.is_run;
+                if(!is_run && is_download){download_moex()}
+                if(is_download){
+                    val = response.val_current;
+                    tot = response.val_total;
+                    if(val >= 0 && tot > 0){
+                        $('#id_prgs_moex').attr('value', val);
+                        $('#id_prgs_moex').attr('max', tot);
+                    }
+                }
+            }, // если успешно
             error: function (response){console.log(response.responseJSON.errors)}  // если ошибка
         });
     }
+	// let prgs_val = 0;
+    // function cickle_query_download_moex(){
+		// prgs_val += 2;
+		// $('#id_prgs_moex').val(prgs_val);
+		// if(prgs_val < 100){setTimeout(cickle_query_download_moex, 200);}
+		// else{dwnld_moex_stop()}
+    // }
+	// function download_moex(){
+		// dwnld_moex_start()
+		// // alert($('#id_prgs_moex').val());
+		// // {
+        // go_ajax()
+		// // }
+		// // cickle_query_download_moex()
+        // dwnld_moex_stop()
+    // }
+	// function dwnld_moex_start(){
+		// prgs_val = 0;
+        // $('#id_btn_moex').attr('disabled', true);
+        // $('#id_lbl_moex').text('Загрузка:');
+        // $('#id_div_val_moex').hide();
+        // $('#id_div_prgs_moex').show();
+        // $('#id_div_upgrade_moex').hide();
+        // $('#id_prgs_moex').val(prgs_val);
+	// }
+	// function dwnld_moex_stop(){
+        // $('#id_btn_moex').attr('disabled', false);
+        // $('#id_lbl_moex').text('Загружено облигаций:');
+        // $('#id_div_val_moex').show();
+        // $('#id_div_prgs_moex').hide();
+        // $('#id_div_upgrade_moex').show();
+        // $('#id_prgs_moex').val(prgs_val);
+	// }
+    // function go_ajax(){
+        // $.ajax({
+            // data: {'check': 25}, // получаяем данные формы
+            // url: "{% url 'office:dwnldmoexbond' %}",
+            // success: function (response){  // если успешно
+                // // if (response.is_taken == true){
+                // console.log('error')
+                // alert(response.is_taken);
+            // },
+            // error: function (response){console.log(response.responseJSON.errors)}  // если ошибка
+        // });
+    // }
 </script>
 {% endblock javascripts %}
