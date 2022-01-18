@@ -67,3 +67,6 @@ def moexbond(request):
     # context['paginator'] = paginator
 
     return render(request, 'office/moexbond.html', context)
+
+
+# https://pythonru.com/primery/django-ajax

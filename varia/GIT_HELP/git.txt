@@ -1,0 +1,32 @@
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin git@github.com:alexey-sin/PROG_ISP.git
+git push -u origin main
+
+git pull --rebase
+
+git checkout -b new
+...
+git add .
+git commit -m fix_bug
+
+git checkout master
+git merge new
+git push origin master
+git branch -d new
+
+
+git config --global user.name 'alexsey-sin'
+git config --global user.email 'alexey-sin@yandex.ru'
+
+git clone git@github.com:alexsey-sin/yandex_praktikum.git
+git clone https://github.com/alexsey-sin/yandex_praktikum.git
+
+Три команды в одном git add . && git commit && git push
+git config --global alias.acp '!f() { git add -A && git commit -m \"$1\" && git push; }; f'
+
+Использование
+git acp "My_commit"
+

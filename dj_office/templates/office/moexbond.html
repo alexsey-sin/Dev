@@ -32,11 +32,79 @@ table td:first-child:before {
                     <!-- [ Hover-table ] start -->
                     <div class="col-xl-12">
                         <div class="card">
-                            <div class="card-header">
-                                <h5>Фразы группы: </h5>
-                                &nbsp;&nbsp;&nbsp;&nbsp;
-                                <h3>{{ group_name }}</h3>
-                                <span class="d-block m-t-5">Всего в группе: {{ cnt_phrases }} фраз.</span>
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="row">
+                                        <div class="col">
+                                            <h5 class="mb-0">ММВБ Облигации</h5>
+                                        </div>
+                                        <div class="col">
+                                            <label class="form-check-label">Загружено:</label>
+                                        </div>
+                                        <div class="col">
+                                            <div hidden>
+                                                <label class="form-check-label">7500</label>
+                                            </div>
+                                            <div class="progress">
+                                                <div class="progress-bar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100" style="width: 30%; height: 30px;">50%</div>
+                                            </div>
+                                        </div>
+                                        <div class="col"><button class="btn btn-primary" type="button">Обновить</button></div>
+                                    </div>
+                                    <div class="input-group"></div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Фильтр</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-1"><label class="form-check-label" for="formCheck-1">Номинал от:</label></div>
+                                            <div class="input-group"><input class="form-control" type="number"></div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-2"><label class="form-check-label" for="formCheck-2">Номинал до:</label></div>
+                                            <div class="input-group"><input class="form-control" type="number"></div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-3"><label class="form-check-label" for="formCheck-3">Дата погашения от:</label></div>
+                                            <div class="input-group"><input class="form-control" type="date"></div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-4"><label class="form-check-label" for="formCheck-4">Дата погашения до:</label></div>
+                                            <div class="input-group"><input class="form-control" type="date"></div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-5"><label class="form-check-label" for="formCheck-5">Тип облигации:</label></div>
+                                            <div class="input-group"></div><select>
+                                                <optgroup label="This is a group">
+                                                    <option value="12" selected="">This is item 1</option>
+                                                    <option value="13">This is item 2</option>
+                                                    <option value="14">This is item 3</option>
+                                                </optgroup>
+                                            </select>
+                                        </div>
+                                        <div class="col"><button class="btn btn-primary btn-sm" type="button">Обновить</button></div>
+                                    </div>
+                                    <div class="input-group"></div>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="row">
+                                <div class="col-md-6 text-nowrap">
+                                    <div id="dataTable_length" class="dataTables_length" aria-controls="dataTable"><label class="form-label">Show&nbsp;<select class="d-inline-block form-select form-select-sm">
+                                                <option value="10" selected="">10</option>
+                                                <option value="25">25</option>
+                                                <option value="50">50</option>
+                                                <option value="100">100</option>
+                                            </select>&nbsp;</label></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="text-md-end dataTables_filter" id="dataTable_filter"><label class="form-label"><input type="search" class="form-control form-control-sm" aria-controls="dataTable" placeholder="Search"></label></div>
+                                </div>
                             </div>
                             <div class="card-block table-border-style">
                                 <div class="table-responsive">
@@ -54,9 +122,9 @@ table td:first-child:before {
                                             {% for row in page %}
                                             <tr>
                                                 <td></td>
-                                                <td><div style="width: 300px; overflow: hidden; text-overflow: ellipsis">{{ row.text }}</div></td>
-                                                <td>{{ row.author }}</td>
-                                                <td>{{ row.pub_date }}</td>
+                                                <td><div style="width: 300px; overflow: hidden; text-overflow: ellipsis">jjdjyyagaa{{ row.text }}</div></td>
+                                                <td>hdgsafasta{{ row.author }}</td>
+                                                <td>,kdmsnhasyhs{{ row.pub_date }}</td>
                                                 <td>
                                                     <img src="/static/assets/images/icons8-edit-30.png" alt="Редактировать" title="Редактировать" data-toggle="modal" data-target="#openModalPhrase" onclick="editRowPhrase('{{ row.id }}','{{ row.text }}');"></img>
                                                     &nbsp;&nbsp;&nbsp;&nbsp;

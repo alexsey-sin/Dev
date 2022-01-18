@@ -21,7 +21,7 @@ dt2 = dt + timedelta(days=10)
 
 # Дату в строку
 s = dt2.strftime('%d.%m.%Y')
-print(s)  # -> '2018-08-19'
+print(s)  # -> '19.08.2018'
 
 
 

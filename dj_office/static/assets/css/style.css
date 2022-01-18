@@ -189,14 +189,14 @@ p.text-muted {
   -webkit-box-shadow: 0 1px 20px 0 rgba(69, 90, 100, 0.08);
           box-shadow: 0 1px 20px 0 rgba(69, 90, 100, 0.08);
   border: none;
-  margin-bottom: 30px;
+  margin-bottom: 10px;
   -webkit-transition: all 0.5s ease-in-out;
   transition: all 0.5s ease-in-out;
 }
 .card .card-header {
   background-color: transparent;
   border-bottom: 1px solid #f1f1f1;
-  padding: 20px 25px;
+  padding: 5px 25px;
   position: relative;
 }
 .card .card-header h5 {
@@ -7659,7 +7659,7 @@ a.btn-theme.active {
 }
 
 .btn {
-  padding: 10px 20px;
+  padding: 2px 20px;
   border-radius: 0.25rem;
   font-size: 14px;
   margin-bottom: 5px;
@@ -8350,9 +8350,11 @@ a.btn-theme.active {
 }
 
 .progress-bar {
+  border-color: #f4f7fa;
+  border-width: 2;
   background-color: #04a9f5;
-  -webkit-box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.3);
-          box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.3);
+  /* -webkit-box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.3); */
+          /* box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.3); */
 }
 .progress-bar.progress-c-blue {
   background: #04a9f5;
