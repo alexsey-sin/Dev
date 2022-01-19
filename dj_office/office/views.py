@@ -3,8 +3,7 @@ from django.shortcuts import render
 # from django.contrib.auth import get_user_model
 # from django.http import HttpResponse
 from office.models import MoexBOND, GlobalVariable
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta
 import requests
 import time
 from django.http import JsonResponse
@@ -12,7 +11,6 @@ import json
 import threading
 from threading import Thread
 from django.http import JsonResponse
-from datetime import datetime as dt
  
 # User = get_user_model()
 
@@ -84,17 +82,6 @@ def download_moex(request):
     thread_name = 'DownLoadBondFromMOEX'
     if not request.GET: return JsonResponse({})
 
-    # str_from_modify = ''
-    # last_modify_lid = DomconnectCrmLid.objects.order_by('modify_date').last()
-    # if last_modify_lid:
-        # from_modify = last_modify_lid.modify_date
-        # from_modify = from_modify - timedelta(seconds=1)
-        # str_from_modify = from_modify.strftime('%Y-%m-%dT%H:%M:%S')
-
-
-    # return JsonResponse({'is_run': False})
-
-    # Проверим идет ли загрузка
     is_run = False
     for thread in threading.enumerate():
         if thread.getName() == thread_name: is_run = True; break
@@ -137,70 +124,19 @@ def download_moex(request):
         th.start()
         response['is_run'] = True
     return JsonResponse(response)
-    # if not request.POST: return JsonResponse({})
-    
-    # thread_name = 'DownLoadBondFromMOEX'
-
-    # # Проверим - закончен ли процесс предыдущей загрузки
-    # for thread in threading.enumerate():
-        # if thread.getName() == thread_name:
-            # return HttpResponse('Процесс загрузки.', content_type='text/plain; charset=utf-8')
-
-    # th = Thread(target=thread_download_bond_moex, name=thread_name, args=())
-    # th.start()
-
-    # # return HttpResponse('Загрузка началась.', content_type='text/plain; charset=utf-8')
-    # response = {
-        # 'is_taken': 25,
-    # }
-    # return JsonResponse(response)
 
 def fix_result(mess):
     gvar, _ = GlobalVariable.objects.get_or_create(key='log_download')
-    gvar.val_datetime = dt.today()
+    gvar.val_datetime = datetime.today()
     if not gvar.descriptions: gvar.descriptions = mess
     else: gvar.descriptions = gvar.descriptions + mess
     gvar.save()
 
-def append_bond_moex(lids):
-    for new_lid in lids:
-        # try:
-        print('before lid:')
-        lid = DomconnectCrmLid.objects.get_or_create(id_lid=int(new_lid.get('ID')))
-        print('after lid:', lid)
-        lid.title = new_lid.get('TITLE')
-        lid.status_id = new_lid.get('STATUS_ID')
-        lid.create_date = dt.strptime(new_lid.get('DATE_CREATE'), '%Y-%m-%dT%H:%M:%S%z')  # "2022-01-01T04:43:22+03:00"
-        lid.modify_date = dt.strptime(new_lid.get('DATE_MODIFY'), '%Y-%m-%dT%H:%M:%S%z')
-        lid.source_id = int(new_lid.get('SOURCE_ID'))
-        lid.assigned_by_id = int(new_lid.get('ASSIGNED_BY_ID'))
-        lid.crm_1493416385 = new_lid.get('UF_CRM_1493416385')
-        lid.crm_1499437861 = new_lid.get('UF_CRM_1499437861')
-        lid.crm_1580454770 = new_lid.get('UF_CRM_1580454770')
-        lid.crm_1534919765 = ';'.join(new_lid.get('UF_CRM_1534919765'))
-        lid.crm_1571987728429 = new_lid.get('UF_CRM_1571987728429')
-        lid.crm_1592566018 = ';'.join(new_lid.get('UF_CRM_1592566018'))
-        lid.crm_1493413514 = new_lid.get('UF_CRM_1493413514')
-        lid.crm_1492017494 = new_lid.get('UF_CRM_1492017494')
-        lid.crm_1492017736 = new_lid.get('UF_CRM_1492017736')
-        lid.crm_1498756113 = bool(new_lid.get('UF_CRM_1498756113'))
-        lid.crm_1615982450 = new_lid.get('UF_CRM_1615982450')
-        lid.crm_1615982567 = new_lid.get('UF_CRM_1615982567')
-        lid.crm_1615982644 = new_lid.get('UF_CRM_1615982644')
-        lid.crm_1615982716 = new_lid.get('UF_CRM_1615982716')
-        lid.crm_1615982795 = new_lid.get('UF_CRM_1615982795')
-        lid.crm_1640267556 = new_lid.get('UF_CRM_1640267556')
-        lid.save()
-        print(lid.id_lid, 'Ok')
-        # except Exception as e: 
-        #     lid.delete()
-        #     return str(e)
-
-def GetMOEXsecidBonds():
+def GetMOEXsecidBonds():  # Загрузка списка бумаг
     str_url = "http://iss.moex.com/iss/securities.json"
     outList = []
-    # start = 7600
-    start = 0
+    start = 7000
+    # start = 0
     limit = 100
     search_parameters = {
         'lang': 'ru',
@@ -208,11 +144,11 @@ def GetMOEXsecidBonds():
         'group_by_filter': 'stock_bonds',
     }
     
+    print('Загрузка списка.')
     cnt_err = 0
     while(True):
         gvar_go, _ = GlobalVariable.objects.get_or_create(key='go_download')
         if gvar_go.val_bool == False: break
-        print('list')
         try:
             search_parameters['limit'] = limit
             search_parameters['start'] = start
@@ -234,10 +170,11 @@ def GetMOEXsecidBonds():
     if cnt_err: fix_result(f'Ошибок загрузки списка: {cnt_err}')
     return outList
 
-def GetMOEXBonds(listSecId):
+def GetMOEXBonds(listSecId):  # Загрузка бумаг и сохранение в базу
     # For example can be substituted RU000A101PV6.json
     str_url_tmp = "http://iss.moex.com/iss/securities/"
     
+    print('Загрузка бумаг.')
     cnt_err = 0
     total = len(listSecId)
     for i in range(total):
@@ -279,7 +216,7 @@ def GetMOEXBonds(listSecId):
             if cnt_field == 7:
                 lid, _ = MoexBOND.objects.get_or_create(secid=dict_bond['SECID'])
                 lid.name = dict_bond['NAME']
-                lid.matdate = dt.strptime(dict_bond['MATDATE'], '%Y-%m-%d')
+                lid.matdate = datetime.strptime(dict_bond['MATDATE'], '%Y-%m-%d')
                 lid.facevalue = dict_bond['FACEVALUE']
                 lid.couponfrequency = dict_bond['COUPONFREQUENCY']
                 lid.couponvalue = dict_bond['COUPONVALUE']
@@ -299,10 +236,16 @@ def GetMOEXBonds(listSecId):
 
     if cnt_err: fix_result(f'Ошибок загрузки бумаг: {cnt_err}')
 
-def thread_download_bond_moex():
+def thread_download_bond_moex():  # Поток загрузки бумаг
     MoexBOND.objects.all().delete()
     listSecIdBonds = GetMOEXsecidBonds()  # []
     GetMOEXBonds(listSecIdBonds)
+    all_cnt = MoexBOND.objects.all().count()
+    gvar_end, _ = GlobalVariable.objects.get_or_create(key='end_download')
+    gvar_end.val_int = all_cnt
+    gvar_end.val_datetime = datetime.today()
+    gvar_end.save()
+    print('Загрузка завершена.')
     
 
 # https://pythonru.com/primery/django-ajax
