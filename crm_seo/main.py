@@ -117,22 +117,32 @@ if __name__ == '__main__':
     
     
     
-    from_date = '01.01.2022'
-    e, data_lids = get_lids(from_date)
-    if e: print(e)
+    # from_date = '01.01.2022'
+    # e, data_lids = get_lids(from_date)
+    # if e: print(e)
     
-    with open('lids_format.txt', 'w', encoding='utf-8') as out_file:
-        json.dump(data_lids, out_file, ensure_ascii=False, indent=4)
+    # with open('lids_format.txt', 'w', encoding='utf-8') as out_file:
+        # json.dump(data_lids, out_file, ensure_ascii=False, indent=4)
     
-    with open('lids.json', 'w', encoding='utf-8') as out_file:
-        json.dump(data_lids, out_file, ensure_ascii=False)
+    # with open('lids.json', 'w', encoding='utf-8') as out_file:
+        # json.dump(data_lids, out_file, ensure_ascii=False)
 
-    end_script_time = datetime.now()
-    print('\nDuration: {}'.format(end_script_time - start_script_time))
+    # end_script_time = datetime.now()
+    # print('\nDuration: {}'.format(end_script_time - start_script_time))
+
+
     
-    
-    
-    
+    # url = "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"
+    # responce = requests.get(url)
+    # if responce.status_code == 200:
+        # with open('jquery.min.js', 'w', encoding='utf-8') as outfile:
+            # outfile.write(responce.text)
+        # print('Ok')
+
+
+    from_date = '2022-01-01T04:43:22+03:00'
+    ddd = datetime.strptime(from_date, '%Y-%m-%dT%H:%M:%S%z')
+    print(ddd)
 
 
 

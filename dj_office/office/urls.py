@@ -10,8 +10,8 @@ app_name = 'office'
 urlpatterns = [
     path('', views.index, name='home'),
     path('moexbond', views.moexbond, name='moexbond'),
+    path('dwnldmoexbond', views.download_moex, name='dwnldmoexbond'),
 
-    # path('lizagroup', views.lizagroup, name='lizagroup'),
     # path('lizaphrases/<str:id_group>', views.lizaphrases, name='lizaphrases'),
 
     # path('germangroup', views.germangroup, name='germangroup'),

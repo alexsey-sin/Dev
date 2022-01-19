@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'api',
     'demo',
     'mobile',
+    'domconnect',
 ]
 
 MIDDLEWARE = [
@@ -109,7 +110,8 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+# USE_TZ = True
+USE_TZ = False
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
@@ -131,12 +133,12 @@ SIMPLE_JWT = {
 STATIC_URL = '/static/'
 
 # для сервера
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # # для локального компьютера
-# STATICFILES_DIRS = (
-    # os.path.join(BASE_DIR, 'static'),
-# )
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
 #############################################################
 MEDIA_URL = '/media/'
 
@@ -144,9 +146,9 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # для локального компьютера
-# MEDIAFILES_DIRS = (
-#     os.path.join(BASE_DIR, 'media'),
-# )
+MEDIAFILES_DIRS = (
+    os.path.join(BASE_DIR, 'media'),
+)
 
 LOGGING = {
     'version': 1,

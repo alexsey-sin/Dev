@@ -41,21 +41,20 @@ table td:first-child:before {
                                         <div class="col">
                                             <label id="id_lbl_moex" class="form-check-label">Загружено облигаций:</label>
                                         </div>
-                                        <div class="col">
-                                            <div id="id_div_val_moex">
-                                                <label id="id_val_moex" class="form-check-label">7500</label>
-                                            </div>
-                                            <div id="id_div_upgrade_moex">
-                                                <label class="form-check-label">Обновлено:&nbsp</label>
-                                                <label id="id_val_upgrade_moex" class="form-check-label">4 дня</label>
-                                                <label class="form-check-label">&nbsp назад</label>
-                                            </div>
-											<div id="id_div_prgs_moex" style="display: none">
-												<progress id="id_prgs_moex" value="20" max="100">
-                                            </progress>
-											</div>
+                                        <div class="col" id="id_div_val_moex">
+                                            <label id="id_val_moex" class="form-check-label">7500</label>
                                         </div>
-                                        <div class="col"><button class="btn btn-primary" id="id_btn_moex" type="button" onclick="download_moex();">Обновить</button></div>
+                                        <div class="col" id="id_div_upgrade_moex">
+                                            <label class="form-check-label">Обновлено:&nbsp</label>
+                                            <label id="id_val_upgrade_moex" class="form-check-label">4 дня</label>
+                                            <label class="form-check-label">&nbsp назад</label>
+                                        </div>
+                                        <div class="col" id="id_div_prgs_moex" style="display: none">
+                                            <progress id="id_prgs_moex" value="20" max="100"></progress>
+                                        </div>
+                                        <div class="col">
+                                            <button class="btn btn-primary" id="id_btn_moex" type="button" onclick="download_moex();">Обновить</button>
+                                        </div>
                                     </div>
                                     <div class="input-group"></div>
                                 </div>
@@ -229,7 +228,7 @@ table td:first-child:before {
 {% endblock content %}
 
 {% block javascripts %}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="/static/assets/js/jquery.min.js"></script>
 <script language="javascript">
 	let prgs_val = 0;
     // if (window.history.replaceState){  // предотвращает повторную отправку формы при обновлении страницы если перед этим была отправка
@@ -253,9 +252,10 @@ table td:first-child:before {
 		dwnld_moex_start()
 		// alert($('#id_prgs_moex').val());
 		// {
-
+        go_ajax()
 		// }
-		cickle_query_download_moex()
+		// cickle_query_download_moex()
+        dwnld_moex_stop()
     }
 	function dwnld_moex_start(){
 		prgs_val = 0;
@@ -274,5 +274,17 @@ table td:first-child:before {
         $('#id_div_upgrade_moex').show();
         $('#id_prgs_moex').val(prgs_val);
 	}
+    function go_ajax(){
+        $.ajax({
+            data: {'check': 25}, // получаяем данные формы
+            url: "{% url 'office:dwnldmoexbond' %}",
+            success: function (response){  // если успешно
+                // if (response.is_taken == true){
+                console.log('error')
+                alert(response.is_taken);
+            },
+            error: function (response){console.log(response.responseJSON.errors)}  // если ошибка
+        });
+    }
 </script>
 {% endblock javascripts %}

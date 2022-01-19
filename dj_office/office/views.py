@@ -72,7 +72,7 @@ def moexbond(request):
 
 def download_moex(request):
     response = {
-        'is_taken': 5,
+        'is_taken': 25,
     }
     return JsonResponse(response)
 

@@ -9,6 +9,7 @@ urlpatterns = [
     path('demo/', include('demo.urls')),
     path('api/', include('api.urls')),
     path('mobile/', include('mobile.urls')),
+    path('domconnect/', include('domconnect.urls')),
     path('', include('app.urls')),
     path('', include('authentication.urls')),
     path('api-token-auth/', views.obtain_auth_token),
