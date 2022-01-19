@@ -12,11 +12,18 @@ class GlobalVariableAdmin(admin.ModelAdmin):
 
 @admin.register(MoexBOND)
 class MoexBONDAdmin(admin.ModelAdmin):
-    list_display = [field.name for field in MoexBOND._meta.get_fields()]
+    list_display = ('id', 'secid', 'mdate', 'facevalue',
+        'couponfrequency', 'couponvalue', 'typename')
+    # list_display = [field.name for field in MoexBOND._meta.get_fields()]
     search_fields = ('secid', 'name', 'matdate', 'facevalue', 'couponvalue', 'typename')
-    list_filter = ('secid', 'name', 'matdate', 'facevalue', 'couponvalue', 'typename')
+    # list_filter = ('secid', 'name', 'matdate', 'facevalue', 'couponvalue', 'typename')
     empty_value_display = '-пусто-'
     date_hierarchy = 'matdate'
+    def mdate(self, obj):
+        return obj.matdate.strftime('%d.%m.%Y')
+        mdate.admin_order_field = 'matdate'
+        mdate.short_description = 'Погашение'    
+
     # formfield_overrides = {
         # models.IntegerField: {'widget': NumberInput(attrs={'size':'150'})},
         # # models.CharField: {'widget': TextInput(attrs={'size':'20'})},

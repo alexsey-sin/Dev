@@ -276,50 +276,5 @@ table td:first-child:before {
             error: function (response){console.log(response.responseJSON.errors)}  // если ошибка
         });
     }
-	// let prgs_val = 0;
-    // function cickle_query_download_moex(){
-		// prgs_val += 2;
-		// $('#id_prgs_moex').val(prgs_val);
-		// if(prgs_val < 100){setTimeout(cickle_query_download_moex, 200);}
-		// else{dwnld_moex_stop()}
-    // }
-	// function download_moex(){
-		// dwnld_moex_start()
-		// // alert($('#id_prgs_moex').val());
-		// // {
-        // go_ajax()
-		// // }
-		// // cickle_query_download_moex()
-        // dwnld_moex_stop()
-    // }
-	// function dwnld_moex_start(){
-		// prgs_val = 0;
-        // $('#id_btn_moex').attr('disabled', true);
-        // $('#id_lbl_moex').text('Загрузка:');
-        // $('#id_div_val_moex').hide();
-        // $('#id_div_prgs_moex').show();
-        // $('#id_div_upgrade_moex').hide();
-        // $('#id_prgs_moex').val(prgs_val);
-	// }
-	// function dwnld_moex_stop(){
-        // $('#id_btn_moex').attr('disabled', false);
-        // $('#id_lbl_moex').text('Загружено облигаций:');
-        // $('#id_div_val_moex').show();
-        // $('#id_div_prgs_moex').hide();
-        // $('#id_div_upgrade_moex').show();
-        // $('#id_prgs_moex').val(prgs_val);
-	// }
-    // function go_ajax(){
-        // $.ajax({
-            // data: {'check': 25}, // получаяем данные формы
-            // url: "{% url 'office:dwnldmoexbond' %}",
-            // success: function (response){  // если успешно
-                // // if (response.is_taken == true){
-                // console.log('error')
-                // alert(response.is_taken);
-            // },
-            // error: function (response){console.log(response.responseJSON.errors)}  // если ошибка
-        // });
-    // }
 </script>
 {% endblock javascripts %}

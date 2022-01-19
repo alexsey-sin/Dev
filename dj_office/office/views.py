@@ -158,7 +158,8 @@ def download_moex(request):
 def fix_result(mess):
     gvar, _ = GlobalVariable.objects.get_or_create(key='log_download')
     gvar.val_datetime = dt.today()
-    gvar.descriptions += mess
+    if not gvar.descriptions: gvar.descriptions = mess
+    else: gvar.descriptions = gvar.descriptions + mess
     gvar.save()
 
 def append_bond_moex(lids):
@@ -198,7 +199,8 @@ def append_bond_moex(lids):
 def GetMOEXsecidBonds():
     str_url = "http://iss.moex.com/iss/securities.json"
     outList = []
-    start = 7600
+    # start = 7600
+    start = 0
     limit = 100
     search_parameters = {
         'lang': 'ru',
@@ -248,7 +250,6 @@ def GetMOEXBonds(listSecId):
                 raise Exception(f'Ответ сервера: {response.status_code}')
             res = response.json()
             
-            print(listSecId[i])
             cnt_field = 0
             dict_bond = {}
             dict_bond['SECID'] = listSecId[i]
@@ -277,17 +278,17 @@ def GetMOEXBonds(listSecId):
 
             if cnt_field == 7:
                 lid, _ = MoexBOND.objects.get_or_create(secid=dict_bond['SECID'])
-                lid.name = dict_bond['TITLE']
-                # lid.matdate = dict_bond['MATDATE']
-                # lid.facevalue = dict_bond['FACEVALUE']
-                # lid.couponfrequency = dict_bond['COUPONFREQUENCY']
-                # lid.couponvalue = dict_bond['COUPONVALUE']
+                lid.name = dict_bond['NAME']
+                lid.matdate = dt.strptime(dict_bond['MATDATE'], '%Y-%m-%d')
+                lid.facevalue = dict_bond['FACEVALUE']
+                lid.couponfrequency = dict_bond['COUPONFREQUENCY']
+                lid.couponvalue = dict_bond['COUPONVALUE']
                 lid.typename = dict_bond['TYPE']
                 lid.save()
-                print('Ok')
 
 
-        except Exception as exc:
+        except Exception as e:
+            print(e)
             cnt_err += 1
         gvar_cur, _ = GlobalVariable.objects.get_or_create(key='cur_num_download')
         gvar_cur.val_int = i
@@ -303,7 +304,5 @@ def thread_download_bond_moex():
     listSecIdBonds = GetMOEXsecidBonds()  # []
     GetMOEXBonds(listSecIdBonds)
     
-
-    # print('stop thread')
 
 # https://pythonru.com/primery/django-ajax
