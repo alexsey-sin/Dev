@@ -39,19 +39,19 @@ table td:first-child:before {
                                             <h5 class="mb-0">ММВБ Облигации</h5>
                                         </div>
                                         <div class="col">
-                                            <label id="id_lbl_moex" class="form-check-label">Всего облигаций:</label>
+                                            <label id="id_lbl" class="form-check-label">Всего облигаций:</label>
                                         </div>
-                                        <div class="col" id="id_div_val_moex">
-                                            <label id="id_val_moex" class="form-check-label">7500</label>
+                                        <div class="col" id="id_div_val">
+                                            <label id="id_val" class="form-check-label">{{ num_all_bond }}</label>
                                         </div>
-                                        <div class="col" id="id_div_upgrade_moex">
-                                            <label class="form-check-label">Обновлено: 20.01.2022</label>
+                                        <div class="col" id="id_div_upgrade">
+                                            <label id="id_lbl_upgrade" class="form-check-label">{{ last_upgrade }}</label>
                                         </div>
-                                        <div class="col" id="id_div_prgs_moex" style="display: none">
-                                            <progress id="id_prgs_moex" value="20" max="100"></progress>
+                                        <div class="col" id="id_div_prgs" style="display: none">
+                                            <progress id="id_prgs" value="20" max="100"></progress>
                                         </div>
                                         <div class="col">
-                                            <button class="btn btn-primary" id="id_btn_moex" type="button" onclick="download_moex();">Обновить</button>
+                                            <button class="btn btn-primary" id="id_btn_run_stop" type="button" onclick="download_bond();">Обновить</button>
                                         </div>
                                     </div>
                                     <div class="input-group"></div>
@@ -90,7 +90,7 @@ table td:first-child:before {
                                             </select>
                                         </div>
                                         <div class="col">
-											<button class="btn btn-primary btn-sm" type="button">Обновить</button>
+											<button class="btn btn-primary btn-sm" type="button" onclick="test();">Обновить</button>
 										</div>
                                     </div>
                                     <div class="input-group"></div>
@@ -229,32 +229,32 @@ table td:first-child:before {
 <script src="/static/assets/js/jquery.min.js"></script>
 <script language="javascript">
     let is_download = false;
-	function download_moex(){
+	function download_bond(){
         if (is_download){  // Включен режим загрузки
             is_download = false;
-			$('#id_lbl_moex').show();
-			$('#id_div_val_moex').show();
-			$('#id_div_upgrade_moex').show();
-            $('#id_div_prgs_moex').hide();
-            $('#id_btn_moex').text('Обновить');
+			$('#id_lbl').text('Всего облигаций:');
+			$('#id_div_val').show();
+			$('#id_div_upgrade').show();
+            $('#id_div_prgs').hide();
+            $('#id_btn_run_stop').text('Обновить');
             ajax_data = {'stop': true};
             go_ajax(ajax_data)
         }else{
             is_download = true;
-			$('#id_lbl_moex').hide();
-			$('#id_div_val_moex').hide();
-			$('#id_div_upgrade_moex').hide();
-            $('#id_prgs_moex').val(0);
-            $('#id_div_prgs_moex').show();
-            $('#id_btn_moex').text('Остановить');
+			$('#id_lbl').text('Загрузка:');
+			$('#id_div_val').hide();
+			$('#id_div_upgrade').hide();
+            $('#id_prgs').val(0);
+            $('#id_div_prgs').show();
+            $('#id_btn_run_stop').text('Остановить');
             ajax_data = {'start': true};
-            go_ajax(ajax_data)
+            go_ajax(ajax_data);
             setTimeout(cickle_query_download, 500);
         }
     }
     function cickle_query_download(){
         ajax_data = {'get_state': true};
-        go_ajax(ajax_data)
+        go_ajax(ajax_data);
 		if(is_download){setTimeout(cickle_query_download, 500);}
     }
     function go_ajax(ajax_data){
@@ -263,18 +263,44 @@ table td:first-child:before {
             url: "{% url 'office:dwnldmoexbond' %}",
             success: function (response){
                 is_run = response.is_run;
-                if(!is_run && is_download){download_moex()}
+                if(!is_run && is_download){download_bond()}
                 if(is_download){
                     val = response.val_current;
                     tot = response.val_total;
+					all = response.num_all_bond;
+					upgrade = response.last_upgrade;
                     if(val >= 0 && tot > 0){
-                        $('#id_prgs_moex').attr('value', val);
-                        $('#id_prgs_moex').attr('max', tot);
-                    }
+                        $('#id_prgs').attr('value', val);
+                        $('#id_prgs').attr('max', tot);
+                    };
+					if(all){$('#id_val').text(all)};
+					if(upgrade){$('#id_lbl_upgrade').text(upgrade)};
                 }
             }, // если успешно
             error: function (response){console.log(response.responseJSON.errors)}  // если ошибка
         });
     }
+	function test(){
+		ajax_data = {'get_state': true};
+        $.ajax({
+            data: ajax_data, // отсылаемые данные
+            url: "{% url 'office:dwnldmoexbond' %}",
+            success: function (response){
+                is_run = response.is_run;
+				val = response.val_current;
+				tot = response.val_total;
+				all = response.num_all_bond;
+				upgrade = response.last_upgrade;
+				console.log(val);
+				console.log(tot);
+				console.log(all);
+				console.log(upgrade);
+				if(all){$('#id_val').text(all)};
+				if(upgrade){$('#id_lbl_upgrade').text(upgrade)};
+            }, // если успешно
+            error: function (response){console.log(response.responseJSON.errors)}  // если ошибка
+        });
+	
+	}
 </script>
 {% endblock javascripts %}

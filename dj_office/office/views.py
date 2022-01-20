@@ -33,7 +33,13 @@ def moexbond(request):
     u_name = user.get_full_name()
     if u_name.strip() == '':
         u_name = user.username
-    context = {'u_name': u_name, 'page_title': 'Лиза'}
+    context = {'u_name': u_name, 'page_title': 'Облигации ММВБ'}
+    context['segment'] = 'moexbond'
+
+    gvar_end, _ = GlobalVariable.objects.get_or_create(key='end_download')
+    context['num_all_bond'] = gvar_end.val_int
+    last_date = gvar_end.val_datetime.strftime('%d.%m.%Y')
+    context['last_upgrade'] = f'Обновлено: {last_date}'
 
     # group = get_object_or_404(LizaGroupPhrase, id=id_group)
     # context['group_name'] = group.text
@@ -92,8 +98,12 @@ def download_moex(request):
     if get_state:
         gvar_cur, _ = GlobalVariable.objects.get_or_create(key='cur_num_download')
         gvar_tot, _ = GlobalVariable.objects.get_or_create(key='tot_num_download')
+        gvar_end, _ = GlobalVariable.objects.get_or_create(key='end_download')
         response['val_current'] = gvar_cur.val_int
         response['val_total'] = gvar_tot.val_int
+        response['num_all_bond'] = gvar_end.val_int
+        response['last_upgrade'] = gvar_end.val_datetime.strftime('%d.%m.%Y')
+
         
     is_stop = request.GET.get('stop')
     if is_stop:
@@ -135,7 +145,7 @@ def fix_result(mess):
 def GetMOEXsecidBonds():  # Загрузка списка бумаг
     str_url = "http://iss.moex.com/iss/securities.json"
     outList = []
-    start = 7000
+    start = 7600
     # start = 0
     limit = 100
     search_parameters = {
