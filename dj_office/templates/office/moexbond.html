@@ -4,14 +4,14 @@
 
 {% block stylesheets %}
 <style>
-table {
-    counter-reset: count;
+	table {
+		counter-reset: count;
+	}
+	table td:first-child:before {
+		content: counter(count);
+		counter-increment: count;
+	}
 }
-table td:first-child:before {
-    content: counter(count);
-    counter-increment: count;
-}
-
 </style>
 {% endblock stylesheets %}
 
@@ -39,7 +39,7 @@ table td:first-child:before {
                                             <h5 class="mb-0">ММВБ Облигации</h5>
                                         </div>
                                         <div class="col">
-                                            <label id="id_lbl" class="form-check-label">Всего облигаций:</label>
+                                            <label id="id_lbl_bond" class="form-check-label">Всего облигаций:</label>
                                         </div>
                                         <div class="col" id="id_div_val">
                                             <label id="id_val" class="form-check-label">{{ num_all_bond }}</label>
@@ -59,56 +59,17 @@ table td:first-child:before {
                             </div>
                             <div class="card">
                                 <div class="card-header">
-                                    <h5 class="mb-0">Фильтр</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
+									<div class="row">
                                         <div class="col">
-                                            <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-1"><label class="form-check-label" for="formCheck-1">Номинал от:</label></div>
-                                            <div class="input-group"><input style="width: 160px;" type="number"></div>
-                                        </div>
-                                        <div class="col">
-                                            <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-2"><label class="form-check-label" for="formCheck-2">Номинал до:</label></div>
-                                            <div class="input-group"><input style="width: 160px;" type="number"></div>
-                                        </div>
-                                        <div class="col">
-                                            <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-3"><label class="form-check-label" for="formCheck-3">Погашение от:</label></div>
-                                            <div class="input-group"><input style="width: 160px;" type="date"></div>
-                                        </div>
-                                        <div class="col">
-                                            <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-4"><label class="form-check-label" for="formCheck-4">Погашение до:</label></div>
-                                            <div class="input-group"><input style="width: 160px;" type="date"></div>
-                                        </div>
-                                        <div class="col">
-                                            <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-5"><label class="form-check-label" for="formCheck-5">Тип облигации:</label></div>
-                                            <div class="input-group"></div><select>
-                                                <optgroup label="This is a group">
-                                                    <option value="12" selected="">This is item 1</option>
-                                                    <option value="13">This is item 2</option>
-                                                    <option value="14">This is item 3</option>
-                                                </optgroup>
-                                            </select>
-                                        </div>
-                                        <div class="col">
-											<button class="btn btn-primary btn-sm" type="button" onclick="test();">Обновить</button>
+											<h5 class="mb-0">Фильтр</h5>
 										</div>
-                                    </div>
-                                    <div class="input-group"></div>
-                                </div>
-                            </div>
-                            
-                            
-                            <div class="row">
-                                <div class="col-md-6 text-nowrap">
-                                    <div id="dataTable_length" class="dataTables_length" aria-controls="dataTable"><label class="form-label">Show&nbsp;<select class="d-inline-block form-select form-select-sm">
-                                                <option value="10" selected="">10</option>
-                                                <option value="25">25</option>
-                                                <option value="50">50</option>
-                                                <option value="100">100</option>
-                                            </select>&nbsp;</label></div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="text-md-end dataTables_filter" id="dataTable_filter"><label class="form-label"><input type="search" class="form-control form-control-sm" aria-controls="dataTable" placeholder="Search"></label></div>
+                                        <div class="col">
+                                            <label id="id_lbl_filter" class="form-check-label">Не выбрано<br>Не выбрано</label>
+										</div>
+                                        <div class="col">
+                                            <button type="button" class="btn btn-primary" id="id_btn_filter_open" data-toggle="modal" data-target="#openModalFilter">Выбрать / создать</button>
+										</div>
+									</div>
                                 </div>
                             </div>
                             <div class="card-block table-border-style">
@@ -160,67 +121,106 @@ table td:first-child:before {
         </div>
     </div>
 </div>
-<div id="openModaDeletePhrase" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+<div id="openModalFilter" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="openModaDeletePhraseTitle">Удаление фразы</h5>
+          <h5 class="modal-title" id="openModaDeletePhraseTitle">Фильтр</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
-            <input type="hidden" id="deletePhraseId" value="">
-            <h4 id="deletePhrase"></h4>
+			<div class="card">
+				<hr style="border: 1px solid gray;">
+				<div class="card">
+					<div class="row">
+						<form method="post" enctype="multipart/form-data">
+							<div class="row">
+								<div class="col">
+									<select class="form-control" style="margin-left: 15px; padding: 2px 2px; height: 28px; width: 160px;">
+										<option value="12" selected="">This is item 1</option>
+										<option value="13">This is item 2</option>
+										<option value="14">This is item 3</option>
+									</select>
+								</div>
+								<div class="col">
+										{% csrf_token %}
+										<input type="hidden" name="apply">
+										<button type="submit" class="btn btn-primary">Применить</button>
+								</div>
+							</div>
+						</form>
+						<div class="col">
+							<button type="button" class="btn btn-primary" onclick="active_new_filter();">Создать</button>
+						</div>
+								<input type="hidden" id="deletePhraseId" value="">
+								<h4 id="deletePhrase"></h4>
+					</div>
+				</div>
+				<hr style="border: 1px solid gray;">
+				<form method="post" enctype="multipart/form-data">
+					{% csrf_token %}
+					<div class="card">
+						<div class="row" style="padding: 10px;">
+							<div class="form-check"><label class="form-check-label">Название:</label></div>
+							<div class="input-group"><input style="width: 250px;" type="text" name="new_filter" value="Новый фильтр"></div>
+						</div>
+						<div class="row" style="padding: 10px;">
+							<div class="col">
+								<div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-1" name="check_facevalue_from"><label class="form-check-label" for="formCheck-1">Номинал от:</label></div>
+								<div class="input-group"><input style="width: 160px;" type="number" name="facevalue_from"></div>
+							</div>
+							<div class="col">
+								<div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-2" name="check_facevalue_to"><label class="form-check-label" for="formCheck-2">Номинал до:</label></div>
+								<div class="input-group"><input style="width: 160px;" type="number" name="facevalue_to"></div>
+							</div>
+						</div>
+						<div class="row" style="padding: 10px;">
+							<div class="col">
+								<div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-3" name="check_matdate_from"><label class="form-check-label" for="formCheck-3">Погашение от:</label></div>
+								<div class="input-group"><input style="width: 160px;" type="date" name="matdate_from"></div>
+							</div>
+							<div class="col">
+								<div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-4" name="check_matdate_to"><label class="form-check-label" for="formCheck-4">Погашение до:</label></div>
+								<div class="input-group"><input style="width: 160px;" type="date" name="matdate_to"></div>
+							</div>
+						</div>
+						<div class="row" style="padding: 10px;">
+							<div class="col">
+								<div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-5" name="check_profit_from"><label class="form-check-label" for="formCheck-5">Доходность от:</label></div>
+								<div class="input-group"><input style="width: 160px;" type="number" name="profit_from"></div>
+							</div>
+							<div class="col">
+								<div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-6" name="check_profit_to"><label class="form-check-label" for="formCheck-6">Доходность до:</label></div>
+								<div class="input-group"><input style="width: 160px;" type="number" name="profit_to"></div>
+							</div>
+						</div>
+						<div class="row" style="padding: 10px;">
+							<div class="col">
+								<div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-7" name="check_select_type"><label class="form-check-label" for="formCheck-7">По типу облигаций</label></div>
+								<hr style="border: 1px solid gray;">
+
+								<div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-7" name="check_select_type"><label class="form-check-label" for="formCheck-7">По типу облигаций</label></div>
+								<div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-7" name="check_select_type"><label class="form-check-label" for="formCheck-7">По типу облигаций</label></div>
+								<div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-7" name="check_select_type"><label class="form-check-label" for="formCheck-7">По типу облигаций</label></div>
+								<div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-7" name="check_select_type"><label class="form-check-label" for="formCheck-7">По типу облигаций</label></div>
+								
+
+							</div>
+							<div class="col" style="margin: auto;">
+								<button type="submit" class="btn btn-primary">Сохранить</button>
+							</div>
+						</div>
+					</div>
+				</form>
+				<hr style="border: 1px solid gray;">
+			</div>
         </div>
         <div class="modal-footer">
-            <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <input type="hidden" id="id_delete" name="delete">
-                <button type="submit" class="btn btn-danger">Удалить</button>
-            </form>
         </div>
       </div>
     </div>
-</div>
-<div id="openModalPhrase" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-				<h5 class="modal-title" id="openModalPhraseTitle">Добавление фразы</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
-			<div class="bd-example">
-				<form id="id_form" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {% for field in form %}
-                    <div class="form-group row" aria-required={% if field.field.required %}"true"{% else %}"false"{% endif %}>
-                            <label for="{{ field.id_for_label }}" class="col-md-4 col-form-label text-md-right">
-                                {{ field.label }}
-                                {% if field.field.required %}
-                                    <span class="required">*</span>
-                                {% endif %}
-                            </label>
-                            <div class="col-md-6">
-
-                                {{ field }}
-
-                                {% if field.help_text %}
-                                <small id="{{ field.id_for_label }}-help" class="form-text text-muted">{{ field.help_text|safe }}</small>
-                                {% endif %}
-                            </div>                
-                    </div>
-                    {% endfor %}
-                    <input type="hidden" id="id_edit" name="edit">
-                    <div class="modal-footer">
-                        <button id="openModalPhraseButton" type="submit" class="btn btn-primary">Добавить</button>
-                    </div>
-                </form>
-			</div>
-		</div>
-	</div>
 </div>
 
 {% endblock content %}
@@ -232,7 +232,7 @@ table td:first-child:before {
 	function download_bond(){
         if (is_download){  // Включен режим загрузки
             is_download = false;
-			$('#id_lbl').text('Всего облигаций:');
+			$('#id_lbl_bond').text('Всего облигаций:');
 			$('#id_div_val').show();
 			$('#id_div_upgrade').show();
             $('#id_div_prgs').hide();
@@ -241,7 +241,7 @@ table td:first-child:before {
             go_ajax(ajax_data)
         }else{
             is_download = true;
-			$('#id_lbl').text('Загрузка:');
+			$('#id_lbl_bond').text('Загрузка:');
 			$('#id_div_val').hide();
 			$('#id_div_upgrade').hide();
             $('#id_prgs').val(0);
@@ -280,6 +280,8 @@ table td:first-child:before {
             error: function (response){console.log(response.responseJSON.errors)}  // если ошибка
         });
     }
+	function active_new_filter(){
+    }
 	function test(){
 		ajax_data = {'get_state': true};
         $.ajax({
@@ -302,5 +304,6 @@ table td:first-child:before {
         });
 	
 	}
+});
 </script>
 {% endblock javascripts %}

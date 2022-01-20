@@ -1,0 +1,118 @@
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-1"><label class="form-check-label" for="formCheck-1">Номинал от:</label></div>
+                                            <div class="input-group"><input style="width: 160px;" type="number"></div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-2"><label class="form-check-label" for="formCheck-2">Номинал до:</label></div>
+                                            <div class="input-group"><input style="width: 160px;" type="number"></div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-3"><label class="form-check-label" for="formCheck-3">Погашение от:</label></div>
+                                            <div class="input-group"><input style="width: 160px;" type="date"></div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-4"><label class="form-check-label" for="formCheck-4">Погашение до:</label></div>
+                                            <div class="input-group"><input style="width: 160px;" type="date"></div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-5"><label class="form-check-label" for="formCheck-5">Тип облигации:</label></div>
+                                            <select>
+                                                <optgroup>
+                                                    <option value="12" selected="">This is item 1</option>
+                                                    <option value="13">This is item 2</option>
+                                                    <option value="14">This is item 3</option>
+                                                </optgroup>
+                                            </select>
+                                        </div>
+                                        <div class="col">
+											<div class="row">
+												<label class="form-check-label">Тип облигации:</label>
+												<select>
+													<optgroup label="Тип фильтра">
+														<option value="12" selected="">This is item 1</option>
+														<option value="13">This is item 2</option>
+														<option value="14">This is item 3</option>
+													</optgroup>
+												</select>
+											</div>
+											<div class="row">
+												<button class="btn btn-primary btn-sm" type="button" onclick="test();">Обновить</button>
+											</div>
+										</div>
+                                    </div>
+                                    <div class="input-group"></div>
+                                </div>
+
+
+                            
+                            
+                            <div class="row">
+                                <div class="col-md-6 text-nowrap">
+                                    <div id="dataTable_length" class="dataTables_length" aria-controls="dataTable"><label class="form-label">Show&nbsp;<select class="d-inline-block form-select form-select-sm">
+                                                <option value="10" selected="">10</option>
+                                                <option value="25">25</option>
+                                                <option value="50">50</option>
+                                                <option value="100">100</option>
+                                            </select>&nbsp;</label></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="text-md-end dataTables_filter" id="dataTable_filter"><label class="form-label"><input type="search" class="form-control form-control-sm" aria-controls="dataTable" placeholder="Search"></label></div>
+                                </div>
+                            </div>
+
+<div id="openModalPhrase" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+				<h5 class="modal-title" id="openModalPhraseTitle">Добавление фразы</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="bd-example">
+				<form id="id_form" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div class="form-group row" aria-required={% if field.field.required %}"true"{% else %}"false"{% endif %}>
+                            <label for="{{ field.id_for_label }}" class="col-md-4 col-form-label text-md-right">
+                                {{ field.label }}
+                                {% if field.field.required %}
+                                    <span class="required">*</span>
+                                {% endif %}
+                            </label>
+                            <div class="col-md-6">
+
+                                {{ field }}
+
+                                {% if field.help_text %}
+                                <small id="{{ field.id_for_label }}-help" class="form-text text-muted">{{ field.help_text|safe }}</small>
+                                {% endif %}
+                            </div>                
+                    </div>
+                    {% endfor %}
+                    <input type="hidden" id="id_edit" name="edit">
+                    <div class="modal-footer">
+                        <button id="openModalPhraseButton" type="submit" class="btn btn-primary">Добавить</button>
+                    </div>
+                </form>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+								<select class="form-control" style="margin-left: 15px; padding: 2px 2px; height: 28px; width: 160px;" name="select_type">
+									<option value="12">This is item 1</option>
+									<option value="13">This is item 2</option>
+									<option value="14">This is item 3</option>
+								</select>
+								
+								
+								
+	<select class="form-control" style="margin-left: 15px; padding: 2px 2px; height: 28px; width: 160px;" name="select_type">
+		<option value="12"><input type="checkbox" id="selCheck-5">This is item 1</option>
+		<option value="13"><input type="checkbox" id="selCheck-6">This is item 2</option>
+		<option value="14"><input type="checkbox" id="selCheck-7">This is item 3</option>
+	</select>

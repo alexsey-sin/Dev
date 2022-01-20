@@ -6899,7 +6899,7 @@ pre[class*=language-]:after, pre[class*=language-]:before {
 .custom-select,
 .form-control {
   background: #f4f7fa;
-  padding: 10px 20px;
+  padding: 5px 20px;
   font-size: 14px;
 }
 .custom-select:focus,
@@ -6956,7 +6956,8 @@ pre[class*=language-]:after, pre[class*=language-]:before {
 /* input group End */
 /**====== Form Componant css end ======**/
 select.form-control:not([size]):not([multiple]) {
-  height: calc(2.55rem + 2px);
+  /* height: calc(2.55rem + 2px); */
+  height: 2px;
 }
 
 .input-group-lg > .input-group-append > select.btn:not([size]):not([multiple]),
@@ -6969,7 +6970,7 @@ select.form-control-lg:not([size]):not([multiple]) {
 }
 
 .minicolors .form-control {
-  padding: 6px 12px 5px 44px;
+  padding: 6px 5px 5px 5px;
 }
 
 /* form-select */
@@ -7662,13 +7663,15 @@ a.btn-theme.active {
   padding: 2px 20px;
   border-radius: 0.25rem;
   font-size: 14px;
-  margin-bottom: 5px;
+  margin-top: 2px;
+  margin-bottom: 2px;
   margin-right: 10px;
   -webkit-transition: all 0.3s ease-in-out;
   transition: all 0.3s ease-in-out;
 }
 .btn > i {
   margin-right: 12px;
+  margin-left: 12px;
 }
 .btn.btn-icon, .btn.drp-icon {
   width: 45px;

@@ -1,7 +1,38 @@
 from django.contrib import admin
-from office.models import GlobalVariable, MoexBOND
+from office.models import TypeBOND, MoexBOND, GlobalVariable
 # from django.db import models
 # from django.forms import NumberInput
+
+
+@admin.register(TypeBOND)
+class TypeBONDAdmin(admin.ModelAdmin):
+    def v_descr(self):
+        if self.descriptions: return f'{self.descriptions[:20]}...'
+    v_descr.short_description = 'Текст'
+
+    list_display = ('typekey', 'name', v_descr)
+    empty_value_display = '---'
+
+
+@admin.register(MoexBOND)
+class MoexBONDAdmin(admin.ModelAdmin):
+    def mdate(self):
+        return self.matdate.strftime('%d.%m.%Y')
+    mdate.admin_order_field = 'matdate'
+    mdate.short_description = 'Погашение'    
+
+    list_display = ('secid', 'name', mdate, 'facevalue', 'couponfrequency', 'couponvalue', 'typekey')
+    search_fields = ('secid', )
+    empty_value_display = '---'
+    date_hierarchy = 'matdate'
+
+    # list_filter = ('secid', 'name', 'matdate', 'facevalue', 'couponvalue', 'typename')
+    # list_display = [field.name for field in MoexBOND._meta.get_fields()]
+    # formfield_overrides = {
+        # models.IntegerField: {'widget': NumberInput(attrs={'size':'150'})},
+        # # models.CharField: {'widget': TextInput(attrs={'size':'20'})},
+        # # models.TextField: {'widget': Textarea(attrs={'rows':4, 'cols':40})},
+    # }
 
 
 @admin.register(GlobalVariable)
@@ -18,24 +49,3 @@ class GlobalVariableAdmin(admin.ModelAdmin):
 
     list_display = ('key', v_str, 'val_bool', 'val_int', 'val_decimal', v_date, v_descr)
     empty_value_display = '---'
-
-
-@admin.register(MoexBOND)
-class MoexBONDAdmin(admin.ModelAdmin):
-    def mdate(self):
-        return self.matdate.strftime('%d.%m.%Y')
-    mdate.admin_order_field = 'matdate'
-    mdate.short_description = 'Погашение'    
-
-    list_display = ('secid', 'name', mdate, 'facevalue', 'couponfrequency', 'couponvalue', 'typename')
-    search_fields = ('secid', )
-    empty_value_display = '---'
-    date_hierarchy = 'matdate'
-
-    # list_filter = ('secid', 'name', 'matdate', 'facevalue', 'couponvalue', 'typename')
-    # list_display = [field.name for field in MoexBOND._meta.get_fields()]
-    # formfield_overrides = {
-        # models.IntegerField: {'widget': NumberInput(attrs={'size':'150'})},
-        # # models.CharField: {'widget': TextInput(attrs={'size':'20'})},
-        # # models.TextField: {'widget': Textarea(attrs={'rows':4, 'cols':40})},
-    # }
