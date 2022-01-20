@@ -67,11 +67,17 @@
                     <div class="col-xl-12">
                         <div class="card">
                             <div class="card-header">
-                                <h5>Статистика SEO</h5>
-                                <form action={% url 'domconnect:downloadLidsFromCRM' '19.01.2022' %}  method="POST">
-                                    {% csrf_token %}
-                                    <button id="id_btn_download" type="submit" class="btn btn-primary">Загрузить</button>
-                                </form>
+                                <div class="row">
+                                    <div class="col">
+                                        <h5>Статистика SEO</h5>
+                                    </div>
+                                    <div class="col">
+                                        <progress id="id_prgs_download" value="20" max="100" style="display: none"></progress>
+                                    </div>
+                                    <div class="col">
+                                        <button id="id_btn_download" type="submit" class="btn btn-primary" onclick="download_lids();">Загрузить</button>
+                                    </div>
+                                </div>
                             </div>
                             <!-- <div class="card-block table-border-style"> -->
                                 <div class="table-responsive">
@@ -229,34 +235,47 @@
 {% endblock content %}
 {% block javascripts %}
 <script language="javascript">
-    if (window.history.replaceState){  // предотвращает повторную отправку формы при обновлении страницы если перед этим была отправка
-        window.history.replaceState(null, null, window.location.href);
-    }
-    function editRowNumber(i,n,tc,tt,ttr,nt,td,od,uon,uonn,pc1,obc1,m,s,a,cm){
-        $('#id_edit').val(i);
-        $('#editNumber').text(n);
-        $('#id_type_channel').val(tc);
-        $('#id_type_trunk').val(tt);
-        $('#id_type_tariff').val(ttr);
-        $('#id_name_tariff').val(nt);
-        $('#id_tariff_description').val(td);
-        $('#id_oatc_batc_description').val(od);
-        $('#id_unlimited_on_net').val(uon);
-        $('#id_unlimited_on_net_not_consume_package').val(uonn);
-        $('#id_package_cost').val(parseFloat(pc1.replace(',','.').replace(' ','')));
-        $('#id_oatc_batc_cost').val(parseFloat(obc1.replace(',','.').replace(' ','')));
-        $('#id_mobile_packet').val(m);
-        $('#id_sms_packet').val(s);
-        if (a == "True"){
-            $('#id_active').setAttr("checked");
+    let is_download = false;
+	function download_lids(){
+        if (is_download){  // Включен режим загрузки
+            is_download = false;
+            $('#id_prgs_download').hide();
+            $('#id_btn_download').text('Загрузить');
+            ajax_data = {'stop': true};
+            go_ajax(ajax_data)
         }else{
-            $('#id_active').removeAttr("checked");
+            is_download = true;
+            $('#id_prgs_download').val(0);
+            $('#id_prgs_download').show();
+            $('#id_btn_download').text('Остановить');
+            ajax_data = {'start': true, 'from_date': '20.01.2022'};
+            go_ajax(ajax_data)
+            setTimeout(cickle_query_download, 500);
         }
-        $('#id_comment').val(cm);
     }
-    function deleteRowNumber(i,t){
-        $('#id_delete').val(i);
-        $('#deleteNumber').text(t);
+    function cickle_query_download(){
+        ajax_data = {'get_state': true};
+        go_ajax(ajax_data)
+		if(is_download){setTimeout(cickle_query_download, 500);}
+    }
+    function go_ajax(ajax_data){
+        $.ajax({
+            data: ajax_data, // отсылаемые данные
+            url: "{% url 'domconnect:downloadLidsFromCRM' %}",
+            success: function (response){
+                is_run = response.is_run;
+                if(!is_run && is_download){download_lids()}
+                if(is_download){
+                    val = response.val_current;
+                    tot = response.val_total;
+                    if(val >= 0 && tot > 0){
+                        $('#id_prgs_download').attr('value', val);
+                        $('#id_prgs_download').attr('max', tot);
+                    }
+                }
+            }, // если успешно
+            error: function (response){console.log(response.responseJSON.errors)}  // если ошибка
+        });
     }
 </script>
 {% endblock javascripts %}

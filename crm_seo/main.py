@@ -110,7 +110,7 @@ def get_lids(from_data):
 
 
 if __name__ == '__main__':
-    start_script_time = datetime.now()
+    # start_script_time = datetime.now()
 
     # Документация: https://dev.1c-bitrix.ru/rest_help/crm/leads/crm_lead_list.php
     # Пример запроса https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.list
@@ -140,9 +140,50 @@ if __name__ == '__main__':
         # print('Ok')
 
 
-    from_date = '2022-01-01T04:43:22+03:00'
-    ddd = datetime.strptime(from_date, '%Y-%m-%dT%H:%M:%S%z')
-    print(ddd)
+    # from_date = '2022-01-01T04:43:22+03:00'
+    # ddd = datetime.strptime(from_date, '%Y-%m-%dT%H:%M:%S%z')
+    # print(ddd)
+
+    with open('lids.json', 'r', encoding='utf-8') as file:  # читаем время создания токена если есть
+        js_lids = json.load(file)
+    # dt_old_str = js.get('time_create')
+    
+    y_id = True
+    many = 0
+    for lid in js_lids:
+        f_id = lid.get('UF_CRM_1592566018')
+        if f_id == None or len(f_id) == 0:
+            y_id = False
+            continue
+        if len(f_id) > many: many = len(f_id)
+        
+    print(len(js_lids))
+    print('y_id', y_id)
+    print('many', many)
 
 
-
+        # * "ID": "1253690",
+        # * "TITLE": "Позвонить клиенту: 17.01.2022 14:00:00 - ➕➕ ✏️ Константин С. ⏳ Рузаевка (+00:00), Северная улица 5- ТТК ([Лиза] Звонок без результата, перезвон)",
+        # * "STATUS_ID": "42",
+        # * "DATE_CREATE": "2022-01-14T12:39:52+03:00",
+        # * "DATE_MODIFY": "2022-01-18T14:01:02+03:00",
+        # "SOURCE_ID": "98",
+        # "ASSIGNED_BY_ID": "11149",
+        # "UF_CRM_1493416385": null,
+        # "UF_CRM_1499437861": null,
+        # "UF_CRM_1580454770": "0",
+        # "UF_CRM_1534919765": [],// Группы источников
+        # "UF_CRM_1571987728429": "Ростелеком, ТТК",
+        # "UF_CRM_1592566018": [// ТИп лида
+            # 3116
+        # ],
+        # "UF_CRM_1493413514": "4",
+        # "UF_CRM_1492017494": "Республика Мордовия",
+        # "UF_CRM_1492017736": "Рузаевка",
+        # "UF_CRM_1498756113": "0",
+        # "UF_CRM_1615982450": null,
+        # "UF_CRM_1615982567": null,
+        # "UF_CRM_1615982644": null,
+        # "UF_CRM_1615982716": null,
+        # "UF_CRM_1615982795": null,
+        # "UF_CRM_1640267556": null
