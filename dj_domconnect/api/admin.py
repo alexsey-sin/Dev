@@ -24,15 +24,35 @@ class BidDomRuAdmin(admin.ModelAdmin):
 
 @admin.register(BidBeeline)
 class BidBeelineAdmin(admin.ModelAdmin):
-    list_display = [field.name for field in BidBeeline._meta.get_fields()]
-    search_fields = ('change_date',)
-    list_filter = ('id', 'city','street', 'house', 'apartment', 'lastname',
-        'phone', 'change_date')
+    def address(self):
+        return f'{self.city}, {self.street}, {self.house}'
+    address.short_description = 'Адрес'
+    def field_FIO(self):
+        return f'{self.firstname} {self.patronymic} {self.lastname}'
+    field_FIO.short_description = 'ФИО'
+    def gr_error(self):
+        return f'{self.grafic_error[:20]}...'
+    gr_error.short_description = 'Ошибки графика'
+    def gr_dop_info(self):
+        return f'{self.grafic_dop_info[:20]}...'
+    gr_dop_info.short_description = 'График Доп инфо'
+    def b_log(self):
+        return f'{self.bot_log[:20]}...'
+    b_log.short_description = 'Лог'
+    def p_date(self):
+        return self.pub_date.strftime('%d.%m.%Y %H:%M')
+    p_date.short_description = 'Создано'
+
+    # list_display = [field.name for field in BidBeeline._meta.get_fields()]
+    list_display = ['id_lid', address, field_FIO, 'status', p_date, gr_dop_info, gr_error, b_log]
+    search_fields = ('id_lid',)  # Верхнее поле "Найти"
+    list_filter = ('pub_date', 'city')
     empty_value_display = '-пусто-'
     date_hierarchy = 'pub_date'
     formfield_overrides = {
         models.IntegerField: {'widget': NumberInput(attrs={'size':'150'})},
     }
+    list_per_page = 20  # количество объектов на одной странице при отображении списка объектов. По умолчанию равно 100.
 
 
 @admin.register(BidMTS)

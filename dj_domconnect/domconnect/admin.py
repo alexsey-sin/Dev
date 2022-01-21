@@ -1,11 +1,11 @@
 from django.contrib import admin
-from domconnect.models import  DomconnectCrmLid, GlobalVariable
+from domconnect.models import DomconnectCrmLid, GlobalVariable
 from django.db import models
 from django.forms import NumberInput
 
 
 @admin.register(DomconnectCrmLid)
-class BidOnlimeAdmin(admin.ModelAdmin):
+class DomconnectCrmLidAdmin(admin.ModelAdmin):
     list_display = [field.name for field in DomconnectCrmLid._meta.get_fields()]
     # search_fields = ('change_date',)
     # list_filter = ('id', 'phone', 'change_date')
@@ -14,10 +14,11 @@ class BidOnlimeAdmin(admin.ModelAdmin):
     formfield_overrides = {
         models.IntegerField: {'widget': NumberInput(attrs={'size':'150'})},
     }
+    list_per_page = 20
 
 
 @admin.register(GlobalVariable)
-class BidOnlimeAdmin(admin.ModelAdmin):
+class GlobalVariableAdmin(admin.ModelAdmin):
     list_display = [field.name for field in GlobalVariable._meta.get_fields()]
     # search_fields = ('change_date',)
     # list_filter = ('id', 'phone', 'change_date')

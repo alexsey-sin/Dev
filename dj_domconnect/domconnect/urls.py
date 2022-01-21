@@ -1,7 +1,6 @@
 # -*- encoding: utf-8 -*-
 from django.urls import path
 from domconnect import views
-from django.conf import settings
 
 
 app_name = 'domconnect'

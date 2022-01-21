@@ -104,7 +104,7 @@ class BidBeeline(models.Model):
     )
     street = models.CharField(
         max_length=200,
-        verbose_name = 'Адрес',
+        verbose_name = 'Улица',
     )
     house = models.CharField(
         max_length=50,

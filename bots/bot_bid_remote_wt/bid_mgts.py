@@ -873,13 +873,6 @@ def set_bid(data, bid_type):
                 time.sleep(5)
                 return '', data
                 
-            # #===========
-            # time.sleep(10)
-            # with open('out.html', 'w', encoding='utf-8') as outfile:
-                # outfile.write(driver.page_source)
-            # raise Exception('Финиш.')
-            # #===========
-
             # Жмем кнопку Далее (на печать документов)
             els = driver.find_elements(By.XPATH, '//button[contains(@class, "preloaderShow")]')
             if len(els) != 1: raise Exception('Ошибка нет кнопки Далее(шаг 7)')

@@ -7,6 +7,7 @@ from selenium import webdriver  # $ pip install selenium
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.keys import Keys
 
 # url_host = 'http://127.0.0.1:8000/'
 url_host = 'http://django.domconnect.ru/'
@@ -274,22 +275,30 @@ def set_bid(data):
         
         ###################### Login ######################
         els = driver.find_elements(By.ID, 'id_login')
-        if els[0]: els[0].send_keys(data['partner_login'])
+        if els[0]:
+            try: els[0].send_keys(data['partner_login'])
+            except: raise Exception('Ошибка ввода 1')
         else: raise Exception('Ошибка авторизация')
         time.sleep(1)
 
         els = driver.find_elements(By.ID, 'id_workercode')
-        if els[0]: els[0].send_keys(data['partner_workercode'])
+        if els[0]:
+            try: els[0].send_keys(data['partner_workercode'])
+            except: raise Exception('Ошибка ввода 2')
         else: raise Exception('Ошибка авторизации')
         time.sleep(1)
 
         els = driver.find_elements(By.ID, 'id_password')
-        if els[0]: els[0].send_keys(data['partner_password'])
+        if els[0]:
+            try: els[0].send_keys(data['partner_password'])
+            except: raise Exception('Ошибка ввода 3')
         else: raise Exception('Ошибка авторизация')
         time.sleep(1)
         
         els = driver.find_elements(By.TAG_NAME, 'button')
-        if els[0]: els[0].click()
+        if els[0]:
+            try: els[0].click()
+            except: raise Exception('Ошибка клика 1')
         else: raise Exception('Ошибка авторизация')
         time.sleep(3)
         ###################### Главная страница ######################
@@ -301,7 +310,9 @@ def set_bid(data):
             if link and link.find('/ngapp#!/checkaddress/search') >= 0:
                 el = el_a
                 break
-        if el: el.click()
+        if el:
+            try: el.click()
+            except: raise Exception('Ошибка клика 2')
         else: raise Exception('Ошибка переход к списку городов')
         time.sleep(3)
         ###################### Страница поиска адреса ######################
@@ -309,7 +320,9 @@ def set_bid(data):
         els = driver.find_elements(By.ID, 'btn-append-to-body')
         if len(els) != 1: raise Exception('Ошибка нет поля ввод города')
         city = data.get('city')
-        if city: els[0].send_keys(city)
+        if city:
+            try: els[0].send_keys(city)
+            except: raise Exception('Ошибка ввода 4')
         else: raise Exception('Ошибка не задан город')
         time.sleep(3)
         # Ищем всплывающее контекстное меню с подсказкой города
@@ -319,14 +332,18 @@ def set_bid(data):
         if len(els_ul) != 1: raise Exception('Ошибка нет всплывающее контекстное меню с подсказкой города')
         els_a = els_ul[0].find_elements(By.TAG_NAME, 'a')
         if len(els_a) == 0: raise Exception(f'Ошибка Населенный пункт {city} не найден')
-        elif len(els_a) == 1: els_a[0].click()
+        elif len(els_a) == 1:
+            try: els_a[0].click()
+            except: raise Exception('Ошибка клика 3')
         else:
             # Здесь можно для каждого нас. пункта прописать отдельные правила
             # по выбору пункта всплывающего меню
             if city == 'Ярославль':
-                els_a[0].click()
+                try: els_a[0].click()
+                except: raise Exception('Ошибка клика 4')
             elif city == 'Кострома':
-                els_a[0].click()
+                try: els_a[0].click()
+                except: raise Exception('Ошибка клика 5')
             else:
                 # Множественный выбор
                 lst_nas_punkt = []
@@ -339,7 +356,8 @@ def set_bid(data):
                     for ci in lst_cheq:
                         lst_tup.append((ci, lst_nas_punkt[ci]))
                     i_tup = find_short_tup(lst_tup)
-                    els_a[i_tup].click()
+                    try: els_a[i_tup].click()
+                    except: raise Exception('Ошибка клика 6')
         
         time.sleep(3)
         
@@ -347,17 +365,32 @@ def set_bid(data):
         els_street = driver.find_elements(By.XPATH, '//input[@placeholder="Улица"]')
         if len(els_street) != 1: raise Exception('Ошибка не найдено поле ввода названия улицы')
         el_street = els_street[0]
+        # Удалим если что-то уже введено
+        try: el_street.send_keys(Keys.CONTROL + 'a')
+        except: raise Exception('Ошибка ввода 5')
+        time.sleep(0.2)
+        try: el_street.send_keys(Keys.DELETE)
+        except: raise Exception('Ошибка ввода 6')
+        time.sleep(0.2)
+
         # Преобразуем в нормальный вид [тип, название]
-        lst_street = ordering_street(data['street'])
+        street = data.get('street')
+        if not street: raise Exception('Ошибка не задано поле улица')
+        street = street.replace('ё', 'е')
+        lst_street = ordering_street(street)
         if lst_street:  # если распознали по типу
-            el_street.send_keys(lst_street[1])
+            try: el_street.send_keys(lst_street[1])
+            except: raise Exception('Ошибка ввода 7')
         else:  # если нет - вводим как есть
-            el_street.send_keys(data['street'])
+            try: el_street.send_keys(street)
+            except: raise Exception('Ошибка ввода 8')
+            lst_street = ('улица', street)
         
         # Нажимаем кнопку найти
         els_button = driver.find_elements(By.XPATH, '//button[@ng-click="checkaddressAbstractController.searchPattern()"]')
         if len(els_button) != 1: raise Exception('Ошибка не найдена кнопка поиск улицы')
-        els_button[0].click()
+        try: els_button[0].click()
+        except: raise Exception('Ошибка клика 7')
         time.sleep(5)
         
         driver.implicitly_wait(1)
@@ -367,16 +400,23 @@ def set_bid(data):
             streets = []
             for el_div in els_div:
                 if el_div.text == 'Улицы не найдены':
-                    raise Exception(f'Ошибка улица {data["street"]} не найдена.')
+                    raise Exception(f'Ошибка улица {street} не найдена.')
             
             # Ищем всплывающее контекстное меню с подсказкой города
             els_div = driver.find_elements(By.ID, 'listStart')
             if len(els_div) != 1: raise Exception('Ошибка нет всплывающее контекстное меню с подсказкой улицы')
             els_a = els_div[0].find_elements(By.XPATH, './*//a[@class="link ng-binding"]')
-            if len(els_a) == 0: raise Exception(f'Ошибка улица {data["street"]} не найдена2.')
-            els_a[0].click()
+            if len(els_a) == 0: raise Exception(f'Ошибка улица {street} не найдена2.')
+            f_lst = []
+            for i in range(len(els_a)):
+                name_street = els_a[i].text
+                if name_street.find(lst_street[1]) >= 0 and name_street.find(lst_street[0]) >= 0: f_lst.append((i, name_street))
+            
+            f_ind = find_short_tup(f_lst)
+            try: els_a[f_ind].click()
+            except: raise Exception('Ошибка клика 8')
             time.sleep(5)
-
+        
         driver.implicitly_wait(10)
         time.sleep(5)
         # Ищем таблицу с номерами домов
@@ -398,7 +438,8 @@ def set_bid(data):
                 break
         
         if el:
-            el.click()
+            try: el.click()
+            except: raise Exception('Ошибка клика 9')
         else: raise Exception(f'Ошибка Дом {house} не найден')
         time.sleep(5)
         
@@ -409,7 +450,9 @@ def set_bid(data):
             if link and link.find('ok()') >= 0:
                 el = el_b
                 break
-        if el: el.click()
+        if el:
+            try: el.click()
+            except: raise Exception('Ошибка клика 10')
         else: raise Exception('Ошибка нет кнопки продолжить после прочтения ограничений')
         time.sleep(3)
         ###################### Страница ввода заявки ######################
@@ -423,27 +466,31 @@ def set_bid(data):
             raise Exception('Ошибка не могу ввести номер дома')
         time.sleep(1)
         
-        # Ищем фамилию
+        # Вводим фамилию
         els_ln = driver.find_elements(By.XPATH, '//input[@name="client_surname"]')
         if len(els_ln) != 1: raise Exception('Ошибка нет поля ввода фамилии')
-        els_ln[0].send_keys(data['lastname'])
+        try: els_ln[0].send_keys(data['lastname'])
+        except: raise Exception('Ошибка ввода 9')
         time.sleep(1)
-        # Ищем имя
+        # Вводим имя
         els_fn = driver.find_elements(By.XPATH, '//input[@name="client_name"]')
         if len(els_fn) != 1: raise Exception('Ошибка нет поля ввода имени')
-        els_fn[0].send_keys(data['firstname'])
+        try: els_fn[0].send_keys(data['firstname'])
+        except: raise Exception('Ошибка ввода 10')
         time.sleep(1)
-        # Ищем отчество
+        # Вводим отчество
         els_fn = driver.find_elements(By.XPATH, '//input[@name="client_patrony"]')
         if len(els_fn) != 1: raise Exception('Ошибка нет поля ввода отчества')
-        els_fn[0].send_keys(data['patronymic'])
+        try: els_fn[0].send_keys(data['patronymic'])
+        except: raise Exception('Ошибка ввода 11')
         time.sleep(1)
-        # Ищем телефон
+        # Вводим телефон
         els_ph = driver.find_elements(By.XPATH, '//input[@name="phone_number_1"]')
         if len(els_ph) != 1: raise Exception('Ошибка нет поля ввода телефона')
         phone = data.get('phone')
         if phone == None: raise Exception('Ошибка не задан телефон')
-        els_ph[0].send_keys(phone[1:])
+        try: els_ph[0].send_keys(phone[1:])
+        except: raise Exception('Ошибка ввода 12')
         time.sleep(1)
         driver.set_window_size(1000,1000)
         time.sleep(3)
@@ -456,7 +503,8 @@ def set_bid(data):
             # Ищем вкладку пакетные предложения
             els_pack = driver.find_elements(By.XPATH, '//div[@ng-click="$servCtrl.stype.tab = 3; $servCtrl.stype.presetsClicked = true;"]')
             if len(els_pack) != 1: raise Exception('Ошибка нет вкладки пакетные предложения')
-            els_pack[0].click()
+            try: els_pack[0].click()
+            except: raise Exception('Ошибка клика 11')
 
         time.sleep(10)
         
@@ -464,12 +512,14 @@ def set_bid(data):
         els_tarifs = driver.find_elements(By.XPATH, '//label[@class="title cur-pointer ng-binding title--normal title--dotted"]')
         tarif = data['tarif']
         lst_tarif = []
-        for el_tarif in els_tarifs:
-            lst_tarif.append(el_tarif.text.strip())
+        for el_tarif in els_tarifs: lst_tarif.append(el_tarif.text.strip())
 
         f_ind = find_string_to_substrs(lst_tarif, tarif)
         if f_ind < 0: raise Exception(f'Ошибка Тариф {tarif} не найден')
-        els_tarifs[f_ind].click()
+        driver.execute_script("arguments[0].scrollIntoView();", els_tarifs[f_ind])
+        time.sleep(1)
+        try: els_tarifs[f_ind].click()
+        except: raise Exception('Ошибка клика 12')
         time.sleep(10)
         
         # Страница возможно сдвинулась и верхняя кнопка не видна, прокрутим страницу вниз
@@ -481,12 +531,14 @@ def set_bid(data):
             # ищем кнопку назначить в график
             els_button = driver.find_elements(By.XPATH, '//button[@ng-click="$newAdrCtrl.createWithSchedule()"]')
             if len(els_button) != 1: raise Exception('Ошибка нет кнопки назначить в график')
-            els_button[0].click()
+            try: els_button[0].click()
+            except: raise Exception('Ошибка клика 13')
         else:
             # ищем кнопку отправить без назначения в график
             els_button = driver.find_elements(By.XPATH, '//button[@ng-click="$newAdrCtrl.create()"]')
             if len(els_button) != 1: raise Exception('Ошибка нет кнопки отправить без назначения в график')
-            els_button[0].click()
+            try: els_button[0].click()
+            except: raise Exception('Ошибка клика 14')
         time.sleep(10)
             
         # смотрим ответ
@@ -517,7 +569,8 @@ def set_bid(data):
                 print('Назначаем график', dt_grafic)
                 els_button = driver.find_elements(By.XPATH, '//button[@ng-click="close()"]')
                 if len(els_button) != 1: raise Exception('Ошибка нет кнопки продолжить')
-                els_button[0].click()
+                try: els_button[0].click()
+                except: raise Exception('Ошибка клика 15')
                 time.sleep(10)
 
                 # Берем доп информацию
@@ -531,7 +584,8 @@ def set_bid(data):
                 # Кликаем календарь
                 els_btn_cld = driver.find_elements(By.XPATH, '//button[@ng-click="showCalendar()"]')
                 if len(els_btn_cld) != 1: raise Exception('Ошибка нет кнопки календарь')
-                els_btn_cld[0].click()
+                try: els_btn_cld[0].click()
+                except: raise Exception('Ошибка клика 16')
                 time.sleep(10)
                 
                 els_cld = driver.find_elements(By.TAG_NAME, 'schedules-calendar')
@@ -567,21 +621,23 @@ def set_bid(data):
                                 f_day = True
                                 if f_month:
                                     time.sleep(10)
-                                    el_days.click()
-                                    print('Day click.')
+                                    try: el_days.click()
+                                    except: raise Exception('Ошибка клика 17')
+                                    # print('Day click.')
                                     time.sleep(10)
                     if f_month == False or f_day == False:
                         er_mess = f'Ошибка день \"{lst_date[0]} {s_mon}\" в календаре не найден.'
                         if free_first_day: er_mess += f' Ближайший свободный день: {free_first_day}'
                         raise Exception(er_mess)
                 except: pass
-                print('Date is Ok')
+                # print('Date is Ok')
                 
                 # Определяем время
                 time.sleep(20)
                 els_time = driver.find_elements(By.XPATH, '//span[@class="ui-select-toggle"]')
                 if len(els_time) != 1: raise Exception('Ошибка Нет поля выбора время.')
-                els_time[0].click()
+                try: els_time[0].click()
+                except: raise Exception('Ошибка клика 18')
                 time.sleep(2)
                 
                 els_li_times = driver.find_elements(By.XPATH, '//li[@id="ui-select-choices-0"]')
@@ -611,45 +667,57 @@ def set_bid(data):
                     if lst_tmp: e_mess += f'Возможны варианты: {";".join(lst_tmp)}'
                     raise Exception(e_mess)
                 time.sleep(3)
-                els_times[i_time].click()
+                try: els_times[i_time].click()
+                except: raise Exception('Ошибка клика 19')
                 time.sleep(2)
-                print('time Ok:', i_time)
+                # print('time Ok:', i_time)
 
                 # Поля подъезд, этаж, домофон
                 els = driver.find_elements(By.XPATH, '//input[@ng-model="schedule.address.entrance"]')
                 if len(els) != 1: raise Exception('Ошибка нет поля подъезд.')
-                els[0].send_keys('-')
+                try: els[0].send_keys('-')
+                except: raise Exception('Ошибка ввода 13')
                 time.sleep(2)
             
                 els = driver.find_elements(By.XPATH, '//input[@ng-model="schedule.address.floor"]')
                 if len(els) != 1: raise Exception('Ошибка нет поля этаж.')
-                els[0].send_keys('-')
+                try: els[0].send_keys('-')
+                except: raise Exception('Ошибка ввода 14')
                 time.sleep(2)
             
                 els = driver.find_elements(By.XPATH, '//input[@ng-model="schedule.address.code"]')
                 if len(els) != 1: raise Exception('Ошибка нет поля домофон.')
-                els[0].send_keys('-')
+                try: els[0].send_keys('-')
+                except: raise Exception('Ошибка ввода 15')
                 time.sleep(2)
                 
                 # Кликаем финальную кнопку Назначить в график
                 els = driver.find_elements(By.XPATH, '//button[@ng-disabled="isScheduleDisable()"]')
                 if len(els) != 1: raise Exception('Ошибка нет кнопки Назначить в график(Финальная).')
-                els[0].click()
+                try: els[0].click()
+                except: raise Exception('Ошибка клика 20')
                 time.sleep(5)
                 
                 
+
                 
         except Exception as e:
             data['grafic_error'] = str(e)
         
+        # #===========
+        # time.sleep(10)
+        # with open('out.html', 'w', encoding='utf-8') as outfile:
+            # outfile.write(driver.page_source)
+        # raise Exception('Финиш.')
+        # #===========
         # raise Exception('Finish')
         
     except Exception as e:
         rez_set_bid = str(e)
     finally:
-        time.sleep(5)
-        with open('out_file.html', 'w', encoding='utf-8') as outfile:
-            outfile.write(driver.page_source)
+        # time.sleep(5)
+        # with open('out_file.html', 'w', encoding='utf-8') as outfile:
+            # outfile.write(driver.page_source)
         driver.quit()
    
     return rez_set_bid, data
@@ -860,32 +928,34 @@ if __name__ == '__main__':
     
     
     # data = {
-        # 'partner_login': 'S24-61',
-        # 'partner_workercode': '1010000101',
-        # 'partner_password': 'Gf&dhdk234hfbbs4',
-        # 'id_lid': '1197942',
-        # 'city': 'Ярославль',
-        # # 'city': 'Дзерsssжинск',
-        # 'street': 'улица Труфанова',
-        # # 'street': 'mnnfhjdhdy',
-        # 'house': '29 корп 3',
-        # 'apartment': '63',
+        # 'partner_login': 'S01-181',
+        # 'partner_workercode': '1999999222',
+        # 'partner_password': '8GFysus@kffs7',
+        # 'id_lid': '1259587',
+        # 'city': 'Орехово-Зуево',
+        # 'street': 'Центральный бульвар',
+        # 'house': '12',
+        # 'apartment': '61',
+        # # 'city': 'Иннополис',
+        # # 'street': 'Спортивная улица',
+        # # 'house': '138',
+        # # 'apartment': '91',
         # 'firstname': 'Валерия',
         # 'lastname': '-',
         # 'patronymic': '-',
         # 'phone': '79111234567',
         # 'type_abonent': '0',
         # # 'tarif': 'Интернет 100 Мбит с ТВ',
-        # 'tarif': 'Интернет 100 Мбит',
+        # 'tarif': '100;ТВ',
         
-        # # 'dt_grafic': '',
-        # 'dt_grafic': '02.12.2021 16-18',
+        # 'dt_grafic': '',
+        # # 'dt_grafic': '02.12.2021 16-18',
         # 'grafic_error': '',
         # 'grafic_dop_info': '',
     # }
     # rez, data = set_bid(data)
     # if rez: print(rez)
-    # gr_e = data['grafic_error']
+    # # gr_e = data['grafic_error']
     # if gr_e:
         # print('gr_e')
         # print(gr_e)
@@ -897,12 +967,12 @@ if __name__ == '__main__':
     pass
     '''
         1 аккаунт
-            S24-61
-            1010000101
-            Gf&dhdk234hfbbs4
+            S01-181
+            1999999222
+            8GFysus@kffs7
 
         2 аккаунт
             0K23-181
             1010000101
-            CgslU7tfFsK5w8
+            FudlU7tfFsK5g6
     '''
