@@ -63,6 +63,7 @@ try: els[0].send_keys('Введенная фраза')
 except: raise Exception('Ошибка ввода фразы')
 
 # Имитация стрелок клавиатуры, Enter
+from selenium.webdriver.common.keys import Keys
 try: els[0].send_keys(Keys.ENTER)       # Keys.ARROW_DOWN
 except: raise Exception('Ошибка ENTER')
         els[0].send_keys(Keys.CONTROL + 'a')
