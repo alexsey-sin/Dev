@@ -16,17 +16,16 @@ class TypeBONDAdmin(admin.ModelAdmin):
 
 @admin.register(MoexBOND)
 class MoexBONDAdmin(admin.ModelAdmin):
-    # def mdate(self):
-        # if self.matdate: return self.matdate.strftime('%d.%m.%Y')
-        # else: return ''
-    # mdate.admin_order_field = 'matdate'
-    # mdate.short_description = 'Погашение'    
+    def mdate(self):
+        if self.matdate: return self.matdate.strftime('%d.%m.%Y')
+    mdate.admin_order_field = 'matdate'
+    mdate.short_description = 'Погашение'    
 
-    # list_display = ('secid', 'name', mdate, 'facevalue', 'couponfrequency', 'couponvalue', 'typekey', 'profit')
-    list_display = ('secid', )
-    # search_fields = ('secid', )
+    list_display = ('secid', 'name', mdate, 'facevalue', 'couponfrequency', 'couponvalue', 'typekey', 'profit')
+    # list_display = ('secid', )
+    search_fields = ('secid', )
     empty_value_display = '---'
-    # date_hierarchy = 'matdate'
+    date_hierarchy = 'matdate'
 
     # list_filter = ('secid', 'name', 'matdate', 'facevalue', 'couponvalue', 'typename')
     # formfield_overrides = {
@@ -55,4 +54,7 @@ class GlobalVariableAdmin(admin.ModelAdmin):
 @admin.register(FilterBOND)
 class FilterBONDAdmin(admin.ModelAdmin):
     list_display = [field.name for field in FilterBOND._meta.get_fields()]
+
+
+    # list_display = ('key', v_str, 'val_bool', 'val_int', 'val_decimal', v_date, v_descr)
     empty_value_display = '---'

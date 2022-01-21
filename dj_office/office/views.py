@@ -3,6 +3,7 @@ from django.shortcuts import render
 # from django.contrib.auth import get_user_model
 # from django.http import HttpResponse
 from office.models import TypeBOND, MoexBOND, GlobalVariable, FilterBOND
+from office.forms import FilterBONDForm
 from datetime import datetime, timedelta
 import requests
 import time
@@ -11,6 +12,8 @@ import json
 import threading
 from threading import Thread
 from django.http import JsonResponse
+from decimal import Decimal
+
  
 # User = get_user_model()
 
@@ -23,34 +26,18 @@ def index(request):
         u_name = user.username
     context = {'u_name': u_name}
 
-    # return render(request, 'app/index.html', context)
-    return render(request, 'office/index.html', context)
-    
-
-@login_required(login_url="/login/")
-def moexbond(request):
-    user = request.user
-    u_name = user.get_full_name()
-    if u_name.strip() == '':
-        u_name = user.username
-    context = {'u_name': u_name, 'page_title': 'Облигации ММВБ'}
-    context['segment'] = 'moexbond'
-
-    gvar_end, _ = GlobalVariable.objects.get_or_create(key='end_download')
-    val = gvar_end.val_int
-    if val: context['num_all_bond'] = val
-    else: context['num_all_bond'] = 0
-    val = gvar_end.val_datetime
-    if val: context['last_upgrade'] = f'Обновлено: {val.strftime("%d.%m.%Y")}'
-    else: context['last_upgrade'] = '---'
-    
 
     # group = get_object_or_404(LizaGroupPhrase, id=id_group)
     # context['group_name'] = group.text
     
     # if request.method == 'POST':
-        # form = LizaPhraseForm(request.POST or None)
-        # id_edit = request.POST.get('edit', None)
+        # id_filter = request.POST.get('id_filter', None)
+        # if id_filter:
+            # form = LizaPhraseForm(request.POST or None)
+            # if form.is_valid():
+                # new_form = form.save(commit=False)
+                # new_form.by_type = '["djdhss", ";lktirr45","mmbnhcy"]'
+                # new_form.save()
         # id_delete = request.POST.get('delete', None)
 
         # if id_edit:  # редактирование
@@ -85,24 +72,56 @@ def moexbond(request):
     # context['page'] = page
     # context['paginator'] = paginator
 
+    return render(request, 'office/index.html', context)
+
+
+@login_required(login_url="/login/")
+def moexbond(request):
+    user = request.user
+    u_name = user.get_full_name()
+    if u_name.strip() == '':
+        u_name = user.username
+    context = {'u_name': u_name, 'page_title': 'Облигации ММВБ'}
+    context['segment'] = 'moexbond'
+
+    if request.method == 'POST':
+        print('POST')
+        id_filter = request.POST.get('id_filter', None)
+        if id_filter:
+            print('id_filter', id_filter)
+            form = FilterBONDForm(request.POST or None)
+            if form.is_valid():
+                print('form.is_valid')
+                new_form = form.save(commit=False)
+                new_form.by_type = '["djdhss", ";lktirr45","mmbnhcy"]'
+                new_form.save()
+                print('save.ok')
+
+    gvar_end, _ = GlobalVariable.objects.get_or_create(key='end_download')
+    val = gvar_end.val_int
+    if val: context['num_all_bond'] = val
+    else: context['num_all_bond'] = 0
+    val = gvar_end.val_datetime
+    if val: context['last_upgrade'] = f'Обновлено: {val.strftime("%d.%m.%Y")}'
+    else: context['last_upgrade'] = '---'
+    
     return render(request, 'office/moexbond.html', context)
 
 
+@login_required(login_url="/login/")
 def testbond(request):
     response = {'value': 0}
-    obj_type, _ = TypeBOND.objects.get_or_create(typekey='hfjddytyst19818')
-    print(obj_type)
-    print(obj_type.id)
-    try:
-        lid, _ = MoexBOND.objects.get_or_create(secid='dkd123456', typekey=obj_type.id)
-    except Exception as e: print(e)
-    # 
+    # obj_type, _ = TypeBOND.objects.get_or_create(typekey='hfjddytyst19818')
+    # lid, _ = MoexBOND.objects.get_or_create(secid='dkd123456', typekey=obj_type)
+    # print(obj_type)
+    # print(obj_type.id)
     
-    print(lid)
-    # lid.save()
-    print(lid.id)
+    # print(lid)
+    # # lid.save()
+    # print(lid.id)
     return JsonResponse(response)
-    
+
+
 def download_moex(request):
     thread_name = 'DownLoadBondFromMOEX'
     if not request.GET: return JsonResponse({})
@@ -243,14 +262,14 @@ def GetMOEXBonds(listSecId):  # Загрузка бумаг и сохранен�
                     cnt_field += 1
 
             if cnt_field == 7:
-                lid, _ = MoexBOND.objects.get_or_create(secid=dict_bond['SECID'])
+                obj_type, _ = TypeBOND.objects.get_or_create(typekey=dict_bond['TYPE'])
+                lid, _ = MoexBOND.objects.get_or_create(secid=dict_bond['SECID'], typekey=obj_type)
                 lid.name = dict_bond['NAME']
                 lid.matdate = datetime.strptime(dict_bond['MATDATE'], '%Y-%m-%d')
                 lid.facevalue = dict_bond['FACEVALUE']
                 lid.couponfrequency = dict_bond['COUPONFREQUENCY']
                 lid.couponvalue = dict_bond['COUPONVALUE']
                 obj_type, _ = TypeBOND.objects.get_or_create(typekey=dict_bond['TYPE'])
-                lid.typename = obj_type
                 # Вычисляем номинальную доходность
                 try:
                     kup = Decimal(dict_bond['COUPONVALUE'])
@@ -258,6 +277,7 @@ def GetMOEXBonds(listSecId):  # Загрузка бумаг и сохранен�
                     nominal = Decimal(dict_bond['FACEVALUE'])
                     if kup > 0 and kup_year > 0 and nominal > 0:
                         lid.profit = ((kup * kup_year) / nominal) * 100
+                    else: continue
                 except Exception as e: print(e)
                 lid.save()
 

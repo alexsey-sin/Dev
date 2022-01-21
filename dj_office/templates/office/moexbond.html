@@ -136,6 +136,7 @@
 				<div class="card">
 					<div class="row">
 						<form method="post" enctype="multipart/form-data">
+							{% csrf_token %}
 							<div class="row">
 								<div class="col">
 									<select class="form-control" style="margin-left: 15px; padding: 2px 2px; height: 28px; width: 160px;">
@@ -145,14 +146,13 @@
 									</select>
 								</div>
 								<div class="col">
-										{% csrf_token %}
 										<input type="hidden" name="apply">
 										<button type="submit" class="btn btn-primary">Применить</button>
 								</div>
 							</div>
 						</form>
 						<div class="col">
-							<button type="button" class="btn btn-primary" onclick="active_new_filter();">Создать</button>
+							<button type="button" class="btn btn-primary" onclick="modify_filter();">Изменить</button>
 						</div>
 								<input type="hidden" id="deletePhraseId" value="">
 								<h4 id="deletePhrase"></h4>
@@ -163,37 +163,42 @@
 					{% csrf_token %}
 					<div class="card">
 						<div class="row" style="padding: 10px;">
-							<div class="form-check"><label class="form-check-label">Название:</label></div>
-							<div class="input-group"><input style="width: 250px;" type="text" name="new_filter" value="Новый фильтр"></div>
-						</div>
-						<div class="row" style="padding: 10px;">
 							<div class="col">
-								<div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-1" name="check_facevalue_from"><label class="form-check-label" for="formCheck-1">Номинал от:</label></div>
-								<div class="input-group"><input style="width: 160px;" type="number" name="facevalue_from"></div>
+								<div class="form-check"><label class="form-check-label">Название:</label></div>
+								<div class="input-group"><input id="id_new_filter" style="width: 250px;" type="text" name="name" value="Новый фильтр" disabled></div>
 							</div>
-							<div class="col">
-								<div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-2" name="check_facevalue_to"><label class="form-check-label" for="formCheck-2">Номинал до:</label></div>
-								<div class="input-group"><input style="width: 160px;" type="number" name="facevalue_to"></div>
+							<div class="col" style="margin: auto;">
+								<button id="id_btn_new_filter" type="button" class="btn btn-primary" onclick="active_new_filter(true);">Создать</button>
 							</div>
 						</div>
 						<div class="row" style="padding: 10px;">
 							<div class="col">
-								<div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-3" name="check_matdate_from"><label class="form-check-label" for="formCheck-3">Погашение от:</label></div>
-								<div class="input-group"><input style="width: 160px;" type="date" name="matdate_from"></div>
+								<div class="form-check"><input id="id_check_facevalue_from" class="form-check-input" type="checkbox" id="formCheck-1" name="check_facevalue_from"><label class="form-check-label" for="formCheck-1" disabled>Номинал от:</label></div>
+								<div class="input-group"><input id="id_facevalue_from" style="width: 160px;" type="number" name="facevalue_from" disabled></div>
 							</div>
 							<div class="col">
-								<div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-4" name="check_matdate_to"><label class="form-check-label" for="formCheck-4">Погашение до:</label></div>
-								<div class="input-group"><input style="width: 160px;" type="date" name="matdate_to"></div>
+								<div class="form-check"><input id="id_check_facevalue_to" class="form-check-input" type="checkbox" id="formCheck-2" name="check_facevalue_to" disabled><label class="form-check-label" for="formCheck-2">Номинал до:</label></div>
+								<div class="input-group"><input id="id_facevalue_to" style="width: 160px;" type="number" name="facevalue_to" disabled></div>
 							</div>
 						</div>
 						<div class="row" style="padding: 10px;">
 							<div class="col">
-								<div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-5" name="check_profit_from"><label class="form-check-label" for="formCheck-5">Доходность от:</label></div>
-								<div class="input-group"><input style="width: 160px;" type="number" name="profit_from"></div>
+								<div class="form-check"><input id="id_check_matdate_from" class="form-check-input" type="checkbox" id="formCheck-3" name="check_matdate_from" disabled><label class="form-check-label" for="formCheck-3">Погашение от:</label></div>
+								<div class="input-group"><input id="id_matdate_from" style="width: 160px;" type="date" name="matdate_from" disabled></div>
 							</div>
 							<div class="col">
-								<div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-6" name="check_profit_to"><label class="form-check-label" for="formCheck-6">Доходность до:</label></div>
-								<div class="input-group"><input style="width: 160px;" type="number" name="profit_to"></div>
+								<div class="form-check"><input id="id_check_matdate_to" class="form-check-input" type="checkbox" id="formCheck-4" name="check_matdate_to" disabled><label class="form-check-label" for="formCheck-4">Погашение до:</label></div>
+								<div class="input-group"><input id="id_matdate_to" style="width: 160px;" type="date" name="matdate_to" disabled></div>
+							</div>
+						</div>
+						<div class="row" style="padding: 10px;">
+							<div class="col">
+								<div class="form-check"><input id="id_check_profit_from" class="form-check-input" type="checkbox" id="formCheck-5" name="check_profit_from" disabled><label class="form-check-label" for="formCheck-5">Доходность от:</label></div>
+								<div class="input-group"><input id="id_profit_from" style="width: 160px;" type="number" name="profit_from" disabled></div>
+							</div>
+							<div class="col">
+								<div class="form-check"><input id="id_check_profit_to" class="form-check-input" type="checkbox" id="formCheck-6" name="check_profit_to" disabled><label class="form-check-label" for="formCheck-6">Доходность до:</label></div>
+								<div class="input-group"><input id="id_profit_to" style="width: 160px;" type="number" name="profit_to" disabled></div>
 							</div>
 						</div>
 						<div class="row" style="padding: 10px;">
@@ -209,7 +214,8 @@
 
 							</div>
 							<div class="col" style="margin: auto;">
-								<button type="submit" class="btn btn-primary">Сохранить</button>
+								<input type="hidden" name="id_filter" value="*">
+								<button id="id_btn_save_filter" type="submit" class="btn btn-primary" disabled>Сохранить</button>
 							</div>
 						</div>
 					</div>
@@ -280,7 +286,45 @@
             error: function (response){console.log(response.responseJSON.errors)}  // если ошибка
         });
     }
-	function active_new_filter(){
+	function active_new_filter(state){
+		if(state == true){
+			$('#id_btn_new_filter').prop('disabled', true);
+			$('#id_new_filter').prop('disabled', false);
+			$('#id_btn_save_filter').prop('disabled', false);
+			
+			$('#id_check_facevalue_from').prop('disabled', false);
+			$('#id_facevalue_from').prop('disabled', false);
+			$('#id_check_facevalue_to').prop('disabled', false);
+			$('#id_facevalue_to').prop('disabled', false);
+			$('#id_check_matdate_from').prop('disabled', false);
+			$('#id_matdate_from').prop('disabled', false);
+			$('#id_check_matdate_to').prop('disabled', false);
+			$('#id_matdate_to').prop('disabled', false);
+			$('#id_check_profit_from').prop('disabled', false);
+			$('#id_profit_from').prop('disabled', false);
+			$('#id_check_profit_to').prop('disabled', false);
+			$('#id_profit_to').prop('disabled', false);
+		}else{
+			$('#id_btn_new_filter').prop('disabled', false);
+			$('#id_new_filter').prop('disabled', true);
+			$('#id_btn_save_filter').prop('disabled', true);
+			
+			$('#id_check_facevalue_from').prop('disabled', true);
+			$('#id_facevalue_from').prop('disabled', true);
+			$('#id_check_facevalue_to').prop('disabled', true);
+			$('#id_facevalue_to').prop('disabled', true);
+			$('#id_check_matdate_from').prop('disabled', true);
+			$('#id_matdate_from').prop('disabled', true);
+			$('#id_check_matdate_to').prop('disabled', true);
+			$('#id_matdate_to').prop('disabled', true);
+			$('#id_check_profit_from').prop('disabled', true);
+			$('#id_profit_from').prop('disabled', true);
+			$('#id_check_profit_to').prop('disabled', true);
+			$('#id_profit_to').prop('disabled', true);
+		} // onclick="active_new_filter(false);"
+    }
+	function modify_filter(){
+		
     }
 	function test(){
 		ajax_data = {'get_state': true};

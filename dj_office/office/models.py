@@ -117,7 +117,6 @@ class FilterBOND(models.Model):
     )
     check_facevalue_from = models.BooleanField(
         blank = True,
-        null = True,
         default = 'False',
         verbose_name = 'активно Номинал от',
     )
@@ -128,7 +127,6 @@ class FilterBOND(models.Model):
     )
     check_facevalue_to = models.BooleanField(
         blank = True,
-        null = True,
         default = 'False',
         verbose_name = 'активно Номинал до',
     )
@@ -139,7 +137,6 @@ class FilterBOND(models.Model):
     )
     check_matdate_from = models.BooleanField(
         blank = True,
-        null = True,
         default = 'False',
         verbose_name = 'активно Погашение от',
     )
@@ -150,7 +147,6 @@ class FilterBOND(models.Model):
     )
     check_matdate_to = models.BooleanField(
         blank = True,
-        null = True,
         default = 'False',
         verbose_name = 'активно Погашение до',
     )
@@ -161,7 +157,6 @@ class FilterBOND(models.Model):
     )
     check_profit_from = models.BooleanField(
         blank = True,
-        null = True,
         default = 'False',
         verbose_name = 'активно Доходность от',
     )
@@ -174,7 +169,6 @@ class FilterBOND(models.Model):
     )
     check_profit_to = models.BooleanField(
         blank = True,
-        null = True,
         default = 'False',
         verbose_name = 'активно Доходность до',
     )
