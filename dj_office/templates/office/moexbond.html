@@ -168,12 +168,12 @@
 								<div class="input-group"><input id="id_new_filter" style="width: 250px;" type="text" name="name" value="Новый фильтр" disabled></div>
 							</div>
 							<div class="col" style="margin: auto;">
-								<button id="id_btn_new_filter" type="button" class="btn btn-primary" onclick="active_new_filter(true);">Создать</button>
+								<button id="id_btn_new_filter" type="button" class="btn btn-primary" onclick="active_new_filter();">Создать</button>
 							</div>
 						</div>
 						<div class="row" style="padding: 10px;">
 							<div class="col">
-								<div class="form-check"><input id="id_check_facevalue_from" class="form-check-input" type="checkbox" id="formCheck-1" name="check_facevalue_from"><label class="form-check-label" for="formCheck-1" disabled>Номинал от:</label></div>
+								<div class="form-check"><input id="id_check_facevalue_from" class="form-check-input" type="checkbox" id="formCheck-1" name="check_facevalue_from" disabled><label class="form-check-label" for="formCheck-1">Номинал от:</label></div>
 								<div class="input-group"><input id="id_facevalue_from" style="width: 160px;" type="number" name="facevalue_from" disabled></div>
 							</div>
 							<div class="col">
@@ -235,6 +235,7 @@
 <script src="/static/assets/js/jquery.min.js"></script>
 <script language="javascript">
     let is_download = false;
+    let is_new_filter = false;
 	function download_bond(){
         if (is_download){  // Включен режим загрузки
             is_download = false;
@@ -286,26 +287,9 @@
             error: function (response){console.log(response.responseJSON.errors)}  // если ошибка
         });
     }
-	function active_new_filter(state){
-		if(state == true){
-			$('#id_btn_new_filter').prop('disabled', true);
-			$('#id_new_filter').prop('disabled', false);
-			$('#id_btn_save_filter').prop('disabled', false);
-			
-			$('#id_check_facevalue_from').prop('disabled', false);
-			$('#id_facevalue_from').prop('disabled', false);
-			$('#id_check_facevalue_to').prop('disabled', false);
-			$('#id_facevalue_to').prop('disabled', false);
-			$('#id_check_matdate_from').prop('disabled', false);
-			$('#id_matdate_from').prop('disabled', false);
-			$('#id_check_matdate_to').prop('disabled', false);
-			$('#id_matdate_to').prop('disabled', false);
-			$('#id_check_profit_from').prop('disabled', false);
-			$('#id_profit_from').prop('disabled', false);
-			$('#id_check_profit_to').prop('disabled', false);
-			$('#id_profit_to').prop('disabled', false);
-		}else{
-			$('#id_btn_new_filter').prop('disabled', false);
+	function active_new_filter(){
+		if(is_new_filter){
+			$('#id_btn_new_filter').text('Создать');
 			$('#id_new_filter').prop('disabled', true);
 			$('#id_btn_save_filter').prop('disabled', true);
 			
@@ -321,7 +305,26 @@
 			$('#id_profit_from').prop('disabled', true);
 			$('#id_check_profit_to').prop('disabled', true);
 			$('#id_profit_to').prop('disabled', true);
-		} // onclick="active_new_filter(false);"
+			is_new_filter = false;
+		}else{
+			$('#id_btn_new_filter').text('Отмена');
+			$('#id_new_filter').prop('disabled', false);
+			$('#id_btn_save_filter').prop('disabled', false);
+			
+			$('#id_check_facevalue_from').prop('disabled', false);
+			$('#id_facevalue_from').prop('disabled', false);
+			$('#id_check_facevalue_to').prop('disabled', false);
+			$('#id_facevalue_to').prop('disabled', false);
+			$('#id_check_matdate_from').prop('disabled', false);
+			$('#id_matdate_from').prop('disabled', false);
+			$('#id_check_matdate_to').prop('disabled', false);
+			$('#id_matdate_to').prop('disabled', false);
+			$('#id_check_profit_from').prop('disabled', false);
+			$('#id_profit_from').prop('disabled', false);
+			$('#id_check_profit_to').prop('disabled', false);
+			$('#id_profit_to').prop('disabled', false);
+			is_new_filter = true;
+		} // onclick="active_new_filter();"
     }
 	function modify_filter(){
 		
