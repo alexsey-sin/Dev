@@ -173,7 +173,7 @@
 						</div>
 						<div class="row" style="padding: 10px;">
 							<div class="col">
-								<div class="form-check"><input id="id_check_facevalue_from" class="form-check-input" type="checkbox" id="formCheck-1" name="check_facevalue_from" disabled><label class="form-check-label" for="formCheck-1">Номинал от:</label></div>
+								<div class="form-check"><input id="id_check_facevalue_from" class="form-check-input" type="checkbox" id="formCheck-1" name="check_facevalue_from" onclick="toggle_disabled('id_facevalue_from');" disabled><label class="form-check-label" for="formCheck-1">Номинал от:</label></div>
 								<div class="input-group"><input id="id_facevalue_from" style="width: 160px;" type="number" name="facevalue_from" disabled></div>
 							</div>
 							<div class="col">
@@ -294,17 +294,17 @@
 			$('#id_btn_save_filter').prop('disabled', true);
 			
 			$('#id_check_facevalue_from').prop('disabled', true);
-			$('#id_facevalue_from').prop('disabled', true);
+			// $('#id_facevalue_from').prop('disabled', true);
 			$('#id_check_facevalue_to').prop('disabled', true);
-			$('#id_facevalue_to').prop('disabled', true);
+			// $('#id_facevalue_to').prop('disabled', true);
 			$('#id_check_matdate_from').prop('disabled', true);
-			$('#id_matdate_from').prop('disabled', true);
+			// $('#id_matdate_from').prop('disabled', true);
 			$('#id_check_matdate_to').prop('disabled', true);
-			$('#id_matdate_to').prop('disabled', true);
+			// $('#id_matdate_to').prop('disabled', true);
 			$('#id_check_profit_from').prop('disabled', true);
-			$('#id_profit_from').prop('disabled', true);
+			// $('#id_profit_from').prop('disabled', true);
 			$('#id_check_profit_to').prop('disabled', true);
-			$('#id_profit_to').prop('disabled', true);
+			// $('#id_profit_to').prop('disabled', true);
 			is_new_filter = false;
 		}else{
 			$('#id_btn_new_filter').text('Отмена');
@@ -312,22 +312,30 @@
 			$('#id_btn_save_filter').prop('disabled', false);
 			
 			$('#id_check_facevalue_from').prop('disabled', false);
-			$('#id_facevalue_from').prop('disabled', false);
+			// $('#id_facevalue_from').prop('disabled', false);
 			$('#id_check_facevalue_to').prop('disabled', false);
-			$('#id_facevalue_to').prop('disabled', false);
+			// $('#id_facevalue_to').prop('disabled', false);
 			$('#id_check_matdate_from').prop('disabled', false);
-			$('#id_matdate_from').prop('disabled', false);
+			// $('#id_matdate_from').prop('disabled', false);
 			$('#id_check_matdate_to').prop('disabled', false);
-			$('#id_matdate_to').prop('disabled', false);
+			// $('#id_matdate_to').prop('disabled', false);
 			$('#id_check_profit_from').prop('disabled', false);
-			$('#id_profit_from').prop('disabled', false);
+			// $('#id_profit_from').prop('disabled', false);
 			$('#id_check_profit_to').prop('disabled', false);
-			$('#id_profit_to').prop('disabled', false);
+			// $('#id_profit_to').prop('disabled', false);
 			is_new_filter = true;
 		} // onclick="active_new_filter();"
     }
 	function modify_filter(){
 		
+    }
+	function toggle_disabled(id){
+		attr = $('#' + id).attr('disabled');
+		if (attr == 'disabled'){
+			$('#' + id).prop('disabled', false);
+		}else{
+			$('#' + id).prop('disabled', true);
+		}
     }
 	function test(){
 		ajax_data = {'get_state': true};

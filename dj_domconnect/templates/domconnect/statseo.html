@@ -1463,17 +1463,11 @@ function toggle_display(id){
     elem = document.getElementById(id);
 	elems = document.getElementsByClassName("hidden-div");
 	let old_state = getComputedStyle(elem).display
-	// each - действия, которые будут выполняться для каждого элемента массива
-	// index - это текущий индекс элемента массива (число)
-	// value - это значение текущего элемента массива
 	$.each(elems,function(index,value){
 		value.style.display = 'none';
 	});
-	
 	if (old_state == 'none'){
 		elem.style.display = 'inline';
-	}else{
-		elem.style.display = 'none';
 	}
 }
 </script>
