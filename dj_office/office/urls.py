@@ -12,6 +12,7 @@ urlpatterns = [
     path('moexbond', views.moexbond, name='moexbond'),
     path('dwnldmoexbond', views.download_moex, name='dwnldmoexbond'),
 
+    path('testbond', views.testbond, name='testbond'),
     # path('lizaphrases/<str:id_group>', views.lizaphrases, name='lizaphrases'),
 
     # path('germangroup', views.germangroup, name='germangroup'),

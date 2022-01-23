@@ -1,5 +1,5 @@
 from django.contrib import admin
-from office.models import TypeBOND, MoexBOND, GlobalVariable
+from office.models import TypeBOND, MoexBOND, GlobalVariable, FilterBOND
 # from django.db import models
 # from django.forms import NumberInput
 
@@ -16,18 +16,19 @@ class TypeBONDAdmin(admin.ModelAdmin):
 
 @admin.register(MoexBOND)
 class MoexBONDAdmin(admin.ModelAdmin):
-    def mdate(self):
-        return self.matdate.strftime('%d.%m.%Y')
-    mdate.admin_order_field = 'matdate'
-    mdate.short_description = 'Погашение'    
+    # def mdate(self):
+        # if self.matdate: return self.matdate.strftime('%d.%m.%Y')
+        # else: return ''
+    # mdate.admin_order_field = 'matdate'
+    # mdate.short_description = 'Погашение'    
 
-    list_display = ('secid', 'name', mdate, 'facevalue', 'couponfrequency', 'couponvalue', 'typekey')
-    search_fields = ('secid', )
+    # list_display = ('secid', 'name', mdate, 'facevalue', 'couponfrequency', 'couponvalue', 'typekey', 'profit')
+    list_display = ('secid', )
+    # search_fields = ('secid', )
     empty_value_display = '---'
-    date_hierarchy = 'matdate'
+    # date_hierarchy = 'matdate'
 
     # list_filter = ('secid', 'name', 'matdate', 'facevalue', 'couponvalue', 'typename')
-    # list_display = [field.name for field in MoexBOND._meta.get_fields()]
     # formfield_overrides = {
         # models.IntegerField: {'widget': NumberInput(attrs={'size':'150'})},
         # # models.CharField: {'widget': TextInput(attrs={'size':'20'})},
@@ -48,4 +49,10 @@ class GlobalVariableAdmin(admin.ModelAdmin):
     v_date.short_description = 'Дата'
 
     list_display = ('key', v_str, 'val_bool', 'val_int', 'val_decimal', v_date, v_descr)
+    empty_value_display = '---'
+
+
+@admin.register(FilterBOND)
+class FilterBONDAdmin(admin.ModelAdmin):
+    list_display = [field.name for field in FilterBOND._meta.get_fields()]
     empty_value_display = '---'

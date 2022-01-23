@@ -40,17 +40,17 @@ class LizaPhrase(models.Model):
         LizaGroupPhrase,
         on_delete=models.CASCADE,
         verbose_name='Принадлежность фразы к группе',
-        )
+    )
     pub_date = models.DateTimeField(
         auto_now=True,
         verbose_name='Дата создания/изменения',
         help_text='Текущее время (авто)',
-        )
+    )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         verbose_name='Автор',
-        )
+    )
 
     def __str__(self):
         return self.text
@@ -93,17 +93,17 @@ class GermanPhrase(models.Model):
         GermanGroupPhrase,
         on_delete=models.CASCADE,
         verbose_name='Принадлежность фразы к группе',
-        )
+    )
     pub_date = models.DateTimeField(
         auto_now=True,
         verbose_name='Дата создания/изменения',
         help_text='Текущее время (авто)',
-        )
+    )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         verbose_name='Автор',
-        )
+    )
 
     def __str__(self):
         return self.text
@@ -121,17 +121,17 @@ class File(models.Model):
         GermanGroupPhrase,
         on_delete=models.CASCADE,
         verbose_name='Принадлежность фразы к группе',
-        )
+    )
     pub_date = models.DateTimeField(
         auto_now=True,
         verbose_name='Дата создания/изменения',
         help_text='Текущее время (авто)',
-        )
+    )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         verbose_name='Автор',
-        )
+    )
 
     def delete(self, *args, **kwargs):
         storage, path = self.file.storage, self.file.path  # До удаления записи получаем необходимую информацию
@@ -161,17 +161,17 @@ class Name(models.Model):
         choices=SEX_VAR,
         default = N,
         verbose_name = 'Пол',
-        )
+    )
     pub_date = models.DateTimeField(
         auto_now=True,
         verbose_name='Дата создания/изменения',
         help_text='Текущее время (авто)',
-        )
+    )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         verbose_name='Автор',
-        )
+    )
     short_names = models.TextField(
         blank = True,
         verbose_name='Короткие имена',
@@ -218,17 +218,17 @@ class NdzPhrase(models.Model):  # фразы Недозвоны
         NdzGroupPhrase,
         on_delete=models.CASCADE,
         verbose_name='Принадлежность фразы к группе',
-        )
+    )
     pub_date = models.DateTimeField(
         auto_now=True,
         verbose_name='Дата создания/изменения',
         help_text='Текущее время (авто)',
-        )
+    )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         verbose_name='Автор',
-        )
+    )
 
     def __str__(self):
         return self.text
@@ -270,17 +270,17 @@ class PzPhrase(models.Model):  # фразы Пропущенные звонки
         PzGroupPhrase,
         on_delete=models.CASCADE,
         verbose_name='Принадлежность фразы к группе',
-        )
+    )
     pub_date = models.DateTimeField(
         auto_now=True,
         verbose_name='Дата создания/изменения',
         help_text='Текущее время (авто)',
-        )
+    )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         verbose_name='Автор',
-        )
+    )
 
     def __str__(self):
         return self.text

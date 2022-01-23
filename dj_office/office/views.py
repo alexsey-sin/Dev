@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 # from django.contrib.auth import get_user_model
 # from django.http import HttpResponse
-from office.models import MoexBOND, GlobalVariable
+from office.models import TypeBOND, MoexBOND, GlobalVariable, FilterBOND
 from datetime import datetime, timedelta
 import requests
 import time
@@ -37,9 +37,13 @@ def moexbond(request):
     context['segment'] = 'moexbond'
 
     gvar_end, _ = GlobalVariable.objects.get_or_create(key='end_download')
-    context['num_all_bond'] = gvar_end.val_int
-    last_date = gvar_end.val_datetime.strftime('%d.%m.%Y')
-    context['last_upgrade'] = f'Обновлено: {last_date}'
+    val = gvar_end.val_int
+    if val: context['num_all_bond'] = val
+    else: context['num_all_bond'] = 0
+    val = gvar_end.val_datetime
+    if val: context['last_upgrade'] = f'Обновлено: {val.strftime("%d.%m.%Y")}'
+    else: context['last_upgrade'] = '---'
+    
 
     # group = get_object_or_404(LizaGroupPhrase, id=id_group)
     # context['group_name'] = group.text
@@ -84,6 +88,21 @@ def moexbond(request):
     return render(request, 'office/moexbond.html', context)
 
 
+def testbond(request):
+    response = {'value': 0}
+    obj_type, _ = TypeBOND.objects.get_or_create(typekey='hfjddytyst19818')
+    print(obj_type)
+    print(obj_type.id)
+    try:
+        lid, _ = MoexBOND.objects.get_or_create(secid='dkd123456', typekey=obj_type.id)
+    except Exception as e: print(e)
+    # 
+    
+    print(lid)
+    # lid.save()
+    print(lid.id)
+    return JsonResponse(response)
+    
 def download_moex(request):
     thread_name = 'DownLoadBondFromMOEX'
     if not request.GET: return JsonResponse({})
@@ -230,7 +249,16 @@ def GetMOEXBonds(listSecId):  # Загрузка бумаг и сохранен�
                 lid.facevalue = dict_bond['FACEVALUE']
                 lid.couponfrequency = dict_bond['COUPONFREQUENCY']
                 lid.couponvalue = dict_bond['COUPONVALUE']
-                lid.typename = dict_bond['TYPE']
+                obj_type, _ = TypeBOND.objects.get_or_create(typekey=dict_bond['TYPE'])
+                lid.typename = obj_type
+                # Вычисляем номинальную доходность
+                try:
+                    kup = Decimal(dict_bond['COUPONVALUE'])
+                    kup_year = int(dict_bond['COUPONFREQUENCY'])
+                    nominal = Decimal(dict_bond['FACEVALUE'])
+                    if kup > 0 and kup_year > 0 and nominal > 0:
+                        lid.profit = ((kup * kup_year) / nominal) * 100
+                except Exception as e: print(e)
                 lid.save()
 
 

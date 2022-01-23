@@ -109,7 +109,7 @@
                         </div>
                         <!-- <div class="card"> -->
 							<div width="200px" align="center">
-								<button type="button" class="btn btn-secondary" title="Добавить новое имя" data-toggle="modal" data-target="#openModalPhrase">Добавить</button>
+								<button type="button" class="btn btn-secondary" onclick="test();">Добавить</button>
 							</div>
                         <!-- </div> -->
                    </div>
@@ -286,24 +286,23 @@
 		ajax_data = {'get_state': true};
         $.ajax({
             data: ajax_data, // отсылаемые данные
-            url: "{% url 'office:dwnldmoexbond' %}",
+            url: "{% url 'office:testbond' %}",
             success: function (response){
-                is_run = response.is_run;
-				val = response.val_current;
-				tot = response.val_total;
-				all = response.num_all_bond;
-				upgrade = response.last_upgrade;
+                // is_run = response.is_run;
+				val = response.value;
+				// tot = response.val_total;
+				// all = response.num_all_bond;
+				// upgrade = response.last_upgrade;
 				console.log(val);
-				console.log(tot);
-				console.log(all);
-				console.log(upgrade);
-				if(all){$('#id_val').text(all)};
-				if(upgrade){$('#id_lbl_upgrade').text(upgrade)};
+				// console.log(tot);
+				// console.log(all);
+				// console.log(upgrade);
+				// if(all){$('#id_val').text(all)};
+				// if(upgrade){$('#id_lbl_upgrade').text(upgrade)};
             }, // если успешно
             error: function (response){console.log(response.responseJSON.errors)}  // если ошибка
         });
 	
 	}
-});
 </script>
 {% endblock javascripts %}
