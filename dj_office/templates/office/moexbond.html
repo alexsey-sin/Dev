@@ -139,7 +139,7 @@
 							{% csrf_token %}
 							<div class="row">
 								<div class="col">
-									<select class="form-control" style="margin-left: 15px; padding: 2px 2px; height: 28px; width: 160px;">
+									<select id="id_sel_filter" class="form-control" style="margin-left: 15px; padding: 2px 2px; height: 28px; width: 160px;">
 										<option value="12" selected="">This is item 1</option>
 										<option value="13">This is item 2</option>
 										<option value="14">This is item 3</option>
@@ -147,12 +147,12 @@
 								</div>
 								<div class="col">
 										<input type="hidden" name="apply">
-										<button type="submit" class="btn btn-primary">Применить</button>
+										<button id="id_btn_apply" type="submit" class="btn btn-primary">Применить</button>
 								</div>
 							</div>
 						</form>
 						<div class="col">
-							<button type="button" class="btn btn-primary" onclick="modify_filter();">Изменить</button>
+							<button id="id_btn_change" type="button" class="btn btn-primary" onclick="modify_filter();">Изменить</button>
 						</div>
 								<input type="hidden" id="deletePhraseId" value="">
 								<h4 id="deletePhrase"></h4>
@@ -177,27 +177,27 @@
 								<div class="input-group"><input id="id_facevalue_from" style="width: 160px;" type="number" name="facevalue_from" disabled></div>
 							</div>
 							<div class="col">
-								<div class="form-check"><input id="id_check_facevalue_to" class="form-check-input" type="checkbox" id="formCheck-2" name="check_facevalue_to" disabled><label class="form-check-label" for="formCheck-2">Номинал до:</label></div>
+								<div class="form-check"><input id="id_check_facevalue_to" class="form-check-input" type="checkbox" id="formCheck-2" name="check_facevalue_to" onclick="toggle_disabled('id_facevalue_to');" disabled><label class="form-check-label" for="formCheck-2">Номинал до:</label></div>
 								<div class="input-group"><input id="id_facevalue_to" style="width: 160px;" type="number" name="facevalue_to" disabled></div>
 							</div>
 						</div>
 						<div class="row" style="padding: 10px;">
 							<div class="col">
-								<div class="form-check"><input id="id_check_matdate_from" class="form-check-input" type="checkbox" id="formCheck-3" name="check_matdate_from" disabled><label class="form-check-label" for="formCheck-3">Погашение от:</label></div>
+								<div class="form-check"><input id="id_check_matdate_from" class="form-check-input" type="checkbox" id="formCheck-3" name="check_matdate_from" onclick="toggle_disabled('id_matdate_from');" disabled><label class="form-check-label" for="formCheck-3">Погашение от:</label></div>
 								<div class="input-group"><input id="id_matdate_from" style="width: 160px;" type="date" name="matdate_from" disabled></div>
 							</div>
 							<div class="col">
-								<div class="form-check"><input id="id_check_matdate_to" class="form-check-input" type="checkbox" id="formCheck-4" name="check_matdate_to" disabled><label class="form-check-label" for="formCheck-4">Погашение до:</label></div>
+								<div class="form-check"><input id="id_check_matdate_to" class="form-check-input" type="checkbox" id="formCheck-4" name="check_matdate_to" onclick="toggle_disabled('id_matdate_to');" disabled><label class="form-check-label" for="formCheck-4">Погашение до:</label></div>
 								<div class="input-group"><input id="id_matdate_to" style="width: 160px;" type="date" name="matdate_to" disabled></div>
 							</div>
 						</div>
 						<div class="row" style="padding: 10px;">
 							<div class="col">
-								<div class="form-check"><input id="id_check_profit_from" class="form-check-input" type="checkbox" id="formCheck-5" name="check_profit_from" disabled><label class="form-check-label" for="formCheck-5">Доходность от:</label></div>
+								<div class="form-check"><input id="id_check_profit_from" class="form-check-input" type="checkbox" id="formCheck-5" name="check_profit_from" onclick="toggle_disabled('id_profit_from');" disabled><label class="form-check-label" for="formCheck-5">Доходность от:</label></div>
 								<div class="input-group"><input id="id_profit_from" style="width: 160px;" type="number" name="profit_from" disabled></div>
 							</div>
 							<div class="col">
-								<div class="form-check"><input id="id_check_profit_to" class="form-check-input" type="checkbox" id="formCheck-6" name="check_profit_to" disabled><label class="form-check-label" for="formCheck-6">Доходность до:</label></div>
+								<div class="form-check"><input id="id_check_profit_to" class="form-check-input" type="checkbox" id="formCheck-6" name="check_profit_to" onclick="toggle_disabled('id_profit_to');" disabled><label class="form-check-label" for="formCheck-6">Доходность до:</label></div>
 								<div class="input-group"><input id="id_profit_to" style="width: 160px;" type="number" name="profit_to" disabled></div>
 							</div>
 						</div>
@@ -288,47 +288,82 @@
         });
     }
 	function active_new_filter(){
+		clear_new_filter();
 		if(is_new_filter){
 			$('#id_btn_new_filter').text('Создать');
 			$('#id_new_filter').prop('disabled', true);
 			$('#id_btn_save_filter').prop('disabled', true);
+			$('#id_sel_filter').prop('disabled', false);
+			$('#id_btn_apply').prop('disabled', false);
+			$('#id_btn_change').prop('disabled', false);
 			
 			$('#id_check_facevalue_from').prop('disabled', true);
-			// $('#id_facevalue_from').prop('disabled', true);
+			$('#id_facevalue_from').prop('disabled', true);
 			$('#id_check_facevalue_to').prop('disabled', true);
-			// $('#id_facevalue_to').prop('disabled', true);
+			$('#id_facevalue_to').prop('disabled', true);
 			$('#id_check_matdate_from').prop('disabled', true);
-			// $('#id_matdate_from').prop('disabled', true);
+			$('#id_matdate_from').prop('disabled', true);
 			$('#id_check_matdate_to').prop('disabled', true);
-			// $('#id_matdate_to').prop('disabled', true);
+			$('#id_matdate_to').prop('disabled', true);
 			$('#id_check_profit_from').prop('disabled', true);
-			// $('#id_profit_from').prop('disabled', true);
+			$('#id_profit_from').prop('disabled', true);
 			$('#id_check_profit_to').prop('disabled', true);
-			// $('#id_profit_to').prop('disabled', true);
+			$('#id_profit_to').prop('disabled', true);
 			is_new_filter = false;
 		}else{
 			$('#id_btn_new_filter').text('Отмена');
 			$('#id_new_filter').prop('disabled', false);
 			$('#id_btn_save_filter').prop('disabled', false);
+			$('#id_sel_filter').prop('disabled', true);
+			$('#id_btn_apply').prop('disabled', true);
+			$('#id_btn_change').prop('disabled', true);
 			
 			$('#id_check_facevalue_from').prop('disabled', false);
-			// $('#id_facevalue_from').prop('disabled', false);
+			if ($('#id_check_facevalue_from').prop('checked') == true){
+				$('#id_facevalue_from').prop('disabled', false);
+			}
 			$('#id_check_facevalue_to').prop('disabled', false);
-			// $('#id_facevalue_to').prop('disabled', false);
+			if ($('#id_check_facevalue_to').prop('checked')){
+				$('#id_facevalue_to').prop('disabled', false);
+			}
 			$('#id_check_matdate_from').prop('disabled', false);
-			// $('#id_matdate_from').prop('disabled', false);
+			if ($('#id_check_matdate_from').prop('checked')){
+				$('#id_matdate_from').prop('disabled', false);
+			}
 			$('#id_check_matdate_to').prop('disabled', false);
-			// $('#id_matdate_to').prop('disabled', false);
+			if ($('#id_check_matdate_to').prop('checked')){
+				$('#id_matdate_to').prop('disabled', false);
+			}
 			$('#id_check_profit_from').prop('disabled', false);
-			// $('#id_profit_from').prop('disabled', false);
+			if ($('#id_check_profit_from').prop('checked')){
+				$('#id_profit_from').prop('disabled', false);
+			}
 			$('#id_check_profit_to').prop('disabled', false);
-			// $('#id_profit_to').prop('disabled', false);
+			if ($('#id_check_profit_to').prop('checked')){
+				$('#id_profit_to').prop('disabled', false);
+			}
 			is_new_filter = true;
+			$('#id_new_filter').focus();
 		} // onclick="active_new_filter();"
     }
 	function modify_filter(){
 		
     }
+	function clear_new_filter(){
+		$('#id_new_filter').prop('value', 'Новый фильтр');
+		$('#id_check_facevalue_from').prop('checked', false)
+		$('#id_facevalue_from').val('');
+		$('#id_check_facevalue_to').prop('checked', false)
+		$('#id_facevalue_to').val('');
+		$('#id_check_matdate_from').prop('checked', false)
+		$('#id_matdate_from').val('');
+		$('#id_check_matdate_to').prop('checked', false)
+		$('#id_matdate_to').val('');
+		$('#id_check_profit_from').prop('checked', false)
+		$('#id_profit_from').val('');
+		$('#id_check_profit_to').prop('checked', false)
+		$('#id_profit_to').val('');
+	}
 	function toggle_disabled(id){
 		attr = $('#' + id).attr('disabled');
 		if (attr == 'disabled'){
