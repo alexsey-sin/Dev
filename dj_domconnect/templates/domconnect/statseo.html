@@ -248,7 +248,7 @@
             $('#id_prgs_download').val(0);
             $('#id_prgs_download').show();
             $('#id_btn_download').text('Остановить');
-            ajax_data = {'start': true, 'from_date': '20.01.2022'};
+            ajax_data = {'start': true};
             go_ajax(ajax_data)
             setTimeout(cickle_query_download, 500);
         }
@@ -256,7 +256,7 @@
     function cickle_query_download(){
         ajax_data = {'get_state': true};
         go_ajax(ajax_data)
-		if(is_download){setTimeout(cickle_query_download, 500);}
+		if(is_download){setTimeout(cickle_query_download, 1000);}
     }
     function go_ajax(ajax_data){
         $.ajax({
