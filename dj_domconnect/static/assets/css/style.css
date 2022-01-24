@@ -189,14 +189,14 @@ p.text-muted {
   -webkit-box-shadow: 0 1px 20px 0 rgba(69, 90, 100, 0.08);
           box-shadow: 0 1px 20px 0 rgba(69, 90, 100, 0.08);
   border: none;
-  margin-bottom: 30px;
+  margin-bottom: 10px;
   -webkit-transition: all 0.5s ease-in-out;
   transition: all 0.5s ease-in-out;
 }
 .card .card-header {
   background-color: transparent;
   border-bottom: 1px solid #f1f1f1;
-  padding: 20px 25px;
+  padding: 5px 25px;
   position: relative;
 }
 .card .card-header h5 {
@@ -6899,7 +6899,7 @@ pre[class*=language-]:after, pre[class*=language-]:before {
 .custom-select,
 .form-control {
   background: #f4f7fa;
-  padding: 10px 20px;
+  padding: 5px 20px;
   font-size: 14px;
 }
 .custom-select:focus,
@@ -6956,7 +6956,8 @@ pre[class*=language-]:after, pre[class*=language-]:before {
 /* input group End */
 /**====== Form Componant css end ======**/
 select.form-control:not([size]):not([multiple]) {
-  height: calc(2.55rem + 2px);
+  /* height: calc(2.55rem + 2px); */
+  height: 2px;
 }
 
 .input-group-lg > .input-group-append > select.btn:not([size]):not([multiple]),
@@ -6969,7 +6970,7 @@ select.form-control-lg:not([size]):not([multiple]) {
 }
 
 .minicolors .form-control {
-  padding: 6px 12px 5px 44px;
+  padding: 6px 5px 5px 5px;
 }
 
 /* form-select */
@@ -7659,16 +7660,18 @@ a.btn-theme.active {
 }
 
 .btn {
-  padding: 10px 20px;
+  padding: 2px 20px;
   border-radius: 0.25rem;
   font-size: 14px;
-  margin-bottom: 5px;
+  margin-top: 2px;
+  margin-bottom: 2px;
   margin-right: 10px;
   -webkit-transition: all 0.3s ease-in-out;
   transition: all 0.3s ease-in-out;
 }
 .btn > i {
   margin-right: 12px;
+  margin-left: 12px;
 }
 .btn.btn-icon, .btn.drp-icon {
   width: 45px;
@@ -8350,9 +8353,11 @@ a.btn-theme.active {
 }
 
 .progress-bar {
+  border-color: #f4f7fa;
+  border-width: 2;
   background-color: #04a9f5;
-  -webkit-box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.3);
-          box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.3);
+  /* -webkit-box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.3); */
+          /* box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.3); */
 }
 .progress-bar.progress-c-blue {
   background: #04a9f5;
