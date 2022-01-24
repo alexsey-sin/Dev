@@ -7,37 +7,9 @@
 <style>
 .group-s{
     display: none;
-  }
-  
+}
 .tr-open{
-  display: table-row;
-}
-table {
-    min-width: 1300px;
-    font-size: 14px;
-    text-align: center;
-}
-.table-fixed-head {
-    width: 100%;
-    table-layout: fixed;
-    border-collapse: collapse;
-    height: 100vh;
-}
-.table-fixed-head th,
-.table-fixed-head td {
-    padding: 5px;
-    min-width: 100px;
-    max-width: 100px;
-}
-.table-fixed-head thead tr {
-    display: block;
-    position: relative;
-}
-.table-fixed-head tbody {
-    display: block;
-    overflow: auto;
-    width: 100%;
-    height: calc(100vh - 30px);
+    display: table-row;
 }
 </style>
 {% endblock stylesheets %}
@@ -506,17 +478,14 @@ table {
                                     </table>
                                    </div>
                                   
-                                   <div class="accordion accordion-flush" id="accordionExample">
-                                    <div class="accordion-item ">
-                                      <h2 class="accordion-header" id="headingTwo">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                          https://mirbeeline.ru/
-                                        </button>
-                                      </h2>
-                                      <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+                                      <h5>
+                                        <button type="button" onclick="div_open('id_div_mirbeeline');">https://mirbeeline.ru/</button>
+
+                                      </h5>
+                                    <div id="id_div_mirbeeline" style="display: none;">
                                         <div class="accordion-body">
                                           <div class="table-responsive">
-                                              <table class="table table-bordered table-hover table-responsive table-fixed-head">
+                                        <table class="table table-bordered table-hover table-responsive table-fixed-head">
                                           <thead>
                                               <tr>
                                                 <th scope="col">ID</th>
@@ -953,11 +922,9 @@ table {
                                               <td>328</td> 
                                           </tr>
                                   
-                                      </table>  
+                                        </table>  
                                         </div>
                                       </div>
-                                    </div>
-                                  </div>
                                 </div>
                             </div>
                         </div>
@@ -1018,7 +985,7 @@ table {
 </script>
 <script>
 function collapsgroup(id){
-    let alltr = document.querySelectorAll(`tr.group-${id}`);
+    let alltr = document.querySelectorAll("tr.group-${id}");
     for (let i = 0;i < alltr.length;i++){
         alltr[i].classList.toggle("tr-open");
     }
@@ -1030,6 +997,15 @@ function collapsgroup(id){
         btn.classList.remove("fa-chevron-up");
         btn.classList.add("fa-chevron-down");
     }
+}
+function div_open(id){
+    elem = document.getElementById(id);
+    // if (getComputedStyle(elem).display == 'none'){
+    //     elem.show();
+    // }else{
+    //     elem.hide();
+    // }
+    alert(getComputedStyle(elem).display);
 }
 </script>
 
