@@ -157,7 +157,7 @@ LOGGING = {
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': 'debug.log',
+            'filename': 'info.log',
         },
     },
     'loggers': {

@@ -40,6 +40,77 @@ def get_token(login: str, password: str) -> (str, str):
     except:
         return 'Ошибка get_token: try: requests.post', ''
 
+def get_canalog(from_data):
+    # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.catalog.get'
+    # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.catalog.list'
+    # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.productsection.fields'
+    # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.fields'
+    # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.userfield.get'
+    # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.userfield.list'
+    # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.status.entity.items' # Типы источника лида
+    url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.userfield.get'
+    
+    # dt_start = datetime.strptime(from_data, '%d.%m.%Y')
+    # str_dt_start = dt_start.strftime('%Y-%m-%dT%H:%M:%S')
+    # go_next = 0
+    # go_total = 0
+    # out_lst = []
+
+    # headers = {
+        # 'Content-Type': 'application/json',
+        # 'Connection': 'Keep-Alive',
+        # 'User-Agent': 'Apache-HttpClient/4.1.1 (java 1.5)',
+    # }
+    # print(str_dt_start)
+    # return '', []
+    # while True:
+    data = {
+        # 'filter': {'FIELD_NAME': 'UF_CRM_1592566018',}
+        'id': 1840,
+        # 'order': { "DATE_MODIFY": "ASC" },  # Если нужно с сортировкой
+        # 'filter': {
+            # "CATALOG_ID": 30,
+            # # # '<DATE_CREATE': '2021-10-31T23:59:59',
+        # },
+        # 'select': [           crm.status.entity.items?entityId=SOURCE
+            # "ID", 
+            # "CATALOG_ID", 
+            # "SECTION_ID", 
+            # "NAME",
+            # "XML_ID",
+            # "CODE",
+        # ]
+    }
+    try:
+        responce = requests.post(url, json=data)
+        # responce = requests.post(url)
+        # responce = requests.post(url, headers=headers)
+        if responce.status_code == 200:
+            answer = json.loads(responce.text)
+            result = answer.get('result')
+            if not result: print('update_typelid no result in answer')
+            dct_list = result.get('LIST')
+            if not dct_list: print('update_typelid no field LIST in result in answer')
+            for dct in dct_list:
+                print(dct)
+            # for k, v in result.items():
+                # print(k,v)
+                # print()
+            # go_next = answer.get('next')
+            # go_total = answer.get('total')
+            # out_lst += result
+            # if not go_next: break
+            # print(dct_list)
+            # print(answer)
+            # print(go_next, go_total)
+        else: return f'Ошибка get_canalog: responce.status_code: {responce.status_code}\n{responce.text}'
+    except: return 'Ошибка get_canalog: try: requests.post'
+        # time.sleep(1)
+        # break
+        
+    return ''
+
+
 def get_lids(from_data):
     url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.list'
     
@@ -117,9 +188,9 @@ if __name__ == '__main__':
     
     
     
-    # from_date = '01.01.2022'
-    # e, data_lids = get_lids(from_date)
-    # if e: print(e)
+    from_date = '01.01.2022'
+    e = get_canalog(from_date)
+    if e: print(e)
     
     # with open('lids_format.txt', 'w', encoding='utf-8') as out_file:
         # json.dump(data_lids, out_file, ensure_ascii=False, indent=4)
@@ -144,22 +215,22 @@ if __name__ == '__main__':
     # ddd = datetime.strptime(from_date, '%Y-%m-%dT%H:%M:%S%z')
     # print(ddd)
 
-    with open('lids.json', 'r', encoding='utf-8') as file:  # читаем время создания токена если есть
-        js_lids = json.load(file)
-    # dt_old_str = js.get('time_create')
+    # with open('lids.json', 'r', encoding='utf-8') as file:  # читаем время создания токена если есть
+        # js_lids = json.load(file)
+    # # dt_old_str = js.get('time_create')
     
-    y_id = True
-    many = 0
-    for lid in js_lids:
-        f_id = lid.get('UF_CRM_1592566018')
-        if f_id == None or len(f_id) == 0:
-            y_id = False
-            continue
-        if len(f_id) > many: many = len(f_id)
+    # y_id = True
+    # many = 0
+    # for lid in js_lids:
+        # f_id = lid.get('UF_CRM_1592566018')
+        # if f_id == None or len(f_id) == 0:
+            # y_id = False
+            # continue
+        # if len(f_id) > many: many = len(f_id)
         
-    print(len(js_lids))
-    print('y_id', y_id)
-    print('many', many)
+    # print(len(js_lids))
+    # print('y_id', y_id)
+    # print('many', many)
 
 
         # * "ID": "1253690",

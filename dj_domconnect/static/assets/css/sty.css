@@ -1,0 +1,38 @@
+.group-s{
+    display: none;
+  }
+  
+.tr-open{
+  display: table-row;
+}
+table {
+    min-width: 1300px;
+    font-size: 14px;
+    text-align: center;
+}
+.table-fixed-head {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    height: 100vh;
+  }
+  
+  .table-fixed-head th,
+  .table-fixed-head td {
+    padding: 5px;
+    min-width: 100px;
+    max-width: 100px;
+  }
+  
+  .table-fixed-head thead tr {
+    display: block;
+    position: relative;
+  }
+  
+  .table-fixed-head tbody {
+    display: block;
+    overflow: auto;
+    width: 100%;
+    height: calc(100vh - 30px);
+  }
+  
