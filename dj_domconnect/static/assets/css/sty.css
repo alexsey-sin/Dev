@@ -7,8 +7,8 @@
 }
 table {
     min-width: 1300px;
-    font-size: 14px;
-    text-align: center;
+    font-size: 13px;
+    margin-bottom: 5px;
 }
 .table-fixed-head {
     width: 100%;
@@ -19,9 +19,10 @@ table {
   
   .table-fixed-head th,
   .table-fixed-head td {
-    padding: 5px;
-    min-width: 100px;
-    max-width: 100px;
+    padding: 1px;
+    min-width: 75px;
+    max-width: 75px;
+    text-align: center;
   }
   
   .table-fixed-head thead tr {
@@ -35,4 +36,4 @@ table {
     width: 100%;
     height: calc(100vh - 30px);
   }
-  
+
