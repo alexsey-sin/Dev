@@ -1,3 +1,5 @@
+import json
+
 # Сохраняем в файл словарь gt_catalog отформатированный с отступами
 with open('catalog.txt', 'w', encoding='utf-8') as out_file:
     json.dump(gt_catalog, out_file, ensure_ascii=False, indent=4)

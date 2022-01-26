@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.db.models import Q
 # from django.core.paginator import Paginator
 # from app.forms import NameForm, LizaPhraseForm, GermanPhraseForm, NdzPhraseForm, PzPhraseForm
-from domconnect.models import DcCrmGlobVar, DcCrmLid
+from domconnect.models import DcCrmGlobVar, DcCrmLid, DcCashSEO
 from domconnect.thread import thread_download_crm, calculateSEO
 from datetime import datetime
 import calendar
@@ -15,6 +15,7 @@ from django.http import JsonResponse
 import threading
 from threading import Thread
 import logging
+import json
 
 
 logging.basicConfig(
@@ -45,16 +46,30 @@ def index(request):  # Статистика SEO
     str_month = ['', 'Янв.', 'Фев.', 'Мар.', 'Апр.', 'Май', 'Июн.', 'Июл.', 'Авг.', 'Сен.', 'Окт.', 'Ноя.', 'Дек.']
     col_date = datetime.today()
     col_month = []
-    for _ in range(12):
+    col_rercent = [2, 7, 9, 10, 14, 22, 23]  # Номера строк с процентами
+    col_many = [18, ]  # Номера строк с деньгами
+    for i in range(12):
         s_date = f'01.{col_date.month}.{col_date.year}'
+        print(s_date)
         f_date = datetime.strptime(s_date, '%d.%m.%Y')
-        
+        c_data = DcCashSEO.objects.filter(val_date=f_date, table=1).order_by('row')
+        c_row = {'head': f'{str_month[col_date.month]} {col_date.year}'}
+        for j in range(len(c_data)):
+            if j in col_rercent: c_row[str(c_data[j].row)] = f'{round(c_data[j].val,2)}%'
+            elif j in col_many: c_row[str(c_data[j].row)] = f'{round(c_data[j].val)}р.'
+            else: c_row[str(c_data[j].row)] = str(round(c_data[j].val))
+            # print(r_data.row, r_data.val)
+        # print(c_row)
+        col_month.append(c_row)
+        # break
     
-    
-    
-        col_month.append(f'{str_month[col_date.month]} {col_date.year}')
         col_date = col_date - timedelta(days=col_date.day)
     col_month.reverse()
+    
+    with open('col_month.json', 'w', encoding='utf-8') as out_file:
+        json.dump(col_month, out_file, ensure_ascii=False, indent=4)
+
+    # print(col_month)
     context['col_month'] = col_month
 
 
