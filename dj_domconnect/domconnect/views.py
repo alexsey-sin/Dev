@@ -3,10 +3,12 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
+from django.db.models import Q
 # from django.core.paginator import Paginator
 # from app.forms import NameForm, LizaPhraseForm, GermanPhraseForm, NdzPhraseForm, PzPhraseForm
 from domconnect.models import DcCrmGlobVar, DcCrmLid
 from datetime import datetime
+import calendar
 from datetime import timedelta
 import requests
 import time
@@ -18,11 +20,11 @@ import logging
 
 
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.INFO,
     filename='main.log',
-    format='%(asctime)s:%(levelname)-8s:%(name)s:%(message)s'
+    format='%(asctime)s:%(name)s:%(message)s'
 )
-log = logging.getLogger(__name__)  # запустили
+# log = logging.getLogger(__name__)  # запускать в функциях
 # log.info('So should this')
 # # # # log.debug('This message should go to the log file')
 # # # # log.warning('And this, too')
@@ -30,15 +32,13 @@ typesource = {}
 typelid = {}
 
 @login_required(login_url='/login/')
-def index(request):
+def index(request):  # Статистика SEO
     user = request.user
     u_name = user.get_full_name()
     if u_name.strip() == '':
         u_name = user.username
     context = {'u_name': u_name}
 
-    # lid = DcCrmLid.objects.get_or_create(id_lid='123')
-    # print(datetime.now())
 
 
     context['segment'] = 'statseo'
@@ -46,15 +46,67 @@ def index(request):
     
 
 @login_required(login_url='/login/')
-def dataCrm(request):
+def dataCrm(request):  # Данные SEO
+    log = logging.getLogger(__name__)  # запустили логгирование
+
     user = request.user
     u_name = user.get_full_name()
     if u_name.strip() == '':
         u_name = user.username
     context = {'u_name': u_name}
 
-    # lid = DcCrmLid.objects.get_or_create(id_lid='123')
-    # print(datetime.now())
+    cur_day = datetime.today().day      # Номер текущего дня
+    cur_month = datetime.today().month  # Номер текущего меяца
+    cur_year = datetime.today().year    # Номер текущего года
+    cnt_days_in_cur_month = calendar.monthrange(cur_year, cur_month)[1] # Количество дней в текущем месяце
+
+    # print(cnt_days_in_cur_month)
+    # print(cur_day, cur_month, cur_year)
+
+    # Все лиды за текущий месяц
+    lids_all = DcCrmLid.objects.filter(create_date__year=cur_year, create_date__month=cur_month)
+    lids_seo = lids_all.filter(crm_1592566018='SEO')
+    # (1) Лиды
+    cell_01_01_12 = round((lids_seo.count() / cur_day) * cnt_days_in_cur_month)
+    # (4) Лиды (все)
+    cell_01_04_12 = round((lids_all.count() / cur_day) * cnt_days_in_cur_month)
+    # (5) Будн. дней 
+    cell_01_05_12 = lids_all.filter(create_date__week_day__range=(0,4)).count()
+    # (6) Выходных дней 
+    cell_01_06_12 = lids_all.filter(create_date__week_day__range=(5,6)).count()
+    # (7) Лиды с ТхВ 
+    cell_01_07_12 = lids_seo.exclude(Q(crm_1571987728429='')|Q(crm_1571987728429=None)).count()  # Провайдеры ДК (длина больше 0)
+    # (8) % лидов с ТхВ
+    cell_01_08_12 = ''
+    if cell_01_01_12:
+        cell = round((cell_01_07_12 / cell_01_01_12) * 100)
+        cell_01_08_12 = f'{cell}%'
+    # (9) Сделки >50
+    # cell_01_09_12 = lids_all.filter(crm_1493416385__gt=50, status_id__contains='Подключаем').count() с прогнозом
+
+
+
+
+
+
+
+
+
+    print('cell_01_01_12', cell_01_01_12)
+
+
+    print('cell_01_04_12', cell_01_04_12)
+    print('cell_01_05_12', cell_01_05_12)
+    print('cell_01_06_12', cell_01_06_12)
+    print('cell_01_07_12', cell_01_07_12)
+    print('cell_01_08_12', cell_01_08_12)
+    # print('cell_01_09_12', cell_01_09_12)
+
+
+    # Названия ячеек cell_01_02_12   => №таблицы_№строки_№столбца
+    # print('cnt_lids_all', cnt_lids_all)
+    # log.info(f'cnt_lids_all: {cnt_lids_all}')
+    # log.info(f'cnt_lids_seo: {cnt_lids_seo}')
 
 
     context['segment'] = 'datacrm'
@@ -125,6 +177,7 @@ def thread_download_crm(str_from_modify):
     print('stop thread')
     
 def download_typesource():  # Обновление Типов источника лида
+    log = logging.getLogger(__name__)  # запустили логгирование
     key_crm = get_key_crm()
     url = f'https://crm.domconnect.ru/rest/{key_crm}/crm.status.entity.items'
     data = {'entityId': 'SOURCE'}
@@ -136,14 +189,15 @@ def download_typesource():  # Обновление Типов источника
             result = answer.get('result')
             for res in result:
                 status_id = res.get('STATUS_ID')
-                if not status_id or not status_id.isdigit():
-                    log.info(f'Ошибка update_typesource: error status_id: {status_id}')
+                if not status_id:
+                    log.info(f'Ошибка download_typesource: error status_id: {status_id}')
                     continue
                 typesource[status_id] = res.get('NAME')
-        else: return log.info(f'Ошибка update_typesource: responce.status_code: {responce.status_code}\n{responce.text}')
-    except Exception as e: log.info(f'Ошибка update_typesource: try: requests.post {e}')
+        else: return log.info(f'Ошибка download_typesource: responce.status_code: {responce.status_code}\n{responce.text}')
+    except Exception as e: log.info(f'Ошибка download_typesource: try: requests.post {e}')
 
 def download_typelid():  # Обновление Типов лида
+    log = logging.getLogger(__name__)  # запустили логгирование
     '''
         Чтобы найти значения поля UF_CRM_1592566018
         делаем запрос
@@ -172,6 +226,7 @@ def download_typelid():  # Обновление Типов лида
     except Exception as e: log.info(f'Ошибка download_typelid: try: requests.post {e}')
 
 def download_lids(str_from_modify):
+    log = logging.getLogger(__name__)  # запустили логгирование
     gvar_url, create = DcCrmGlobVar.objects.get_or_create(key='url_download_crm')
     url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.list'
     if create:
@@ -243,8 +298,8 @@ def download_lids(str_from_modify):
                 ok, err = append_lids(result)
                 cnt_ok += ok; cnt_err += err
                 if not go_next: break
-            else: log.info(f'Ошибка get_lids: responce.status_code: {responce.status_code}\n{responce.text}')
-        except Exception as e: log.info(f'Ошибка get_lids: try: requests.post {e}')
+            else: log.info(f'Ошибка download_lids: responce.status_code: {responce.status_code}\n{responce.text}')
+        except Exception as e: log.info(f'Ошибка download_lids: try: requests.post {e}')
         gvar_cur, _ = DcCrmGlobVar.objects.get_or_create(key='cur_num_download_crm')
         gvar_cur.val_int = go_next
         gvar_cur.save()
@@ -260,6 +315,7 @@ def download_lids(str_from_modify):
     log.info(mess)
 
 def append_lids(lids):
+    log = logging.getLogger(__name__)  # запустили логгирование
     cnt_err = 0
     cnt_ok = 0
     for new_lid in lids:
@@ -271,21 +327,26 @@ def append_lids(lids):
             lid.create_date = datetime.strptime(new_lid.get('DATE_CREATE')[:-6], '%Y-%m-%dT%H:%M:%S')  # "2022-01-01T04:43:22+03:00"
             lid.modify_date = datetime.strptime(new_lid.get('DATE_MODIFY')[:-6], '%Y-%m-%dT%H:%M:%S')
             val_field = new_lid.get('SOURCE_ID')
-            if val_field: lid.source_id = typesource[val_field]
+            if val_field:
+                if not val_field in typesource: lid.source_id = val_field
+                else: lid.source_id = typesource[val_field]
             val_field = new_lid.get('ASSIGNED_BY_ID')
             if val_field: lid.assigned_by_id = val_field
             val_field = new_lid.get('UF_CRM_1493416385')
-            if val_field: lid.crm_1493416385 = val_field
+            if val_field: lid.crm_1493416385 = int(val_field)
             val_field = new_lid.get('UF_CRM_1499437861')
             if val_field: lid.crm_1499437861 = val_field
             val_field = new_lid.get('UF_CRM_1580454770')
-            if val_field: lid.crm_1580454770 = val_field
+            if val_field: lid.crm_1580454770 = bool(val_field)
             val_field = new_lid.get('UF_CRM_1534919765')
             if val_field and len(val_field) > 0: lid.crm_1534919765 = val_field[0]
             val_field = new_lid.get('UF_CRM_1571987728429')
             if val_field: lid.crm_1571987728429 = val_field
             val_field = new_lid.get('UF_CRM_1592566018')
-            if val_field and len(val_field) > 0: lid.crm_1592566018 = typelid[str(val_field[0])]
+            if val_field and len(val_field) > 0:
+                val_field = str(val_field[0])
+                if val_field not in typelid: lid.crm_1592566018 = val_field
+                else: lid.crm_1592566018 = typelid[val_field]
             val_field = new_lid.get('UF_CRM_1493413514')
             if val_field: lid.crm_1493413514 = val_field
             val_field = new_lid.get('UF_CRM_1492017494')
@@ -293,7 +354,7 @@ def append_lids(lids):
             val_field = new_lid.get('UF_CRM_1492017736')
             if val_field: lid.crm_1492017736 = val_field
             val_field = new_lid.get('UF_CRM_1498756113')
-            if val_field: lid.crm_1498756113 = val_field
+            if val_field: lid.crm_1498756113 = bool(val_field)
             val_field = new_lid.get('UF_CRM_1615982450')
             if val_field: lid.crm_1615982450 = val_field
             val_field = new_lid.get('UF_CRM_1615982567')

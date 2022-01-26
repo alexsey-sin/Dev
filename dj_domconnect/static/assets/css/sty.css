@@ -8,13 +8,11 @@
 table {
     min-width: 1300px;
     font-size: 13px;
-    margin-bottom: 5px;
 }
 .table-fixed-head {
     width: 100%;
     table-layout: fixed;
     border-collapse: collapse;
-    height: 100vh;
   }
   
   .table-fixed-head th,
@@ -34,6 +32,5 @@ table {
     display: block;
     overflow: auto;
     width: 100%;
-    height: calc(100vh - 30px);
+    height: calc(710px - 30px);
   }
-

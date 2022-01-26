@@ -2,6 +2,7 @@ import os
 import time
 import re
 from datetime import datetime
+import calendar
 import requests  # pip install requests
 import json
 
@@ -40,15 +41,15 @@ def get_token(login: str, password: str) -> (str, str):
     except:
         return 'Ошибка get_token: try: requests.post', ''
 
-def get_canalog(from_data):
+def get_catalog():
     # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.catalog.get'
     # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.catalog.list'
     # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.productsection.fields'
-    # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.fields'
+    url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.fields'
     # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.userfield.get'
     # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.userfield.list'
     # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.status.entity.items' # Типы источника лида
-    url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.userfield.get'
+    # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.userfield.get'
     
     # dt_start = datetime.strptime(from_data, '%d.%m.%Y')
     # str_dt_start = dt_start.strftime('%Y-%m-%dT%H:%M:%S')
@@ -64,6 +65,33 @@ def get_canalog(from_data):
     # print(str_dt_start)
     # return '', []
     # while True:
+    select = [
+        'ID', 
+        'TITLE', 
+        'STATUS_ID', 
+        'DATE_CREATE',
+        'DATE_MODIFY',
+        'SOURCE_ID',
+        'ASSIGNED_BY_ID',
+        'UF_CRM_1493416385',  # Сумма тарифа
+        'UF_CRM_1499437861',  # ИНН/Организация
+        'UF_CRM_1580454770',  # Звонок?
+        'UF_CRM_1534919765',  # Группы источников
+        'UF_CRM_1571987728429',  # Провайдеры ДК
+        'UF_CRM_1592566018',  # ТИп лида
+        'UF_CRM_1493413514',  # Провайдер
+        'UF_CRM_1492017494',  # Область
+        'UF_CRM_1492017736',  # Город
+        'UF_CRM_1498756113',  # Юр. лицо
+
+        'UF_CRM_1615982450',  # utm_source
+        'UF_CRM_1615982567',  # utm_medium
+        'UF_CRM_1615982644',  # utm_campaign
+        'UF_CRM_1615982716',  # utm_term                
+        'UF_CRM_1615982795',  # utm_content                
+        'UF_CRM_1640267556',  # utm_group 
+    ]
+
     data = {
         # 'filter': {'FIELD_NAME': 'UF_CRM_1592566018',}
         'id': 1840,
@@ -82,20 +110,21 @@ def get_canalog(from_data):
         # ]
     }
     try:
-        responce = requests.post(url, json=data)
-        # responce = requests.post(url)
+        # responce = requests.post(url, json=data)
+        responce = requests.post(url)
         # responce = requests.post(url, headers=headers)
         if responce.status_code == 200:
             answer = json.loads(responce.text)
             result = answer.get('result')
-            if not result: print('update_typelid no result in answer')
-            dct_list = result.get('LIST')
-            if not dct_list: print('update_typelid no field LIST in result in answer')
-            for dct in dct_list:
-                print(dct)
-            # for k, v in result.items():
-                # print(k,v)
-                # print()
+            # if not result: print('update_typelid no result in answer')
+            # dct_list = result.get('LIST')
+            # if not dct_list: print('update_typelid no field LIST in result in answer')
+            # for dct in dct_list:
+                # print(dct)
+            for k, v in result.items():
+                if k in select:
+                    print(k,v)
+                    print()
             # go_next = answer.get('next')
             # go_total = answer.get('total')
             # out_lst += result
@@ -103,8 +132,8 @@ def get_canalog(from_data):
             # print(dct_list)
             # print(answer)
             # print(go_next, go_total)
-        else: return f'Ошибка get_canalog: responce.status_code: {responce.status_code}\n{responce.text}'
-    except: return 'Ошибка get_canalog: try: requests.post'
+        else: return f'Ошибка get_catalog: responce.status_code: {responce.status_code}\n{responce.text}'
+    except: return 'Ошибка get_catalog: try: requests.post'
         # time.sleep(1)
         # break
         
@@ -188,10 +217,15 @@ if __name__ == '__main__':
     
     
     
-    from_date = '01.01.2022'
-    e = get_canalog(from_date)
+    e = get_catalog()
     if e: print(e)
-    
+    # cur_day = datetime.today().day
+    # cur_month = datetime.today().month
+    # cur_year = datetime.today().year
+    # cnt_days_in_cur_month = calendar.monthrange(cur_year, cur_month)[1]
+    # # print(cnt_days_in_cur_month)
+    # # print(cur_day, cur_month, cur_year)
+    # print(datetime.today().isoweekday())
     # with open('lids_format.txt', 'w', encoding='utf-8') as out_file:
         # json.dump(data_lids, out_file, ensure_ascii=False, indent=4)
     

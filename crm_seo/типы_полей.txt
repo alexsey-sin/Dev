@@ -1,0 +1,45 @@
+ID {'type': 'integer', 'isRequired': False, 'isReadOnly': True, 'isImmutable': False, 'isMultiple': False, 'isDynamic': False, 'title': 'ID'}
+
+TITLE {'type': 'string', 'isRequired': True, 'isReadOnly': False, 'isImmutable': False, 'isMultiple': False, 'isDynamic': False, 'title': 'Название лида'}
+
+SOURCE_ID {'type': 'crm_status', 'isRequired': False, 'isReadOnly': False, 'isImmutable': False, 'isMultiple': False, 'isDynamic': False, 'statusType': 'SOURCE', 'title': 'Источник'}
+
+STATUS_ID {'type': 'crm_status', 'isRequired': False, 'isReadOnly': False, 'isImmutable': False, 'isMultiple': False, 'isDynamic': False, 'statusType': 'STATUS', 'title': 'Статус'}
+
+ASSIGNED_BY_ID {'type': 'user', 'isRequired': False, 'isReadOnly': False, 'isImmutable': False, 'isMultiple': False, 'isDynamic': False, 'title': 'Ответственный'}
+
+DATE_CREATE {'type': 'datetime', 'isRequired': False, 'isReadOnly': True, 'isImmutable': False, 'isMultiple': False, 'isDynamic': False, 'title': 'Дата создания'}
+
+DATE_MODIFY {'type': 'datetime', 'isRequired': False, 'isReadOnly': True, 'isImmutable': False, 'isMultiple': False, 'isDynamic': False, 'title': 'Дата изменения'}
+
+UF_CRM_1534919765 {'type': 'enumeration', 'isRequired': False, 'isReadOnly': False, 'isImmutable': False, 'isMultiple': True, 'isDynamic': True, 'items': [{'ID': '1440', 'VALUE': 'Реклама Yandex'}, {'ID': '1441', 'VALUE': 'Реклама Yandex (elama-yandex)'}, {'ID': '1442', 'VALUE': 'Реклама Yandex (ya-pik)'}, {'ID': '1443', 'VALUE': 'Реклама Google'}, {'ID': '1472', 'VALUE': 'Потенциалы'}, {'ID': '1555', 'VALUE': 'G-Bee'}, {'ID': '1636', 'VALUE': 'G-Bee_s'}, {'ID': '1556', 'VALUE': 'Y-Bee'}, {'ID': '1637', 'VALUE': 'Y-Bee_s'}, {'ID': '3006', 'VALUE': 'Y-MTS'}, {'ID': '3009', 'VALUE': 'G-MTS'}, {'ID': '3113', 'VALUE': 'ga-mts'}, {'ID': '1557', 'VALUE': 'L'}, {'ID': '1558', 'VALUE': 'L-F'}, {'ID': '1559', 'VALUE': 'L-S'}, {'ID': '1560', 'VALUE': 'P'}, {'ID': '3021', 'VALUE': 'inoinet'}, {'ID': '3039', 'VALUE': 'mts-sale'}, {'ID': '3042', 'VALUE': 'ya-ttk-di'}, {'ID': '3161', 'VALUE': 'vk_yar'}, {'ID': '3162', 'VALUE': 'inst_yar'}, {'ID': '3182', 'VALUE': 'Y-2Bee'}, {'ID': '3183', 'VALUE': 'G-2Bee'}, {'ID': '3383', 'VALUE': 'Y-0Bee'}, {'ID': '3386', 'VALUE': 'Y-Rsya-0Bee'}, {'ID': '3392', 'VALUE': 'Y_Banner'}, {'ID': '3395', 'VALUE': 'Y_MTS-ural'}, {'ID': '3398', 'VALUE': 'Bee_sms'}, {'ID': '3469', 'VALUE': 'Y-2-Bee-Di'}], 'title': 'UF_CRM_1534919765', 'listLabel': 'Группы источников', 'formLabel': 'Группы источников', 'filterLabel': 'Группы источников'}
+
+UF_CRM_1499437861 {'type': 'string', 'isRequired': False, 'isReadOnly': False, 'isImmutable': False, 'isMultiple': False, 'isDynamic': True, 'title': 'UF_CRM_1499437861', 'listLabel': 'Организация / ИНН', 'formLabel': 'Организация / ИНН', 'filterLabel': 'Организация / ИНН'}
+
+UF_CRM_1492017736 {'type': 'string', 'isRequired': False, 'isReadOnly': False, 'isImmutable': False, 'isMultiple': False, 'isDynamic': True, 'title': 'UF_CRM_1492017736', 'listLabel': 'Город', 'formLabel': 'Город', 'filterLabel': 'Город'}
+
+UF_CRM_1492017494 {'type': 'string', 'isRequired': False, 'isReadOnly': False, 'isImmutable': False, 'isMultiple': False, 'isDynamic': True, 'title': 'UF_CRM_1492017494', 'listLabel': 'Область', 'formLabel': 'Область', 'filterLabel': 'Область'}
+
+UF_CRM_1493413514 {'type': 'crm_status', 'isRequired': False, 'isReadOnly': False, 'isImmutable': False, 'isMultiple': False, 'isDynamic': True, 'statusType': 'INDUSTRY', 'title': 'UF_CRM_1493413514', 'listLabel': 'Провайдер', 'formLabel': 'Провайдер', 'filterLabel': 'Провайдер'}
+
+UF_CRM_1493416385 {'type': 'integer', 'isRequired': False, 'isReadOnly': False, 'isImmutable': False, 'isMultiple': False, 'isDynamic': True, 'title': 'UF_CRM_1493416385', 'listLabel': 'Сумма тарифа*', 'formLabel': 'Сумма тарифа*', 'filterLabel': 'Сумма тарифа*'}
+
+UF_CRM_1498756113 {'type': 'boolean', 'isRequired': False, 'isReadOnly': False, 'isImmutable': False, 'isMultiple': False, 'isDynamic': True, 'title': 'UF_CRM_1498756113', 'listLabel': 'Юр. лицо', 'formLabel': 'Юр. лицо', 'filterLabel': 'Юр. лицо'}
+
+UF_CRM_1571987728429 {'type': 'string', 'isRequired': False, 'isReadOnly': False, 'isImmutable': False, 'isMultiple': False, 'isDynamic': True, 'title': 'UF_CRM_1571987728429', 'listLabel': 'Провайдеры DC', 'formLabel': 'Провайдеры DC', 'filterLabel': 'Провайдеры DC'}
+
+UF_CRM_1580454770 {'type': 'boolean', 'isRequired': False, 'isReadOnly': False, 'isImmutable': False, 'isMultiple': False, 'isDynamic': True, 'title': 'UF_CRM_1580454770', 'listLabel': 'Звонок?', 'formLabel': 'Звонок?', 'filterLabel': 'Звонок?'}
+
+UF_CRM_1615982450 {'type': 'string', 'isRequired': False, 'isReadOnly': False, 'isImmutable': False, 'isMultiple': False, 'isDynamic': True, 'title': 'UF_CRM_1615982450', 'listLabel': 'utm_source', 'formLabel': 'utm_source', 'filterLabel': 'utm_source'}
+
+UF_CRM_1615982567 {'type': 'string', 'isRequired': False, 'isReadOnly': False, 'isImmutable': False, 'isMultiple': False, 'isDynamic': True, 'title': 'UF_CRM_1615982567', 'listLabel': 'utm_medium', 'formLabel': 'utm_medium', 'filterLabel': 'utm_medium'}
+
+UF_CRM_1615982644 {'type': 'string', 'isRequired': False, 'isReadOnly': False, 'isImmutable': False, 'isMultiple': False, 'isDynamic': True, 'title': 'UF_CRM_1615982644', 'listLabel': 'utm_campaign', 'formLabel': 'utm_campaign', 'filterLabel': 'utm_campaign'}
+
+UF_CRM_1615982716 {'type': 'string', 'isRequired': False, 'isReadOnly': False, 'isImmutable': False, 'isMultiple': False, 'isDynamic': True, 'title': 'UF_CRM_1615982716', 'listLabel': 'utm_term', 'formLabel': 'utm_term', 'filterLabel': 'utm_term'}
+
+UF_CRM_1615982795 {'type': 'string', 'isRequired': False, 'isReadOnly': False, 'isImmutable': False, 'isMultiple': False, 'isDynamic': True, 'title': 'UF_CRM_1615982795', 'listLabel': 'utm_content', 'formLabel': 'utm_content', 'filterLabel': 'utm_content'}
+
+UF_CRM_1640267556 {'type': 'string', 'isRequired': False, 'isReadOnly': False, 'isImmutable': False, 'isMultiple': False, 'isDynamic': True, 'title': 'UF_CRM_1640267556', 'listLabel': 'utm_group', 'formLabel': 'utm_group', 'filterLabel': 'utm_group'}
+
+UF_CRM_1592566018 {'type': 'enumeration', 'isRequired': False, 'isReadOnly': False, 'isImmutable': False, 'isMultiple': True, 'isDynamic': True, 'items': [{'ID': '3116', 'VALUE': 'SEO'}, {'ID': '3117', 'VALUE': 'Реклама'}, {'ID': '3118', 'VALUE': 'П'}, {'ID': '3119', 'VALUE': 'ХБ'}, {'ID': '3120', 'VALUE': 'Другое'}], 'title': 'UF_CRM_1592566018', 'listLabel': 'Тип лида', 'formLabel': 'Тип лида', 'filterLabel': 'Тип лида'}

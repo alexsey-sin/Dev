@@ -74,12 +74,11 @@ class DcCrmLid(models.Model):  # Лид
         max_length = 100,
         blank = True,
         default = '',
-        verbose_name='ASSIGNED_BY_ID',
+        verbose_name='Ответственный',
     )
-    crm_1493416385 = models.CharField(
-        max_length = 100,
+    crm_1493416385 = models.IntegerField(
         blank = True,
-        default = '',
+        default = 0,
         verbose_name = 'Сумма тарифа',
     )
     crm_1499437861 = models.CharField(
@@ -88,10 +87,9 @@ class DcCrmLid(models.Model):  # Лид
         default = '',
         verbose_name = 'ИНН/Организация',
     )
-    crm_1580454770 = models.CharField(
-        max_length = 100,
+    crm_1580454770 = models.BooleanField(
         blank = True,
-        default = '',
+        default = False,
         verbose_name = 'Звонок?',
     )
     crm_1534919765 = models.CharField(
@@ -110,7 +108,7 @@ class DcCrmLid(models.Model):  # Лид
         max_length = 100,
         blank = True,
         default = '',
-        verbose_name = 'ТИп лида',
+        verbose_name = 'Тип лида',
     )
     crm_1493413514 = models.CharField(
         max_length = 100,
@@ -130,10 +128,9 @@ class DcCrmLid(models.Model):  # Лид
         default = '',
         verbose_name = 'Город',
     )
-    crm_1498756113 = models.CharField(
-        max_length = 100,
+    crm_1498756113 = models.BooleanField(
         blank = True,
-        default = '',
+        default = False,
         verbose_name = 'Юр. лицо',
     )
     crm_1615982450 = models.CharField(
