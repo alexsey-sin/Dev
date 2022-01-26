@@ -2,43 +2,6 @@ from django.db import models
 from datetime import datetime
 
 
-class DcCrmTypeSource(models.Model):  # Тип источника лида
-    source_id = models.IntegerField(  # id источника лида
-        unique = True,
-        verbose_name='SOURCE_ID',
-    )
-    sort = models.IntegerField(
-        blank = True,
-        null = True,
-        verbose_name='SORT',
-    )
-    name = models.CharField(  # название источника лида
-        max_length = 255,
-        blank = True,
-        default = '',
-        verbose_name='Описание',
-    )
-
-    def __str__(self):
-        return str(self.source_id)
-
-
-class DcCrmTypeLid(models.Model):  # Тип Лидов
-    type_id = models.IntegerField(  # id источника лида
-        unique = True,
-        verbose_name='TYPE_ID',
-    )
-    value = models.CharField(  # название источника лида
-        max_length = 255,
-        blank = True,
-        default = '',
-        verbose_name='Значение',
-    )
-
-    def __str__(self):
-        return str(self.type_id)
-
-
 class DcCrmGlobVar(models.Model):
     key = models.CharField(  # Название переменной
         max_length = 100,
@@ -101,9 +64,10 @@ class DcCrmLid(models.Model):  # Лид
         null = True,
         verbose_name='Изменено',
     )
-    source_id = models.ForeignKey(
-        DcCrmTypeSource,
-        on_delete=models.CASCADE,
+    source_id = models.CharField(
+        max_length = 100,
+        blank = True,
+        default = '',
         verbose_name='Источник',
     )
     assigned_by_id = models.CharField(

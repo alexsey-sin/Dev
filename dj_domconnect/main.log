@@ -1,8 +1,0 @@
-2022-01-25 15:35:37,408:DEBUG   :asyncio:Using proactor: IocpProactor
-2022-01-25 15:36:03,312:DEBUG   :asyncio:Using proactor: IocpProactor
-2022-01-25 15:57:05,637:DEBUG   :asyncio:Using proactor: IocpProactor
-2022-01-25 16:07:44,714:DEBUG   :asyncio:Using proactor: IocpProactor
-2022-01-25 16:07:55,232:DEBUG   :asyncio:Using proactor: IocpProactor
-2022-01-25 16:21:33,989:DEBUG   :asyncio:Using proactor: IocpProactor
-2022-01-25 16:21:38,957:DEBUG   :asyncio:Using proactor: IocpProactor
-2022-01-25 16:22:01,971:DEBUG   :asyncio:Using proactor: IocpProactor

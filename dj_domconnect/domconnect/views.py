@@ -5,7 +5,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 # from django.core.paginator import Paginator
 # from app.forms import NameForm, LizaPhraseForm, GermanPhraseForm, NdzPhraseForm, PzPhraseForm
-from domconnect.models import DcCrmTypeSource, DcCrmTypeLid, DcCrmGlobVar, DcCrmLid
+from domconnect.models import DcCrmGlobVar, DcCrmLid
 from datetime import datetime
 from datetime import timedelta
 import requests
@@ -26,7 +26,8 @@ log = logging.getLogger(__name__)  # запустили
 # log.info('So should this')
 # # # # log.debug('This message should go to the log file')
 # # # # log.warning('And this, too')
-
+typesource = {}
+typelid = {}
 
 @login_required(login_url='/login/')
 def index(request):
@@ -110,16 +111,20 @@ def dataAjax(request):
         response['is_run'] = True
     return JsonResponse(response)
 
-
 def thread_download_crm(str_from_modify):
     print(f'start thread {str_from_modify}')
-    update_typesource()
-    update_typelid()
-    # download_lids(str_from_modify)
+    download_typesource()
+    download_typelid()
+    download_lids(str_from_modify)
+
+    # for k, v in typesource.items():
+    #     print(k, v)
+    # for k, v in typelid.items():
+    #     print(k, v)
+ 
     print('stop thread')
     
-
-def update_typesource():  # Обновление Типов источника лида
+def download_typesource():  # Обновление Типов источника лида
     key_crm = get_key_crm()
     url = f'https://crm.domconnect.ru/rest/{key_crm}/crm.status.entity.items'
     data = {'entityId': 'SOURCE'}
@@ -134,17 +139,11 @@ def update_typesource():  # Обновление Типов источника �
                 if not status_id or not status_id.isdigit():
                     log.info(f'Ошибка update_typesource: error status_id: {status_id}')
                     continue
-                tps, _ = DcCrmTypeSource.objects.get_or_create(source_id=status_id)
-                val_field = res.get('SORT')
-                if val_field: tps.sort = val_field
-                val_field = res.get('NAME')
-                if val_field: tps.name = val_field
-                tps.save()
+                typesource[status_id] = res.get('NAME')
         else: return log.info(f'Ошибка update_typesource: responce.status_code: {responce.status_code}\n{responce.text}')
     except Exception as e: log.info(f'Ошибка update_typesource: try: requests.post {e}')
 
-
-def update_typelid():  # Обновление Типов лида
+def download_typelid():  # Обновление Типов лида
     '''
         Чтобы найти значения поля UF_CRM_1592566018
         делаем запрос
@@ -156,9 +155,21 @@ def update_typelid():  # Обновление Типов лида
 
     '''
     key_crm = get_key_crm()
-    url = f'https://crm.domconnect.ru/rest/{key_crm}/crm.lead.userfield.get?id=1840'
+    url = f'https://crm.domconnect.ru/rest/{key_crm}/crm.lead.userfield.get'
+    data = {'id': 1840}
 
-
+    try:
+        responce = requests.post(url, json=data)
+        if responce.status_code == 200:
+            answer = json.loads(responce.text)
+            result = answer.get('result')
+            field_list = result.get('LIST')
+            for f_lst in field_list:
+                id_tl = f_lst.get('ID')
+                val_tl = f_lst.get('VALUE')
+                typelid[id_tl] = val_tl
+        else: return log.info(f'Ошибка download_typelid: responce.status_code: {responce.status_code}\n{responce.text}')
+    except Exception as e: log.info(f'Ошибка download_typelid: try: requests.post {e}')
 
 def download_lids(str_from_modify):
     gvar_url, create = DcCrmGlobVar.objects.get_or_create(key='url_download_crm')
@@ -240,14 +251,13 @@ def download_lids(str_from_modify):
         gvar_tot, _ = DcCrmGlobVar.objects.get_or_create(key='tot_num_download_crm')
         gvar_tot.val_int = go_total
         gvar_tot.save()
-        time.sleep(2)
+        time.sleep(1)
     
     gvar_go, _ = DcCrmGlobVar.objects.get_or_create(key='go_download_crm')
     gvar_go.val_bool = False
     gvar_go.save()
     mess = f'Обработано лидов: {cnt_ok}. Ошибок: {cnt_err}'
     log.info(mess)
-
 
 def append_lids(lids):
     cnt_err = 0
@@ -261,7 +271,7 @@ def append_lids(lids):
             lid.create_date = datetime.strptime(new_lid.get('DATE_CREATE')[:-6], '%Y-%m-%dT%H:%M:%S')  # "2022-01-01T04:43:22+03:00"
             lid.modify_date = datetime.strptime(new_lid.get('DATE_MODIFY')[:-6], '%Y-%m-%dT%H:%M:%S')
             val_field = new_lid.get('SOURCE_ID')
-            if val_field: lid.source_id = val_field
+            if val_field: lid.source_id = typesource[val_field]
             val_field = new_lid.get('ASSIGNED_BY_ID')
             if val_field: lid.assigned_by_id = val_field
             val_field = new_lid.get('UF_CRM_1493416385')
@@ -275,7 +285,7 @@ def append_lids(lids):
             val_field = new_lid.get('UF_CRM_1571987728429')
             if val_field: lid.crm_1571987728429 = val_field
             val_field = new_lid.get('UF_CRM_1592566018')
-            if val_field and len(val_field) > 0: lid.crm_1592566018 = val_field[0]
+            if val_field and len(val_field) > 0: lid.crm_1592566018 = typelid[str(val_field[0])]
             val_field = new_lid.get('UF_CRM_1493413514')
             if val_field: lid.crm_1493413514 = val_field
             val_field = new_lid.get('UF_CRM_1492017494')
@@ -303,7 +313,6 @@ def append_lids(lids):
         if err: cnt_err += 1
     return cnt_ok, cnt_err
 
-
 def get_key_crm():
     key = '371/ao3ct8et7i7viajs'
     gvar_key, create = DcCrmGlobVar.objects.get_or_create(key='key_crm')
@@ -313,7 +322,6 @@ def get_key_crm():
     else:
         key = gvar_key.val_str
     return key
-
 
 @login_required(login_url='/login/')
 def deleteAllLids(request):
