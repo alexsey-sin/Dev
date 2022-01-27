@@ -8,6 +8,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
+import re
 
 # url_host = 'http://127.0.0.1:8000/'
 url_host = 'http://django.domconnect.ru/'
@@ -511,10 +512,19 @@ def set_bid(data):
         # Ищем тарифные предложения
         els_tarifs = driver.find_elements(By.XPATH, '//label[@class="title cur-pointer ng-binding title--normal title--dotted"]')
         tarif = data['tarif']
+        lst_new_tarif = []
+        # Проверяем наличие цифры
+        dig = re.search(r'\d{3,}', tarif)
+        if dig: lst_new_tarif.append(dig.group().strip())
+        # Проверяем наличие ТВ в тарифном плане
+        tv = re.search(r'ТВ', tarif)
+        if tv: lst_new_tarif.append(tv.group().strip())
+        if lst_new_tarif: tarif = ';'.join(lst_new_tarif)
+        
         lst_tarif = []
         for el_tarif in els_tarifs: lst_tarif.append(el_tarif.text.strip())
-
         f_ind = find_string_to_substrs(lst_tarif, tarif)
+        
         if f_ind < 0: raise Exception(f'Ошибка Тариф {tarif} не найден')
         driver.execute_script("arguments[0].scrollIntoView();", els_tarifs[f_ind])
         time.sleep(1)
@@ -869,11 +879,15 @@ def send_telegram(chat: str, token: str, text: str):
 def run_bid_beeline(tlg_chat, tlg_token):
     opsos = 'Билайн'
     
+    # личный бот @infra
+    TELEGRAM_CHAT_ID = '1740645090'
+    TELEGRAM_TOKEN = '2009560099:AAHtYot6EOHh_qr9EUoCoczQhjyRdulKHYo'
+    
     rez, bid_list = get_did_in_dj_domconnect()
     if rez:
         tlg_mess = 'Ошибка при загрузке заявок из domconnect.ru'
-        r = send_telegram(tlg_chat, tlg_token, tlg_mess)
-        print('TelegramMessage:', r)
+        r = send_telegram(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN, tlg_mess)
+        print(tlg_mess, '\nTelegramMessage:', r)
         return
     if len(bid_list) == 0:
         cur_time = datetime.now().strftime('%H:%M:%S %d-%m-%Y')
@@ -932,10 +946,10 @@ if __name__ == '__main__':
         # 'partner_workercode': '1999999222',
         # 'partner_password': '8GFysus@kffs7',
         # 'id_lid': '1259587',
-        # 'city': 'Орехово-Зуево',
-        # 'street': 'Центральный бульвар',
-        # 'house': '12',
-        # 'apartment': '61',
+        # 'city': 'Москва',
+        # 'street': 'Новощукинская улица',
+        # 'house': '4',
+        # 'apartment': '151',
         # # 'city': 'Иннополис',
         # # 'street': 'Спортивная улица',
         # # 'house': '138',
@@ -945,13 +959,13 @@ if __name__ == '__main__':
         # 'patronymic': '-',
         # 'phone': '79111234567',
         # 'type_abonent': '0',
-        # # 'tarif': 'Интернет 100 Мбит с ТВ',
-        # 'tarif': '100;ТВ',
+        # 'tarif': 'Интернет 100 Мбит с ТВ',
+        # # 'tarif': 'Интернет 100 Мбит',
         
         # 'dt_grafic': '',
-        # # 'dt_grafic': '02.12.2021 16-18',
-        # 'grafic_error': '',
-        # 'grafic_dop_info': '',
+        # # # 'dt_grafic': '02.12.2021 16-18',
+        # # 'grafic_error': '',
+        # # 'grafic_dop_info': '',
     # }
     # rez, data = set_bid(data)
     # if rez: print(rez)

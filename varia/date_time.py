@@ -25,9 +25,17 @@ print(s)  # -> '19.08.2018'
 
 
 
-
-
-
+import calendar
+cal = calendar.Calendar()
+now = datetime.now()
+# Количество рабочих дней в текущем месяце
+working_days = len([x for x in cal.itermonthdays2(now.year, now.month) if x[0] !=0 and x[1] < 5])
+print('Рабочих дней: ', working_days)
+cur_day = now.day      # Номер текущего дня
+cur_month = now.month  # Номер текущего меяца
+cur_year = now.year    # Номер текущего года
+cnt_days_in_cur_month = calendar.monthrange(cur_year, cur_month)[1] # Количество дней в текущем месяце
+print(cur_day, cur_month, cur_year)
 
 
 '''

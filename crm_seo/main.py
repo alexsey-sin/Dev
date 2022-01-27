@@ -45,11 +45,10 @@ def get_catalog():
     # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.catalog.get'
     # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.catalog.list'
     # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.productsection.fields'
-    url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.fields'
+    # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.fields'  # типы и структура полей
     # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.userfield.get'
     # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.userfield.list'
-    # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.status.entity.items' # Типы источника лида
-    # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.userfield.get'
+    url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.status.entity.items' # Типы источника лида
     
     # dt_start = datetime.strptime(from_data, '%d.%m.%Y')
     # str_dt_start = dt_start.strftime('%Y-%m-%dT%H:%M:%S')
@@ -65,72 +64,79 @@ def get_catalog():
     # print(str_dt_start)
     # return '', []
     # while True:
-    select = [
-        'ID', 
-        'TITLE', 
-        'STATUS_ID', 
-        'DATE_CREATE',
-        'DATE_MODIFY',
-        'SOURCE_ID',
-        'ASSIGNED_BY_ID',
-        'UF_CRM_1493416385',  # Сумма тарифа
-        'UF_CRM_1499437861',  # ИНН/Организация
-        'UF_CRM_1580454770',  # Звонок?
-        'UF_CRM_1534919765',  # Группы источников
-        'UF_CRM_1571987728429',  # Провайдеры ДК
-        'UF_CRM_1592566018',  # ТИп лида
-        'UF_CRM_1493413514',  # Провайдер
-        'UF_CRM_1492017494',  # Область
-        'UF_CRM_1492017736',  # Город
-        'UF_CRM_1498756113',  # Юр. лицо
+    # select = [
+        # 'ID', 
+        # 'TITLE', 
+        # 'STATUS_ID', 
+        # 'DATE_CREATE',
+        # 'DATE_MODIFY',
+        # 'SOURCE_ID',
+        # 'ASSIGNED_BY_ID',
+        # 'UF_CRM_1493416385',  # Сумма тарифа
+        # 'UF_CRM_1499437861',  # ИНН/Организация
+        # 'UF_CRM_1580454770',  # Звонок?
+        # 'UF_CRM_1534919765',  # Группы источников
+        # 'UF_CRM_1571987728429',  # Провайдеры ДК
+        # 'UF_CRM_1592566018',  # ТИп лида
+        # 'UF_CRM_1493413514',  # Провайдер
+        # 'UF_CRM_1492017494',  # Область
+        # 'UF_CRM_1492017736',  # Город
+        # 'UF_CRM_1498756113',  # Юр. лицо
 
-        'UF_CRM_1615982450',  # utm_source
-        'UF_CRM_1615982567',  # utm_medium
-        'UF_CRM_1615982644',  # utm_campaign
-        'UF_CRM_1615982716',  # utm_term                
-        'UF_CRM_1615982795',  # utm_content                
-        'UF_CRM_1640267556',  # utm_group 
-    ]
+        # 'UF_CRM_1615982450',  # utm_source
+        # 'UF_CRM_1615982567',  # utm_medium
+        # 'UF_CRM_1615982644',  # utm_campaign
+        # 'UF_CRM_1615982716',  # utm_term                
+        # 'UF_CRM_1615982795',  # utm_content                
+        # 'UF_CRM_1640267556',  # utm_group 
+    # ]
 
-    data = {
-        # 'filter': {'FIELD_NAME': 'UF_CRM_1592566018',}
-        'id': 1840,
-        # 'order': { "DATE_MODIFY": "ASC" },  # Если нужно с сортировкой
-        # 'filter': {
-            # "CATALOG_ID": 30,
-            # # # '<DATE_CREATE': '2021-10-31T23:59:59',
-        # },
-        # 'select': [           crm.status.entity.items?entityId=SOURCE
-            # "ID", 
-            # "CATALOG_ID", 
-            # "SECTION_ID", 
-            # "NAME",
-            # "XML_ID",
-            # "CODE",
-        # ]
-    }
+    # data = {
+        # # 'filter': {'FIELD_NAME': 'UF_CRM_1592566018',}
+        # 'id': 1840,
+        # # 'order': { "DATE_MODIFY": "ASC" },  # Если нужно с сортировкой
+        # # 'filter': {
+            # # "CATALOG_ID": 30,
+            # # # # '<DATE_CREATE': '2021-10-31T23:59:59',
+        # # },
+        # # 'select': [           crm.status.entity.items?entityId=SOURCE
+            # # "ID", 
+            # # "CATALOG_ID", 
+            # # "SECTION_ID", 
+            # # "NAME",
+            # # "XML_ID",
+            # # "CODE",
+        # # ]
+    # }
+    data = {'entityId': 'SOURCE'}
     try:
-        # responce = requests.post(url, json=data)
-        responce = requests.post(url)
+        responce = requests.post(url, json=data)
+        # responce = requests.post(url)
         # responce = requests.post(url, headers=headers)
         if responce.status_code == 200:
             answer = json.loads(responce.text)
             result = answer.get('result')
+            for dct in result:
+                name = dct.get('NAME')
+                id = dct.get('STATUS_ID')
+                print('ID', id, 'name:', name)
+            print('Всего: ', len(result))
+                # if name == 'Подключаем': print(name, 'ID', dct.get('ID'))  #  8
             # if not result: print('update_typelid no result in answer')
             # dct_list = result.get('LIST')
             # if not dct_list: print('update_typelid no field LIST in result in answer')
-            # for dct in dct_list:
-                # print(dct)
-            for k, v in result.items():
-                if k in select:
-                    print(k,v)
-                    print()
+                # print()
+            # for k, v in result.items():
+                # if k in select:
+                    # print(k,v)
+                    # print()
             # go_next = answer.get('next')
             # go_total = answer.get('total')
             # out_lst += result
             # if not go_next: break
             # print(dct_list)
             # print(answer)
+            # print(result)
             # print(go_next, go_total)
         else: return f'Ошибка get_catalog: responce.status_code: {responce.status_code}\n{responce.text}'
     except: return 'Ошибка get_catalog: try: requests.post'
@@ -138,6 +144,37 @@ def get_catalog():
         # break
         
     return ''
+
+def get_source():
+    url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.status.entity.items' # Типы источника лида
+    
+    out_dct = []
+    data = {'entityId': 'SOURCE'}
+    try:
+        responce = requests.post(url, json=data)
+        if responce.status_code == 200:
+            answer = json.loads(responce.text)
+            result = answer.get('result')
+            for dct in result:
+                name = dct.get('NAME')
+                st_id = dct.get('STATUS_ID')
+                out_dct.append('ID: %20s      NAME: %s' % (st_id, name))
+                # out_dct.append({'ID': st_id, 'NAME': name})
+                # print('ID: %20s      NAME: %s' % (st_id, name))
+            print('Всего: ', len(result))
+            # print(answer)
+            # print(result)
+
+            with open('source_id.txt', 'w', encoding='utf-8') as outfile:
+                outfile.write('\n'.join(out_dct))
+                # json.dump(out_dct, outfile, ensure_ascii=False, indent=4)
+
+
+        else: return f'Ошибка get_source: responce.status_code: {responce.status_code}\n{responce.text}'
+    except: return 'Ошибка get_source: try: requests.post'
+        
+    return ''
+
 
 
 def get_lids(from_data):
@@ -210,6 +247,7 @@ def get_lids(from_data):
 
 
 if __name__ == '__main__':
+    pass
     # start_script_time = datetime.now()
 
     # Документация: https://dev.1c-bitrix.ru/rest_help/crm/leads/crm_lead_list.php
@@ -217,8 +255,9 @@ if __name__ == '__main__':
     
     
     
-    e = get_catalog()
-    if e: print(e)
+    # e = get_catalog()
+    # e = get_source()
+    # if e: print(e)
     # cur_day = datetime.today().day
     # cur_month = datetime.today().month
     # cur_year = datetime.today().year
@@ -292,3 +331,15 @@ if __name__ == '__main__':
         # "UF_CRM_1615982716": null,
         # "UF_CRM_1615982795": null,
         # "UF_CRM_1640267556": null
+    from datetime import datetime
+    import calendar
+    cal = calendar.Calendar()
+    now = datetime.now()
+    # Количество рабочих дней в текущем месяце
+    working_days = len([x for x in cal.itermonthdays2(now.year, now.month) if x[0] !=0 and x[1] < 5])
+    print('Рабочих дней: ', working_days)
+    cur_day = now.day      # Номер текущего дня
+    cur_month = now.month  # Номер текущего меяца
+    cur_year = now.year    # Номер текущего года
+    print(cur_day, cur_month, cur_year)
+

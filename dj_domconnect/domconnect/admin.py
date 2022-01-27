@@ -37,10 +37,10 @@ class DcCrmLidAdmin(admin.ModelAdmin):
         'crm_1615982450', 'crm_1615982567', 'crm_1615982644', 'crm_1615982716', 'crm_1615982795',
         'crm_1640267556'
         )
-    # search_fields = ('change_date',)
-    # list_filter = ('id', 'phone', 'change_date')
+    search_fields = ('id_lid', 'status_id',)
+    list_filter = ('status_id', )
     empty_value_display = '-пусто-'
-    # date_hierarchy = 'pub_date'
+    date_hierarchy = 'create_date'
     formfield_overrides = {
         models.IntegerField: {'widget': NumberInput(attrs={'size':'150'})},
     }

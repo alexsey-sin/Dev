@@ -594,11 +594,15 @@ def send_telegram(chat: str, token: str, text: str):
 def run_txv_domru(tlg_chat, tlg_token):
     tlg_mess = ''
     
+    # личный бот @infra
+    TELEGRAM_CHAT_ID = '1740645090'
+    TELEGRAM_TOKEN = '2009560099:AAHtYot6EOHh_qr9EUoCoczQhjyRdulKHYo'
+    
     rez, txv_list = get_txv_in_dj_domconnect(pv_code)
     if rez:
         tlg_mess = 'Ошибка при загрузке запросов из domconnect.ru'
-        r = send_telegram(tlg_chat, tlg_token, tlg_mess)
-        print('TelegramMessage:', r)
+        r = send_telegram(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN, tlg_mess)
+        print(tlg_mess, '\nTelegramMessage:', r)
         return
     if len(txv_list) == 0:
         cur_time = datetime.now().strftime('%H:%M:%S %d-%m-%Y')
