@@ -172,3 +172,25 @@ class DcCrmLid(models.Model):  # Лид
 
     def __str__(self):
         return str(self.id_lid)
+
+
+class DcCashSEO(models.Model):  # Кэш SEO
+    val_date = models.DateField(
+        verbose_name='Период',
+    )
+    table = models.PositiveSmallIntegerField(  # от 0 до 32767
+        verbose_name = 'Таблица',
+    )
+    row = models.PositiveSmallIntegerField(  # от 0 до 32767
+        verbose_name = 'Строка',
+    )
+    val = models.DecimalField(
+        max_digits = 8,
+        decimal_places = 2,
+        blank = True,
+        default = 0.0,
+        verbose_name = 'Значение',
+    )
+
+    def __str__(self):
+        return self.val_date.strftime('%m.%Y')

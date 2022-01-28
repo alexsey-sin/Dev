@@ -15,35 +15,15 @@
     <thead>
         <tr>
           <th scope="col" style="min-width: 200px; max-width: 200px;">Тип</th>
-          <th scope="col">Янв. 2021</th>
-          <th scope="col">Фев. 2021</th>
-          <th scope="col">Мар. 2021</th>
-          <th scope="col">Апр. 2021</th>
-          <th scope="col">Май 2021</th>
-          <th scope="col">Июн. 2021</th>
-          <th scope="col">Июл. 2021</th>
-          <th scope="col">Авг. 2021</th>
-          <th scope="col">Сен. 2021</th>
-          <th scope="col">Окт. 2021</th>
-          <th scope="col">Ноя. 2021</th>
-          <th scope="col">Дек. 2021</th>
+          {% for month in col_month %}
+          <th scope="col">{{ month }}</th>
+          {% endfor %}
         </tr>
     </thead>
       <tbody>
           <tr>
                <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Метка SEO</td>
-               <td>17294</td>
-               <td>20035 </td> 
-               <td>17301</td>
-               <td>18312</td> 
-               <td>16076</td>
-               <td>17485</td> 
-               <td>19964</td>
-               <td>20133</td> 
-               <td>22015</td>
-               <td>22156</td> 
-               <td>23975</td>
-               <td>24973</td> 
+               <td colspan="13">{{ label_seo }}</td>
           </tr>
           <tr>
               <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Лиды</td>
