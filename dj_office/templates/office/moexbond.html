@@ -16,13 +16,17 @@
 {% endblock stylesheets %}
 
 {% block content %}
-{% if error_mess %}
-<div class="alert alert-danger" role="alert">
-    {{ error_mess }}
-</div>
-{% endif %}
-
 <div class="pcoded-content">
+	{% if error_mess %}
+		<div id="error-message" class="alert alert-danger" role="alert">
+			{{ error_mess }}
+		</div>
+	{% endif %}
+	{% if success_mess %}
+		<div id="success-message" class="alert alert-success" role="alert">
+			{{ success_mess }}
+		</div>	
+	{% endif %}
     <div class="pcoded-inner-content">
         <div class="main-body">
             <div class="page-wrapper">
@@ -64,7 +68,7 @@
 											<h5 class="mb-0">Фильтр</h5>
 										</div>
                                         <div class="col">
-                                            <label id="id_lbl_filter" class="form-check-label">Не выбрано<br>Не выбрано</label>
+                                            <label id="id_lbl_filter" class="form-check-label">Не выбрано</label>
 										</div>
                                         <div class="col">
                                             <button type="button" class="btn btn-primary" id="id_btn_filter_open" data-toggle="modal" data-target="#openModalFilter">Выбрать / создать</button>
@@ -140,9 +144,10 @@
 							<div class="row">
 								<div class="col">
 									<select id="id_sel_filter" class="form-control" style="margin-left: 15px; padding: 2px 2px; height: 28px; width: 160px;">
-										<option value="12" selected="">This is item 1</option>
-										<option value="13">This is item 2</option>
-										<option value="14">This is item 3</option>
+										<option value="">Выберите фильтр</option>
+										{% for filter in filters %}
+										<option value={{ filter.id }}>{{ filter.name }}</option>
+										{% endfor %}
 									</select>
 								</div>
 								<div class="col">
@@ -165,7 +170,7 @@
 						<div class="row" style="padding: 10px;">
 							<div class="col">
 								<div class="form-check"><label class="form-check-label">Название:</label></div>
-								<div class="input-group"><input id="id_new_filter" style="width: 250px;" type="text" name="name" value="Новый фильтр" disabled></div>
+								<div class="input-group"><input id="id_new_filter" style="width: 250px;" type="text" name="name" value="" disabled></div>
 							</div>
 							<div class="col" style="margin: auto;">
 								<button id="id_btn_new_filter" type="button" class="btn btn-primary" onclick="active_new_filter();">Создать</button>
@@ -214,7 +219,7 @@
 
 							</div>
 							<div class="col" style="margin: auto;">
-								<input type="hidden" name="id_filter" value="*">
+								<input type="hidden" name="id_filter" value="">
 								<button id="id_btn_save_filter" type="submit" class="btn btn-primary" disabled>Сохранить</button>
 							</div>
 						</div>
@@ -234,6 +239,8 @@
 {% block javascripts %}
 <script src="/static/assets/js/jquery.min.js"></script>
 <script language="javascript">
+	$("#error-message").fadeOut(2000);
+	$("#success-message").fadeOut(2000);
     let is_download = false;
     let is_new_filter = false;
 	function download_bond(){
@@ -350,7 +357,7 @@
 		
     }
 	function clear_new_filter(){
-		$('#id_new_filter').prop('value', 'Новый фильтр');
+		$('#id_new_filter').prop('value', '');
 		$('#id_check_facevalue_from').prop('checked', false)
 		$('#id_facevalue_from').val('');
 		$('#id_check_facevalue_to').prop('checked', false)

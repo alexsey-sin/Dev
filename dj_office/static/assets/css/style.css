@@ -7733,20 +7733,20 @@ a.btn-theme.active {
 }
 
 /* Alternate buttons */
-.btn-primary {
-  color: #fff;
-  background-color: #04a9f5;
-  border-color: #04a9f5;
-}
-.btn-primary:hover {
-  color: #fff;
-  background-color: #038fcf;
-  border-color: #0386c3;
-}
+/* .btn-primary { */
+  /* color: #fff; */
+  /* background-color: #04a9f5; */
+  /* border-color: #04a9f5; */
+/* } */
+/* .btn-primary:hover { */
+  /* color: #fff; */
+  /* background-color: #038fcf; */
+  /* border-color: #0386c3; */
+/* } */
 .btn-primary.disabled, .btn-primary:disabled {
   color: #fff;
-  background-color: #04a9f5;
-  border-color: #04a9f5;
+  background-color: #46c2fb;
+  border-color: #46c2fb;
 }
 .btn-primary:not(:disabled):not(.disabled).active, .btn-primary:not(:disabled):not(.disabled):active, .show > .btn-primary.dropdown-toggle {
   color: #fff;

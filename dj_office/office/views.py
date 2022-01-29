@@ -83,20 +83,33 @@ def moexbond(request):
         u_name = user.username
     context = {'u_name': u_name, 'page_title': 'Облигации ММВБ'}
     context['segment'] = 'moexbond'
-
+    error_mess = ''
+    success_mess = ''
+    
     if request.method == 'POST':
-        print('POST')
-        id_filter = request.POST.get('id_filter', None)
-        if id_filter:
-            print('id_filter', id_filter)
-            form = FilterBONDForm(request.POST or None)
-            if form.is_valid():
-                print('form.is_valid')
-                new_form = form.save(commit=False)
-                new_form.by_type = '["djdhss", ";lktirr45","mmbnhcy"]'
-                new_form.save()
-                print('save.ok')
-
+        # print('POST')
+        # id_filter = request.POST.get('id_filter', None)
+        # if id_filter:
+            # print('id_filter', id_filter)
+        form = FilterBONDForm(request.POST or None)
+        if form.is_valid():
+            # print('form.is_valid')
+            new_form = form.save(commit=False)
+            new_form.by_type = '["djdhss", ";lktirr45","mmbnhcy"]'
+            new_form.save()
+            # print('save.ok')
+            success_mess = 'Фильтр сохранен.'
+        else:
+            for field in form.errors:
+               error_mess += f'{field} {form.errors[field].as_text()}\n'
+    
+    all_filters = FilterBOND.objects.all()
+    filters = []
+    for f in all_filters: filters.append({'id': f.id, 'name': f.name})
+    context['filters'] = filters
+    print(filters)
+    
+    # error_mess = 'Фильтр должен иметь название'
     gvar_end, _ = GlobalVariable.objects.get_or_create(key='end_download')
     val = gvar_end.val_int
     if val: context['num_all_bond'] = val
@@ -104,7 +117,8 @@ def moexbond(request):
     val = gvar_end.val_datetime
     if val: context['last_upgrade'] = f'Обновлено: {val.strftime("%d.%m.%Y")}'
     else: context['last_upgrade'] = '---'
-    
+    if error_mess: context['error_mess'] = error_mess
+    if success_mess: context['success_mess'] = success_mess
     return render(request, 'office/moexbond.html', context)
 
 
