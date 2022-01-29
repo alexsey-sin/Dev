@@ -4,6 +4,7 @@ from django.shortcuts import render
 # from django.http import HttpResponse
 from office.models import TypeBOND, MoexBOND, GlobalVariable, FilterBOND
 from office.forms import FilterBONDForm
+from office.thread import thread_download_bond_moex
 from datetime import datetime, timedelta
 import requests
 import time
@@ -85,31 +86,48 @@ def moexbond(request):
     context['segment'] = 'moexbond'
     error_mess = ''
     success_mess = ''
+    id_filter = None
+    bond_data = None
     
     if request.method == 'POST':
         # print('POST')
-        # id_filter = request.POST.get('id_filter', None)
+        id_filter = request.POST.get('select_filter', None)
         # if id_filter:
             # print('id_filter', id_filter)
-        form = FilterBONDForm(request.POST or None)
-        if form.is_valid():
-            # print('form.is_valid')
-            new_form = form.save(commit=False)
-            new_form.by_type = '["djdhss", ";lktirr45","mmbnhcy"]'
-            new_form.save()
-            # print('save.ok')
-            success_mess = 'Фильтр сохранен.'
-        else:
-            for field in form.errors:
-               error_mess += f'{field} {form.errors[field].as_text()}\n'
-    
+        # form = FilterBONDForm(request.POST or None)
+        # if form.is_valid():
+            # # print('form.is_valid')
+            # new_form = form.save(commit=False)
+            # new_form.by_type = '["djdhss", ";lktirr45","mmbnhcy"]'
+            # new_form.save()
+            # # print('save.ok')
+            # success_mess = 'Фильтр сохранен.'
+        # else:
+            # for field in form.errors:
+               # error_mess += f'{field} {form.errors[field].as_text()}\n'
+    # success_mess = 'Фильтр сохранен.'
+
+
+    if id_filter:
+        # context['id_filter'] = id_filter
+        obj_filter = FilterBOND.objects.get(id=id_filter)
+        # print(obj_filter.check_facevalue_from)
+    else:
+        bond_data = FilterBOND.objects.all()
+        
+    context['bond_data'] = bond_data
+        
     all_filters = FilterBOND.objects.all()
     filters = []
-    for f in all_filters: filters.append({'id': f.id, 'name': f.name})
+    for f in all_filters:
+        row_flt = {'id': f.id, 'name': f.name}
+        if id_filter and f.id == int(id_filter): row_flt['selected'] = True
+        filters.append(row_flt)
     context['filters'] = filters
-    print(filters)
     
     # error_mess = 'Фильтр должен иметь название'
+
+    
     gvar_end, _ = GlobalVariable.objects.get_or_create(key='end_download')
     val = gvar_end.val_int
     if val: context['num_all_bond'] = val
@@ -119,6 +137,7 @@ def moexbond(request):
     else: context['last_upgrade'] = '---'
     if error_mess: context['error_mess'] = error_mess
     if success_mess: context['success_mess'] = success_mess
+    # print(context)
     return render(request, 'office/moexbond.html', context)
 
 
@@ -136,6 +155,7 @@ def testbond(request):
     return JsonResponse(response)
 
 
+@login_required(login_url="/login/")
 def download_moex(request):
     thread_name = 'DownLoadBondFromMOEX'
     if not request.GET: return JsonResponse({})
@@ -187,137 +207,5 @@ def download_moex(request):
         response['is_run'] = True
     return JsonResponse(response)
 
-def fix_result(mess):
-    gvar, _ = GlobalVariable.objects.get_or_create(key='log_download')
-    gvar.val_datetime = datetime.today()
-    if not gvar.descriptions: gvar.descriptions = mess
-    else: gvar.descriptions = gvar.descriptions + mess
-    gvar.save()
-
-def GetMOEXsecidBonds():  # Загрузка списка бумаг
-    str_url = "http://iss.moex.com/iss/securities.json"
-    outList = []
-    start = 7600
-    # start = 0
-    limit = 100
-    search_parameters = {
-        'lang': 'ru',
-        'group_by': 'group',
-        'group_by_filter': 'stock_bonds',
-    }
-    
-    print('Загрузка списка.')
-    cnt_err = 0
-    while(True):
-        gvar_go, _ = GlobalVariable.objects.get_or_create(key='go_download')
-        if gvar_go.val_bool == False: break
-        try:
-            search_parameters['limit'] = limit
-            search_parameters['start'] = start
-            response = requests.get(str_url, params=search_parameters)
-            if response.status_code != 200:
-                raise Exception(f'Ответ сервера: {response.status_code}')
-            res = response.json()
-            ind_sec_id = res['securities']['columns'].index('secid')
-            cnt = len(res['securities']['data'])
-            if cnt == 0:
-                break
-            for i in range(cnt):
-                sec_id = res['securities']['data'][i][ind_sec_id]
-                outList.append(sec_id)
-        except Exception as exc:
-            cnt_err += 1
-
-        start += limit
-    if cnt_err: fix_result(f'Ошибок загрузки списка: {cnt_err}')
-    return outList
-
-def GetMOEXBonds(listSecId):  # Загрузка бумаг и сохранение в базу
-    # For example can be substituted RU000A101PV6.json
-    str_url_tmp = "http://iss.moex.com/iss/securities/"
-    
-    print('Загрузка бумаг.')
-    cnt_err = 0
-    total = len(listSecId)
-    for i in range(total):
-        gvar_go, _ = GlobalVariable.objects.get_or_create(key='go_download')
-        if gvar_go.val_bool == False: break
-        try:
-            str_url = f'{str_url_tmp}{listSecId[i]}.json'
-            response = requests.get(str_url)
-            if response.status_code != 200:
-                raise Exception(f'Ответ сервера: {response.status_code}')
-            res = response.json()
-            
-            cnt_field = 0
-            dict_bond = {}
-            dict_bond['SECID'] = listSecId[i]
-            # перелистаем поля бумаги
-            for fldBond in res['description']['data']:
-                if fldBond[0] == 'SECID' and listSecId[i] == fldBond[2]:
-                    cnt_field += 1
-                if fldBond[0] == 'NAME':
-                    dict_bond['NAME'] = fldBond[2]
-                    cnt_field += 1
-                if fldBond[0] == 'MATDATE':
-                    dict_bond['MATDATE'] = fldBond[2]
-                    cnt_field += 1
-                if fldBond[0] == 'FACEVALUE':
-                    dict_bond['FACEVALUE'] = fldBond[2]
-                    cnt_field += 1
-                if fldBond[0] == 'COUPONFREQUENCY':
-                    dict_bond['COUPONFREQUENCY'] = fldBond[2]
-                    cnt_field += 1
-                if fldBond[0] == 'COUPONVALUE':
-                    dict_bond['COUPONVALUE'] = fldBond[2]
-                    cnt_field += 1
-                if fldBond[0] == 'TYPE':
-                    dict_bond['TYPE'] = fldBond[2]
-                    cnt_field += 1
-
-            if cnt_field == 7:
-                obj_type, _ = TypeBOND.objects.get_or_create(typekey=dict_bond['TYPE'])
-                lid, _ = MoexBOND.objects.get_or_create(secid=dict_bond['SECID'], typekey=obj_type)
-                lid.name = dict_bond['NAME']
-                lid.matdate = datetime.strptime(dict_bond['MATDATE'], '%Y-%m-%d')
-                lid.facevalue = dict_bond['FACEVALUE']
-                lid.couponfrequency = dict_bond['COUPONFREQUENCY']
-                lid.couponvalue = dict_bond['COUPONVALUE']
-                obj_type, _ = TypeBOND.objects.get_or_create(typekey=dict_bond['TYPE'])
-                # Вычисляем номинальную доходность
-                try:
-                    kup = Decimal(dict_bond['COUPONVALUE'])
-                    kup_year = int(dict_bond['COUPONFREQUENCY'])
-                    nominal = Decimal(dict_bond['FACEVALUE'])
-                    if kup > 0 and kup_year > 0 and nominal > 0:
-                        lid.profit = ((kup * kup_year) / nominal) * 100
-                    else: continue
-                except Exception as e: print(e)
-                lid.save()
-
-
-        except Exception as e:
-            print(e)
-            cnt_err += 1
-        gvar_cur, _ = GlobalVariable.objects.get_or_create(key='cur_num_download')
-        gvar_cur.val_int = i
-        gvar_cur.save()
-        gvar_tot, _ = GlobalVariable.objects.get_or_create(key='tot_num_download')
-        gvar_tot.val_int = total
-        gvar_tot.save()
-
-    if cnt_err: fix_result(f'Ошибок загрузки бумаг: {cnt_err}')
-
-def thread_download_bond_moex():  # Поток загрузки бумаг
-    MoexBOND.objects.all().delete()
-    listSecIdBonds = GetMOEXsecidBonds()  # []
-    GetMOEXBonds(listSecIdBonds)
-    all_cnt = MoexBOND.objects.all().count()
-    gvar_end, _ = GlobalVariable.objects.get_or_create(key='end_download')
-    gvar_end.val_int = all_cnt
-    gvar_end.val_datetime = datetime.today()
-    gvar_end.save()
-    print('Загрузка завершена.')
-    
 
 # https://pythonru.com/primery/django-ajax

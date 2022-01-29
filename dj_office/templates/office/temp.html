@@ -116,3 +116,254 @@
 		<option value="13"><input type="checkbox" id="selCheck-6">This is item 2</option>
 		<option value="14"><input type="checkbox" id="selCheck-7">This is item 3</option>
 	</select>
+
+                            <div class="card">
+                                <div class="card-header">
+									<div class="row">
+                                        <div class="col">
+											<h5 class="mb-0">Фильтр</h5>
+										</div>
+                                        <div class="col">
+                                            <label id="id_lbl_filter" class="form-check-label">Не выбрано</label>
+										</div>
+                                        <div class="col">
+                                            <button type="button" class="btn btn-primary" id="id_btn_filter_open" data-toggle="modal" data-target="#openModalFilter">Выбрать / создать</button>
+										</div>
+									</div>
+                                </div>
+                            </div>
+
+<div id="openModalFilter" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="openModaDeletePhraseTitle">Фильтр</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+			<div class="card">
+				<hr style="border: 1px solid gray;">
+				<div class="card">
+					<div class="row">
+						<form method="post" enctype="multipart/form-data">
+							{% csrf_token %}
+							<div class="row">
+								<div class="col">
+									<select id="id_sel_filter" class="form-control" style="margin-left: 15px; padding: 2px 2px; height: 28px; width: 160px;">
+										<option selected disabled hidden>Выберите</option>
+										<option value="">Выберите фильтр</option>
+										{% for filter in filters %}
+										<option value={{ filter.id }}>{{ filter.name }}</option>
+										{% endfor %}
+									</select>
+								</div>
+								<div class="col">
+										<input type="hidden" name="apply">
+										<button id="id_btn_apply" type="submit" class="btn btn-primary">Применить</button>
+								</div>
+							</div>
+						</form>
+						<div class="col">
+							<button id="id_btn_change" type="button" class="btn btn-primary" onclick="modify_filter();">Изменить</button>
+						</div>
+								<input type="hidden" id="deletePhraseId" value="">
+								<h4 id="deletePhrase"></h4>
+					</div>
+				</div>
+				<hr style="border: 1px solid gray;">
+				<form method="post" enctype="multipart/form-data">
+					{% csrf_token %}
+					<div class="card">
+						<div class="row" style="padding: 10px;">
+							<div class="col">
+								<div class="form-check"><label class="form-check-label">Название:</label></div>
+								<div class="input-group"><input id="id_new_filter" style="width: 250px;" type="text" name="name" value="" disabled></div>
+							</div>
+							<div class="col" style="margin: auto;">
+								<button id="id_btn_new_filter" type="button" class="btn btn-primary" onclick="active_new_filter();">Создать</button>
+							</div>
+						</div>
+						<div class="row" style="padding: 10px;">
+							<div class="col">
+								<div class="form-check"><input id="id_check_facevalue_from" class="form-check-input" type="checkbox" id="formCheck-1" name="check_facevalue_from" onclick="toggle_disabled('id_facevalue_from');" disabled><label class="form-check-label" for="formCheck-1">Номинал от:</label></div>
+								<div class="input-group"><input id="id_facevalue_from" style="width: 160px;" type="number" name="facevalue_from" disabled></div>
+							</div>
+							<div class="col">
+								<div class="form-check"><input id="id_check_facevalue_to" class="form-check-input" type="checkbox" id="formCheck-2" name="check_facevalue_to" onclick="toggle_disabled('id_facevalue_to');" disabled><label class="form-check-label" for="formCheck-2">Номинал до:</label></div>
+								<div class="input-group"><input id="id_facevalue_to" style="width: 160px;" type="number" name="facevalue_to" disabled></div>
+							</div>
+						</div>
+						<div class="row" style="padding: 10px;">
+							<div class="col">
+								<div class="form-check"><input id="id_check_matdate_from" class="form-check-input" type="checkbox" id="formCheck-3" name="check_matdate_from" onclick="toggle_disabled('id_matdate_from');" disabled><label class="form-check-label" for="formCheck-3">Погашение от:</label></div>
+								<div class="input-group"><input id="id_matdate_from" style="width: 160px;" type="date" name="matdate_from" disabled></div>
+							</div>
+							<div class="col">
+								<div class="form-check"><input id="id_check_matdate_to" class="form-check-input" type="checkbox" id="formCheck-4" name="check_matdate_to" onclick="toggle_disabled('id_matdate_to');" disabled><label class="form-check-label" for="formCheck-4">Погашение до:</label></div>
+								<div class="input-group"><input id="id_matdate_to" style="width: 160px;" type="date" name="matdate_to" disabled></div>
+							</div>
+						</div>
+						<div class="row" style="padding: 10px;">
+							<div class="col">
+								<div class="form-check"><input id="id_check_profit_from" class="form-check-input" type="checkbox" id="formCheck-5" name="check_profit_from" onclick="toggle_disabled('id_profit_from');" disabled><label class="form-check-label" for="formCheck-5">Доходность от:</label></div>
+								<div class="input-group"><input id="id_profit_from" style="width: 160px;" type="number" name="profit_from" disabled></div>
+							</div>
+							<div class="col">
+								<div class="form-check"><input id="id_check_profit_to" class="form-check-input" type="checkbox" id="formCheck-6" name="check_profit_to" onclick="toggle_disabled('id_profit_to');" disabled><label class="form-check-label" for="formCheck-6">Доходность до:</label></div>
+								<div class="input-group"><input id="id_profit_to" style="width: 160px;" type="number" name="profit_to" disabled></div>
+							</div>
+						</div>
+						<div class="row" style="padding: 10px;">
+							<div class="col">
+								<div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-7" name="check_select_type"><label class="form-check-label" for="formCheck-7">По типу облигаций</label></div>
+								<hr style="border: 1px solid gray;">
+
+								<div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-7" name="check_select_type"><label class="form-check-label" for="formCheck-7">По типу облигаций</label></div>
+								<div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-7" name="check_select_type"><label class="form-check-label" for="formCheck-7">По типу облигаций</label></div>
+								<div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-7" name="check_select_type"><label class="form-check-label" for="formCheck-7">По типу облигаций</label></div>
+								<div class="form-check"><input class="form-check-input" type="checkbox" id="formCheck-7" name="check_select_type"><label class="form-check-label" for="formCheck-7">По типу облигаций</label></div>
+								
+
+							</div>
+							<div class="col" style="margin: auto;">
+								<input type="hidden" name="id_filter" value="">
+								<button id="id_btn_save_filter" type="submit" class="btn btn-primary" disabled>Сохранить</button>
+							</div>
+						</div>
+					</div>
+				</form>
+				<hr style="border: 1px solid gray;">
+			</div>
+        </div>
+        <div class="modal-footer">
+        </div>
+      </div>
+    </div>
+</div>
+
+<script src="/static/assets/js/jquery.min.js"></script>
+<script language="javascript">
+    let is_new_filter = false;
+	function test(){
+		ajax_data = {'get_state': true};
+        $.ajax({
+            data: ajax_data, // отсылаемые данные
+            url: "{% url 'office:testbond' %}",
+            success: function (response){
+                // is_run = response.is_run;
+				val = response.value;
+				// tot = response.val_total;
+				// all = response.num_all_bond;
+				// upgrade = response.last_upgrade;
+				console.log(val);
+				// console.log(tot);
+				// console.log(all);
+				// console.log(upgrade);
+				// if(all){$('#id_val').text(all)};
+				// if(upgrade){$('#id_lbl_upgrade').text(upgrade)};
+            }, // если успешно
+            error: function (response){console.log(response.responseJSON.errors)}  // если ошибка
+        });
+	
+	}
+	// $("#id_sel_filter").change(function() {
+        // // var s = $("#sel1").val(); // Получаем значение выбранного селекта с id sel1
+        // // if (s == '3'){ // Если значение равно 3, то
+            // // $("#sel2").hide(); // Скрываем селект с id sel2
+        // // } else {
+            // // $("#sel2").show();
+        // // }
+		// id_sel = $("#id_sel_filter").val();
+		// alert(id_sel);
+    // });
+
+	function active_new_filter(){
+		clear_new_filter();
+		if(is_new_filter){
+			$('#id_btn_new_filter').text('Создать');
+			$('#id_new_filter').prop('disabled', true);
+			$('#id_btn_save_filter').prop('disabled', true);
+			$('#id_sel_filter').prop('disabled', false);
+			$('#id_btn_apply').prop('disabled', false);
+			$('#id_btn_change').prop('disabled', false);
+			
+			$('#id_check_facevalue_from').prop('disabled', true);
+			$('#id_facevalue_from').prop('disabled', true);
+			$('#id_check_facevalue_to').prop('disabled', true);
+			$('#id_facevalue_to').prop('disabled', true);
+			$('#id_check_matdate_from').prop('disabled', true);
+			$('#id_matdate_from').prop('disabled', true);
+			$('#id_check_matdate_to').prop('disabled', true);
+			$('#id_matdate_to').prop('disabled', true);
+			$('#id_check_profit_from').prop('disabled', true);
+			$('#id_profit_from').prop('disabled', true);
+			$('#id_check_profit_to').prop('disabled', true);
+			$('#id_profit_to').prop('disabled', true);
+			is_new_filter = false;
+		}else{
+			$('#id_btn_new_filter').text('Отмена');
+			$('#id_new_filter').prop('disabled', false);
+			$('#id_btn_save_filter').prop('disabled', false);
+			$('#id_sel_filter').prop('disabled', true);
+			$('#id_btn_apply').prop('disabled', true);
+			$('#id_btn_change').prop('disabled', true);
+			
+			$('#id_check_facevalue_from').prop('disabled', false);
+			if ($('#id_check_facevalue_from').prop('checked') == true){
+				$('#id_facevalue_from').prop('disabled', false);
+			}
+			$('#id_check_facevalue_to').prop('disabled', false);
+			if ($('#id_check_facevalue_to').prop('checked')){
+				$('#id_facevalue_to').prop('disabled', false);
+			}
+			$('#id_check_matdate_from').prop('disabled', false);
+			if ($('#id_check_matdate_from').prop('checked')){
+				$('#id_matdate_from').prop('disabled', false);
+			}
+			$('#id_check_matdate_to').prop('disabled', false);
+			if ($('#id_check_matdate_to').prop('checked')){
+				$('#id_matdate_to').prop('disabled', false);
+			}
+			$('#id_check_profit_from').prop('disabled', false);
+			if ($('#id_check_profit_from').prop('checked')){
+				$('#id_profit_from').prop('disabled', false);
+			}
+			$('#id_check_profit_to').prop('disabled', false);
+			if ($('#id_check_profit_to').prop('checked')){
+				$('#id_profit_to').prop('disabled', false);
+			}
+			is_new_filter = true;
+			$('#id_new_filter').focus();
+		} // onclick="active_new_filter();"
+    }
+	function modify_filter(){
+		
+    }
+	function clear_new_filter(){
+		$('#id_new_filter').prop('value', '');
+		$('#id_check_facevalue_from').prop('checked', false)
+		$('#id_facevalue_from').val('');
+		$('#id_check_facevalue_to').prop('checked', false)
+		$('#id_facevalue_to').val('');
+		$('#id_check_matdate_from').prop('checked', false)
+		$('#id_matdate_from').val('');
+		$('#id_check_matdate_to').prop('checked', false)
+		$('#id_matdate_to').val('');
+		$('#id_check_profit_from').prop('checked', false)
+		$('#id_profit_from').val('');
+		$('#id_check_profit_to').prop('checked', false)
+		$('#id_profit_to').val('');
+	}
+	// function toggle_disabled(id){
+		// attr = $('#' + id).attr('disabled');
+		// if (attr == 'disabled'){
+			// $('#' + id).prop('disabled', false);
+		// }else{
+			// $('#' + id).prop('disabled', true);
+		// }
+    // }
+
+</script>
+

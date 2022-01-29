@@ -27,7 +27,7 @@ class MoexBONDAdmin(admin.ModelAdmin):
     empty_value_display = '---'
     date_hierarchy = 'matdate'
 
-    # list_filter = ('secid', 'name', 'matdate', 'facevalue', 'couponvalue', 'typename')
+    list_filter = ('typekey', 'matdate')
     # formfield_overrides = {
         # models.IntegerField: {'widget': NumberInput(attrs={'size':'150'})},
         # # models.CharField: {'widget': TextInput(attrs={'size':'20'})},

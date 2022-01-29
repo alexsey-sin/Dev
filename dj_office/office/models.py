@@ -34,7 +34,7 @@ class MoexBOND(models.Model):
         null = True,
         verbose_name = 'Название',
     )
-    matdate = models.DateTimeField(
+    matdate = models.DateField(
         blank = True,
         null = True,
         verbose_name = 'Погашение',
