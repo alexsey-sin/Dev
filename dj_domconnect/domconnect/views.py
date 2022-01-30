@@ -40,7 +40,10 @@ def index(request):  # Статистика SEO
     # Посмотрим состояние загрузки в глобальной переменной
     gvar_go, _ = DcCrmGlobVar.objects.get_or_create(key='go_download_crm')
     if gvar_go.val_bool: label_seo = 'Идет загрузка лидов ...'
-    else: label_seo = f'Последнее обновление: {gvar_go.val_datetime.strftime("%d.%m.%Y %H:%M:%S")}'
+    else: 
+        if gvar_go.val_datetime: last_datetime = gvar_go.val_datetime.strftime("%d.%m.%Y %H:%M:%S")
+        else: last_datetime = 'Нет данных'
+        label_seo = f'Последнее обновление: {last_datetime}'
     context['label_seo'] = label_seo
 
     str_month = ['', 'Янв.', 'Фев.', 'Мар.', 'Апр.', 'Май', 'Июн.', 'Июл.', 'Авг.', 'Сен.', 'Окт.', 'Ноя.', 'Дек.']
