@@ -1,5 +1,5 @@
 from django.contrib import admin
-from domconnect.models import DcCrmGlobVar, DcCrmLid, DcCashSEO
+from domconnect.models import DcCrmGlobVar, DcCrmLid, DcCashSEO, DcSourceSiteSEO
 from django.db import models
 from django.forms import NumberInput
 
@@ -24,21 +24,21 @@ class DcCrmLidAdmin(admin.ModelAdmin):
     def fl_source_id(self):
         return f'{self.source_id[:15]}...'
     fl_source_id.short_description = 'Источник'
-    def c_date(self):
-        return self.create_date.strftime('%d.%m.%Y %H:%M')
-    c_date.short_description = 'Создано'
-    def m_date(self):
-        return self.modify_date.strftime('%d.%m.%Y %H:%M')
-    m_date.short_description = 'Изменено'
+    # def c_date(self):  # Так по этому полю не работает сортировка в заголовке
+    #     if self.create_date: return self.create_date.strftime('%d.%m.%Y %H:%M')
+    # c_date.short_description = 'Создано'
+    # def m_date(self):
+    #     if self.modify_date: return self.modify_date.strftime('%d.%m.%Y %H:%M')
+    # m_date.short_description = 'Изменено'
 
-    list_display = ('id_lid', fl_title, 'status_id', c_date, m_date, fl_source_id, 'assigned_by_id',
+    list_display = ('id_lid', fl_title, 'status_id', 'create_date', 'modify_date', fl_source_id, 'assigned_by_id',
         'crm_1493416385', 'crm_1499437861', 'crm_1580454770', 'crm_1534919765', fl_1571987728429,
         'crm_1592566018', 'crm_1493413514', 'crm_1492017494', 'crm_1492017736', 'crm_1498756113',
         'crm_1615982450', 'crm_1615982567', 'crm_1615982644', 'crm_1615982716', 'crm_1615982795',
         'crm_1640267556'
         )
     search_fields = ('id_lid', 'status_id',)
-    list_filter = ('status_id', )
+    list_filter = ('status_id', 'source_id', 'crm_1493413514')
     empty_value_display = '-пусто-'
     date_hierarchy = 'create_date'
     formfield_overrides = {
@@ -50,7 +50,7 @@ class DcCrmLidAdmin(admin.ModelAdmin):
 @admin.register(DcCashSEO)
 class DcCashSEOAdmin(admin.ModelAdmin):
     def v_date(self):
-        return self.val_date.strftime('%m.%Y')
+        if self.val_date: return self.val_date.strftime('%m.%Y')
     v_date.short_description = 'Период'
 
     list_display = (v_date, 'table', 'row', 'val')
@@ -59,3 +59,11 @@ class DcCashSEOAdmin(admin.ModelAdmin):
     list_filter = ('val_date', 'table')
     empty_value_display = '-пусто-'
     date_hierarchy = 'val_date'
+
+
+@admin.register(DcSourceSiteSEO)
+class DcSourceSiteSEOAdmin(admin.ModelAdmin):
+    list_display = [field.name for field in DcSourceSiteSEO._meta.get_fields()]
+    list_display = ('source', 'site', 'provider')
+    search_fields = ('source',)
+    list_filter = ('site', 'provider')

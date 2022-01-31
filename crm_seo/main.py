@@ -145,6 +145,63 @@ def get_catalog():
         
     return ''
 
+def get_company():
+    url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.company.fields'
+    
+    # data = {
+        # # 'filter': {'FIELD_NAME': 'UF_CRM_1592566018',}
+        # 'id': 1840,
+        # # 'order': { "DATE_MODIFY": "ASC" },  # Если нужно с сортировкой
+        # # 'filter': {
+            # # "CATALOG_ID": 30,
+            # # # # '<DATE_CREATE': '2021-10-31T23:59:59',
+        # # },
+        # # 'select': [           crm.status.entity.items?entityId=SOURCE
+            # # "ID", 
+            # # "CATALOG_ID", 
+            # # "SECTION_ID", 
+            # # "NAME",
+            # # "XML_ID",
+            # # "CODE",
+        # # ]
+    # }
+    data = {'entityId': 'SOURCE'}
+    try:
+        responce = requests.post(url, json=data)
+        # responce = requests.post(url)
+        # responce = requests.post(url, headers=headers)
+        if responce.status_code == 200:
+            answer = json.loads(responce.text)
+            # result = answer.get('result')
+            # for dct in result:
+                # name = dct.get('NAME')
+                # id = dct.get('STATUS_ID')
+                # print('ID', id, 'name:', name)
+            # print('Всего: ', len(result))
+                # if name == 'Подключаем': print(name, 'ID', dct.get('ID'))  #  8
+            # if not result: print('update_typelid no result in answer')
+            # dct_list = result.get('LIST')
+            # if not dct_list: print('update_typelid no field LIST in result in answer')
+                # print()
+            # for k, v in result.items():
+                # if k in select:
+                    # print(k,v)
+                    # print()
+            # go_next = answer.get('next')
+            # go_total = answer.get('total')
+            # out_lst += result
+            # if not go_next: break
+            # print(dct_list)
+            print(answer)
+            # print(result)
+            # print(go_next, go_total)
+        else: return f'Ошибка get_catalog: responce.status_code: {responce.status_code}\n{responce.text}'
+    except: return 'Ошибка get_catalog: try: requests.post'
+        # time.sleep(1)
+        # break
+        
+    return ''
+
 def get_source():
     url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.status.entity.items' # Типы источника лида
     
@@ -257,7 +314,8 @@ if __name__ == '__main__':
     
     # e = get_catalog()
     # e = get_source()
-    # if e: print(e)
+    e = get_company()
+    if e: print(e)
     # cur_day = datetime.today().day
     # cur_month = datetime.today().month
     # cur_year = datetime.today().year
@@ -331,15 +389,15 @@ if __name__ == '__main__':
         # "UF_CRM_1615982716": null,
         # "UF_CRM_1615982795": null,
         # "UF_CRM_1640267556": null
-    from datetime import datetime
-    import calendar
-    cal = calendar.Calendar()
-    now = datetime.now()
-    # Количество рабочих дней в текущем месяце
-    working_days = len([x for x in cal.itermonthdays2(now.year, now.month) if x[0] !=0 and x[1] < 5])
-    print('Рабочих дней: ', working_days)
-    cur_day = now.day      # Номер текущего дня
-    cur_month = now.month  # Номер текущего меяца
-    cur_year = now.year    # Номер текущего года
-    print(cur_day, cur_month, cur_year)
+    # from datetime import datetime
+    # import calendar
+    # cal = calendar.Calendar()
+    # now = datetime.now()
+    # # Количество рабочих дней в текущем месяце
+    # working_days = len([x for x in cal.itermonthdays2(now.year, now.month) if x[0] !=0 and x[1] < 5])
+    # print('Рабочих дней: ', working_days)
+    # cur_day = now.day      # Номер текущего дня
+    # cur_month = now.month  # Номер текущего меяца
+    # cur_year = now.year    # Номер текущего года
+    # print(cur_day, cur_month, cur_year)
 

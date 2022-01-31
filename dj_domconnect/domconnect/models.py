@@ -194,3 +194,19 @@ class DcCashSEO(models.Model):  # Кэш SEO
 
     def __str__(self):
         return self.val_date.strftime('%m.%Y')
+
+
+class DcSourceSiteSEO(models.Model):  # Источники для перечня тавлиц SEO
+    source = models.CharField(  # Название источника
+        max_length = 100,
+        unique = True,
+        verbose_name='Источник',
+    )
+    site = models.CharField(
+        max_length = 100,
+        verbose_name='Сайт',
+    )
+    provider = models.CharField(
+        max_length = 100,
+        verbose_name='Провайдер',
+    )

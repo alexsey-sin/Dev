@@ -283,7 +283,6 @@ def calculate_1_table(ask_date):
     weekenddays = cnt_days_in_month - working_days  # выходных дней
     coef_forecast = cnt_days_in_month / cur_day  # Коэфициент полного месяца (для прогноза если месяйц не полный)
     
-    print('ask_date', ask_date, coef_forecast)
     out_dict = {}
     lids_all = DcCrmLid.objects.filter(create_date__year=cur_year, create_date__month=cur_month)
     count_lids_all = lids_all.count()
@@ -310,6 +309,7 @@ def calculate_1_table(ask_date):
         cell = lids_all.filter(crm_1493416385__gt=50, status_id__contains='CONVERTED').count()
         cell_12 = round(cell* coef_forecast)
         # (13) Сделки 80
+        # https://docs.google.com/spreadsheets/d/1fPFxlhAje5V_kdlSHpLytBbgE6SiBaWtfsrFjw1XYv8/edit#gid=1803529933
         # ('Билайн', 'МТС [кроме МСК и МО]', 'Ростелеком [кроме МСК]', 'МГТС [МСК и МО]')
         cell = lids_seo_conv.filter(crm_1493413514__in=['OTHER', '2', '3', '11']).count()  # Провайдер (INDUSTRY)
         cell_13 = round(cell * coef_forecast)
@@ -406,3 +406,60 @@ def calculate_1_table(ask_date):
 
     return out_dict
 
+def calculate_source_table(ask_date):
+    cur_day = ask_date.day      # Номер дня
+    cur_month = ask_date.month  # Номер меяца
+    cur_year = ask_date.year    # Номер года
+    cnt_days_in_month = calendar.monthrange(cur_year, cur_month)[1] # Количество дней в месяце
+
+    # working_days = len([x for x in calendar.Calendar().itermonthdays2(cur_year, cur_month) if x[0] !=0 and x[1] < 5])  # Количество рабочих дней в месяце
+    # weekenddays = cnt_days_in_month - working_days  # выходных дней
+    coef_forecast = cnt_days_in_month / cur_day  # Коэфициент полного месяца (для прогноза если месяйц не полный)
+    
+    print('ask_date', ask_date, coef_forecast)
+    out_dict = {}
+    lids_all = DcCrmLid.objects.filter(create_date__year=cur_year, create_date__month=cur_month)
+    count_lids_all = lids_all.count()
+    if count_lids_all:
+        lids_seo = lids_all.filter(crm_1592566018='SEO')
+        lids_seo_conv = lids_seo.filter(crm_1493416385__gt=50, status_id__contains='CONVERTED')  # Подключаем (SOURCE)
+        # (1) Лиды
+        cell_01 = round(lids_seo.count() * coef_forecast)
+        # (4) Лиды (все)
+        cell_04 = round(count_lids_all * coef_forecast)
+        # (5) Будн. дней 
+        cell_05 = working_days
+        # (6) Выходных дней 
+        cell_06 = weekenddays
+        # (7) Лиды с ТхВ 
+        cell_07 = lids_seo.exclude(Q(crm_1571987728429='')|Q(crm_1571987728429=None)).count()  # Провайдеры ДК (длина больше 0)
+        # (8) % лидов с ТхВ
+        if cell_01: cell_08 = round((cell_07 / cell_01) * 100, 2)
+        # (9) Сделки >50
+        cell_09 = round(lids_seo_conv.count() * coef_forecast)
+        # (10) %Лид=>Сд. >50
+        cell_10 = round((cell_09 / cell_01) * 100, 2)
+        # (12) Сделки >50 (все)
+        cell = lids_all.filter(crm_1493416385__gt=50, status_id__contains='CONVERTED').count()
+        cell_12 = round(cell* coef_forecast)
+        # (13) Сделки 80
+        # https://docs.google.com/spreadsheets/d/1fPFxlhAje5V_kdlSHpLytBbgE6SiBaWtfsrFjw1XYv8/edit#gid=1803529933
+        # ('Билайн', 'МТС [кроме МСК и МО]', 'Ростелеком [кроме МСК]', 'МГТС [МСК и МО]')
+        cell = lids_seo_conv.filter(crm_1493413514__in=['OTHER', '2', '3', '11']).count()  # Провайдер (INDUSTRY)
+        cell_13 = round(cell * coef_forecast)
+        # (14) Сд. приоритет (БИ и МТС ФЛ)
+        # ('Билайн', 'МТС [кроме МСК и МО]')
+        cell = lids_seo_conv.filter(crm_1493413514__in=['OTHER', '2']).count()  # Провайдер (INDUSTRY)
+        cell_14 = round(cell * coef_forecast)
+        # (15) Доля сделок ПРИОР от сд. >50
+        cell_15 = round((cell_14 / cell_09) * 100, 2)
+        # (16) Ср. лид/день (будн.)
+        cell = lids_seo.filter(create_date__week_day__range=(2,6)).count() # Дни недели пронумерованы от 1(воскресение) до 7(суббота)
+        cell_16 = round(cell / working_days)
+        # (17) Ср. лид/день (вых.)
+        cell = lids_seo.filter(create_date__week_day__in=(1,7)).count() # Дни недели пронумерованы от 1(воскресение) до 7(суббота)
+        cell_17 = round(cell / weekenddays)
+        # (18) ТП SEO
+        # ('ТП_пр', 'ТП_нраб', 'ТП_моб') https://docs.google.com/spreadsheets/d/1fPFxlhAje5V_kdlSHpLytBbgE6SiBaWtfsrFjw1XYv8/edit#gid=1803529933
+        cell_tp_seo = lids_seo.filter(status_id__in=['1', '16', '21', '31', '32', '33']).count()  # Статус (STATUS)
+        cell_18 = round(cell_tp_seo * coef_forecast)

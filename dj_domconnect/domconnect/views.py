@@ -115,8 +115,9 @@ def dataAjax(request):
     last_modify_lid = DcCrmLid.objects.order_by('modify_date').last()
     if last_modify_lid:
         from_modify = last_modify_lid.modify_date
-        from_modify = from_modify - timedelta(seconds=1)
-        str_from_modify = from_modify.strftime('%Y-%m-%dT%H:%M:%S')
+        if type(from_modify) == datetime:
+            from_modify = from_modify - timedelta(seconds=1)
+            str_from_modify = from_modify.strftime('%Y-%m-%dT%H:%M:%S')
 
     # Проверим идет ли загрузка
     is_run = False
