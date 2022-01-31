@@ -198,14 +198,16 @@ def append_lids(lids):
             val_field = new_lid.get('UF_CRM_1580454770')
             if val_field: lid.crm_1580454770 = bool(val_field)
             val_field = new_lid.get('UF_CRM_1534919765')
-            if val_field and len(val_field) > 0: lid.crm_1534919765 = val_field[0]
+            if val_field:
+                 if len(val_field) > 0: lid.crm_1534919765 = val_field[0]
             val_field = new_lid.get('UF_CRM_1571987728429')
             if val_field: lid.crm_1571987728429 = val_field
             val_field = new_lid.get('UF_CRM_1592566018')
-            if val_field and len(val_field) > 0:
-                val_field = str(val_field[0])
-                if val_field not in typelid: lid.crm_1592566018 = val_field
-                else: lid.crm_1592566018 = typelid[val_field]
+            if val_field:
+                if len(val_field) > 0:
+                    val_field = str(val_field[0])
+                    if val_field not in typelid: lid.crm_1592566018 = val_field
+                    else: lid.crm_1592566018 = typelid[val_field]
             val_field = new_lid.get('UF_CRM_1493413514')
             if val_field: lid.crm_1493413514 = val_field
             val_field = new_lid.get('UF_CRM_1492017494')
@@ -428,9 +430,9 @@ def calculate_source_table(ask_date):
         # (4) Лиды (все)
         cell_04 = round(count_lids_all * coef_forecast)
         # (5) Будн. дней 
-        cell_05 = working_days
-        # (6) Выходных дней 
-        cell_06 = weekenddays
+        # cell_05 = working_days
+        # # (6) Выходных дней 
+        # cell_06 = weekenddays
         # (7) Лиды с ТхВ 
         cell_07 = lids_seo.exclude(Q(crm_1571987728429='')|Q(crm_1571987728429=None)).count()  # Провайдеры ДК (длина больше 0)
         # (8) % лидов с ТхВ
@@ -454,12 +456,12 @@ def calculate_source_table(ask_date):
         # (15) Доля сделок ПРИОР от сд. >50
         cell_15 = round((cell_14 / cell_09) * 100, 2)
         # (16) Ср. лид/день (будн.)
-        cell = lids_seo.filter(create_date__week_day__range=(2,6)).count() # Дни недели пронумерованы от 1(воскресение) до 7(суббота)
-        cell_16 = round(cell / working_days)
-        # (17) Ср. лид/день (вых.)
-        cell = lids_seo.filter(create_date__week_day__in=(1,7)).count() # Дни недели пронумерованы от 1(воскресение) до 7(суббота)
-        cell_17 = round(cell / weekenddays)
-        # (18) ТП SEO
+        # cell = lids_seo.filter(create_date__week_day__range=(2,6)).count() # Дни недели пронумерованы от 1(воскресение) до 7(суббота)
+        # cell_16 = round(cell / working_days)
+        # # (17) Ср. лид/день (вых.)
+        # cell = lids_seo.filter(create_date__week_day__in=(1,7)).count() # Дни недели пронумерованы от 1(воскресение) до 7(суббота)
+        # cell_17 = round(cell / weekenddays)
+        # # (18) ТП SEO
         # ('ТП_пр', 'ТП_нраб', 'ТП_моб') https://docs.google.com/spreadsheets/d/1fPFxlhAje5V_kdlSHpLytBbgE6SiBaWtfsrFjw1XYv8/edit#gid=1803529933
         cell_tp_seo = lids_seo.filter(status_id__in=['1', '16', '21', '31', '32', '33']).count()  # Статус (STATUS)
         cell_18 = round(cell_tp_seo * coef_forecast)
