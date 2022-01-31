@@ -178,10 +178,10 @@ class DcCashSEO(models.Model):  # Кэш SEO
     val_date = models.DateField(
         verbose_name='Период',
     )
-    table = models.PositiveSmallIntegerField(  # от 0 до 32767
+    table = models.PositiveSmallIntegerField(  # от 1.  PositiveSmallIntegerField =(от 0 до 32767)
         verbose_name = 'Таблица',
     )
-    row = models.PositiveSmallIntegerField(  # от 0 до 32767
+    row = models.PositiveSmallIntegerField(  # от 1.  PositiveSmallIntegerField =(от 0 до 32767)
         verbose_name = 'Строка',
     )
     val = models.DecimalField(
@@ -209,4 +209,11 @@ class DcSourceSiteSEO(models.Model):  # Источники для перечня
     provider = models.CharField(
         max_length = 100,
         verbose_name='Провайдер',
+    )
+    '''
+        Основная
+    
+    '''
+    table = models.PositiveSmallIntegerField(
+        verbose_name = 'Таблица',
     )
