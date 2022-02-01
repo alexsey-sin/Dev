@@ -1,5 +1,5 @@
-from domconnect.models import DcCrmGlobVar, DcCrmLid, DcCashSEO
-from django.db.models import Q
+from domconnect.models import DcCrmGlobVar, DcCrmLid, DcCashSEO, DcSiteSEO, DcSourceSEO
+from django.db.models import Q, Avg
 import time
 import logging
 import requests
@@ -112,7 +112,7 @@ def download_lids(str_from_modify):
             'filter': {
                 # '>DATE_CREATE': '2020-01-01T00:00:00',  # '2021-10-01T00:00:00'
                 # '>DATE_CREATE': '2022-01-01T00:00:00',  # '2021-10-01T00:00:00'
-                '>DATE_CREATE': '2021-10-01T00:00:00',  # '2021-10-01T00:00:00'
+                '>DATE_CREATE': '2021-11-01T00:00:00',  # '2021-10-01T00:00:00'
                 '!STATUS_ID': [17, 24],    # Дубль и ошибка в телефоне
             },
             'select': [
@@ -258,33 +258,71 @@ def calculateSEO():
         last_year = last_record.val_date.year
     log.info(f'Последняя запись кэш {last_month}.{last_year}')
 
+    # ask_date = ask_date - timedelta(days=ask_date.day)
+    # dct = calculate_source_table(ask_date, 'mirbeeline.ru_Билайн', 'OTHER')
+    # for k, v in dct.items():
+    #     print(k, v)
+    for _ in range(12):
+        empty_data_month = True
+        # Расчет основной таблицы (Метка SEO)
+        dct = calculate_0_table(ask_date)
+        if len(dct) > 0:
+            empty_data_month = False
+            # Сохранение в кэш основной таблицы (Метка SEO)
+            save_cash(0, 0, dct, ask_date)
 
-    # for _ in range(12):
-    #     dct = calculate_1_table(ask_date)
-    #     save_cash(1, dct, ask_date)
-    #     if last_month == ask_date.month and last_year == ask_date.year: break
-    #     ask_date = ask_date - timedelta(days=ask_date.day)
-    #     if len(dct) == 0: break
-    # log.info(f'Запись кэш завершена.')
+        # Берем список сайтов
+        objs_site = DcSiteSEO.objects.all().order_by('num')
+        for obj_site in objs_site:
+            site_num = obj_site.num
+            site_name = obj_site.site
+            site_provider = obj_site.provider
+            lst_res_source = []  # Результирующий список результатов вычислений источников
+            # По каждому сайту берем список источников
+            sources = obj_site.sources.order_by('num')
+            for src in sources:
+                source_name = src.source
+                source_num = src.num
+                # По каждому источнику делаем вычисления
+                dct_source = calculate_source_table(ask_date, source_name, site_provider)
+                if len(dct_source) > 0:
+                    empty_data_month = False
+                    # Сохранение в кэш основной таблицы (Метка SEO)
+                    save_cash(site_num, source_num, dct, ask_date)
+                    lst_res_source.append(dct_source)
 
-def save_cash(table, in_dct, ask_date):
+            if len(lst_res_source) > 0:
+                calculate_site_table(lst_res_source)
+            # print(sources)
+        break
+        
+        if last_month == ask_date.month and last_year == ask_date.year: break
+        ask_date = ask_date - timedelta(days=ask_date.day)
+        if empty_data_month: break
+    log.info(f'Запись кэш завершена.')
+
+def save_cash(num_site, num_source, in_dct, ask_date):
     str_save_date = f'01.{ask_date.month}.{ask_date.year}'
     save_date = datetime.strptime(str_save_date, '%d.%m.%Y')
     for cell, val in in_dct.items():
         row = cell.split('_')[1]
-        rec, _ = DcCashSEO.objects.get_or_create(val_date=save_date, table=table, row=row)
+        rec, _ = DcCashSEO.objects.get_or_create(val_date=save_date, num_site=num_site, num_source=num_source, row=row)
         rec.val = val
         rec.save()
 
-def calculate_1_table(ask_date):
+def calculate_0_table(ask_date):
     cur_day = ask_date.day      # Номер дня
     cur_month = ask_date.month  # Номер меяца
     cur_year = ask_date.year    # Номер года
     cnt_days_in_month = calendar.monthrange(cur_year, cur_month)[1] # Количество дней в месяце
+    if cur_day < 5:
+        cnt_min_in_month = cnt_days_in_month * 1440
+        cur_min = (cur_day - 1) * 1440 + (ask_date.hour * 60) + ask_date.minute
+        coef_forecast = cnt_min_in_month / cur_min  # Коэфициент полного месяца (для прогноза если месяйц не полный с учетом минут)
+    else: coef_forecast = cnt_days_in_month / cur_day  # Коэфициент полного месяца (для прогноза если месяйц не полный)
 
     working_days = len([x for x in calendar.Calendar().itermonthdays2(cur_year, cur_month) if x[0] !=0 and x[1] < 5])  # Количество рабочих дней в месяце
     weekenddays = cnt_days_in_month - working_days  # выходных дней
-    coef_forecast = cnt_days_in_month / cur_day  # Коэфициент полного месяца (для прогноза если месяйц не полный)
     
     out_dict = {}
     lids_all = DcCrmLid.objects.filter(create_date__year=cur_year, create_date__month=cur_month)
@@ -414,52 +452,72 @@ def calculate_source_table(ask_date, ask_source, ask_provider):
     cur_month = ask_date.month  # Номер меяца
     cur_year = ask_date.year    # Номер года
     cnt_days_in_month = calendar.monthrange(cur_year, cur_month)[1] # Количество дней в месяце
-
-    coef_forecast = cnt_days_in_month / cur_day  # Коэфициент полного месяца (для прогноза если месяйц не полный)
+    if cur_day < 5:
+        cnt_min_in_month = cnt_days_in_month * 1440
+        cur_min = (cur_day - 1) * 1440 + (ask_date.hour * 60) + ask_date.minute
+        coef_forecast = cnt_min_in_month / cur_min  # Коэфициент полного месяца (для прогноза если месяйц не полный с учетом минут)
+    else: coef_forecast = cnt_days_in_month / cur_day  # Коэфициент полного месяца (для прогноза если месяйц не полный)
     
+    # print(coef_forecast)
     out_dict = {}
-    # lids_all = DcCrmLid.objects.filter(create_date__year=cur_year, create_date__month=cur_month)
-    # count_lids_all = lids_all.count()
-    # if count_lids_all:
-    #     lids_seo = lids_all.filter(crm_1592566018='SEO')
-    #     lids_seo_conv = lids_seo.filter(crm_1493416385__gt=50, status_id__contains='CONVERTED')  # Подключаем (SOURCE)
-    #     # (1) Лиды
-    #     cell_01 = round(lids_seo.count() * coef_forecast)
-    #     # (4) Лиды (все)
-    #     cell_04 = round(count_lids_all * coef_forecast)
-    #     # (5) Будн. дней 
-    #     # cell_05 = working_days
-    #     # # (6) Выходных дней 
-    #     # cell_06 = weekenddays
-    #     # (7) Лиды с ТхВ 
-    #     cell_07 = lids_seo.exclude(Q(crm_1571987728429='')|Q(crm_1571987728429=None)).count()  # Провайдеры ДК (длина больше 0)
-    #     # (8) % лидов с ТхВ
-    #     if cell_01: cell_08 = round((cell_07 / cell_01) * 100, 2)
-    #     # (9) Сделки >50
-    #     cell_09 = round(lids_seo_conv.count() * coef_forecast)
-    #     # (10) %Лид=>Сд. >50
-    #     cell_10 = round((cell_09 / cell_01) * 100, 2)
-    #     # (12) Сделки >50 (все)
-    #     cell = lids_all.filter(crm_1493416385__gt=50, status_id__contains='CONVERTED').count()
-    #     cell_12 = round(cell* coef_forecast)
-    #     # (13) Сделки 80
-    #     # https://docs.google.com/spreadsheets/d/1fPFxlhAje5V_kdlSHpLytBbgE6SiBaWtfsrFjw1XYv8/edit#gid=1803529933
-    #     # ('Билайн', 'МТС [кроме МСК и МО]', 'Ростелеком [кроме МСК]', 'МГТС [МСК и МО]')
-    #     cell = lids_seo_conv.filter(crm_1493413514__in=['OTHER', '2', '3', '11']).count()  # Провайдер (INDUSTRY)
-    #     cell_13 = round(cell * coef_forecast)
-    #     # (14) Сд. приоритет (БИ и МТС ФЛ)
-    #     # ('Билайн', 'МТС [кроме МСК и МО]')
-    #     cell = lids_seo_conv.filter(crm_1493413514__in=['OTHER', '2']).count()  # Провайдер (INDUSTRY)
-    #     cell_14 = round(cell * coef_forecast)
-    #     # (15) Доля сделок ПРИОР от сд. >50
-    #     cell_15 = round((cell_14 / cell_09) * 100, 2)
-    #     # (16) Ср. лид/день (будн.)
-    #     # cell = lids_seo.filter(create_date__week_day__range=(2,6)).count() # Дни недели пронумерованы от 1(воскресение) до 7(суббота)
-    #     # cell_16 = round(cell / working_days)
-    #     # # (17) Ср. лид/день (вых.)
-    #     # cell = lids_seo.filter(create_date__week_day__in=(1,7)).count() # Дни недели пронумерованы от 1(воскресение) до 7(суббота)
-    #     # cell_17 = round(cell / weekenddays)
-    #     # # (18) ТП SEO
-    #     # ('ТП_пр', 'ТП_нраб', 'ТП_моб') https://docs.google.com/spreadsheets/d/1fPFxlhAje5V_kdlSHpLytBbgE6SiBaWtfsrFjw1XYv8/edit#gid=1803529933
-    #     cell_tp_seo = lids_seo.filter(status_id__in=['1', '16', '21', '31', '32', '33']).count()  # Статус (STATUS)
-    #     cell_18 = round(cell_tp_seo * coef_forecast)
+    lids_all = DcCrmLid.objects.filter(create_date__year=cur_year, create_date__month=cur_month, source_id=ask_source)
+    count_lids_all = lids_all.count()
+    if count_lids_all:
+        # (1) Лиды
+        cell_01 = round(count_lids_all * coef_forecast)
+        # (2) Сделки
+        cell_conv = lids_all.filter(status_id__contains='CONVERTED')
+        cell_02 = round(cell_conv.count() * coef_forecast)
+        # (3) Сделки > 50
+        cell_conv_sum = cell_conv.filter(crm_1493416385__gt=50)
+        cell_03 = round(cell_conv_sum.count() * coef_forecast)
+        # (4) Сд. приоритет
+        # Провайдер=('МТС [кроме МСК и МО]' или 'Билайн')
+        cell_conv_sum_sd_pr = cell_conv.filter(crm_1499437861='', crm_1493413514__in=['2', 'OTHER'])
+        cell_04 = round(cell_conv_sum_sd_pr.count() * coef_forecast)
+        # (5) Ср. чек
+        dct = cell_conv.aggregate(avg=Avg('crm_1493416385'))
+        avg = dct.get('avg')
+        if avg: cell_05 = round(avg)
+        else: cell_05 = 0
+        # (6) Подключки
+        cell_06 = 0
+        # (7) ТП
+        # ('ТП_пр' или 'ТП_нраб' или 'ТП_моб')
+        cell_tp = lids_all.filter(status_id__in=['1', '16', '21', '31', '32', '33'])
+        cell_07 = round(cell_tp.count() * coef_forecast)
+        # (8) ТП IVR
+        # ('ТП IVR')
+        cell_tp = lids_all.filter(status_id__in=['52',])
+        cell_08 = round(cell_tp.count() * coef_forecast)
+        # (9) SEO Лиды ТхВ
+        cell = lids_all.exclude(Q(crm_1571987728429=''))
+        cell_09 = round(cell.count() * coef_forecast)
+        # (10) Сделки 80
+        # https://docs.google.com/spreadsheets/d/1fPFxlhAje5V_kdlSHpLytBbgE6SiBaWtfsrFjw1XYv8/edit#gid=1803529933
+        # ('Билайн', 'МТС [кроме МСК и МО]', 'Ростелеком [кроме МСК]', 'МГТС [МСК и МО]')
+        cell = cell_conv_sum.filter(crm_1493413514__in=['OTHER', '2', '3', '11'])  # Провайдер (INDUSTRY)
+        cell_10 = round(cell.count() * coef_forecast)
+        # (11) Сделки >50
+        # провайдер из переменной ask_provider(список). Для мультибрендовых источников - несколько значений
+        lst = ask_provider.split(';')
+        cell = cell_conv_sum.filter(crm_1493413514__in=lst)  # Провайдер (INDUSTRY)
+        cell_11 = round(cell.count() * coef_forecast)
+
+        out_dict['cell_01'] = cell_01
+        out_dict['cell_02'] = cell_02
+        out_dict['cell_03'] = cell_03
+        out_dict['cell_04'] = cell_04
+        out_dict['cell_05'] = cell_05
+        out_dict['cell_06'] = cell_06
+        out_dict['cell_07'] = cell_07
+        out_dict['cell_08'] = cell_08
+        out_dict['cell_09'] = cell_09
+        out_dict['cell_10'] = cell_10
+        out_dict['cell_11'] = cell_11
+
+    return out_dict
+
+def calculate_site_table(lst_res_source):
+    print(lst_res_source)
+    pass

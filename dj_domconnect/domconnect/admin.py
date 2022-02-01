@@ -1,5 +1,5 @@
 from django.contrib import admin
-from domconnect.models import DcCrmGlobVar, DcCrmLid, DcCashSEO, DcSourceSiteSEO
+from domconnect.models import DcCrmGlobVar, DcCrmLid, DcCashSEO, DcSiteSEO, DcSourceSEO
 from django.db import models
 from django.forms import NumberInput
 
@@ -49,21 +49,22 @@ class DcCrmLidAdmin(admin.ModelAdmin):
 
 @admin.register(DcCashSEO)
 class DcCashSEOAdmin(admin.ModelAdmin):
-    def v_date(self):
-        if self.val_date: return self.val_date.strftime('%m.%Y')
-    v_date.short_description = 'Период'
-
-    list_display = (v_date, 'table', 'row', 'val')
-    # list_display = [field.name for field in DcCashSEO._meta.get_fields()]
-    # search_fields = ('change_date',)
-    list_filter = ('val_date', 'table')
+    list_display = ('val_date', 'num_site', 'num_source', 'row', 'val')
+    search_fields = ('num_site', 'num_source',)
+    list_filter = ('val_date', 'num_site', 'num_source',)
     empty_value_display = '-пусто-'
     date_hierarchy = 'val_date'
 
 
-@admin.register(DcSourceSiteSEO)
-class DcSourceSiteSEOAdmin(admin.ModelAdmin):
-    list_display = [field.name for field in DcSourceSiteSEO._meta.get_fields()]
-    list_display = ('source', 'site', 'provider')
-    search_fields = ('source',)
+@admin.register(DcSiteSEO)
+class DcSiteSEOAdmin(admin.ModelAdmin):
+    list_display = ('site', 'provider', 'num')
+    search_fields = ('site', 'provider',)
     list_filter = ('site', 'provider')
+
+
+@admin.register(DcSourceSEO)
+class DcSourceSEOAdmin(admin.ModelAdmin):
+    list_display = ('source', 'site', 'num')
+    search_fields = ('source',)
+    list_filter = ('source', 'site')

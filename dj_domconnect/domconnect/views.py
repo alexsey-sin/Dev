@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.db.models import Q
 # from django.core.paginator import Paginator
 # from app.forms import NameForm, LizaPhraseForm, GermanPhraseForm, NdzPhraseForm, PzPhraseForm
-from domconnect.models import DcCrmGlobVar, DcCrmLid, DcCashSEO
+from domconnect.models import DcCrmGlobVar, DcCrmLid, DcCashSEO, DcSiteSEO, DcSourceSEO
 from domconnect.thread import thread_download_crm, calculateSEO
 from datetime import datetime
 import calendar
@@ -53,9 +53,9 @@ def index(request):  # Статистика SEO
     col_many = [18, ]  # Номера строк с деньгами
     for i in range(12):
         s_date = f'01.{col_date.month}.{col_date.year}'
-        print(s_date)
+        # print(s_date)
         f_date = datetime.strptime(s_date, '%d.%m.%Y')
-        c_data = DcCashSEO.objects.filter(val_date=f_date, table=1).order_by('row')
+        c_data = DcCashSEO.objects.filter(val_date=f_date, num_site=0, num_source=0).order_by('row')
         c_row = {'head': f'{str_month[col_date.month]} {col_date.year}'}
         for j in range(len(c_data)):
             if j in col_rercent: c_row[str(c_data[j].row)] = f'{round(c_data[j].val,2)}%'
@@ -161,14 +161,71 @@ def dataAjax(request):
     return JsonResponse(response)
 
 @login_required(login_url='/login/')
-def deleteAllLids(request):
+def deleteAllLids(request):  # Удаление всех лидов
     count = DcCrmLid.objects.all().count()
     DcCrmLid.objects.all().delete()
 
     context = {
         'result': 'Ok',
-        'message': f'Записи удалены. ({count})',
+        'message': f'Записи лидов удалены. ({count})',
         'result_style': 'success',
     }
+    return render(request, 'domconnect/show_mess_and_redirect.html', context)
+
+@login_required(login_url='/login/')
+def deleteCash(request):  # Удаление данных из таблицы кэш
+    count = DcCashSEO.objects.all().count()
+    DcSiteSEO.objects.all().delete()
+    DcSiteSEO.objects.all().delete()
+
+    context = {
+        'result': 'Ok',
+        'message': f'Записи кэш удалены. ({count})',
+        'result_style': 'success',
+    }
+    return render(request, 'domconnect/show_mess_and_redirect.html', context)
+
+@login_required(login_url='/login/')
+def upgradeSiteSource(request):  # Удаление и загрузка данных таблиц Site и Source из файла
+    log = logging.getLogger(__name__)  # запустили логгирование
+    err = ''
+    try:
+        with open('SiteSource.json', 'r', encoding='utf-8') as file:
+            js_data = json.load(file)
+        if not js_data or len(js_data) == 0: raise Exception('Нет данных для обновления.')
+        DcSourceSEO.objects.all().delete()
+        DcCashSEO.objects.all().delete()
+        # Перебираем сайты с вложенными источниками и заносим в базу
+        for dct_site in js_data:
+            num =  dct_site.get('num')
+            site = dct_site.get('site')
+            provider = dct_site.get('provider')
+            sources = dct_site.get('sources')
+            if not num or not site or not provider or not sources:
+                raise Exception('Ошибка данных сайта для обновления.')
+            obj_site, _ = DcSiteSEO.objects.get_or_create(num=num, site=site, provider=provider)
+            if not obj_site: raise Exception('Ошибка сохранения сайта.')
+            for rec in sources:
+                num = rec.get('num')
+                source = rec.get('source')
+                if not num or not source: raise Exception('Ошибка данных источника для обновления.')
+                obj_source, _ = DcSourceSEO.objects.get_or_create(num=num, source=source, site=obj_site)
+                if not obj_source: raise Exception('Ошибка сохранения источника.')
+        
+    except Exception as e:
+        err = f'Ошибка upgradeSiteSource: try: {e}'
+        log.info(err)
+    if err:
+        context = {
+            'result': 'Error',
+            'message': f'{err}',
+            'result_style': 'danger',
+        }
+    else:
+        context = {
+            'result': 'Ok',
+            'message': 'Записи Site Source обновлены.',
+            'result_style': 'success',
+        }
     return render(request, 'domconnect/show_mess_and_redirect.html', context)
 

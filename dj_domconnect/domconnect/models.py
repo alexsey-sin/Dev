@@ -178,10 +178,15 @@ class DcCashSEO(models.Model):  # Кэш SEO
     val_date = models.DateField(
         verbose_name='Период',
     )
-    table = models.PositiveSmallIntegerField(  # от 1.  PositiveSmallIntegerField =(от 0 до 32767)
-        verbose_name = 'Таблица',
+    # Основная (Метка SEO) = 0; Далее 1,2,3,... по порядку расположения на странице
+    num_site = models.PositiveSmallIntegerField(  # PositiveSmallIntegerField =(от 0 до 32767)
+        verbose_name = 'Ном. Сайт',
     )
-    row = models.PositiveSmallIntegerField(  # от 1.  PositiveSmallIntegerField =(от 0 до 32767)
+    # Основная (Метка SEO) = 0; Далее 1,2,3,... по порядку расположения на странице в рамках сайта. Для сводной таблицы сайта - 0
+    num_source = models.PositiveSmallIntegerField(
+        verbose_name = 'Ном. Источник',
+    )
+    row = models.PositiveSmallIntegerField(
         verbose_name = 'Строка',
     )
     val = models.DecimalField(
@@ -196,24 +201,41 @@ class DcCashSEO(models.Model):  # Кэш SEO
         return self.val_date.strftime('%m.%Y')
 
 
-class DcSourceSiteSEO(models.Model):  # Источники для перечня тавлиц SEO
+class DcSiteSEO(models.Model):  # Сайты для перечня тавлиц SEO
+    site = models.CharField(  # Название сайта
+        max_length = 100,
+        unique = True,
+        verbose_name='Сайт',
+    )
+    provider = models.CharField( # КОДЫ!!! 
+    # Для мультибрендовых сайтов названия провайдеров через ;
+    # ('Билайн', 'МТС [кроме МСК и МО]', 'Ростелеком [кроме МСК]', 'МГТС [МСК и МО]') = 'OTHER;2;3;11'
+        max_length = 100,
+        verbose_name='Провайдер',
+    )
+    num = models.PositiveSmallIntegerField(
+        verbose_name='Номер п/п',
+    )
+
+    def __str__(self):
+        return self.site
+
+
+class DcSourceSEO(models.Model):  # Источники для перечня тавлиц SEO
     source = models.CharField(  # Название источника
         max_length = 100,
         unique = True,
         verbose_name='Источник',
     )
-    site = models.CharField(
-        max_length = 100,
+    site = models.ForeignKey(
+        DcSiteSEO,
+        on_delete=models.CASCADE,
+        related_name='sources',
         verbose_name='Сайт',
     )
-    provider = models.CharField(
-        max_length = 100,
-        verbose_name='Провайдер',
+    num = models.PositiveSmallIntegerField(
+        verbose_name='Номер п/п',
     )
-    '''
-        Основная
-    
-    '''
-    table = models.PositiveSmallIntegerField(
-        verbose_name = 'Таблица',
-    )
+
+    def __str__(self):
+        return self.source

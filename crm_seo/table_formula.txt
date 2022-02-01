@@ -84,67 +84,83 @@ provider Билайн
 
 К - это фраза провайдера для вычислений в поле Сделки >50 
 
-4 (у МТС) 'МТС [кроме МСК и МО]' OR K = 'Билайн'
 
 
 ====================================================================================================
 Таблица "сайты - Провайдер - Источники"
 
-https://mirbeeline.ru/          Билайн                                  mirbeeline.ru_Билайн                
-https://mirbeeline.ru/          Билайн                                  BEELINE-mir-S-88007008690
-https://mirbeeline.ru/          Билайн                                  BEELINE-mir-Y-88007557502
-https://mirbeeline.ru/          Билайн                                  BEELINE-mir-S-74994905105
-https://mirbeeline.ru/          Билайн                                  BEELINE-mir-G-88007557503
-https://mirbeeline.ru/          Билайн                                  BEELINE-mir-G-74994907110
-https://mirbeeline.ru/          Билайн                                  BEELINE-mir-Y-74994906450
-                    
-https://beelineru.ru/           Билайн                                  beelineru.ru_Билайн
-https://beelineru.ru/           Билайн                                  BEELINE-ru-S-88006001150
-https://beelineru.ru/           Билайн                                  BEELINE-ru-S-74993806540
-                    
-https://beellne.ru              Билайн                                  beellne.ru_Билайн
-https://beellne.ru              Билайн                                  BEELINE-mob-9622001110
-                    
-https://mtsru.ru/               МТС [кроме МСК и МО]                    mtsru.ru_МТС [кроме МСК и МО]
-https://mtsru.ru/               МТС [кроме МСК и МО]                    MTS-mob-9201033750
-https://mtsru.ru/               МТС [кроме МСК и МО]                    MTS-ru-S-88007008905
-https://mtsru.ru/               МТС [кроме МСК и МО]                    MTS-ru-G-88007758779
-https://mtsru.ru/               МТС [кроме МСК и МО]                    MTS-ru-Y-88007759007
-                    
-https://rt-internet.ru/         Ростелеком [кроме МСК]                  rt-internet.ru_Ростелеком [кроме МСК и МО]
-https://rt-internet.ru/         Ростелеком [кроме МСК]                  RTK-int-S-88007755004
-https://rt-internet.ru/         Ростелеком [кроме МСК]                  Умный IVR
-https://rt-internet.ru/         Ростелеком [кроме МСК]                  RTK-net-9038205533
+1 https://mirbeeline.ru/          Билайн (OTHER)
+    1 mirbeeline.ru_Билайн                
+    2 BEELINE-mir-S-88007008690
+    3 BEELINE-mir-Y-88007557502
+    4 BEELINE-mir-S-74994905105
+    5 BEELINE-mir-G-88007557503
+    6 BEELINE-mir-G-74994907110
+    7 BEELINE-mir-Y-74994906450
+            
+2 https://beelineru.ru/           Билайн (OTHER)
+    1 beelineru.ru_Билайн
+    2 BEELINE-ru-S-88006001150
+    3 BEELINE-ru-S-74993806540
+            
+3 https://beellne.ru              Билайн (OTHER)
+    1 beellne.ru_Билайн
+    2 BEELINE-mob-9622001110
+            
+4 https://mtsru.ru/               МТС [кроме МСК и МО] (2)
+    1 mtsru.ru_МТС [кроме МСК и МО]
+    2 MTS-mob-9201033750
+    3 MTS-ru-S-88007008905
+    4 MTS-ru-G-88007758779
+    5 MTS-ru-Y-88007759007
                 
-https://msk-online.ru/          Ростелеком-Онлайм [МСК]                 msk-online.ru_Ростелеком-Онлайм [МСК и МО]
-https://msk-online.ru/          Ростелеком-Онлайм [МСК]                 ONLIME-msk-S-74994040710
+5 https://rt-internet.ru/         Ростелеком [кроме МСК] (3)
+    1 rt-internet.ru_Ростелеком [кроме МСК и МО]
+    2 RTK-int-S-88007755004
+    3 Умный IVR
+    4 RTK-net-9038205533
+            
+6 https://msk-online.ru/          Ростелеком-Онлайм [МСК] (25)
+    1 msk-online.ru_Ростелеком-Онлайм [МСК и МО]
+    2 ONLIME-msk-S-74994040710
+            
+7 https://spb-rt.ru/              Ростелеком [кроме МСК] (3)
+    1 spb-rt.ru_Ростелеком РФ
+        
+8 https://sever-ttk.ru/           ТТК (4)
+    1 sever-ttk.ru_ТТК
+    2 TTK-sev-S-88007550775
+    3 TTK-mob-9023331110
+    4 TTK-sev-G-88007753740
+            
+9 https://wwwttk.ru/              ТТК (4)
+    1 wwwttk.ru_ТТК
+    2 TTK-www-S-88007554775
                 
-https://spb-rt.ru/              Ростелеком [кроме МСК]                  spb-rt.ru_Ростелеком РФ
-                
-https://sever-ttk.ru/           ТТК                                     sever-ttk.ru_ТТК
-https://sever-ttk.ru/           ТТК                                     TTK-sev-S-88007550775
-https://sever-ttk.ru/           ТТК                                     TTK-mob-9023331110
-https://sever-ttk.ru/           ТТК                                     TTK-sev-G-88007753740
-                
-https://wwwttk.ru/              ТТК                                     wwwttk.ru_ТТК
-https://wwwttk.ru/              ТТК                                     TTK-www-S-88007554775
-                    
-https://internet-tv-dom.ru/     Дом.ru                                  internet-tv-dom.ru_Дом.ру
-https://internet-tv-dom.ru/     Дом.ru                                  DOMRU-int-S-88007006790
-                
-https://internetv-dom.ru/       Дом.ru                                  internetv-dom.ru_Дом.ru
-                
-https://inet-yar.ru             ?????                                   inet-yar.ru_IVD
-                
-https://beeline-ural.ru/        Билайн                                  beeline-ural.ru
-                
-mt-home.ru_МТС Москва           МГТС [МСК и МО]                         mt-home.ru_МТС Москва
-                
-mts-ural.ru_МТС Урал            МТС [кроме МСК и МО]                    mts-ural.ru_МТС Урал
+10 https://internet-tv-dom.ru/     Дом.ru (1)
+    1 internet-tv-dom.ru_Дом.ру
+    2 DOMRU-int-S-88007006790
+            
+11 https://internetv-dom.ru/       Дом.ru (1)
+    1 internetv-dom.ru_Дом.ru
+            
+####### https://inet-yar.ru             ?????
+#######     1 inet-yar.ru_IVD
+            
+12 https://beeline-ural.ru/        Билайн (OTHER)
+    1 beeline-ural.ru
+            
+13 mt-home.ru_МТС Москва           МГТС [МСК и МО] (11)
+    1 mt-home.ru_МТС Москва
+        
+14 mts-ural.ru_МТС Урал            МТС [кроме МСК и МО] (2)
+    1 mts-ural.ru_МТС Урал
 
-nbn-24.ru_НетБайНет             ВайФайр-НетБайНет (WIFIRE-NETBYNET)     nbn-24.ru_НетБайНет
+15 nbn-24.ru_НетБайНет             ВайФайр-НетБайНет (WIFIRE-NETBYNET) (12)
+    1 nbn-24.ru_НетБайНет
 
-beeline-ural.ru                 Билайн                                  beeline-ural.ru
+#######  beeline-ural.ru                 Билайн (OTHER)
+#######     1 beeline-ural.ru           ПОВТОР!!!
 
 
 

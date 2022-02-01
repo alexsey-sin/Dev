@@ -1,0 +1,255 @@
+[
+    {
+        "num": "1",
+        "site": "https://mirbeeline.ru/",
+        "provider": "OTHER",
+        "sources": [
+            {
+                "num": "1",
+                "source": "mirbeeline.ru_Билайн"
+            },
+            {
+                "num": "2",
+                "source": "BEELINE-mir-S-88007008690"
+            },
+            {
+                "num": "3",
+                "source": "BEELINE-mir-Y-88007557502"
+            },
+            {
+                "num": "4",
+                "source": "BEELINE-mir-S-74994905105"
+            },
+            {
+                "num": "5",
+                "source": "BEELINE-mir-G-88007557503"
+            },
+            {
+                "num": "6",
+                "source": "BEELINE-mir-G-74994907110"
+            },
+            {
+                "num": "7",
+                "source": "BEELINE-mir-Y-74994906450"
+            }
+        ]
+    },
+    {
+        "num": "2",
+        "site": "https://beelineru.ru/",
+        "provider": "OTHER",
+        "sources": [
+            {
+                "num": "1",
+                "source": "beelineru.ru_Билайн"
+            },
+            {
+                "num": "2",
+                "source": "BEELINE-ru-S-88006001150"
+            },
+            {
+                "num": "3",
+                "source": "BEELINE-ru-S-74993806540"
+            }
+        ]
+    },
+    {
+        "num": "3",
+        "site": "https://beellne.ru",
+        "provider": "OTHER",
+        "sources": [
+            {
+                "num": "1",
+                "source": "beellne.ru_Билайн"
+            },
+            {
+                "num": "2",
+                "source": "BEELINE-mob-9622001110"
+            }
+        ]
+    },
+    {
+        "num": "4",
+        "site": "https://mtsru.ru/",
+        "provider": "2",
+        "sources": [
+            {
+                "num": "1",
+                "source": "mtsru.ru_МТС [кроме МСК и МО]"
+            },
+            {
+                "num": "2",
+                "source": "MTS-mob-9201033750"
+            },
+            {
+                "num": "3",
+                "source": "MTS-ru-S-88007008905"
+            },
+            {
+                "num": "4",
+                "source": "MTS-ru-G-88007758779"
+            },
+            {
+                "num": "5",
+                "source": "MTS-ru-Y-88007759007"
+            }
+        ]
+    },
+    {
+        "num": "5",
+        "site": "https://rt-internet.ru/",
+        "provider": "3",
+        "sources": [
+            {
+                "num": "1",
+                "source": "rt-internet.ru_Ростелеком [кроме МСК и МО]"
+            },
+            {
+                "num": "2",
+                "source": "RTK-int-S-88007755004"
+            },
+            {
+                "num": "3",
+                "source": "Умный IVR"
+            },
+            {
+                "num": "4",
+                "source": "RTK-net-9038205533"
+            }
+        ]
+    },
+    {
+        "num": "6",
+        "site": "https://msk-online.ru/",
+        "provider": "25",
+        "sources": [
+            {
+                "num": "1",
+                "source": "msk-online.ru_Ростелеком-Онлайм [МСК и МО]"
+            },
+            {
+                "num": "2",
+                "source": "ONLIME-msk-S-74994040710"
+            }
+        ]
+    },
+    {
+        "num": "7",
+        "site": "https://spb-rt.ru/",
+        "provider": "3",
+        "sources": [
+            {
+                "num": "1",
+                "source": "spb-rt.ru_Ростелеком РФ"
+            }
+        ]
+    },
+    {
+        "num": "8",
+        "site": "https://sever-ttk.ru/",
+        "provider": "4",
+        "sources": [
+            {
+                "num": "1",
+                "source": "sever-ttk.ru_ТТК"
+            },
+            {
+                "num": "2",
+                "source": "TTK-sev-S-88007550775"
+            },
+            {
+                "num": "3",
+                "source": "TTK-mob-9023331110"
+            },
+            {
+                "num": "4",
+                "source": "TTK-sev-G-88007753740"
+            }
+        ]
+    },
+    {
+        "num": "9",
+        "site": "https://wwwttk.ru/",
+        "provider": "4",
+        "sources": [
+            {
+                "num": "1",
+                "source": "wwwttk.ru_ТТК"
+            },
+            {
+                "num": "2",
+                "source": "TTK-www-S-88007554775"
+            }
+        ]
+    },
+    {
+        "num": "10",
+        "site": "https://internet-tv-dom.ru/",
+        "provider": "1",
+        "sources": [
+            {
+                "num": "1",
+                "source": "internet-tv-dom.ru_Дом.ру"
+            },
+            {
+                "num": "2",
+                "source": "DOMRU-int-S-88007006790"
+            }
+        ]
+    },
+    {
+        "num": "11",
+        "site": "https://internetv-dom.ru/",
+        "provider": "1",
+        "sources": [
+            {
+                "num": "1",
+                "source": "internetv-dom.ru_Дом.ru"
+            }
+        ]
+    },
+    {
+        "num": "12",
+        "site": "https://beeline-ural.ru/",
+        "provider": "OTHER",
+        "sources": [
+            {
+                "num": "1",
+                "source": "beeline-ural.ru"
+            }
+        ]
+    },
+    {
+        "num": "13",
+        "site": "mt-home.ru_МТС Москва",
+        "provider": "11",
+        "sources": [
+            {
+                "num": "1",
+                "source": "mt-home.ru_МТС Москва"
+            }
+        ]
+    },
+    {
+        "num": "14",
+        "site": "mts-ural.ru_МТС Урал",
+        "provider": "2",
+        "sources": [
+            {
+                "num": "1",
+                "source": "mts-ural.ru_МТС Урал"
+            }
+        ]
+    },
+    {
+        "num": "15",
+        "site": "nbn-24.ru_НетБайНет",
+        "provider": "12",
+        "sources": [
+            {
+                "num": "1",
+                "source": "nbn-24.ru_НетБайНет"
+            }
+        ]
+    }
+]
