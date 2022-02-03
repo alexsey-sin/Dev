@@ -4,11 +4,11 @@ from datetime import datetime
 
 class DcCrmGlobVar(models.Model):
     key = models.CharField(  # Название переменной
-        max_length = 100,
+        max_length = 255,
         unique = True,  # Если True, это поле должно быть уникальным во всей таблице.
     )
     val_str = models.CharField(
-        max_length = 100,
+        max_length = 255,
         blank = True,
         default = '',
     )
@@ -43,13 +43,13 @@ class DcCrmLid(models.Model):  # Лид
         verbose_name='ID лида',
     )
     title = models.CharField(
-        max_length = 255,
+        max_length = 512,
         blank = True,
         default = '',
         verbose_name = 'Титл',
     )
     status_id = models.CharField(
-        max_length = 100,
+        max_length = 255,
         blank = True,
         default = '',
         verbose_name='Статус',
@@ -65,13 +65,13 @@ class DcCrmLid(models.Model):  # Лид
         verbose_name='Изменено',
     )
     source_id = models.CharField(
-        max_length = 100,
+        max_length = 255,
         blank = True,
         default = '',
         verbose_name='Источник',
     )
     assigned_by_id = models.CharField(
-        max_length = 100,
+        max_length = 255,
         blank = True,
         default = '',
         verbose_name='Ответственный',
@@ -82,7 +82,7 @@ class DcCrmLid(models.Model):  # Лид
         verbose_name = 'Сумма тарифа',
     )
     crm_1499437861 = models.CharField(
-        max_length = 100,
+        max_length = 255,
         blank = True,
         default = '',
         verbose_name = 'ИНН/Организация',
@@ -93,37 +93,37 @@ class DcCrmLid(models.Model):  # Лид
         verbose_name = 'Звонок?',
     )
     crm_1534919765 = models.CharField(
-        max_length = 100,
+        max_length = 255,
         blank = True,
         default = '',
         verbose_name = 'Группы источников',
     )
     crm_1571987728429 = models.CharField(
-        max_length = 100,
+        max_length = 255,
         blank = True,
         default = '',
         verbose_name = 'Провайдеры ДК',
     )
     crm_1592566018 = models.CharField(
-        max_length = 100,
+        max_length = 255,
         blank = True,
         default = '',
         verbose_name = 'Тип лида',
     )
     crm_1493413514 = models.CharField(
-        max_length = 100,
+        max_length = 255,
         blank = True,
         default = '',
         verbose_name = 'Провайдер',
     )
     crm_1492017494 = models.CharField(
-        max_length = 100,
+        max_length = 255,
         blank = True,
         default = '',
         verbose_name = 'Область',
     )
     crm_1492017736 = models.CharField(
-        max_length = 100,
+        max_length = 255,
         blank = True,
         default = '',
         verbose_name = 'Город',
@@ -134,37 +134,37 @@ class DcCrmLid(models.Model):  # Лид
         verbose_name = 'Юр. лицо',
     )
     crm_1615982450 = models.CharField(
-        max_length = 100,
+        max_length = 255,
         blank = True,
         default = '',
         verbose_name = 'utm_source',
     )
     crm_1615982567 = models.CharField(
-        max_length = 100,
+        max_length = 255,
         blank = True,
         default = '',
         verbose_name = 'utm_medium',
     )
     crm_1615982644 = models.CharField(
-        max_length = 100,
+        max_length = 255,
         blank = True,
         default = '',
         verbose_name = 'utm_campaign',
     )
     crm_1615982716 = models.CharField(
-        max_length = 100,
+        max_length = 255,
         blank = True,
         default = '',
         verbose_name = 'utm_term',
     )
     crm_1615982795 = models.CharField(
-        max_length = 100,
+        max_length = 255,
         blank = True,
         default = '',
         verbose_name = 'utm_content',
     )
     crm_1640267556 = models.CharField(
-        max_length = 100,
+        max_length = 255,
         blank = True,
         default = ' ',
         verbose_name = 'utm_group',
@@ -203,14 +203,14 @@ class DcCashSEO(models.Model):  # Кэш SEO
 
 class DcSiteSEO(models.Model):  # Сайты для перечня тавлиц SEO
     site = models.CharField(  # Название сайта
-        max_length = 100,
+        max_length = 255,
         unique = True,
         verbose_name='Сайт',
     )
     provider = models.CharField( # КОДЫ!!! 
     # Для мультибрендовых сайтов названия провайдеров через ;
     # ('Билайн', 'МТС [кроме МСК и МО]', 'Ростелеком [кроме МСК]', 'МГТС [МСК и МО]') = 'OTHER;2;3;11'
-        max_length = 100,
+        max_length = 255,
         verbose_name='Провайдер',
     )
     num = models.PositiveSmallIntegerField(
@@ -223,7 +223,7 @@ class DcSiteSEO(models.Model):  # Сайты для перечня тавлиц 
 
 class DcSourceSEO(models.Model):  # Источники для перечня тавлиц SEO
     source = models.CharField(  # Название источника
-        max_length = 100,
+        max_length = 255,
         unique = True,
         verbose_name='Источник',
     )

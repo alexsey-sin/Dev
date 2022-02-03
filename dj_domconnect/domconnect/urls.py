@@ -10,7 +10,7 @@ urlpatterns = [
     path('datacrm', views.dataCrm, name='datacrm'),
     path('dataajax', views.dataAjax, name='dataajax'),
 
-    # path('del_all', views.deleteAllLids),
+    # path('del_all_lids', views.deleteAllLids),
     path('del_cash', views.deleteCash),
     path('upgrade_site_source', views.upgradeSiteSource),
 ]

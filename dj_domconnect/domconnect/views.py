@@ -30,6 +30,8 @@ logging.basicConfig(
 
 @login_required(login_url='/login/')
 def index(request):  # Статистика SEO
+    # log = logging.getLogger(__name__)
+    # log.info('Start load page')
     user = request.user
     u_name = user.get_full_name()
     if u_name.strip() == '':
@@ -46,45 +48,91 @@ def index(request):  # Статистика SEO
         label_seo = f'Последнее обновление: {last_datetime}'
     context['label_seo'] = label_seo
 
+    # Собираем строку заголовков и основную таблицу
     str_month = ['', 'Янв.', 'Фев.', 'Мар.', 'Апр.', 'Май', 'Июн.', 'Июл.', 'Авг.', 'Сен.', 'Окт.', 'Ноя.', 'Дек.']
     col_date = datetime.today()
-    col_month = []
-    col_rercent = [2, 7, 9, 10, 14, 22, 23]  # Номера строк с процентами
-    col_many = [18, ]  # Номера строк с деньгами
-    for i in range(12):
+    data_month = []
+    col_rercent = [2, 7, 9, 10, 14, 22, 23]  # Индексы строк с процентами
+    col_many = [18, ]  # Индексы строк с деньгами
+    data_0_table = []
+    for _ in range(12):
         s_date = f'01.{col_date.month}.{col_date.year}'
-        # print(s_date)
         f_date = datetime.strptime(s_date, '%d.%m.%Y')
         c_data = DcCashSEO.objects.filter(val_date=f_date, num_site=0, num_source=0).order_by('row')
-        c_row = {'head': f'{str_month[col_date.month]} {col_date.year}'}
+        data_month.append({'head': f'{str_month[col_date.month]} {col_date.year}'})
+        c_row = {}
         for j in range(len(c_data)):
             if j in col_rercent: c_row[str(c_data[j].row)] = f'{round(c_data[j].val,2)}%'
             elif j in col_many: c_row[str(c_data[j].row)] = f'{round(c_data[j].val)}р.'
             else: c_row[str(c_data[j].row)] = str(round(c_data[j].val))
-            # print(r_data.row, r_data.val)
-        # print(c_row)
-        col_month.append(c_row)
-        # break
-    
+        data_0_table.append(c_row)
         col_date = col_date - timedelta(days=col_date.day)
-    col_month.reverse()
     
-    with open('col_month.json', 'w', encoding='utf-8') as out_file:
-        json.dump(col_month, out_file, ensure_ascii=False, indent=4)
+    data_month.reverse()
+    data_0_table.reverse()
+    context['data_month'] = data_month
+    context['data_0_table'] = data_0_table
 
-    # print(col_month)
-    context['col_month'] = col_month
+    # with open('data_month.json', 'w', encoding='utf-8') as out_file:
+    #     json.dump(data_month, out_file, ensure_ascii=False, indent=4)
 
+    # Собираем таблицы сайтов с источниками
+    data_sites = []
+    objs_site = DcSiteSEO.objects.all().order_by('num')
+    for obj_site in objs_site:
+        item_sites = {'id': obj_site.num, 'name_site': obj_site.site}
+        
+        # Таблицы сайта по месяцам
+        col_rercent = [1, 3, 6, 7, 9, 12, 13, 16, 17, 18, 19, 20]  # Индексы строк с процентами
+        col_many = [24, ]  # Индексы строк с деньгами
+        site_table = []  # Список словарей по месяцам сводной таблицы сайта
+        col_date = datetime.today()
+        for _ in range(12):
+            s_date = f'01.{col_date.month}.{col_date.year}'
+            f_date = datetime.strptime(s_date, '%d.%m.%Y')
+            c_data = DcCashSEO.objects.filter(val_date=f_date, num_site=obj_site.num, num_source=0).order_by('row')
+            c_row = {}
+            for j in range(len(c_data)):
+                if j in col_rercent: c_row[str(c_data[j].row)] = f'{round(c_data[j].val,2)}%'
+                elif j in col_many: c_row[str(c_data[j].row)] = f'{round(c_data[j].val)}р.'
+                else: c_row[str(c_data[j].row)] = str(round(c_data[j].val))
+            site_table.append(c_row)
+            col_date = col_date - timedelta(days=col_date.day)
+        site_table.reverse()
+        item_sites['site_table'] = site_table
+        
+        # Проход по источникам сайта
+        source_tables = []
+        sources = DcSourceSEO.objects.filter(site=obj_site).order_by('num')
+        for source in sources:
+            item_source = {'name_source': source.source}
+            it_src_month = []
+            src_date = datetime.today()
+            for _ in range(12):
+                s_date = f'01.{src_date.month}.{src_date.year}'
+                f_date = datetime.strptime(s_date, '%d.%m.%Y')
+                cash_source = DcCashSEO.objects.filter(val_date=f_date, num_site=obj_site.num, num_source=source.num).order_by('row')
+                c_row = {}
+                for j in range(len(cash_source)):
+                    if j == 4: c_row[str(cash_source[j].row)] = f'{round(cash_source[j].val)}р.'
+                    else: c_row[str(cash_source[j].row)] = str(round(cash_source[j].val))
+                it_src_month.append(c_row)
+                src_date = src_date - timedelta(days=src_date.day)
+            it_src_month.reverse()
+            item_source['months'] = it_src_month
+            source_tables.append(item_source)
 
+        item_sites['source_tables'] = source_tables
+        
+        data_sites.append(item_sites)
 
+    context['data_sites'] = data_sites
 
-
-
-
-
-
+    # with open('data_sites.json', 'w', encoding='utf-8') as out_file:
+    #     json.dump(data_sites, out_file, ensure_ascii=False, indent=4)
 
     context['segment'] = 'statseo'
+    # log.info('Stop load page')
     return render(request, 'domconnect/statseo.html', context)
     
 @login_required(login_url='/login/')
@@ -160,6 +208,9 @@ def dataAjax(request):
         response['is_run'] = True
     return JsonResponse(response)
 
+
+################################################################################################
+# API
 @login_required(login_url='/login/')
 def deleteAllLids(request):  # Удаление всех лидов
     count = DcCrmLid.objects.all().count()
@@ -175,8 +226,7 @@ def deleteAllLids(request):  # Удаление всех лидов
 @login_required(login_url='/login/')
 def deleteCash(request):  # Удаление данных из таблицы кэш
     count = DcCashSEO.objects.all().count()
-    DcSiteSEO.objects.all().delete()
-    DcSiteSEO.objects.all().delete()
+    DcCashSEO.objects.all().delete()
 
     context = {
         'result': 'Ok',
@@ -193,8 +243,8 @@ def upgradeSiteSource(request):  # Удаление и загрузка данн
         with open('SiteSource.json', 'r', encoding='utf-8') as file:
             js_data = json.load(file)
         if not js_data or len(js_data) == 0: raise Exception('Нет данных для обновления.')
+        DcSiteSEO.objects.all().delete()
         DcSourceSEO.objects.all().delete()
-        DcCashSEO.objects.all().delete()
         # Перебираем сайты с вложенными источниками и заносим в базу
         for dct_site in js_data:
             num =  dct_site.get('num')
