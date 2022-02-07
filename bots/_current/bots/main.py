@@ -21,8 +21,9 @@ logging.basicConfig(
 # BID_TELEGRAM_TOKEN = '526322367:AAEaw2vaeLl_f6Njfb952NopyxqCGRQXji8'
 
 # Константы
-PERIOD_10_SEC = 3
+PERIOD_10_SEC = 10
 PERIOD_1_SEC = 1
+PERIOD_1_HOUR = 60 * 60
 
 
 if __name__ == '__main__':
@@ -43,13 +44,10 @@ if __name__ == '__main__':
         # Скрипт Сбор_инфо ЛК МТС
         if stm_lk_mts:
             passed = (cur_time - stm_lk_mts).seconds
-        if stm_lk_mts == None or passed >= PERIOD_10_SEC:
+        if stm_lk_mts == None or passed >= PERIOD_1_HOUR:
             stm_lk_mts = cur_time
             logging.info('Старт "Сбор_инфо ЛК МТС"')
             run_lk_mts(logging)
-            # print(f'start txv_beeline {str_time}')
-            # run_txv_beeline(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
-            # run_txv_beeline(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN)
             continue
 
         #===============================================#
