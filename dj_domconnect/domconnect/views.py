@@ -7,10 +7,8 @@ from django.db.models import Q
 # from django.core.paginator import Paginator
 # from app.forms import NameForm, LizaPhraseForm, GermanPhraseForm, NdzPhraseForm, PzPhraseForm
 from domconnect.models import DcCrmGlobVar, DcCrmLid, DcCashSEO, DcSiteSEO, DcSourceSEO
-from domconnect.thread import thread_download_crm, calculateSEO
-from datetime import datetime
-import calendar
-from datetime import timedelta
+from domconnect.download_lids import run_download_crm
+from datetime import datetime, timedelta
 from django.http import JsonResponse
 import threading
 from threading import Thread
@@ -203,7 +201,7 @@ def dataAjax(request):
         gvar_cur.save(update_fields=['val_int'])
 
         # Запустим поток загрузки
-        th = Thread(target=thread_download_crm, name=thread_name, args=(str_from_modify, ))
+        th = Thread(target=run_download_crm, name=thread_name, args=(str_from_modify, ))
         th.start()
         response['is_run'] = True
     return JsonResponse(response)

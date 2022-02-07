@@ -22,13 +22,13 @@ INSTALLED_APPS = [
     'rest_framework',
     # 'rest_framework_simplejwt',
     'rest_framework.authtoken',
-    # 'djoser',
     'app',
     'api',
     'demo',
     'mobile',
     'domconnect',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
