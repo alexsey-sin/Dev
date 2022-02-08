@@ -16,7 +16,7 @@
     <body>
 
 
-        <div id="placeholder" style="width:600px;height:300px;"></div>
+        <!-- <div id="placeholder" style="width:600px;height:300px;"></div> -->
 
 
 
@@ -41,8 +41,8 @@
                     <tr>
                         <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Лиды</td>
                         {% for col in data_0_table %}
-                            {% if forloop.counter == 13 %} <!-- Колонка "График" -->
-                                <td>----</td>
+                            {% if forloop.counter == 13 %} <!-- Колонка "График"  width:50px;height:30px;-->
+                                <td id="placeholder" class="grafic"></td>
                             {% else %}
                                 <td>{{ col.1|floatformat:0 }}</td>
                             {% endif %}
@@ -842,29 +842,43 @@
         // { data: [["2010/10/01", 13], ["2010/10/5", 23],
         //         ["2010/10/10", 32], ["2010/10/15", 33]]}
         // ];
-        data = [4,5,8,9,2,1,0,4,5,6]
+        var data = new Array();
+		var in_data = [4,5,8,9,2,1,0,4,5,6,0,5];
+		for(var i = 0; i < in_data.length; ++i){data[i] = [i, in_data[i]];}
+			// data[i] = new Array();
+			// data[i][0] = i; data[i][1] = in_data[i];
+		// }
+		// alert(data)
         // // преобразуем даты в UTC
         // for(var j = 0; j < all_data.length; ++j) {
         // for(var i = 0; i < all_data[j].data.length; ++i)
         // all_data[j].data[i][0] = Date.parse(all_data[j].data[i][0]);
         // }
         var all_data = [
-            { color: 0, data: [[1, 0], [2, 10], [3, 70]]},
-            { color: 1, data: [[1, 130], [2, 230], [3, 320]]}
+            { color: "#000", data: data},
+            <!-- { color: 1, data: [[1, 130], [2, 230], [3, 320]]} -->
         // ВАЖНО: IE не понимает запятых на конце :(
         ];
         // свойства графика
         var plot_conf = {
-        series: {
-        lines: {
-            show: true,
-            lineWidth: 1
-        }
-        },
-        // xaxis: {
-        // mode: "time",
-        // timeformat: "%y/%m/%d",
-        // }
+			series: {
+				lines: {
+					show: true,
+					lineWidth: 1
+				}
+			},
+			xaxis: {
+				mode: null,
+				tickColor: "FFFFFF",
+				ticks: [],
+				labelWidth: null
+			},
+			yaxis: {
+				mode: null,
+				tickColor: "FFFFFF",
+				ticks: [],
+				labelWidth: null
+			}
         };
         // выводим график
         $.plot($("#placeholder"), all_data, plot_conf);

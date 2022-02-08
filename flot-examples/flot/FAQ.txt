@@ -1,71 +1,71 @@
-Frequently asked questions
+Часто задаваемые вопросы
 --------------------------
 
-Q: How much data can Flot cope with?
+В: С каким объемом данных может справиться Flot?
 
-A: Flot will happily draw everything you send to it so the answer
-depends on the browser. The excanvas emulation used for IE (built with
-VML) makes IE by far the slowest browser so be sure to test with that
-if IE users are in your target group.
+A: Flot с радостью примет все, что вы отправите ему, так что ответ
+зависит от браузера. Эмуляция excanvas, используемая для IE (созданная с
+VML) делает IE самым медленным браузером, поэтому обязательно протестируйте его.
+если пользователи IE входят в вашу целевую группу.
 
-1000 points is not a problem, but as soon as you start having more
-points than the pixel width, you should probably start thinking about
-downsampling/aggregation as this is near the resolution limit of the
-chart anyway. If you downsample server-side, you also save bandwidth.
-
-
-Q: Flot isn't working when I'm using JSON data as source!
-
-A: Actually, Flot loves JSON data, you just got the format wrong.
-Double check that you're not inputting strings instead of numbers,
-like [["0", "-2.13"], ["5", "4.3"]]. This is most common mistake, and
-the error might not show up immediately because Javascript can do some
-conversion automatically.
+1000 баллов - это не проблема, но как только вы начнете получать больше
+точек, чем ширина пикселя, вы, вероятно, должны начать думать о
+субдискретизация/агрегация, так как это близко к пределу разрешения
+график в любом случае. Если вы понижаете частоту дискретизации на стороне сервера, вы также экономите пропускную способность.
 
 
-Q: Can I export the graph?
+В: Flot не работает, когда я использую данные JSON в качестве источника!
 
-A: This is a limitation of the canvas technology. There's a hook in
-the canvas object for getting an image out, but you won't get the tick
-labels. And it's not likely to be supported by IE. At this point, your
-best bet is probably taking a screenshot, e.g. with PrtScn.
-
-
-Q: The bars are all tiny in time mode?
-
-A: It's not really possible to determine the bar width automatically.
-So you have to set the width with the barWidth option which is NOT in
-pixels, but in the units of the x axis (or the y axis for horizontal
-bars). For time mode that's milliseconds so the default value of 1
-makes the bars 1 millisecond wide.
+A: На самом деле, Flot любит данные JSON, вы просто ошиблись форматом.
+Дважды проверьте, что вы не вводите строки вместо чисел,
+например [["0", "-2.13"], ["5", "4.3"]]. Это самая распространенная ошибка, и
+ошибка может появиться не сразу, потому что Javascript может сделать некоторые
+преобразование автоматически.
 
 
-Q: Can I use Flot with libraries like Mootools or Prototype?
+В: Могу ли я экспортировать график?
 
-A: Yes, Flot supports it out of the box and it's easy! Just use jQuery
-instead of $, e.g. call jQuery.plot instead of $.plot and use
-jQuery(something) instead of $(something). As a convenience, you can
-put in a DOM element for the graph placeholder where the examples and
-the API documentation are using jQuery objects.
-
-Depending on how you include jQuery, you may have to add one line of
-code to prevent jQuery from overwriting functions from the other
-libraries, see the documentation in jQuery ("Using jQuery with other
-libraries") for details.
+О: Это ограничение технологии холста. есть крючок
+объект холста для вывода изображения, но вы не получите галочку
+этикетки. И вряд ли он будет поддерживаться IE. В этот момент ваш
+лучше всего, вероятно, сделать снимок экрана, например. с помощью PrtScn.
 
 
-Q: Flot doesn't work with [widget framework xyz]!
+В: В режиме времени все полосы крошечные?
 
-A: The problem is most likely within the framework, or your use of the
-framework.
+A: На самом деле невозможно определить ширину полосы автоматически.
+Таким образом, вы должны установить ширину с параметром barWidth, которого нет в
+пикселей, но в единицах оси x (или оси y для горизонтального
+бары). Для режима времени это миллисекунды, поэтому значение по умолчанию равно 1.
+делает полосы шириной 1 миллисекунду.
 
-The only non-standard thing used by Flot is the canvas tag; otherwise
-it is simply a series of absolute positioned divs within the
-placeholder tag you put in. If this is not working, it's probably
-because the framework you're using is doing something weird with the
-DOM. As a last resort, you might try replotting and see if it helps.
 
-If you find there's a specific thing we can do to Flot to help, feel
-free to submit a bug report. Otherwise, you're welcome to ask for help
-on the mailing list, but please don't submit a bug report to Flot -
-try the framework instead.
+В: Могу ли я использовать Flot с такими библиотеками, как Mootools или Prototype?
+
+О: Да, Flot поддерживает его из коробки, и это просто! Просто используйте jQuery
+вместо $, например. вызовите jQuery.plot вместо $.plot и используйте
+jQuery(что-то) вместо $(что-то). Для удобства можно
+поместите элемент DOM для заполнителя графика, где примеры и
+документация API использует объекты jQuery.
+
+В зависимости от того, как вы включаете jQuery, вам, возможно, придется добавить одну строку
+код для предотвращения перезаписи jQuery функций из других
+библиотеки, см. документацию по jQuery ("Использование jQuery с другими
+библиотеки") для получения подробной информации.
+
+
+Q: Flot не работает с [widget framework xyz]!
+
+A: Проблема, скорее всего, внутри фреймворка или использования вами
+рамки.
+
+Единственная нестандартная вещь, используемая Flot, — это тег canvas; в противном случае
+это просто серия div с абсолютным позиционированием внутри
+тег-заполнитель, который вы вставили. Если это не работает, возможно, это
+потому что используемый вами фреймворк делает что-то странное с
+ДОМ. В крайнем случае, вы можете попробовать перестроить и посмотреть, поможет ли это.
+
+Если вы обнаружите, что мы можем помочь Флоту чем-то конкретным, почувствуйте себя
+бесплатно отправить отчет об ошибке. В противном случае вы можете обратиться за помощью
+в списке рассылки, но, пожалуйста, не отправляйте отчет об ошибке во Flot -
+вместо этого попробуйте фреймворк.

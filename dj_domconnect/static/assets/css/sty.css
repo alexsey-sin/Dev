@@ -22,7 +22,11 @@ table {
     max-width: 75px;
     text-align: center;
   }
-  
+  .grafic {
+    padding: 0px;
+	margin: 0px;
+	border-spacing: 0px;
+  }
   .table-fixed-head thead tr {
     display: block;
     position: relative;
