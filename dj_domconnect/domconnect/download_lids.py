@@ -594,7 +594,7 @@ def calculate_site_table(lst_res_source):
     # (16) Кол-во заявок
     cell_16 = lst_res_source[0]['cell_01']
     # (15) Кол-во звонков
-    if cell_16: cell_15 = round((cell_01 / cell_16) * 100, 2)
+    cell_15 = cell_01 - cell_16
     # (17) % звонков от заявок 
     if cell_16: cell_17 = round((cell_15 / cell_16) * 100, 2)
     # (18) % приор. сделок заявка

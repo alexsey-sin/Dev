@@ -12,8 +12,7 @@ from datetime import datetime, timedelta
 from django.http import JsonResponse
 import threading
 from threading import Thread
-import logging
-import json
+import logging, json, copy
 
 
 logging.basicConfig(
@@ -25,6 +24,7 @@ logging.basicConfig(
 # log.info('So should this')
 # # # # log.debug('This message should go to the log file')
 # # # # log.warning('And this, too')
+
 
 @login_required(login_url='/login/')
 def index(request):  # Статистика SEO
@@ -50,8 +50,6 @@ def index(request):  # Статистика SEO
     str_month = ['', 'Янв.', 'Фев.', 'Мар.', 'Апр.', 'Май', 'Июн.', 'Июл.', 'Авг.', 'Сен.', 'Окт.', 'Ноя.', 'Дек.']
     col_date = datetime.today()
     data_month = []
-    col_rercent = [2, 7, 9, 10, 14, 22, 23]  # Индексы строк с процентами
-    col_many = [18, ]  # Индексы строк с деньгами
     data_0_table = []
     for _ in range(12):
         s_date = f'01.{col_date.month}.{col_date.year}'
@@ -59,20 +57,40 @@ def index(request):  # Статистика SEO
         c_data = DcCashSEO.objects.filter(val_date=f_date, num_site=0, num_source=0).order_by('row')
         data_month.append({'head': f'{str_month[col_date.month]} {col_date.year}'})
         c_row = {}
-        for j in range(len(c_data)):
-            if j in col_rercent: c_row[str(c_data[j].row)] = f'{round(c_data[j].val,2)}%'
-            elif j in col_many: c_row[str(c_data[j].row)] = f'{round(c_data[j].val)}р.'
-            else: c_row[str(c_data[j].row)] = str(round(c_data[j].val))
+        for j in range(len(c_data)): c_row[c_data[j].row] = c_data[j].val
         data_0_table.append(c_row)
         col_date = col_date - timedelta(days=col_date.day)
-    
     data_month.reverse()
     data_0_table.reverse()
+
+    # Добавляем дополнительные столбцы "График" и "Сравн. мес"
+    col_fabula = data_0_table[-1]  # В качестве шаблона новых колонок берем последнюю (свежий месяц)
+    if len(col_fabula):
+        col_gr = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
+        col_cm = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
+
+        for key, _ in col_fabula.items():
+            # gr = []
+            gr = 0
+            for i in range(12): 
+                if len(data_0_table[i]):
+                    # gr.append(site_table[i][key])
+                    gr = 0
+            col_gr[key] = gr
+            # Для колонки "Сравн. мес" вычислим значение
+            num_new = data_0_table[11].get(key)
+            num_old = data_0_table[10].get(key)
+            if num_new and num_old:
+                cm = round((num_new / num_old - 1) * 100)
+                col_cm[key] = cm
+        data_0_table.append(col_gr)  # 13 колонка "График"
+        data_0_table.append(col_cm)  # 14 колонка "Сравн. мес"
+
     context['data_month'] = data_month
     context['data_0_table'] = data_0_table
 
-    # with open('data_month.json', 'w', encoding='utf-8') as out_file:
-    #     json.dump(data_month, out_file, ensure_ascii=False, indent=4)
+    # with open('data_0_table.json', 'w', encoding='utf-8') as out_file:
+    #     json.dump(data_0_table, out_file, ensure_ascii=False, indent=4)
 
     # Собираем таблицы сайтов с источниками
     data_sites = []
@@ -81,8 +99,6 @@ def index(request):  # Статистика SEO
         item_sites = {'id': obj_site.num, 'name_site': obj_site.site}
         
         # Таблицы сайта по месяцам
-        col_rercent = [1, 3, 6, 7, 9, 12, 13, 16, 17, 18, 19, 20]  # Индексы строк с процентами
-        col_many = [24, ]  # Индексы строк с деньгами
         site_table = []  # Список словарей по месяцам сводной таблицы сайта
         col_date = datetime.today()
         for _ in range(12):
@@ -90,13 +106,33 @@ def index(request):  # Статистика SEO
             f_date = datetime.strptime(s_date, '%d.%m.%Y')
             c_data = DcCashSEO.objects.filter(val_date=f_date, num_site=obj_site.num, num_source=0).order_by('row')
             c_row = {}
-            for j in range(len(c_data)):
-                if j in col_rercent: c_row[str(c_data[j].row)] = f'{round(c_data[j].val,2)}%'
-                elif j in col_many: c_row[str(c_data[j].row)] = f'{round(c_data[j].val)}р.'
-                else: c_row[str(c_data[j].row)] = str(round(c_data[j].val))
+            for j in range(len(c_data)): c_row[str(c_data[j].row)] = c_data[j].val
             site_table.append(c_row)
             col_date = col_date - timedelta(days=col_date.day)
         site_table.reverse()
+
+        # Добавляем дополнительные столбцы "График" и "Сравн. мес"
+        col_fabula = site_table[-1]  # В качестве шаблона новых колонок берем последнюю (свежий месяц)
+        if len(col_fabula):
+            col_gr = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
+            col_cm = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
+
+            for key, _ in col_fabula.items():
+                # gr = []
+                gr = 0
+                for i in range(12): 
+                    if len(site_table[i]):
+                        # gr.append(site_table[i][key])
+                        gr = 0
+                col_gr[key] = gr
+                # Для колонки "Сравн. мес" вычислим значение
+                num_new = site_table[11].get(key)
+                num_old = site_table[10].get(key)
+                if num_new and num_old:
+                    cm = round((num_new / num_old - 1) * 100)
+                    col_cm[key] = cm
+            site_table.append(col_gr)  # 13 колонка "График"
+            site_table.append(col_cm)  # 14 колонка "Сравн. мес"
         item_sites['site_table'] = site_table
         
         # Проход по источникам сайта
@@ -111,12 +147,34 @@ def index(request):  # Статистика SEO
                 f_date = datetime.strptime(s_date, '%d.%m.%Y')
                 cash_source = DcCashSEO.objects.filter(val_date=f_date, num_site=obj_site.num, num_source=source.num).order_by('row')
                 c_row = {}
-                for j in range(len(cash_source)):
-                    if j == 4: c_row[str(cash_source[j].row)] = f'{round(cash_source[j].val)}р.'
-                    else: c_row[str(cash_source[j].row)] = str(round(cash_source[j].val))
+                for j in range(len(cash_source)): c_row[str(cash_source[j].row)] = cash_source[j].val
                 it_src_month.append(c_row)
                 src_date = src_date - timedelta(days=src_date.day)
             it_src_month.reverse()
+            
+            # Добавляем дополнительные столбцы "График" и "Сравн. мес"
+            col_fabula = it_src_month[-1]  # В качестве шаблона новых колонок берем последнюю (свежий месяц)
+            if len(col_fabula):
+                col_gr = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
+                col_cm = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
+
+                for key, _ in col_fabula.items():
+                    # gr = []
+                    gr = 0
+                    for i in range(12): 
+                        if len(it_src_month[i]):
+                            # gr.append(site_table[i][key])
+                            gr = 0
+                    col_gr[key] = gr
+                    # Для колонки "Сравн. мес" вычислим значение
+                    num_new = it_src_month[11].get(key)
+                    num_old = it_src_month[10].get(key)
+                    if num_new and num_old:
+                        cm = round((num_new / num_old - 1) * 100)
+                        col_cm[key] = cm
+                it_src_month.append(col_gr)  # 13 колонка "График"
+                it_src_month.append(col_cm)  # 14 колонка "Сравн. мес"
+            
             item_source['months'] = it_src_month
             source_tables.append(item_source)
 

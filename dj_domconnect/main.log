@@ -12247,3 +12247,9 @@ AttributeError: type object 'datetime.datetime' has no attribute 'datetime'
 2022-02-07 14:51:02,717:domconnect.download_lids:Старт загрузки лидов.
 2022-02-07 14:53:53,206:domconnect.download_lids:Загрузка завершена. Обработано лидов: 4105. Ошибок: 0
 2022-02-07 14:56:11,356:domconnect.download_lids:Расчет и сохранение в кэш закончено.
+2022-02-08 12:15:34,168:domconnect.download_lids:Старт загрузки лидов.
+2022-02-08 12:16:15,388:domconnect.download_lids:Загрузка завершена. Обработано лидов: 1007. Ошибок: 0
+2022-02-08 12:18:34,039:domconnect.download_lids:Расчет и сохранение в кэш закончено.
+2022-02-08 15:28:59,403:domconnect.download_lids:Старт загрузки лидов.
+2022-02-08 15:29:19,213:domconnect.download_lids:Загрузка завершена. Обработано лидов: 510. Ошибок: 0
+2022-02-08 15:44:49,538:domconnect.download_lids:Расчет и сохранение в кэш закончено.
