@@ -70,12 +70,15 @@ def index(request):  # Статистика SEO
         col_cm = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
 
         for key, _ in col_fabula.items():
-            # gr = []
-            gr = 0
+            gr = []
+            # gr = 0
             for i in range(12): 
-                if len(data_0_table[i]):
-                    # gr.append(site_table[i][key])
-                    gr = 0
+                # if len(data_0_table[i]):
+                val = data_0_table[i].get(key)
+                if val: val = int(val)
+                else: val = 0
+                gr.append(val)
+                    # gr = 0
             col_gr[key] = gr
             # Для колонки "Сравн. мес" вычислим значение
             num_new = data_0_table[11].get(key)

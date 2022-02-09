@@ -1,40 +1,40 @@
 .group-s{
-    display: none;
-  }
-  
+  display: none;
+}
+
 .tr-open{
   display: table-row;
 }
 table {
-    min-width: 1300px;
-    font-size: 13px;
+  min-width: 1300px;
+  font-size: 13px;
 }
 .table-fixed-head {
-    width: 100%;
-    table-layout: fixed;
-    border-collapse: collapse;
-  }
-  
-  .table-fixed-head th,
-  .table-fixed-head td {
-    padding: 1px;
-    min-width: 75px;
-    max-width: 75px;
-    text-align: center;
-  }
-  .grafic {
-    padding: 0px;
-	margin: 0px;
-	border-spacing: 0px;
-  }
-  .table-fixed-head thead tr {
-    display: block;
-    position: relative;
-  }
-  
-  .table-fixed-head tbody {
-    display: block;
-    overflow: auto;
-    width: 100%;
-    height: calc(710px - 30px);
-  }
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.table-fixed-head th,
+.table-fixed-head td {
+  padding: 1px;
+  min-width: 75px;
+  max-width: 75px;
+  text-align: center;
+}
+.table-fixed-head thead tr {
+  display: block;
+  position: relative;
+}
+.table-fixed-head tbody {
+  display: block;
+  overflow: auto;
+  width: 100%;
+  height: calc(710px - 30px);
+}
+
+.td_grafic {
+  padding: 0px;
+  margin: 0px;
+  border-spacing: 0px;
+}

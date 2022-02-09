@@ -42,7 +42,7 @@
                         <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Лиды</td>
                         {% for col in data_0_table %}
                             {% if forloop.counter == 13 %} <!-- Колонка "График"  width:50px;height:30px;-->
-                                <td id="placeholder" class="grafic"></td>
+                                <td class="td_grafic" gr_data="{{ col.1 }}" id="placeholder"></td>
                             {% else %}
                                 <td>{{ col.1|floatformat:0 }}</td>
                             {% endif %}
@@ -52,7 +52,7 @@
                         <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Реальные лиды<br>(без ТП)</td>
                         {% for col in data_0_table %}
                             {% if forloop.counter == 13 %}
-                                <td>----</td>
+                            <td class="td_grafic" gr_data="{{ col.2 }}"></td>
                             {% else %}
                                 <td>{{ col.2|floatformat:0 }}</td>
                             {% endif %}
@@ -835,6 +835,46 @@
         }
     </script>
     <script language="javascript" type="text/javascript">
+        $(document).ready(function(){
+            draw_grafic();
+        });
+        function draw_grafic(){
+            var gr_elems = document.getElementsByClassName('td_grafic');
+            console.log(gr_elems.length);
+            for(let i = 0; i < gr_elems.length; i++){
+                in_data = gr_elems[i].getAttribute('gr_data');
+                console.log(in_data);
+                var draw_data = new Array();
+                for(var j = 0; j < in_data.length; ++j){draw_data[j] = [j, in_data[j]];}
+
+                var all_data = [
+                    { color: "#000", data: draw_data},
+                ];
+
+                var plot_conf = {
+                    series: {
+                        lines: {
+                            show: true,
+                            lineWidth: 1
+                        }
+                    },
+                    xaxis: {
+                        mode: null,
+                        tickColor: "FFFFFF",
+                        ticks: [],
+                        labelWidth: null
+                    },
+                    yaxis: {
+                        mode: null,
+                        tickColor: "FFFFFF",
+                        ticks: [],
+                        labelWidth: null
+                    }
+                };
+                $.plot($(gr_elems[i]), all_data, plot_conf);
+                // console.log(array[i]);
+            } 
+        }
         // данные для графиков
         // var all_data = [
         // { data: [["2010/10/01", 0], ["2010/10/5", 1],
@@ -842,9 +882,9 @@
         // { data: [["2010/10/01", 13], ["2010/10/5", 23],
         //         ["2010/10/10", 32], ["2010/10/15", 33]]}
         // ];
-        var data = new Array();
-		var in_data = [4,5,8,9,2,1,0,4,5,6,0,5];
-		for(var i = 0; i < in_data.length; ++i){data[i] = [i, in_data[i]];}
+        // var data = new Array();
+		// var in_data = [4,5,8,9,2,1,0,4,5,6,0,5];
+		// for(var i = 0; i < in_data.length; ++i){data[i] = [i, in_data[i]];}
 			// data[i] = new Array();
 			// data[i][0] = i; data[i][1] = in_data[i];
 		// }
@@ -854,34 +894,34 @@
         // for(var i = 0; i < all_data[j].data.length; ++i)
         // all_data[j].data[i][0] = Date.parse(all_data[j].data[i][0]);
         // }
-        var all_data = [
-            { color: "#000", data: data},
-            <!-- { color: 1, data: [[1, 130], [2, 230], [3, 320]]} -->
-        // ВАЖНО: IE не понимает запятых на конце :(
-        ];
-        // свойства графика
-        var plot_conf = {
-			series: {
-				lines: {
-					show: true,
-					lineWidth: 1
-				}
-			},
-			xaxis: {
-				mode: null,
-				tickColor: "FFFFFF",
-				ticks: [],
-				labelWidth: null
-			},
-			yaxis: {
-				mode: null,
-				tickColor: "FFFFFF",
-				ticks: [],
-				labelWidth: null
-			}
-        };
-        // выводим график
-        $.plot($("#placeholder"), all_data, plot_conf);
+        // var all_data = [
+        //     { color: "#000", data: data},
+        //     //  { color: 1, data: [[1, 130], [2, 230], [3, 320]]}
+        // // ВАЖНО: IE не понимает запятых на конце :(
+        // ];
+        // // свойства графика
+        // var plot_conf = {
+		// 	series: {
+		// 		lines: {
+		// 			show: true,
+		// 			lineWidth: 1
+		// 		}
+		// 	},
+		// 	xaxis: {
+		// 		mode: null,
+		// 		tickColor: "FFFFFF",
+		// 		ticks: [],
+		// 		labelWidth: null
+		// 	},
+		// 	yaxis: {
+		// 		mode: null,
+		// 		tickColor: "FFFFFF",
+		// 		ticks: [],
+		// 		labelWidth: null
+		// 	}
+        // };
+        // // выводим график
+        // $.plot($("#placeholder"), all_data, plot_conf);
         // https://eax.me/flot/
     </script>
 </html>
