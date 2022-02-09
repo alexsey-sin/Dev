@@ -13,7 +13,7 @@ url_onlime = 'https://dealer.onlime.ru'  # Рабочий
 
 
 
-def get_token(login: str, password: str) -> (str, str):
+def get_token(login: str, password: str):
     url = url_onlime + '/api/dealer/authorize'
     
     headers = {
@@ -146,7 +146,8 @@ def get_catalog():
     return ''
 
 def get_company():
-    url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.company.fields'
+    # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.deal.list'
+    url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.deal.fields'
     
     # data = {
         # # 'filter': {'FIELD_NAME': 'UF_CRM_1592566018',}
@@ -165,10 +166,10 @@ def get_company():
             # # "CODE",
         # # ]
     # }
-    data = {'entityId': 'SOURCE'}
+    # data = {'entityId': 'SOURCE'}
     try:
-        responce = requests.post(url, json=data)
-        # responce = requests.post(url)
+        # responce = requests.post(url, json=data)
+        responce = requests.post(url)
         # responce = requests.post(url, headers=headers)
         if responce.status_code == 200:
             answer = json.loads(responce.text)
@@ -192,9 +193,13 @@ def get_company():
             # out_lst += result
             # if not go_next: break
             # print(dct_list)
-            print(answer)
+            # print(json.dump(answer, indent=2))
             # print(result)
             # print(go_next, go_total)
+
+            with open('deals.json', 'w', encoding='utf-8') as out_file:
+                json.dump(answer, out_file, ensure_ascii=False, indent=4)
+
         else: return f'Ошибка get_catalog: responce.status_code: {responce.status_code}\n{responce.text}'
     except: return 'Ошибка get_catalog: try: requests.post'
         # time.sleep(1)
@@ -302,20 +307,77 @@ def get_lids(from_data):
         time.sleep(1)
     return '', out_lst
 
+def get_deals(from_data):
+    url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.deal.list'
+    
+    # dt_start = datetime.strptime(from_data, '%d.%m.%Y')
+    # str_dt_start = dt_start.strftime('%Y-%m-%dT%H:%M:%S')
+    go_next = 0
+    go_total = 0
+    out_lst = []
+
+    headers = {
+        'Content-Type': 'application/json',
+        'Connection': 'Keep-Alive',
+        'User-Agent': 'Apache-HttpClient/4.1.1 (java 1.5)',
+    }
+    while True:
+        data = {
+            'start': go_next,
+            'order': { "DATE_MODIFY": "ASC" },  # Если нужно с сортировкой
+            'filter': {
+                '>DATE_CREATE': from_data,  # '2021-10-01T00:00:00'
+                # '<DATE_CREATE': '2021-10-31T23:59:59',
+            },
+            'select': [
+                "ID",
+                "SOURCE_ID",
+                "DATE_CREATE",
+                'DATE_MODIFY',
+                "UF_CRM_5904FB99DBF0C",  # Дата подключения
+                "UF_CRM_5EECA3B76309E",  # Дата лида
+                "UF_CRM_5903C16BCEE3A",  # Услуги  []
+                "UF_CRM_5903C16BDAA69",  # Сумма тарифа
+            ]
+        }
+        try:
+            responce = requests.post(url, headers=headers, json=data)
+            if responce.status_code == 200:
+                answer = json.loads(responce.text)
+                result = answer.get('result')
+                go_next = answer.get('next')
+                go_total = answer.get('total')
+                out_lst += result
+                if not go_next: break
+                print(go_next, go_total)
+            else:
+                return f'Ошибка get_deals: responce.status_code: {responce.status_code}\n{responce.text}', []
+        except:
+            return 'Ошибка get_deals: try: requests.post', []
+        time.sleep(1)
+    return '', out_lst
+
 
 if __name__ == '__main__':
     pass
     # start_script_time = datetime.now()
 
     # Документация: https://dev.1c-bitrix.ru/rest_help/crm/leads/crm_lead_list.php
+    # Лиды
     # Пример запроса https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.list
+    # Сделки
+    # Пример запроса https://dev.1c-bitrix.ru/rest_help/crm/cdeals/crm_deal_list.php
     
-    
-    
+
+    from_date = '2022-02-08T00:00:00'
     # e = get_catalog()
     # e = get_source()
-    e = get_company()
+    e, lst_deal = get_deals(from_date)
     if e: print(e)
+
+    with open('deals.json', 'w', encoding='utf-8') as out_file:
+        json.dump(lst_deal, out_file, ensure_ascii=False, indent=4)
+
     # cur_day = datetime.today().day
     # cur_month = datetime.today().month
     # cur_year = datetime.today().year
@@ -364,40 +426,4 @@ if __name__ == '__main__':
     # print('many', many)
 
 
-        # * "ID": "1253690",
-        # * "TITLE": "Позвонить клиенту: 17.01.2022 14:00:00 - ➕➕ ✏️ Константин С. ⏳ Рузаевка (+00:00), Северная улица 5- ТТК ([Лиза] Звонок без результата, перезвон)",
-        # * "STATUS_ID": "42",
-        # * "DATE_CREATE": "2022-01-14T12:39:52+03:00",
-        # * "DATE_MODIFY": "2022-01-18T14:01:02+03:00",
-        # "SOURCE_ID": "98",
-        # "ASSIGNED_BY_ID": "11149",
-        # "UF_CRM_1493416385": null,
-        # "UF_CRM_1499437861": null,
-        # "UF_CRM_1580454770": "0",
-        # "UF_CRM_1534919765": [],// Группы источников
-        # "UF_CRM_1571987728429": "Ростелеком, ТТК",
-        # "UF_CRM_1592566018": [// ТИп лида
-            # 3116
-        # ],
-        # "UF_CRM_1493413514": "4",
-        # "UF_CRM_1492017494": "Республика Мордовия",
-        # "UF_CRM_1492017736": "Рузаевка",
-        # "UF_CRM_1498756113": "0",
-        # "UF_CRM_1615982450": null,
-        # "UF_CRM_1615982567": null,
-        # "UF_CRM_1615982644": null,
-        # "UF_CRM_1615982716": null,
-        # "UF_CRM_1615982795": null,
-        # "UF_CRM_1640267556": null
-    # from datetime import datetime
-    # import calendar
-    # cal = calendar.Calendar()
-    # now = datetime.now()
-    # # Количество рабочих дней в текущем месяце
-    # working_days = len([x for x in cal.itermonthdays2(now.year, now.month) if x[0] !=0 and x[1] < 5])
-    # print('Рабочих дней: ', working_days)
-    # cur_day = now.day      # Номер текущего дня
-    # cur_month = now.month  # Номер текущего меяца
-    # cur_year = now.year    # Номер текущего года
-    # print(cur_day, cur_month, cur_year)
 

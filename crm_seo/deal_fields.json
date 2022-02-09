@@ -1,0 +1,130 @@
+"ID": {
+    "type": "integer",
+    "isRequired": false,
+    "isReadOnly": true,
+    "isImmutable": false,
+    "isMultiple": false,
+    "isDynamic": false,
+    "title": "ID"
+},
+"SOURCE_ID": {
+    "type": "crm_status",
+    "isRequired": false,
+    "isReadOnly": false,
+    "isImmutable": false,
+    "isMultiple": false,
+    "isDynamic": false,
+    "statusType": "SOURCE",
+    "title": "Источник"
+},
+"DATE_CREATE": {
+    "type": "datetime",
+    "isRequired": false,
+    "isReadOnly": true,
+    "isImmutable": false,
+    "isMultiple": false,
+    "isDynamic": false,
+    "title": "Дата создания"
+},
+"DATE_MODIFY": {
+    "type": "datetime",
+    "isRequired": false,
+    "isReadOnly": true,
+    "isImmutable": false,
+    "isMultiple": false,
+    "isDynamic": false,
+    "title": "Дата изменения"
+},
+"UF_CRM_5904FB99DBF0C": {
+    "type": "datetime",
+    "isRequired": false,
+    "isReadOnly": false,
+    "isImmutable": false,
+    "isMultiple": false,
+    "isDynamic": true,
+    "title": "UF_CRM_5904FB99DBF0C",
+    "listLabel": "Дата подключения*",
+    "formLabel": "Дата подключения*",
+    "filterLabel": "Дата подключения*"
+},
+"UF_CRM_5EECA3B76309E": {
+    "type": "date",
+    "isRequired": false,
+    "isReadOnly": false,
+    "isImmutable": false,
+    "isMultiple": false,
+    "isDynamic": true,
+    "title": "UF_CRM_5EECA3B76309E",
+    "listLabel": "Дата лида",
+    "formLabel": "Дата лида",
+    "filterLabel": "Дата лида"
+},
+
+
+"UF_CRM_5903C16BCEE3A": {
+    "type": "enumeration",
+    "isRequired": false,
+    "isReadOnly": false,
+    "isImmutable": false,
+    "isMultiple": true,
+    "isDynamic": true,
+    "items": [
+        {
+            "ID": "191",
+            "VALUE": "Интернет"
+        },
+        {
+            "ID": "192",
+            "VALUE": "Цифровое ТВ"
+        },
+        {
+            "ID": "3381",
+            "VALUE": "Smart TV"
+        },
+        {
+            "ID": "196",
+            "VALUE": "СИМ-карта"
+        },
+        {
+            "ID": "197",
+            "VALUE": "Wi-Fi роутер"
+        },
+        {
+            "ID": "546",
+            "VALUE": "ПЕРЕЕЗД"
+        },
+        {
+            "ID": "193",
+            "VALUE": "Кабельное ТВ"
+        },
+        {
+            "ID": "195",
+            "VALUE": "Телефония"
+        },
+        {
+            "ID": "194",
+            "VALUE": "Спутниковое ТВ"
+        },
+        {
+            "ID": "3402",
+            "VALUE": "Видеонаблюдение"
+        }
+    ],
+    "title": "UF_CRM_5903C16BCEE3A",
+    "listLabel": "Услуги",
+    "formLabel": "Услуги",
+    "filterLabel": "Услуги"
+},
+"UF_CRM_5903C16BDAA69": {
+    "type": "integer",
+    "isRequired": false,
+    "isReadOnly": false,
+    "isImmutable": false,
+    "isMultiple": false,
+    "isDynamic": true,
+    "title": "UF_CRM_5903C16BDAA69",
+    "listLabel": "Сумма тарифа*",
+    "formLabel": "Сумма тарифа*",
+    "filterLabel": "Сумма тарифа*"
+},
+
