@@ -71,14 +71,11 @@ def index(request):  # Статистика SEO
 
         for key, _ in col_fabula.items():
             gr = []
-            # gr = 0
             for i in range(12): 
-                # if len(data_0_table[i]):
                 val = data_0_table[i].get(key)
-                if val: val = int(val)
-                else: val = 0
+                try: val = int(val)
+                except: val = 0
                 gr.append(val)
-                    # gr = 0
             col_gr[key] = gr
             # Для колонки "Сравн. мес" вычислим значение
             num_new = data_0_table[11].get(key)
@@ -121,12 +118,12 @@ def index(request):  # Статистика SEO
             col_cm = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
 
             for key, _ in col_fabula.items():
-                # gr = []
-                gr = 0
+                gr = []
                 for i in range(12): 
-                    if len(site_table[i]):
-                        # gr.append(site_table[i][key])
-                        gr = 0
+                    val = site_table[i].get(key)
+                    try: val = int(val)
+                    except: val = 0
+                    gr.append(val)
                 col_gr[key] = gr
                 # Для колонки "Сравн. мес" вычислим значение
                 num_new = site_table[11].get(key)
@@ -162,12 +159,12 @@ def index(request):  # Статистика SEO
                 col_cm = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
 
                 for key, _ in col_fabula.items():
-                    # gr = []
-                    gr = 0
+                    gr = []
                     for i in range(12): 
-                        if len(it_src_month[i]):
-                            # gr.append(site_table[i][key])
-                            gr = 0
+                        val = it_src_month[i].get(key)
+                        try: val = int(val)
+                        except: val = 0
+                        gr.append(val)
                     col_gr[key] = gr
                     # Для колонки "Сравн. мес" вычислим значение
                     num_new = it_src_month[11].get(key)
