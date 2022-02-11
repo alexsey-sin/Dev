@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 from django.urls import path
 from domconnect import views
+from domconnect.download_crm import run_download_crm
 
 
 app_name = 'domconnect'
@@ -14,4 +15,6 @@ urlpatterns = [
     path('del_cash', views.deleteCash),
     path('del_all_deals', views.deleteAllDeals),
     path('upgrade_site_source', views.upgradeSiteSource),
+
+    path('upgrade_seo', run_download_crm),
 ]

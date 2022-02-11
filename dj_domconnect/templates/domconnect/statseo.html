@@ -15,11 +15,6 @@
     </head>
     <body>
 
-
-        <!-- <div id="placeholder" style="width:600px;height:300px;"></div> -->
-
-
-
         <!-- Начало первая основная таблица -->
         <div class="table-responsive">
             <table class="table table-bordered table-hover table-fixed-head">
@@ -27,10 +22,11 @@
                     <tr>
                         <th scope="col" style="min-width: 200px; max-width: 200px;">Тип</th>
                         {% for month in data_month %}
-                            <th scope="col">{{ month.head }}</th>
+                            <th scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.head }}</th>
                         {% endfor %}
                         <th scope="col">График</th>
                         <th scope="col">Сравн. мес</th>
+                        <th scope="col">{{ str_cur_month }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -46,7 +42,7 @@
                             {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.1|floatformat:0 }}%</td>
                             {% else %}
-                                <td>{{ col.1|floatformat:0 }}</td>
+                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.1|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
@@ -58,7 +54,7 @@
                             {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.2|floatformat:0 }}%</td>
                             {% else %}
-                                <td>{{ col.2|floatformat:0 }}</td>
+                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.2|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
@@ -85,7 +81,7 @@
                             {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.4|floatformat:0 }}%</td>
                             {% else %}
-                                <td>{{ col.4|floatformat:0 }}</td>
+                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.4|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
@@ -121,7 +117,7 @@
                             {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.7|floatformat:0 }}%</td>
                             {% else %}
-                                <td>{{ col.7|floatformat:0 }}</td>
+                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.7|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
@@ -145,7 +141,7 @@
                             {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.9|floatformat:0 }}%</td>
                             {% else %}
-                                <td>{{ col.9|floatformat:0 }}</td>
+                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.9|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
@@ -181,7 +177,7 @@
                             {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.12|floatformat:0 }}%</td>
                             {% else %}
-                                <td>{{ col.12|floatformat:0 }}</td>
+                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.12|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
@@ -193,7 +189,7 @@
                             {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.13|floatformat:0 }}%</td>
                             {% else %}
-                                <td>{{ col.13|floatformat:0 }}</td>
+                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.13|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
@@ -205,7 +201,7 @@
                             {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.14|floatformat:0 }}%</td>
                             {% else %}
-                                <td>{{ col.14|floatformat:0 }}</td>
+                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.14|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
@@ -229,7 +225,7 @@
                             {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.16|floatformat:0 }}%</td>
                             {% else %}
-                                <td>{{ col.16|floatformat:0 }}</td>
+                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.16|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
@@ -241,7 +237,7 @@
                             {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.17|floatformat:0 }}%</td>
                             {% else %}
-                                <td>{{ col.17|floatformat:0 }}</td>
+                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.17|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
@@ -253,7 +249,7 @@
                             {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.18|floatformat:0 }}%</td>
                             {% else %}
-                                <td>{{ col.18|floatformat:0 }}</td>
+                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.18|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
@@ -265,7 +261,7 @@
                             {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.19|floatformat:0 }}%</td>
                             {% else %}
-                                <td>{% if col.19 %}{{ col.19|floatformat:0 }}р.{% endif %}</td>
+                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{% if col.19 %}{{ col.19|floatformat:0 }}р.{% endif %}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
@@ -289,7 +285,7 @@
                             {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.21|floatformat:0 }}%</td>
                             {% else %}
-                                <td>{{ col.21|floatformat:0 }}</td>
+                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.21|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
@@ -301,7 +297,7 @@
                             {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.22|floatformat:0 }}%</td>
                             {% else %}
-                                <td>{{ col.22|floatformat:0 }}</td>
+                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.22|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
@@ -313,7 +309,7 @@
                             {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.23|floatformat:0 }}%</td>
                             {% else %}
-                                <td>{{ col.23|floatformat:0 }}</td>
+                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.23|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
@@ -352,7 +348,7 @@
                             {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.26|floatformat:0 }}%</td>
                             {% else %}
-                                <td>{{ col.26|floatformat:0 }}</td>
+                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.26|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
@@ -364,7 +360,7 @@
                             {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.27|floatformat:0 }}%</td>
                             {% else %}
-                                <td>{{ col.27|floatformat:0 }}</td>
+                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.27|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
@@ -376,7 +372,7 @@
                             {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.28|floatformat:0 }}%</td>
                             {% else %}
-                                <td>{{ col.28|floatformat:0 }}</td>
+                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.28|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
@@ -388,7 +384,7 @@
                             {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.29|floatformat:0 }}%</td>
                             {% else %}
-                                <td>{{ col.29|floatformat:0 }}</td>
+                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.29|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
@@ -400,7 +396,7 @@
                             {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.30|floatformat:0 }}%</td>
                             {% else %}
-                                <td>{{ col.30|floatformat:0 }}</td>
+                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.30|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
@@ -412,7 +408,7 @@
                             {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.31|floatformat:0 }}%</td>
                             {% else %}
-                                <td>{{ col.31|floatformat:0 }}</td>
+                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.31|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
@@ -424,7 +420,7 @@
                             {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.32|floatformat:0 }}%</td>
                             {% else %}
-                                <td>{{ col.32|floatformat:0 }}</td>
+                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.32|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
@@ -458,10 +454,11 @@
                                         <tr>
                                             <th scope="col" style="min-width: 200px; max-width: 200px;">Тип</th>
                                             {% for month in data_month %}
-                                                <th scope="col">{{ month.head }}</th>
+                                                <th scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.head }}</th>
                                             {% endfor %}
                                             <th scope="col">График</th>
                                             <th scope="col">Сравн. мес</th>
+                                            <th scope="col">{{ str_cur_month }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -473,7 +470,7 @@
                                                 {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.1|floatformat:0 }}%</td>
                                                 {% else %}
-                                                    <td scope="col">{{ month.1|floatformat:0 }}</td>
+                                                    <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.1|floatformat:0 }}</td>
                                                 {% endif %}
                                             {% endfor %}
                                         </tr>
@@ -485,7 +482,7 @@
                                                 {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.2|floatformat:0 }}%</td>
                                                 {% else %}
-                                                    <td scope="col">{{ month.2|floatformat:0 }}</td>
+                                                    <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.2|floatformat:0 }}</td>
                                                 {% endif %}
                                             {% endfor %}
                                         </tr>
@@ -497,7 +494,7 @@
                                                 {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.3|floatformat:0 }}%</td>
                                                 {% else %}
-                                                    <td scope="col">{{ month.3|floatformat:0 }}</td>
+                                                    <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.3|floatformat:0 }}</td>
                                                 {% endif %}
                                             {% endfor %}
                                         </tr>
@@ -521,7 +518,7 @@
                                                 {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.5|floatformat:0 }}%</td>
                                                 {% else %}
-                                                    <td scope="col">{{ month.5|floatformat:0 }}</td>
+                                                    <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.5|floatformat:0 }}</td>
                                                 {% endif %}
                                             {% endfor %}
                                         </tr>
@@ -533,7 +530,7 @@
                                                 {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.6|floatformat:0 }}%</td>
                                                 {% else %}
-                                                    <td scope="col">{{ month.6|floatformat:0 }}</td>
+                                                    <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.6|floatformat:0 }}</td>
                                                 {% endif %}
                                             {% endfor %}
                                         </tr>
@@ -569,7 +566,7 @@
                                                 {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.9|floatformat:0 }}%</td>
                                                 {% else %}
-                                                    <td scope="col">{{ month.9|floatformat:0 }}</td>
+                                                    <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.9|floatformat:0 }}</td>
                                                 {% endif %}
                                             {% endfor %}
                                         </tr>
@@ -593,7 +590,7 @@
                                                 {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.11|floatformat:0 }}%</td>
                                                 {% else %}
-                                                    <td scope="col">{{ month.11|floatformat:0 }}</td>
+                                                    <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.11|floatformat:0 }}</td>
                                                 {% endif %}
                                             {% endfor %}
                                         </tr>
@@ -605,7 +602,7 @@
                                                 {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.12|floatformat:0 }}%</td>
                                                 {% else %}
-                                                    <td scope="col">{{ month.12|floatformat:0 }}</td>
+                                                    <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.12|floatformat:0 }}</td>
                                                 {% endif %}
                                             {% endfor %}
                                         </tr>
@@ -641,7 +638,7 @@
                                                 {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.15|floatformat:0 }}%</td>
                                                 {% else %}
-                                                    <td scope="col">{{ month.15|floatformat:0 }}</td>
+                                                    <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.15|floatformat:0 }}</td>
                                                 {% endif %}
                                             {% endfor %}
                                         </tr>
@@ -653,7 +650,7 @@
                                                 {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.16|floatformat:0 }}%</td>
                                                 {% else %}
-                                                    <td scope="col">{{ month.16|floatformat:0 }}</td>
+                                                    <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.16|floatformat:0 }}</td>
                                                 {% endif %}
                                             {% endfor %}
                                         </tr>
@@ -725,7 +722,7 @@
                                                 {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.22|floatformat:0 }}%</td>
                                                 {% else %}
-                                                    <td scope="col">{{ month.22|floatformat:0 }}</td>
+                                                    <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.22|floatformat:0 }}</td>
                                                 {% endif %}
                                             {% endfor %}
                                         </tr>
@@ -737,7 +734,7 @@
                                                 {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.23|floatformat:0 }}%</td>
                                                 {% else %}
-                                                    <td scope="col">{{ month.23|floatformat:0 }}</td>
+                                                    <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.23|floatformat:0 }}</td>
                                                 {% endif %}
                                             {% endfor %}
                                         </tr>
@@ -749,7 +746,7 @@
                                                 {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.24|floatformat:0 }}%</td>
                                                 {% else %}
-                                                    <td scope="col">{{ month.24|floatformat:0 }}</td>
+                                                    <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.24|floatformat:0 }}</td>
                                                 {% endif %}
                                             {% endfor %}
                                         </tr>
@@ -761,7 +758,7 @@
                                                 {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.25|floatformat:0 }}%</td>
                                                 {% else %}
-                                                    <td scope="col">{% if month.25 %}{{ month.25|floatformat:0 }}р.{% endif %}</td>
+                                                    <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{% if month.25 %}{{ month.25|floatformat:0 }}р.{% endif %}</td>
                                                 {% endif %}
                                             {% endfor %}
                                         </tr>
@@ -773,7 +770,7 @@
                                                 {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.26|floatformat:0 }}%</td>
                                                 {% else %}
-                                                    <td scope="col">{{ month.26|floatformat:0 }}</td>
+                                                    <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.26|floatformat:0 }}</td>
                                                 {% endif %}
                                             {% endfor %}
                                         </tr>
@@ -794,17 +791,18 @@
                                         <tr>
                                             <th scope="col" style="min-width: 200px; max-width: 200px;">Тип</th>
                                             {% for month in data_month %}
-                                                <th scope="col">{{ month.head }}</th>
+                                                <th scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.head }}</th>
                                             {% endfor %}
                                             <th scope="col">График</th>
                                             <th scope="col">Сравн. мес</th>
+                                            <th scope="col">{{ str_cur_month }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {% for source in site.source_tables %}
                                             <tr>
                                                 <td style="font-weight: bold; min-width: 200px; max-width: 200px;">{{ source.name_source }}</td>
-                                                <td colspan="12"></td>
+                                                <td colspan="15"></td>
                                             </tr>
                                             <tr>
                                                 <td style="font-weight: normal; min-width: 200px; max-width: 200px;">Лиды</td>
@@ -814,7 +812,7 @@
                                                     {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                                         <td>{{ col.1|floatformat:0 }}%</td>
                                                     {% else %}
-                                                        <td scope="col">{{ col.1|floatformat:0 }}</td>
+                                                        <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.1|floatformat:0 }}</td>
                                                     {% endif %}
                                                 {% endfor %}
                                             </tr>
@@ -826,7 +824,7 @@
                                                     {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                                         <td>{{ col.2|floatformat:0 }}%</td>
                                                     {% else %}
-                                                        <td scope="col">{{ col.2|floatformat:0 }}</td>
+                                                        <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.2|floatformat:0 }}</td>
                                                     {% endif %}
                                                 {% endfor %}
                                             </tr>
@@ -838,7 +836,7 @@
                                                     {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                                         <td>{{ col.3|floatformat:0 }}%</td>
                                                     {% else %}
-                                                        <td scope="col">{{ col.3|floatformat:0 }}</td>
+                                                        <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.3|floatformat:0 }}</td>
                                                     {% endif %}
                                                 {% endfor %}
                                             </tr>
@@ -850,7 +848,7 @@
                                                     {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                                         <td>{{ col.4|floatformat:0 }}%</td>
                                                     {% else %}
-                                                        <td scope="col">{{ col.4|floatformat:0 }}</td>
+                                                        <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.4|floatformat:0 }}</td>
                                                     {% endif %}
                                                 {% endfor %}
                                             </tr>
@@ -874,7 +872,7 @@
                                                     {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                                         <td>{{ col.6|floatformat:0 }}%</td>
                                                     {% else %}
-                                                        <td scope="col">{{ col.6|floatformat:0 }}</td>
+                                                        <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.6|floatformat:0 }}</td>
                                                     {% endif %}
                                                 {% endfor %}
                                             </tr>
@@ -886,7 +884,7 @@
                                                     {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                                         <td>{{ col.7|floatformat:0 }}%</td>
                                                     {% else %}
-                                                        <td scope="col">{{ col.7|floatformat:0 }}</td>
+                                                        <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.7|floatformat:0 }}</td>
                                                     {% endif %}
                                                 {% endfor %}
                                             </tr>
@@ -898,7 +896,7 @@
                                                     {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                                         <td>{{ col.8|floatformat:0 }}%</td>
                                                     {% else %}
-                                                        <td scope="col">{{ col.8|floatformat:0 }}</td>
+                                                        <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.8|floatformat:0 }}</td>
                                                     {% endif %}
                                                 {% endfor %}
                                             </tr>
@@ -910,7 +908,7 @@
                                                     {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                                         <td>{{ col.9|floatformat:0 }}%</td>
                                                     {% else %}
-                                                        <td scope="col">{{ col.9|floatformat:0 }}</td>
+                                                        <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.9|floatformat:0 }}</td>
                                                     {% endif %}
                                                 {% endfor %}
                                             </tr>
@@ -922,7 +920,7 @@
                                                     {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                                         <td>{{ col.10|floatformat:0 }}%</td>
                                                     {% else %}
-                                                        <td scope="col">{{ col.10|floatformat:0 }}</td>
+                                                        <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.10|floatformat:0 }}</td>
                                                     {% endif %}
                                                 {% endfor %}
                                             </tr>
@@ -934,7 +932,7 @@
                                                     {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                                         <td>{{ col.11|floatformat:0 }}%</td>
                                                     {% else %}
-                                                        <td scope="col">{{ col.11|floatformat:0 }}</td>
+                                                        <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.11|floatformat:0 }}</td>
                                                     {% endif %}
                                                 {% endfor %}
                                             </tr>
@@ -946,7 +944,7 @@
                                                     {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
                                                         <td>{{ col.12|floatformat:0 }}%</td>
                                                     {% else %}
-                                                        <td scope="col">{{ col.12|floatformat:0 }}</td>
+                                                        <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.12|floatformat:0 }}</td>
                                                     {% endif %}
                                                 {% endfor %}
                                             </tr>
@@ -961,10 +959,12 @@
                 {% endfor %}
         </div>
         <!-- Конец цикла по сайтам -->
-        <div style="height: 30px;">
-
+        <div style="height: 30px; padding: 20px 50px;">
+            <button type="button" style="background-color: aqua;" onclick="download_seo();">Скачать в .csv</button>
         </div>
     </body>
+    
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
     <script>
         function collapsgroup(id){  // Для работы свертывания некоторых строк в первой таблицы
@@ -973,14 +973,6 @@
                 alltr[i].classList.toggle("tr-open");
             }
             draw_grafic();
-            // let btn = document.getElementById(id);
-            // if (btn.classList.contains('fa-chevron-down')){
-            //     btn.classList.remove("fa-chevron-down");
-            //     btn.classList.add("fa-chevron-up");
-            // }else{
-            //     btn.classList.remove("fa-chevron-up");
-            //     btn.classList.add("fa-chevron-down");
-            // }
         }
     </script>
     <script language="javascript" type="text/javascript">

@@ -6,6 +6,7 @@ import requests
 import json
 from datetime import datetime, timedelta
 import calendar
+# from django.core.handlers.wsgi import WSGIRequest
 
 
 logging.basicConfig(
@@ -35,14 +36,37 @@ typelid = {}
 # }
 
 
-def run_download_crm():
-    loger.info('Старт загрузки СРМ.')
+def run_download_crm(*args, **options):
+    # http_request = False
+    # if args and isinstance(args[0], object) and type(args[0]) == WSGIRequest: http_request = True
+
+    gvar_go, _ = DcCrmGlobVar.objects.get_or_create(key='go_upgrade_seo')
+    if gvar_go.val_bool == True:
+        print('Идет процесс обновления данных SEO и расчета.')
+        return
+    mess = 'Обновение данных SEO запущено.'
+    gvar_go.val_bool = True
+    gvar_go.val_datetime = datetime.today()
+    gvar_go.descriptions = mess
+    gvar_go.save()
+    loger.info(mess)
+    print(mess)
+
     download_typesource()
     download_typelid()
     download_deals()
     download_lids()
     calculateSEO()
-    loger.info('Расчет и сохранение в кэш закончено.')
+
+    mess = 'Расчет и сохранение данных SEO в кэш закончено.'
+    gvar_go = DcCrmGlobVar.objects.get(key='go_upgrade_seo')
+    gvar_go.val_bool = False
+    gvar_go.val_datetime = datetime.today()
+    gvar_go.descriptions = mess
+    gvar_go.save()
+    loger.info(mess)
+    print(mess)
+
 
 def download_typesource():  # Обновление Типов источника лида
     key_crm = get_key_crm()
@@ -114,7 +138,7 @@ def download_deals():
     cnt_err = 0
     cnt_ok = 0
     while True:
-        gvar_go, _ = DcCrmGlobVar.objects.get_or_create(key='go_upgrade_seo')
+        gvar_go = DcCrmGlobVar.objects.get(key='go_upgrade_seo')
         if gvar_go.val_bool == False: break
         if go_next == None: go_next = 0 
         data = {
@@ -211,7 +235,7 @@ def download_lids():
     cnt_err = 0
     cnt_ok = 0
     while True:
-        gvar_go, _ = DcCrmGlobVar.objects.get_or_create(key='go_upgrade_seo')
+        gvar_go = DcCrmGlobVar.objects.get(key='go_upgrade_seo')
         if gvar_go.val_bool == False: break
         if go_next == None: go_next = 0 
         data = {
@@ -355,7 +379,6 @@ def calculateSEO():
         objs_site = DcSiteSEO.objects.all().order_by('num')
         for obj_site in objs_site:
             site_num = obj_site.num
-            site_name = obj_site.site
             site_provider = obj_site.provider
             lst_res_source = []  # Результирующий список результатов вычислений источников
             # По каждому сайту берем список источников
@@ -392,16 +415,9 @@ def save_cash(num_site, num_source, in_dct, ask_date):
         rec.save()
 
 def calculate_0_table(ask_date):
-    cur_day = ask_date.day      # Номер дня
     cur_month = ask_date.month  # Номер меяца
     cur_year = ask_date.year    # Номер года
     cnt_days_in_month = calendar.monthrange(cur_year, cur_month)[1] # Количество дней в месяце
-    if cur_day < 5:
-        cnt_min_in_month = cnt_days_in_month * 1440
-        cur_min = (cur_day - 1) * 1440 + (ask_date.hour * 60) + ask_date.minute
-        coef_forecast = cnt_min_in_month / cur_min  # Коэфициент полного месяца (для прогноза если месяйц не полный с учетом минут)
-    else: coef_forecast = cnt_days_in_month / cur_day  # Коэфициент полного месяца (для прогноза если месяйц не полный)
-
     working_days = len([x for x in calendar.Calendar().itermonthdays2(cur_year, cur_month) if x[0] !=0 and x[1] < 5])  # Количество рабочих дней в месяце
     weekenddays = cnt_days_in_month - working_days  # выходных дней
     
@@ -413,36 +429,32 @@ def calculate_0_table(ask_date):
     lids_seo = lids_all.filter(crm_1592566018='SEO')
     lids_seo_conv = lids_seo.filter(crm_1493416385__gt=50, status_id__contains='CONVERTED')  # Подключаем (SOURCE)
     # (1) Лиды
-    cell_01 = round(lids_seo.count() * coef_forecast)
+    cell_01 = lids_seo.count()
     # (4) Лиды (все)
-    cell_04 = round(count_lids_all * coef_forecast)
+    cell_04 = count_lids_all
     # (5) Будн. дней 
     cell_05 = working_days
     # (6) Выходных дней 
     cell_06 = weekenddays
     # (7) Лиды с ТхВ
-    cell = lids_seo.exclude(Q(crm_1571987728429='')|Q(crm_1571987728429=None))  # Провайдеры ДК (длина больше 0)
-    cell_07 = round(cell.count() * coef_forecast)
+    cell_07 = lids_seo.exclude(Q(crm_1571987728429='')|Q(crm_1571987728429=None)).count()  # Провайдеры ДК (длина больше 0)
     # (8) % лидов с ТхВ
     if cell_01: cell_08 = round((cell_07 / cell_01) * 100, 2)
     else: cell_08 = 0
     # (9) Сделки >50
-    cell_09 = round(lids_seo_conv.count() * coef_forecast)
+    cell_09 = lids_seo_conv.count()
     # (10) %Лид=>Сд. >50
     if cell_01: cell_10 = round((cell_09 / cell_01) * 100, 2)
     else: cell_10 = 0
     # (12) Сделки >50 (все)
-    cell = lids_all.filter(crm_1493416385__gt=50, status_id__contains='CONVERTED').count()
-    cell_12 = round(cell* coef_forecast)
+    cell_12 = lids_all.filter(crm_1493416385__gt=50, status_id__contains='CONVERTED').count()
     # (13) Сделки 80
     # https://docs.google.com/spreadsheets/d/1fPFxlhAje5V_kdlSHpLytBbgE6SiBaWtfsrFjw1XYv8/edit#gid=1803529933
     # ('Билайн', 'МТС [кроме МСК и МО]', 'Ростелеком [кроме МСК]', 'МГТС [МСК и МО]')
-    cell = lids_seo_conv.filter(crm_1493413514__in=['OTHER', '2', '3', '11']).count()  # Провайдер (INDUSTRY)
-    cell_13 = round(cell * coef_forecast)
+    cell_13 = lids_seo_conv.filter(crm_1493413514__in=['OTHER', '2', '3', '11']).count()  # Провайдер (INDUSTRY)
     # (14) Сд. приоритет (БИ и МТС ФЛ)
     # ('Билайн', 'МТС [кроме МСК и МО]')
-    cell = lids_seo_conv.filter(crm_1493413514__in=['OTHER', '2']).count()  # Провайдер (INDUSTRY)
-    cell_14 = round(cell * coef_forecast)
+    cell_14 = lids_seo_conv.filter(crm_1493413514__in=['OTHER', '2']).count()  # Провайдер (INDUSTRY)
     # (15) Доля сделок ПРИОР от сд. >50
     if cell_09: cell_15 = round((cell_14 / cell_09) * 100, 2)
     else: cell_15 = 0
@@ -454,24 +466,20 @@ def calculate_0_table(ask_date):
     cell_17 = round(cell / weekenddays)
     # (18) ТП SEO
     # ('ТП_пр', 'ТП_нраб', 'ТП_моб') https://docs.google.com/spreadsheets/d/1fPFxlhAje5V_kdlSHpLytBbgE6SiBaWtfsrFjw1XYv8/edit#gid=1803529933
-    cell_tp_seo = lids_seo.filter(status_id__in=['1', '16', '21', '31', '32', '33']).count()  # Статус (STATUS)
-    cell_18 = round(cell_tp_seo * coef_forecast)
+    cell_18 = lids_seo.filter(status_id__in=['1', '16', '21', '31', '32', '33']).count()  # Статус (STATUS)
     # (19) Расход ТП
-    cell_19 = round(cell_tp_seo * 3.4)
+    cell_19 = round(cell_18 * 3.4)
     # (20) % ТП
-    if cell_01: cell_20 = round((cell_tp_seo / cell_01) * 100, 2)
+    if cell_01: cell_20 = round((cell_18 / cell_01) * 100, 2)
     else: cell_20 = 0
     # (21) Подключки по дате лида
-    deals_lid = DcCrmDeal.objects.filter(crm_5EECA3B76309E__year=cur_year, crm_5EECA3B76309E__month=cur_month).count()
-    cell_21 = round(deals_lid * coef_forecast)
-    # (21) Подключки по дате оплаты
-    deals_pay = DcCrmDeal.objects.filter(crm_5904FB99DBF0C__year=cur_year, crm_5904FB99DBF0C__month=cur_month).count()
-    cell_22 = round(deals_pay * coef_forecast)
+    cell_21 = DcCrmDeal.objects.filter(crm_5EECA3B76309E__year=cur_year, crm_5EECA3B76309E__month=cur_month).count()
+    # (22) Подключки по дате оплаты
+    cell_22 = DcCrmDeal.objects.filter(crm_5904FB99DBF0C__year=cur_year, crm_5904FB99DBF0C__month=cur_month).count()
     # (23) ТП IVR Лиза  (ТП_IVR)
-    cell_tp_ivr_seo = lids_seo.filter(status_id='52').count()  # Статус (STATUS)
-    cell_23 = round(cell_tp_ivr_seo * coef_forecast)
+    cell_23 = lids_seo.filter(status_id='52').count()  # Статус (STATUS)
     # (24) % ТП IVR 
-    cell_24 = round((cell_tp_ivr_seo / cell_01) * 100, 2)
+    cell_24 = round((cell_23 / cell_01) * 100, 2)
     # (2) Реальные лиды (без ТП)
     if cell_01: cell_02 = cell_01 - cell_18 - cell_23
     else: cell_02 = 0
@@ -487,26 +495,19 @@ def calculate_0_table(ask_date):
     else: cell_25 = 0
 
     # (26) Понедельник
-    cell = lids_all.filter(create_date__week_day=2).count() # Дни недели пронумерованы от 1(воскресение) до 7(суббота)
-    cell_26 = round(cell * coef_forecast)
+    cell_26 = lids_all.filter(create_date__week_day=2).count() # Дни недели пронумерованы от 1(воскресение) до 7(суббота)
     # (27) Вторник
-    cell = lids_all.filter(create_date__week_day=3).count() # Дни недели пронумерованы от 1(воскресение) до 7(суббота)
-    cell_27 = round(cell * coef_forecast)
+    cell_27 = lids_all.filter(create_date__week_day=3).count() # Дни недели пронумерованы от 1(воскресение) до 7(суббота)
     # (28) Среда
-    cell = lids_all.filter(create_date__week_day=4).count() # Дни недели пронумерованы от 1(воскресение) до 7(суббота)
-    cell_28 = round(cell * coef_forecast)
+    cell_28 = lids_all.filter(create_date__week_day=4).count() # Дни недели пронумерованы от 1(воскресение) до 7(суббота)
     # (29) Четверг
-    cell = lids_all.filter(create_date__week_day=5).count() # Дни недели пронумерованы от 1(воскресение) до 7(суббота)
-    cell_29 = round(cell * coef_forecast)
+    cell_29 = lids_all.filter(create_date__week_day=5).count() # Дни недели пронумерованы от 1(воскресение) до 7(суббота)
     # (30) Пятница
-    cell = lids_all.filter(create_date__week_day=6).count() # Дни недели пронумерованы от 1(воскресение) до 7(суббота)
-    cell_30 = round(cell * coef_forecast)
+    cell_30 = lids_all.filter(create_date__week_day=6).count() # Дни недели пронумерованы от 1(воскресение) до 7(суббота)
     # (31) Суббота
-    cell = lids_all.filter(create_date__week_day=7).count() # Дни недели пронумерованы от 1(воскресение) до 7(суббота)
-    cell_31 = round(cell * coef_forecast)
+    cell_31 = lids_all.filter(create_date__week_day=7).count() # Дни недели пронумерованы от 1(воскресение) до 7(суббота)
     # (32) Воскресенье
-    cell = lids_all.filter(create_date__week_day=1).count() # Дни недели пронумерованы от 1(воскресение) до 7(суббота)
-    cell_32 = round(cell * coef_forecast)
+    cell_32 = lids_all.filter(create_date__week_day=1).count() # Дни недели пронумерованы от 1(воскресение) до 7(суббота)
 
     out_dict['cell_01'] = cell_01
     out_dict['cell_02'] = cell_02
@@ -544,66 +545,50 @@ def calculate_0_table(ask_date):
     return out_dict
 
 def calculate_source_table(ask_date, ask_source, ask_provider):
-    cur_day = ask_date.day      # Номер дня
     cur_month = ask_date.month  # Номер меяца
     cur_year = ask_date.year    # Номер года
-    cnt_days_in_month = calendar.monthrange(cur_year, cur_month)[1] # Количество дней в месяце
-    if cur_day < 5:
-        cnt_min_in_month = cnt_days_in_month * 1440
-        cur_min = (cur_day - 1) * 1440 + (ask_date.hour * 60) + ask_date.minute
-        coef_forecast = cnt_min_in_month / cur_min  # Коэфициент полного месяца (для прогноза если месяйц не полный с учетом минут)
-    else: coef_forecast = cnt_days_in_month / cur_day  # Коэфициент полного месяца (для прогноза если месяйц не полный)
     
-    # print(coef_forecast)
     out_dict = {}
     lids_all = DcCrmLid.objects.filter(create_date__year=cur_year, create_date__month=cur_month, source_id=ask_source)
     count_lids_all = lids_all.count()
     if count_lids_all == 0: return out_dict
 
     # (1) Лиды
-    cell_01 = round(count_lids_all * coef_forecast)
+    cell_01 = count_lids_all
     # (2) Сделки
     cell_conv = lids_all.filter(status_id__contains='CONVERTED')
-    cell_02 = round(cell_conv.count() * coef_forecast)
+    cell_02 = cell_conv.count()
     # (3) Сделки > 50
     cell_conv_sum = cell_conv.filter(crm_1493416385__gt=50)
-    cell_03 = round(cell_conv_sum.count() * coef_forecast)
+    cell_03 = cell_conv_sum.count()
     # (4) Сд. приоритет
     # Провайдер=('МТС [кроме МСК и МО]' или 'Билайн')
-    cell_conv_sum_sd_pr = cell_conv.filter(crm_1499437861='', crm_1493413514__in=['2', 'OTHER'])
-    cell_04 = round(cell_conv_sum_sd_pr.count() * coef_forecast)
+    cell_04 = cell_conv.filter(crm_1499437861='', crm_1493413514__in=['2', 'OTHER']).count()
     # (5) Ср. чек
     dct = cell_conv.aggregate(avg=Avg('crm_1493416385'))
     avg = dct.get('avg')
     if avg: cell_05 = round(avg)
     else: cell_05 = 0
     # (6) Подключки по дате лида
-    deals_lid = DcCrmDeal.objects.filter(crm_5EECA3B76309E__year=cur_year, crm_5EECA3B76309E__month=cur_month, source_id=ask_source).count()
-    cell_06 = round(deals_lid * coef_forecast)
+    cell_06 = DcCrmDeal.objects.filter(crm_5EECA3B76309E__year=cur_year, crm_5EECA3B76309E__month=cur_month, source_id=ask_source).count()
     # (7) Подключки по дате оплаты
-    deals_pay = DcCrmDeal.objects.filter(crm_5904FB99DBF0C__year=cur_year, crm_5904FB99DBF0C__month=cur_month, source_id=ask_source).count()
-    cell_07 = round(deals_pay * coef_forecast)
+    cell_07 = DcCrmDeal.objects.filter(crm_5904FB99DBF0C__year=cur_year, crm_5904FB99DBF0C__month=cur_month, source_id=ask_source).count()
     # (8) ТП
     # ('ТП_пр' или 'ТП_нраб' или 'ТП_моб')
-    cell_tp = lids_all.filter(status_id__in=['1', '16', '21', '31', '32', '33'])
-    cell_08 = round(cell_tp.count() * coef_forecast)
+    cell_08 = lids_all.filter(status_id__in=['1', '16', '21', '31', '32', '33']).count()
     # (9) ТП IVR
     # ('ТП IVR')
-    cell_tp = lids_all.filter(status_id__in=['52',])
-    cell_09 = round(cell_tp.count() * coef_forecast)
+    cell_09 = lids_all.filter(status_id__in=['52',]).count()
     # (10) SEO Лиды ТхВ
-    cell = lids_all.exclude(Q(crm_1571987728429=''))
-    cell_10 = round(cell.count() * coef_forecast)
+    cell_10 = lids_all.exclude(Q(crm_1571987728429='')).count()
     # (11) Сделки 80
     # https://docs.google.com/spreadsheets/d/1fPFxlhAje5V_kdlSHpLytBbgE6SiBaWtfsrFjw1XYv8/edit#gid=1803529933
     # ('Билайн', 'МТС [кроме МСК и МО]', 'Ростелеком [кроме МСК]', 'МГТС [МСК и МО]')
-    cell = cell_conv_sum.filter(crm_1493413514__in=['OTHER', '2', '3', '11'])  # Провайдер (INDUSTRY)
-    cell_11 = round(cell.count() * coef_forecast)
+    cell_11 = cell_conv_sum.filter(crm_1493413514__in=['OTHER', '2', '3', '11']).count()   # Провайдер (INDUSTRY)
     # (12) Сделки >50
     # провайдер из переменной ask_provider(список). Для мультибрендовых источников - несколько значений
     lst = ask_provider.split(';')
-    cell = cell_conv_sum.filter(crm_1493413514__in=lst)  # Провайдер (INDUSTRY)
-    cell_12 = round(cell.count() * coef_forecast)
+    cell_12 = cell_conv_sum.filter(crm_1493413514__in=lst).count()  # Провайдер (INDUSTRY)
 
     out_dict['cell_01'] = cell_01
     out_dict['cell_02'] = cell_02
