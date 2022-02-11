@@ -195,8 +195,9 @@ def run_lk_beeline() -> int:
         buff += f'Итого: [min {cnt_avlb_min}/{cnt_totl_min}][sms {cnt_avlb_sms}/{cnt_totl_sms}]\n'
         buff += f'Всего номеров: {cnt_nums}\n'
     except Exception as e:
-        driver.quit()
         return [e, {}, 'error', '']
+    finally:
+        if driver: driver.quit()
 
     ###################### Формируем POST запрос в базу данных ######################
     '''
@@ -220,7 +221,6 @@ def run_lk_beeline() -> int:
 
     '''
     ###################### Всем спасибо, все свободны ######################
-    driver.quit()
     return [0, data, time_str, buff]
 
 

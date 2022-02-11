@@ -891,7 +891,8 @@ def set_bid(data, bid_type):
         
     except Exception as e:
         return str(e), data
-    finally: driver.quit()   
+    finally:
+        if driver: driver.quit()
     
     return '', data
 

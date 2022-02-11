@@ -177,10 +177,10 @@ def set_bid(data):
             # outfile.write(driver.page_source)
         
     except Exception as e:
-        driver.quit()
         return e, data
+    finally:
+        if driver: driver.quit()
 
-    driver.quit()
     return '', data
 
 def set_did_to_dj_domconnect():

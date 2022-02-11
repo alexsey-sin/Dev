@@ -809,7 +809,8 @@ def set_bid(data):  # Заведение заявки
         
     except Exception as e:
         return e, data
-    finally: driver.quit()
+    finally:
+        if driver: driver.quit()
     
     return '', data
 

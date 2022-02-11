@@ -6,8 +6,8 @@ from django.urls import reverse
 from django.db.models import Q
 # from django.core.paginator import Paginator
 # from app.forms import NameForm, LizaPhraseForm, GermanPhraseForm, NdzPhraseForm, PzPhraseForm
-from domconnect.models import DcCrmGlobVar, DcCrmLid, DcCashSEO, DcSiteSEO, DcSourceSEO
-from domconnect.download_lids import run_download_crm
+from domconnect.models import DcCrmGlobVar, DcCrmLid, DcCashSEO, DcSiteSEO, DcSourceSEO, DcCrmDeal
+from domconnect.download_crm import run_download_crm
 from datetime import datetime, timedelta
 from django.http import JsonResponse
 import threading
@@ -19,17 +19,15 @@ logging.basicConfig(
     level=logging.INFO,
     filename='main.log',
     format='%(asctime)s:%(name)s:%(message)s'
+    # log.info('So should this')
+    # # # # log.debug('This message should go to the log file')
+    # # # # log.warning('And this, too')
 )
-# log = logging.getLogger(__name__)  # запускать в функциях
-# log.info('So should this')
-# # # # log.debug('This message should go to the log file')
-# # # # log.warning('And this, too')
+loger = logging.getLogger(__name__)  # запустили логгирование
 
 
 @login_required(login_url='/login/')
 def index(request):  # Статистика SEO
-    # log = logging.getLogger(__name__)
-    # log.info('Start load page')
     user = request.user
     u_name = user.get_full_name()
     if u_name.strip() == '':
@@ -38,8 +36,8 @@ def index(request):  # Статистика SEO
 
     label_seo = ''
     # Посмотрим состояние загрузки в глобальной переменной
-    gvar_go, _ = DcCrmGlobVar.objects.get_or_create(key='go_download_crm')
-    if gvar_go.val_bool: label_seo = 'Идет загрузка лидов ...'
+    gvar_go, _ = DcCrmGlobVar.objects.get_or_create(key='go_upgrade_seo')
+    if gvar_go.val_bool == True: label_seo = 'Идет Обновление данных ...'
     else: 
         if gvar_go.val_datetime: last_datetime = gvar_go.val_datetime.strftime("%d.%m.%Y %H:%M:%S")
         else: last_datetime = 'Нет данных'
@@ -78,9 +76,10 @@ def index(request):  # Статистика SEO
                 gr.append(val)
             col_gr[key] = gr
             # Для колонки "Сравн. мес" вычислим значение
+            col_cm[key] = 0
             num_new = data_0_table[11].get(key)
             num_old = data_0_table[10].get(key)
-            if num_new and num_old:
+            if num_new != None and num_old != None and num_old != 0:
                 cm = round((num_new / num_old - 1) * 100)
                 col_cm[key] = cm
         data_0_table.append(col_gr)  # 13 колонка "График"
@@ -126,9 +125,10 @@ def index(request):  # Статистика SEO
                     gr.append(val)
                 col_gr[key] = gr
                 # Для колонки "Сравн. мес" вычислим значение
+                col_cm[key] = 0
                 num_new = site_table[11].get(key)
                 num_old = site_table[10].get(key)
-                if num_new and num_old:
+                if num_new != None and num_old != None and num_old != 0:
                     cm = round((num_new / num_old - 1) * 100)
                     col_cm[key] = cm
             site_table.append(col_gr)  # 13 колонка "График"
@@ -167,9 +167,10 @@ def index(request):  # Статистика SEO
                         gr.append(val)
                     col_gr[key] = gr
                     # Для колонки "Сравн. мес" вычислим значение
+                    col_cm[key] = 0
                     num_new = it_src_month[11].get(key)
                     num_old = it_src_month[10].get(key)
-                    if num_new and num_old:
+                    if num_new != None and num_old != None and num_old != 0:
                         cm = round((num_new / num_old - 1) * 100)
                         col_cm[key] = cm
                 it_src_month.append(col_gr)  # 13 колонка "График"
@@ -188,12 +189,10 @@ def index(request):  # Статистика SEO
     #     json.dump(data_sites, out_file, ensure_ascii=False, indent=4)
 
     context['segment'] = 'statseo'
-    # log.info('Stop load page')
     return render(request, 'domconnect/statseo.html', context)
     
 @login_required(login_url='/login/')
 def dataCrm(request):  # Данные SEO
-    log = logging.getLogger(__name__)  # запустили логгирование
 
     user = request.user
     u_name = user.get_full_name()
@@ -201,68 +200,56 @@ def dataCrm(request):  # Данные SEO
         u_name = user.username
     context = {'u_name': u_name}
 
-    # calculateSEO()
-    # print('cnt_lids_all', cnt_lids_all)
-    # log.info(f'cnt_lids_all: {cnt_lids_all}')
-    # log.info(f'cnt_lids_seo: {cnt_lids_seo}')
-
 
     context['segment'] = 'datacrm'
     return render(request, 'domconnect/datacrm.html', context)
     
 @login_required(login_url='/login/')
 def dataAjax(request):
-    thread_name = 'DownLoadLidsFromCRM'
-    if not request.GET: return JsonResponse({})
+    # thread_name = 'DownLoadLidsFromCRM'
+    # if not request.GET: return JsonResponse({})
 
-    str_from_modify = ''
-    last_modify_lid = DcCrmLid.objects.order_by('modify_date').last()
-    if last_modify_lid:
-        from_modify = last_modify_lid.modify_date
-        if type(from_modify) == datetime:
-            from_modify = from_modify - timedelta(seconds=1)
-            str_from_modify = from_modify.strftime('%Y-%m-%dT%H:%M:%S')
-
-    # Проверим идет ли загрузка
-    is_run = False
-    for thread in threading.enumerate():
-        if thread.getName() == thread_name: is_run = True; break
-    response = {'is_run': is_run}
+    # # Проверим идет ли загрузка
+    # is_run = False
+    # for thread in threading.enumerate():
+    #     if thread.getName() == thread_name: is_run = True; break
+    # response = {'is_run': is_run}
     
-    # Посмотрим нужны ли данные по загрузке
-    get_state = request.GET.get('get_state')
-    if get_state:
-        gvar_cur, _ = DcCrmGlobVar.objects.get_or_create(key='cur_num_download_crm')
-        gvar_tot, _ = DcCrmGlobVar.objects.get_or_create(key='tot_num_download_crm')
-        response['val_current'] = gvar_cur.val_int
-        response['val_total'] = gvar_tot.val_int
+    # # Посмотрим нужны ли данные по загрузке
+    # get_state = request.GET.get('get_state')
+    # if get_state:
+    #     gvar_cur, _ = DcCrmGlobVar.objects.get_or_create(key='cur_num_download_crm')
+    #     gvar_tot, _ = DcCrmGlobVar.objects.get_or_create(key='tot_num_download_crm')
+    #     response['val_current'] = gvar_cur.val_int
+    #     response['val_total'] = gvar_tot.val_int
         
-    is_stop = request.GET.get('stop')
-    if is_stop:
-        gvar_go, _ = DcCrmGlobVar.objects.get_or_create(key='go_download_crm')
-        gvar_go.val_bool = False
-        gvar_go.val_datetime = datetime.today()
-        gvar_go.save(update_fields=['val_bool'])
+    # is_stop = request.GET.get('stop')
+    # if is_stop:
+    #     gvar_go, _ = DcCrmGlobVar.objects.get_or_create(key='go_upgrade_seo')
+    #     gvar_go.val_bool = False
+    #     gvar_go.val_datetime = datetime.today()
+    #     gvar_go.save(update_fields=['val_bool'])
 
-    is_start = request.GET.get('start')
-    if is_start and not is_run:
-        # Разрешим загрузку в глобальной переменной
-        gvar_go, _ = DcCrmGlobVar.objects.get_or_create(key='go_download_crm')
-        gvar_go.val_bool = True
-        gvar_go.val_datetime = datetime.today()
-        gvar_go.descriptions = 'Загрузка запущена'
-        gvar_go.save(update_fields=['val_bool'])
+    # is_start = request.GET.get('start')
+    # if is_start and not is_run:
+    #     # Разрешим загрузку в глобальной переменной
+    #     gvar_go, _ = DcCrmGlobVar.objects.get_or_create(key='go_upgrade_seo')
+    #     gvar_go.val_bool = True
+    #     gvar_go.val_datetime = datetime.today()
+    #     gvar_go.descriptions = 'Загрузка запущена'
+    #     gvar_go.save(update_fields=['val_bool'])
 
-        # Обнулим глоб. переменную текущей позиции
-        gvar_cur, _ = DcCrmGlobVar.objects.get_or_create(key='cur_num_download_crm')
-        gvar_cur.val_int = 0
-        gvar_cur.save(update_fields=['val_int'])
+    #     # Обнулим глоб. переменную текущей позиции
+    #     gvar_cur, _ = DcCrmGlobVar.objects.get_or_create(key='cur_num_download_crm')
+    #     gvar_cur.val_int = 0
+    #     gvar_cur.save(update_fields=['val_int'])
 
-        # Запустим поток загрузки
-        th = Thread(target=run_download_crm, name=thread_name, args=(str_from_modify, ))
-        th.start()
-        response['is_run'] = True
-    return JsonResponse(response)
+    #     # Запустим поток загрузки
+    #     th = Thread(target=run_download_crm, name=thread_name)
+    #     th.start()
+    #     response['is_run'] = True
+    # return JsonResponse(response)
+    pass
 
 
 ################################################################################################
@@ -293,7 +280,6 @@ def deleteCash(request):  # Удаление данных из таблицы к
 
 @login_required(login_url='/login/')
 def upgradeSiteSource(request):  # Удаление и загрузка данных таблиц Site и Source из файла
-    log = logging.getLogger(__name__)  # запустили логгирование
     err = ''
     try:
         with open('SiteSource.json', 'r', encoding='utf-8') as file:
@@ -320,14 +306,16 @@ def upgradeSiteSource(request):  # Удаление и загрузка данн
         
     except Exception as e:
         err = f'Ошибка upgradeSiteSource: try: {e}'
-        log.info(err)
+
     if err:
+        loger.error(err)
         context = {
             'result': 'Error',
             'message': f'{err}',
             'result_style': 'danger',
         }
     else:
+        loger.info('Site Source Service обновлены.')
         context = {
             'result': 'Ok',
             'message': 'Записи Site Source обновлены.',
@@ -335,3 +323,14 @@ def upgradeSiteSource(request):  # Удаление и загрузка данн
         }
     return render(request, 'domconnect/show_mess_and_redirect.html', context)
 
+@login_required(login_url='/login/')
+def deleteAllDeals(request):  # Удаление всех сделок
+    count = DcCrmDeal.objects.all().count()
+    DcCrmDeal.objects.all().delete()
+
+    context = {
+        'result': 'Ok',
+        'message': f'Записи сделок удалены. ({count})',
+        'result_style': 'success',
+    }
+    return render(request, 'domconnect/show_mess_and_redirect.html', context)

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from domconnect.models import DcCrmGlobVar, DcCrmLid, DcCashSEO, DcSiteSEO, DcSourceSEO
+from domconnect.models import DcCrmGlobVar, DcCrmLid, DcCashSEO, DcSiteSEO, DcSourceSEO, DcCrmDeal
 from django.db import models
 from django.forms import NumberInput
 
@@ -68,3 +68,18 @@ class DcSourceSEOAdmin(admin.ModelAdmin):
     list_display = ('source', 'site', 'num')
     search_fields = ('source',)
     list_filter = ('source', 'site')
+
+
+@admin.register(DcCrmDeal)
+class DcCrmDealAdmin(admin.ModelAdmin):
+    def fl_source_id(self):
+        return f'{self.source_id[:15]}...'
+    fl_source_id.short_description = 'Источник'
+
+    list_display = ('id_deal', fl_source_id, 'create_date', 'modify_date', 'crm_5904FB99DBF0C',
+        'crm_5EECA3B76309E', 'crm_5903C16BCEE3A', 'crm_5903C16BDAA69')
+    search_fields = ('id_deal', 'status_id',)
+    list_filter = ('create_date', 'modify_date', 'crm_5904FB99DBF0C', 'crm_5EECA3B76309E')
+    empty_value_display = '-пусто-'
+    date_hierarchy = 'create_date'
+    list_per_page = 20

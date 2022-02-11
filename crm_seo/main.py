@@ -307,6 +307,26 @@ def get_lids(from_data):
         time.sleep(1)
     return '', out_lst
 
+def get_field_deals():
+    url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.deal.fields'
+    headers = {
+        'Content-Type': 'application/json',
+        'Connection': 'Keep-Alive',
+        'User-Agent': 'Apache-HttpClient/4.1.1 (java 1.5)',
+    }
+    try:
+        responce = requests.post(url, headers=headers)
+        if responce.status_code == 200:
+            answer = json.loads(responce.text)
+            result = answer.get('result')
+            return result
+        else:
+            print(responce.status_code)
+            print(responce.text)
+            return f'Ошибка get_field_deals: responce.status_code: {responce.status_code}\n{responce.text}'
+    except:
+        return 'Ошибка get_field_deals: try: requests.post'
+
 def get_deals(from_data):
     url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.deal.list'
     
@@ -369,14 +389,16 @@ if __name__ == '__main__':
     # Пример запроса https://dev.1c-bitrix.ru/rest_help/crm/cdeals/crm_deal_list.php
     
 
-    from_date = '2022-02-08T00:00:00'
-    # e = get_catalog()
-    # e = get_source()
-    e, lst_deal = get_deals(from_date)
-    if e: print(e)
-
-    with open('deals.json', 'w', encoding='utf-8') as out_file:
-        json.dump(lst_deal, out_file, ensure_ascii=False, indent=4)
+    # from_date = '2022-02-08T00:00:00'
+    # # e = get_catalog()
+    # # e = get_source()
+    # e, lst_deal = get_deals(from_date)
+    # if e: print(e)
+    
+    e = get_field_deals()
+    if e:
+        with open('deals_all_fields.json', 'w', encoding='utf-8') as out_file:
+            json.dump(e, out_file, ensure_ascii=False, indent=4)
 
     # cur_day = datetime.today().day
     # cur_month = datetime.today().month

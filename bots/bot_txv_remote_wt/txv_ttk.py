@@ -492,7 +492,8 @@ def get_txv(data):
         
     except Exception as e:
         return str(e), data
-    finally: driver.quit()
+    finally:
+        if driver: driver.quit()
    
     return '', data
 

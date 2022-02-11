@@ -7,6 +7,16 @@
     "isDynamic": false,
     "title": "ID"
 },
+"STAGE_ID": {
+    "type": "crm_status",
+    "isRequired": false,
+    "isReadOnly": false,
+    "isImmutable": false,
+    "isMultiple": false,
+    "isDynamic": false,
+    "statusType": "DEAL_STAGE",
+    "title": "Стадия сделки"
+},
 "SOURCE_ID": {
     "type": "crm_status",
     "isRequired": false,

@@ -725,10 +725,7 @@ def set_bid(data):
     except Exception as e:
         rez_set_bid = str(e)
     finally:
-        # time.sleep(5)
-        # with open('out_file.html', 'w', encoding='utf-8') as outfile:
-            # outfile.write(driver.page_source)
-        driver.quit()
+        if driver: driver.quit()
    
     return rez_set_bid, data
 

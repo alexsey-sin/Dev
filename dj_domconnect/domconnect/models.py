@@ -174,6 +174,51 @@ class DcCrmLid(models.Model):  # Лид
         return str(self.id_lid)
 
 
+class DcCrmDeal(models.Model):  # Сделки
+    id_deal = models.IntegerField(  # Обязательное поле
+        unique = True,  # Если True, это поле должно быть уникальным во всей таблице.
+        verbose_name='ID сделки',
+    )
+    source_id = models.CharField(
+        max_length = 255,
+        blank = True,
+        default = '',
+        verbose_name='Источник',
+    )
+    create_date = models.DateTimeField(
+        blank = True,
+        null = True,
+        verbose_name='Создано',
+    )
+    modify_date = models.DateTimeField(
+        blank = True,
+        null = True,
+        verbose_name='Изменено',
+    )
+    crm_5904FB99DBF0C = models.DateTimeField(
+        blank = True,
+        null = True,
+        verbose_name='Подключение',
+    )
+    crm_5EECA3B76309E = models.DateTimeField(
+        blank = True,
+        null = True,
+        verbose_name='Дата лида',
+    )
+    crm_5903C16BCEE3A = models.CharField(
+        max_length = 255,
+        blank = True,
+        default = '',
+        verbose_name='Услуги',
+    )
+    crm_5903C16BDAA69 = models.IntegerField(
+        blank = True,
+        default = 0,
+        verbose_name = 'Сумма тарифа',
+    )
+    
+
+
 class DcCashSEO(models.Model):  # Кэш SEO
     val_date = models.DateField(
         verbose_name='Период',
