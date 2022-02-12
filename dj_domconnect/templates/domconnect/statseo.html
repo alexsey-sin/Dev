@@ -22,11 +22,8 @@
                     <tr>
                         <th scope="col" style="min-width: 200px; max-width: 200px;">Тип</th>
                         {% for month in data_month %}
-                            <th scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.head }}</th>
+                            <th scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month }}</th>
                         {% endfor %}
-                        <th scope="col">График</th>
-                        <th scope="col">Сравн. мес</th>
-                        <th scope="col">{{ str_cur_month }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -454,11 +451,8 @@
                                         <tr>
                                             <th scope="col" style="min-width: 200px; max-width: 200px;">Тип</th>
                                             {% for month in data_month %}
-                                                <th scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.head }}</th>
+                                                <th scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month }}</th>
                                             {% endfor %}
-                                            <th scope="col">График</th>
-                                            <th scope="col">Сравн. мес</th>
-                                            <th scope="col">{{ str_cur_month }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -791,11 +785,8 @@
                                         <tr>
                                             <th scope="col" style="min-width: 200px; max-width: 200px;">Тип</th>
                                             {% for month in data_month %}
-                                                <th scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.head }}</th>
+                                                <th scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month }}</th>
                                             {% endfor %}
-                                            <th scope="col">График</th>
-                                            <th scope="col">Сравн. мес</th>
-                                            <th scope="col">{{ str_cur_month }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -960,7 +951,13 @@
         </div>
         <!-- Конец цикла по сайтам -->
         <div style="height: 30px; padding: 20px 50px;">
-            <button type="button" style="background-color: aqua;" onclick="download_seo();">Скачать в .csv</button>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" id="id_get_seo" name="get_seo" value="True">
+                <button type="submit" style="background-color: aqua;">Скачать в .csv</button>
+            </form>
+        </div>
+        <div style="height: 30px;">
         </div>
     </body>
     
@@ -976,6 +973,9 @@
         }
     </script>
     <script language="javascript" type="text/javascript">
+        if (window.history.replaceState){  // предотвращает повторную отправку формы при обновлении страницы если перед этим была отправка
+            window.history.replaceState(null, null, window.location.href);
+        }
         $(document).ready(function(){
             draw_grafic();
         });

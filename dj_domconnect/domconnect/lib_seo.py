@@ -1,12 +1,9 @@
-from domconnect.models import DcCrmGlobVar, DcCrmLid, DcCashSEO, DcSiteSEO, DcCrmDeal
+from domconnect.models import DcCrmGlobVar, DcCrmLid, DcCashSEO, DcSiteSEO, DcCrmDeal, DcSourceSEO
 from django.db.models import Q, Avg
-import time
-import logging
-import requests
-import json
+from decimal import Decimal
 from datetime import datetime, timedelta
-import calendar
-# from django.core.handlers.wsgi import WSGIRequest
+import time, logging, requests, json, calendar, copy
+
 
 
 logging.basicConfig(
@@ -36,7 +33,7 @@ typelid = {}
 # }
 
 
-def run_download_crm(*args, **options):
+def run_upgrade_seo(*args, **options):
     # http_request = False
     # if args and isinstance(args[0], object) and type(args[0]) == WSGIRequest: http_request = True
 
@@ -67,6 +64,17 @@ def run_download_crm(*args, **options):
     loger.info(mess)
     print(mess)
 
+
+def get_key_crm():
+    gvar_key, create = DcCrmGlobVar.objects.get_or_create(key='key_crm')
+    key_crm = ''
+    if create:
+        key_crm = '371/ao3ct8et7i7viajs'
+        gvar_key.val_str = key_crm
+        gvar_key.save()
+    else:
+        key_crm = gvar_key.val_str
+    return key_crm
 
 def download_typesource():  # Обновление Типов источника лида
     key_crm = get_key_crm()
@@ -715,13 +723,214 @@ def calculate_site_table(lst_res_source):
     out_dict['cell_26'] = cell_26
     return out_dict
 
-def get_key_crm():
-    gvar_key, create = DcCrmGlobVar.objects.get_or_create(key='key_crm')
-    key_crm = ''
-    if create:
-        key_crm = '371/ao3ct8et7i7viajs'
-        gvar_key.val_str = key_crm
-        gvar_key.save()
-    else:
-        key_crm = gvar_key.val_str
-    return key_crm
+def make_seo_page():
+    out_data = {}
+
+    # Вычислим коэфициент для прогноза на текущий месяц
+    now_date = datetime.today()
+    cur_day = now_date.day      # Номер дня
+    cur_month = now_date.month  # Номер меяца
+    cur_year = now_date.year    # Номер года
+    cnt_days_in_month = calendar.monthrange(cur_year, cur_month)[1] # Количество дней в месяце
+    if cur_day < 5:
+        cnt_min_in_month = cnt_days_in_month * 1440
+        cur_min = (cur_day - 1) * 1440 + (now_date.hour * 60) + now_date.minute
+        coef_forecast = Decimal(cnt_min_in_month / cur_min)  # Коэфициент полного месяца (для прогноза если месяйц не полный с учетом минут)
+    else: coef_forecast = Decimal(cnt_days_in_month / cur_day)  # Коэфициент полного месяца (для прогноза если месяйц не полный)
+
+    # Собираем строку заголовков и основную таблицу
+    str_month = ['', 'Янв.', 'Фев.', 'Мар.', 'Апр.', 'Май', 'Июн.', 'Июл.', 'Авг.', 'Сен.', 'Окт.', 'Ноя.', 'Дек.']
+    col_date = datetime.today()
+    data_month = []
+    data_0_table = []
+    for _ in range(12):
+        s_date = f'01.{col_date.month}.{col_date.year}'
+        f_date = datetime.strptime(s_date, '%d.%m.%Y')
+        c_data = DcCashSEO.objects.filter(val_date=f_date, num_site=0, num_source=0).order_by('row')
+        data_month.append(f'{str_month[col_date.month]} {col_date.year}')
+        c_row = {}
+        if col_date.month == cur_month and col_date.year == cur_year: forecast = True
+        else: forecast = False
+        for j in range(len(c_data)):
+            val = c_data[j].val
+            if forecast and j not in [2, 4, 5, 7, 9, 10, 14, 19, 23, 24]:
+                c_row[c_data[j].row] = val * coef_forecast
+            else: c_row[c_data[j].row] = val
+        data_0_table.append(c_row)
+        col_date = col_date - timedelta(days=col_date.day)
+    data_month.reverse()
+    data_month += ['График', 'Сравн. мес', f'{str_month[cur_month]} ФАКТ']
+    data_0_table.reverse()
+# 
+    # Добавляем дополнительные столбцы "График", "Сравн. мес" и "месяц ФАКТ"
+    col_fabula = data_0_table[-1]  # В качестве шаблона новых колонок берем последнюю (свежий месяц)
+    if len(col_fabula):
+        col_gr = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
+        col_cm = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
+        col_ft = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
+
+        s_date = f'01.{cur_month}.{cur_year}'
+        f_date = datetime.strptime(s_date, '%d.%m.%Y')
+        obj_cur_month = DcCashSEO.objects.filter(val_date=f_date, num_site=0, num_source=0)
+        for key, _ in col_fabula.items():
+            gr = []
+            for i in range(12): 
+                val = data_0_table[i].get(key)
+                try: val = int(val)
+                except: val = 0
+                gr.append(val)
+            col_gr[key] = gr
+            # Для колонки "Сравн. мес" вычислим значение
+            col_cm[key] = 0
+            num_new = data_0_table[11].get(key)
+            num_old = data_0_table[10].get(key)
+            if num_new != None and num_old != None and num_old != 0:
+                cm = round((num_new / num_old - 1) * 100)
+                col_cm[key] = cm
+            col_ft[key] = obj_cur_month.get(row=key).val
+        data_0_table.append(col_gr)  # 13 колонка "График"
+        data_0_table.append(col_cm)  # 14 колонка "Сравн. мес"
+        data_0_table.append(col_ft)  # 14 колонка "месяц ФАКТ"
+
+    out_data['data_month'] = data_month
+    out_data['data_0_table'] = data_0_table
+
+    # with open('data_0_table.json', 'w', encoding='utf-8') as out_file:
+    #     json.dump(data_0_table, out_file, ensure_ascii=False, indent=4)
+
+    # Собираем таблицы сайтов с источниками
+    data_sites = []
+    objs_site = DcSiteSEO.objects.all().order_by('num')
+    for obj_site in objs_site:
+        item_sites = {'id': obj_site.num, 'name_site': obj_site.site}
+        
+        # Таблицы сайта по месяцам
+        site_table = []  # Список словарей по месяцам сводной таблицы сайта
+        col_date = datetime.today()
+        for _ in range(12):
+            s_date = f'01.{col_date.month}.{col_date.year}'
+            f_date = datetime.strptime(s_date, '%d.%m.%Y')
+            c_data = DcCashSEO.objects.filter(val_date=f_date, num_site=obj_site.num, num_source=0).order_by('row')
+            c_row = {}
+            if col_date.month == cur_month and col_date.year == cur_year: forecast = True
+            else: forecast = False
+            for j in range(len(c_data)):
+                val = c_data[j].val
+                if forecast and j not in [1, 3, 6, 7, 9, 12, 13, 16, 17, 18, 19, 20]:
+                    c_row[c_data[j].row] = val * coef_forecast
+                else: c_row[c_data[j].row] = val
+            site_table.append(c_row)
+            col_date = col_date - timedelta(days=col_date.day)
+        site_table.reverse()
+
+        # Добавляем дополнительные столбцы "График" и "Сравн. мес" и "месяц ФАКТ"
+        col_fabula = site_table[-1]  # В качестве шаблона новых колонок берем последнюю (свежий месяц)
+        s_date = f'01.{cur_month}.{cur_year}'
+        f_date = datetime.strptime(s_date, '%d.%m.%Y')
+        obj_cur_month = DcCashSEO.objects.filter(val_date=f_date, num_site=obj_site.num, num_source=0)
+        if len(col_fabula):
+            col_gr = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
+            col_cm = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
+            col_ft = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
+
+            for key, _ in col_fabula.items():
+                gr = []
+                for i in range(12): 
+                    val = site_table[i].get(key)
+                    try: val = int(val)
+                    except: val = 0
+                    gr.append(val)
+                col_gr[key] = gr
+                # Для колонки "Сравн. мес" вычислим значение
+                col_cm[key] = 0
+                num_new = site_table[11].get(key)
+                num_old = site_table[10].get(key)
+                if num_new != None and num_old != None and num_old != 0:
+                    cm = round((num_new / num_old - 1) * 100)
+                    col_cm[key] = cm
+                col_ft[key] = obj_cur_month.get(row=key).val
+            site_table.append(col_gr)  # 13 колонка "График"
+            site_table.append(col_cm)  # 14 колонка "Сравн. мес"
+            site_table.append(col_ft)  # 14 колонка "месяц ФАКТ"
+        item_sites['site_table'] = site_table
+        
+        # Проход по источникам сайта
+        source_tables = []
+        sources = DcSourceSEO.objects.filter(site=obj_site).order_by('num')
+        for source in sources:
+            item_source = {'name_source': source.source}
+            it_src_month = []
+            src_date = datetime.today()
+            for _ in range(12):
+                s_date = f'01.{src_date.month}.{src_date.year}'
+                f_date = datetime.strptime(s_date, '%d.%m.%Y')
+                cash_source = DcCashSEO.objects.filter(val_date=f_date, num_site=obj_site.num, num_source=source.num).order_by('row')
+                c_row = {}
+                if src_date.month == cur_month and src_date.year == cur_year: forecast = True
+                else: forecast = False
+                for j in range(len(cash_source)):
+                    val = cash_source[j].val
+                    if forecast and j not in [4,]:
+                        c_row[cash_source[j].row] = val * coef_forecast
+                    else: c_row[cash_source[j].row] = val
+                    # c_row[str(cash_source[j].row)] = cash_source[j].val
+                it_src_month.append(c_row)
+                src_date = src_date - timedelta(days=src_date.day)
+            it_src_month.reverse()
+
+            # Добавляем дополнительные столбцы "График" и "Сравн. мес"
+            col_fabula = it_src_month[-1]  # В качестве шаблона новых колонок берем последнюю (свежий месяц)
+            s_date = f'01.{cur_month}.{cur_year}'
+            f_date = datetime.strptime(s_date, '%d.%m.%Y')
+            obj_cur_month = DcCashSEO.objects.filter(val_date=f_date, num_site=obj_site.num, num_source=source.num)
+            if len(col_fabula):
+                col_gr = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
+                col_cm = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
+                col_ft = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
+
+                for key, _ in col_fabula.items():
+                    gr = []
+                    for i in range(12): 
+                        val = it_src_month[i].get(key)
+                        try: val = int(val)
+                        except: val = 0
+                        gr.append(val)
+                    col_gr[key] = gr
+                    # Для колонки "Сравн. мес" вычислим значение
+                    col_cm[key] = 0
+                    num_new = it_src_month[11].get(key)
+                    num_old = it_src_month[10].get(key)
+                    if num_new != None and num_old != None and num_old != 0:
+                        cm = round((num_new / num_old - 1) * 100)
+                        col_cm[key] = cm
+                    col_ft[key] = obj_cur_month.get(row=key).val
+                it_src_month.append(col_gr)  # 13 колонка "График"
+                it_src_month.append(col_cm)  # 14 колонка "Сравн. мес"
+                it_src_month.append(col_ft)  # 14 колонка "месяц ФАКТ"
+            
+            item_source['months'] = it_src_month
+            source_tables.append(item_source)
+
+        item_sites['source_tables'] = source_tables
+        
+        data_sites.append(item_sites)
+
+    out_data['data_sites'] = data_sites
+
+    # with open('data_sites.json', 'w', encoding='utf-8') as out_file:
+    #     json.dump(data_sites, out_file, ensure_ascii=False, indent=4)
+
+    return out_data
+
+def make_csv_text(in_data):
+    out_str = ';'
+    out_str += ';'.join(in_data['data_month'])
+
+    # in_data['data_month']
+    # in_data['str_cur_month']
+    # in_data['data_0_table']
+    # in_data['data_sites'] 
+
+
+
+    return out_str
