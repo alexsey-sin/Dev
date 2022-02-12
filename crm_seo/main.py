@@ -377,6 +377,30 @@ def get_deals(from_data):
         time.sleep(1)
     return '', out_lst
 
+def get_user_status():
+    # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.deal.fields'
+    url = 'https://crm.domconnect.ru/rest/timeman.status/?auth=xxxxxx&user_id=21209'
+    headers = {
+        'Content-Type': 'application/json',
+        'Connection': 'Keep-Alive',
+        'User-Agent': 'Apache-HttpClient/4.1.1 (java 1.5)',
+    }
+    try:
+        responce = requests.post(url, headers=headers)
+        print(responce.status_code)
+        print(responce.text)
+        # if responce.status_code == 200:
+            # answer = json.loads(responce.text)
+            # result = answer.get('result')
+            # return result
+        # else:
+            # print(responce.status_code)
+            # print(responce.text)
+            # return f'Ошибка get_user_status: responce.status_code: {responce.status_code}\n{responce.text}'
+        return ''
+    except:
+        return 'Ошибка get_user_status: try: requests.post'
+
 
 if __name__ == '__main__':
     pass
@@ -395,10 +419,11 @@ if __name__ == '__main__':
     # e, lst_deal = get_deals(from_date)
     # if e: print(e)
     
-    e = get_field_deals()
-    if e:
-        with open('deals_all_fields.json', 'w', encoding='utf-8') as out_file:
-            json.dump(e, out_file, ensure_ascii=False, indent=4)
+    e = get_user_status()
+    if e: print(e)
+    # if e:
+        # with open('deals_all_fields.json', 'w', encoding='utf-8') as out_file:
+            # json.dump(e, out_file, ensure_ascii=False, indent=4)
 
     # cur_day = datetime.today().day
     # cur_month = datetime.today().month
