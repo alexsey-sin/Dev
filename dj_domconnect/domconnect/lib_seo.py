@@ -847,7 +847,7 @@ def make_seo_page():
 
     # Добавляем дополнительные столбцы "График", "Сравн. мес" и "месяц ФАКТ"
     col_fabula = {}  # Шаблон новых колонок
-    for i in range(1, len(row_0_names)+1): col_fabula[str(i)] = ''
+    for i in range(1, len(row_0_names)+1): col_fabula[i] = ''
     col_gr = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
     col_cm = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
     col_ft = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
@@ -856,15 +856,13 @@ def make_seo_page():
     f_date = datetime.strptime(s_date, '%d.%m.%Y')
     obj_cur_month = DcCashSEO.objects.filter(val_date=f_date, num_site=0, num_source=0)
     for key, _ in col_fabula.items():
-        try:
-            gr = []
-            for i in range(12): 
-                val = data_0_table[i].get(key)
-                try: val = int(val)
-                except: val = 0
-                gr.append(val)
-            col_gr[key] = gr
-        except: col_gr[key] = ''
+        gr = []
+        for i in range(12): 
+            val = data_0_table[i].get(key)
+            try: val = int(val)
+            except: val = 0
+            gr.append(val)
+        col_gr[key] = gr
         # Для колонки "Сравн. мес" вычислим значение
         col_cm[key] = 0
         num_new = data_0_table[11].get(key)
@@ -911,7 +909,7 @@ def make_seo_page():
 
         # Добавляем дополнительные столбцы "График" и "Сравн. мес" и "месяц ФАКТ"
         col_fabula = {}  # Шаблон новых колонок
-        for i in range(1, len(row_site_names)+1): col_fabula[str(i)] = ''
+        for i in range(1, len(row_site_names)+1): col_fabula[i] = ''
         s_date = f'01.{cur_month}.{cur_year}'
         f_date = datetime.strptime(s_date, '%d.%m.%Y')
         obj_cur_month = DcCashSEO.objects.filter(val_date=f_date, num_site=obj_site.num, num_source=0)
@@ -920,15 +918,13 @@ def make_seo_page():
         col_ft = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
 
         for key, _ in col_fabula.items():
-            try:
-                gr = []
-                for i in range(12): 
-                    val = site_table[i].get(key)
-                    try: val = int(val)
-                    except: val = 0
-                    gr.append(val)
-                col_gr[key] = gr
-            except: col_gr[key] = ''
+            gr = []
+            for i in range(12): 
+                val = site_table[i].get(key)
+                try: val = int(val)
+                except: val = 0
+                gr.append(val)
+            col_gr[key] = gr
             # Для колонки "Сравн. мес" вычислим значение
             col_cm[key] = 0
             num_new = site_table[11].get(key)
@@ -969,7 +965,7 @@ def make_seo_page():
 
             # Добавляем дополнительные столбцы "График" и "Сравн. мес"
             col_fabula = {}  # Шаблон новых колонок
-            for i in range(1, len(row_source_names)+1): col_fabula[str(i)] = ''
+            for i in range(1, len(row_source_names)+1): col_fabula[i] = ''
             s_date = f'01.{cur_month}.{cur_year}'
             f_date = datetime.strptime(s_date, '%d.%m.%Y')
             obj_cur_month = DcCashSEO.objects.filter(val_date=f_date, num_site=obj_site.num, num_source=source.num)
@@ -978,15 +974,13 @@ def make_seo_page():
             col_ft = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
 
             for key, _ in col_fabula.items():
-                try:
-                    gr = []
-                    for i in range(12): 
-                        val = it_src_month[i].get(key)
-                        try: val = int(val)
-                        except: val = 0
-                        gr.append(val)
-                    col_gr[key] = gr
-                except: col_gr[key] = ''
+                gr = []
+                for i in range(12): 
+                    val = it_src_month[i].get(key)
+                    try: val = int(val)
+                    except: val = 0
+                    gr.append(val)
+                col_gr[key] = gr
                 # Для колонки "Сравн. мес" вычислим значение
                 col_cm[key] = 0
                 num_new = it_src_month[11].get(key)
