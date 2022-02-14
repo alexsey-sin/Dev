@@ -807,168 +807,113 @@ def calculate_site_table(lst_res_source):
     return out_dict
 
 def make_seo_page():
-    out_data = {}
+    try:
+        out_data = {}
 
-    # Вычислим коэфициент для прогноза на текущий месяц
-    now_date = datetime.today()
-    cur_day = now_date.day      # Номер дня
-    cur_month = now_date.month  # Номер меяца
-    cur_year = now_date.year    # Номер года
-    cnt_days_in_month = calendar.monthrange(cur_year, cur_month)[1] # Количество дней в месяце
-    if cur_day < 5:
-        cnt_min_in_month = cnt_days_in_month * 1440
-        cur_min = (cur_day - 1) * 1440 + (now_date.hour * 60) + now_date.minute
-        coef_forecast = Decimal(cnt_min_in_month / cur_min)  # Коэфициент полного месяца (для прогноза если месяйц не полный с учетом минут)
-    else: coef_forecast = Decimal(cnt_days_in_month / cur_day)  # Коэфициент полного месяца (для прогноза если месяйц не полный)
+        # Вычислим коэфициент для прогноза на текущий месяц
+        now_date = datetime.today()
+        cur_day = now_date.day      # Номер дня
+        cur_month = now_date.month  # Номер меяца
+        cur_year = now_date.year    # Номер года
+        cnt_days_in_month = calendar.monthrange(cur_year, cur_month)[1] # Количество дней в месяце
+        if cur_day < 5:
+            cnt_min_in_month = cnt_days_in_month * 1440
+            cur_min = (cur_day - 1) * 1440 + (now_date.hour * 60) + now_date.minute
+            coef_forecast = Decimal(cnt_min_in_month / cur_min)  # Коэфициент полного месяца (для прогноза если месяйц не полный с учетом минут)
+        else: coef_forecast = Decimal(cnt_days_in_month / cur_day)  # Коэфициент полного месяца (для прогноза если месяйц не полный)
 
-    # Собираем строку заголовков и основную таблицу
-    str_month = ['', 'Янв.', 'Фев.', 'Мар.', 'Апр.', 'Май', 'Июн.', 'Июл.', 'Авг.', 'Сен.', 'Окт.', 'Ноя.', 'Дек.']
-    col_date = datetime.today()
-    data_month = []
-    data_0_table = []
-    for _ in range(12):
-        s_date = f'01.{col_date.month}.{col_date.year}'
-        f_date = datetime.strptime(s_date, '%d.%m.%Y')
-        c_data = DcCashSEO.objects.filter(val_date=f_date, num_site=0, num_source=0).order_by('row')
-        data_month.append(f'{str_month[col_date.month]} {col_date.year}')
-        c_row = {}
-        if col_date.month == cur_month and col_date.year == cur_year: forecast = True
-        else: forecast = False
-        for j in range(len(c_data)):
-            val = c_data[j].val
-            if forecast and j not in [2, 4, 5, 7, 9, 10, 14, 19, 23, 24]:
-                c_row[c_data[j].row] = val * coef_forecast
-            else: c_row[c_data[j].row] = val
-        data_0_table.append(c_row)
-        col_date = col_date - timedelta(days=col_date.day)
-    data_month.reverse()
-    data_month += ['График', 'Сравн. мес', f'{str_month[cur_month]} ФАКТ']
-    data_0_table.reverse()
-
-    # Добавляем дополнительные столбцы "График", "Сравн. мес" и "месяц ФАКТ"
-    col_fabula = {}  # Шаблон новых колонок
-    for i in range(1, len(row_0_names)+1): col_fabula[i] = ''
-    col_gr = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
-    col_cm = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
-    col_ft = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
-
-    s_date = f'01.{cur_month}.{cur_year}'
-    f_date = datetime.strptime(s_date, '%d.%m.%Y')
-    obj_cur_month = DcCashSEO.objects.filter(val_date=f_date, num_site=0, num_source=0)
-    for key, _ in col_fabula.items():
-        gr = []
-        for i in range(12): 
-            val = data_0_table[i].get(key)
-            try: val = int(val)
-            except: val = 0
-            gr.append(val)
-        col_gr[key] = gr
-        # Для колонки "Сравн. мес" вычислим значение
-        col_cm[key] = 0
-        num_new = data_0_table[11].get(key)
-        num_old = data_0_table[10].get(key)
-        if num_new != None and num_old != None and num_old != 0:
-            cm = round((num_new / num_old - 1) * 100)
-            col_cm[key] = cm
-        try: col_ft[key] = obj_cur_month.get(row=key).val
-        except: col_ft[key] = ''
-    data_0_table.append(col_gr)  # 13 колонка "График"
-    data_0_table.append(col_cm)  # 14 колонка "Сравн. мес"
-    data_0_table.append(col_ft)  # 14 колонка "месяц ФАКТ"
-
-    out_data['data_month'] = data_month
-    out_data['data_0_table'] = data_0_table
-
-    # with open('data_0_table.json', 'w', encoding='utf-8') as out_file:
-    #     json.dump(data_0_table, out_file, ensure_ascii=False, indent=4)
-
-    # Собираем таблицы сайтов с источниками
-    data_sites = []
-    objs_site = DcSiteSEO.objects.all().order_by('num')
-    for obj_site in objs_site:
-        item_sites = {'id': obj_site.num, 'name_site': obj_site.site}
-        
-        # Таблицы сайта по месяцам
-        site_table = []  # Список словарей по месяцам сводной таблицы сайта
+        # Собираем строку заголовков и основную таблицу
+        str_month = ['', 'Янв.', 'Фев.', 'Мар.', 'Апр.', 'Май', 'Июн.', 'Июл.', 'Авг.', 'Сен.', 'Окт.', 'Ноя.', 'Дек.']
         col_date = datetime.today()
+        data_month = []
+        data_0_table = []
         for _ in range(12):
             s_date = f'01.{col_date.month}.{col_date.year}'
             f_date = datetime.strptime(s_date, '%d.%m.%Y')
-            c_data = DcCashSEO.objects.filter(val_date=f_date, num_site=obj_site.num, num_source=0).order_by('row')
+            c_data = DcCashSEO.objects.filter(val_date=f_date, num_site=0, num_source=0).order_by('row')
+            data_month.append(f'{str_month[col_date.month]} {col_date.year}')
             c_row = {}
             if col_date.month == cur_month and col_date.year == cur_year: forecast = True
             else: forecast = False
             for j in range(len(c_data)):
                 val = c_data[j].val
-                if forecast and j not in [1, 3, 6, 7, 9, 12, 13, 16, 17, 18, 19, 20]:
+                if forecast and j not in [2, 4, 5, 7, 9, 10, 14, 19, 23, 24]:
                     c_row[c_data[j].row] = val * coef_forecast
                 else: c_row[c_data[j].row] = val
-            site_table.append(c_row)
+            data_0_table.append(c_row)
             col_date = col_date - timedelta(days=col_date.day)
-        site_table.reverse()
+        data_month.reverse()
+        data_month += ['График', 'Сравн. мес', f'{str_month[cur_month]} ФАКТ']
+        data_0_table.reverse()
 
-        # Добавляем дополнительные столбцы "График" и "Сравн. мес" и "месяц ФАКТ"
+        # Добавляем дополнительные столбцы "График", "Сравн. мес" и "месяц ФАКТ"
         col_fabula = {}  # Шаблон новых колонок
-        for i in range(1, len(row_site_names)+1): col_fabula[i] = ''
-        s_date = f'01.{cur_month}.{cur_year}'
-        f_date = datetime.strptime(s_date, '%d.%m.%Y')
-        obj_cur_month = DcCashSEO.objects.filter(val_date=f_date, num_site=obj_site.num, num_source=0)
+        for i in range(1, len(row_0_names)+1): col_fabula[i] = ''
         col_gr = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
         col_cm = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
         col_ft = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
 
+        s_date = f'01.{cur_month}.{cur_year}'
+        f_date = datetime.strptime(s_date, '%d.%m.%Y')
+        obj_cur_month = DcCashSEO.objects.filter(val_date=f_date, num_site=0, num_source=0)
         for key, _ in col_fabula.items():
             gr = []
             for i in range(12): 
-                val = site_table[i].get(key)
+                val = data_0_table[i].get(key)
                 try: val = int(val)
                 except: val = 0
                 gr.append(val)
             col_gr[key] = gr
             # Для колонки "Сравн. мес" вычислим значение
             col_cm[key] = 0
-            num_new = site_table[11].get(key)
-            num_old = site_table[10].get(key)
+            num_new = data_0_table[11].get(key)
+            num_old = data_0_table[10].get(key)
             if num_new != None and num_old != None and num_old != 0:
                 cm = round((num_new / num_old - 1) * 100)
                 col_cm[key] = cm
             try: col_ft[key] = obj_cur_month.get(row=key).val
             except: col_ft[key] = ''
-        site_table.append(col_gr)  # 13 колонка "График"
-        site_table.append(col_cm)  # 14 колонка "Сравн. мес"
-        site_table.append(col_ft)  # 14 колонка "месяц ФАКТ"
-        item_sites['site_table'] = site_table
-        
-        # Проход по источникам сайта
-        source_tables = []
-        sources = DcSourceSEO.objects.filter(site=obj_site).order_by('num')
-        for source in sources:
-            item_source = {'name_source': source.source}
-            it_src_month = []
-            src_date = datetime.today()
-            for _ in range(12):
-                s_date = f'01.{src_date.month}.{src_date.year}'
-                f_date = datetime.strptime(s_date, '%d.%m.%Y')
-                cash_source = DcCashSEO.objects.filter(val_date=f_date, num_site=obj_site.num, num_source=source.num).order_by('row')
-                c_row = {}
-                if src_date.month == cur_month and src_date.year == cur_year: forecast = True
-                else: forecast = False
-                for j in range(len(cash_source)):
-                    val = cash_source[j].val
-                    if forecast and j not in [4,]:
-                        c_row[cash_source[j].row] = val * coef_forecast
-                    else: c_row[cash_source[j].row] = val
-                    # c_row[str(cash_source[j].row)] = cash_source[j].val
-                it_src_month.append(c_row)
-                src_date = src_date - timedelta(days=src_date.day)
-            it_src_month.reverse()
+        data_0_table.append(col_gr)  # 13 колонка "График"
+        data_0_table.append(col_cm)  # 14 колонка "Сравн. мес"
+        data_0_table.append(col_ft)  # 14 колонка "месяц ФАКТ"
 
-            # Добавляем дополнительные столбцы "График" и "Сравн. мес"
+        out_data['data_month'] = data_month
+        out_data['data_0_table'] = data_0_table
+
+        # with open('data_0_table.json', 'w', encoding='utf-8') as out_file:
+        #     json.dump(data_0_table, out_file, ensure_ascii=False, indent=4)
+
+        # Собираем таблицы сайтов с источниками
+        data_sites = []
+        objs_site = DcSiteSEO.objects.all().order_by('num')
+        for obj_site in objs_site:
+            item_sites = {'id': obj_site.num, 'name_site': obj_site.site}
+            
+            # Таблицы сайта по месяцам
+            site_table = []  # Список словарей по месяцам сводной таблицы сайта
+            col_date = datetime.today()
+            for _ in range(12):
+                s_date = f'01.{col_date.month}.{col_date.year}'
+                f_date = datetime.strptime(s_date, '%d.%m.%Y')
+                c_data = DcCashSEO.objects.filter(val_date=f_date, num_site=obj_site.num, num_source=0).order_by('row')
+                c_row = {}
+                if col_date.month == cur_month and col_date.year == cur_year: forecast = True
+                else: forecast = False
+                for j in range(len(c_data)):
+                    val = c_data[j].val
+                    if forecast and j not in [1, 3, 6, 7, 9, 12, 13, 16, 17, 18, 19, 20]:
+                        c_row[c_data[j].row] = val * coef_forecast
+                    else: c_row[c_data[j].row] = val
+                site_table.append(c_row)
+                col_date = col_date - timedelta(days=col_date.day)
+            site_table.reverse()
+
+            # Добавляем дополнительные столбцы "График" и "Сравн. мес" и "месяц ФАКТ"
             col_fabula = {}  # Шаблон новых колонок
-            for i in range(1, len(row_source_names)+1): col_fabula[i] = ''
+            for i in range(1, len(row_site_names)+1): col_fabula[i] = ''
             s_date = f'01.{cur_month}.{cur_year}'
             f_date = datetime.strptime(s_date, '%d.%m.%Y')
-            obj_cur_month = DcCashSEO.objects.filter(val_date=f_date, num_site=obj_site.num, num_source=source.num)
+            obj_cur_month = DcCashSEO.objects.filter(val_date=f_date, num_site=obj_site.num, num_source=0)
             col_gr = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
             col_cm = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
             col_ft = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
@@ -976,120 +921,181 @@ def make_seo_page():
             for key, _ in col_fabula.items():
                 gr = []
                 for i in range(12): 
-                    val = it_src_month[i].get(key)
+                    val = site_table[i].get(key)
                     try: val = int(val)
                     except: val = 0
                     gr.append(val)
                 col_gr[key] = gr
                 # Для колонки "Сравн. мес" вычислим значение
                 col_cm[key] = 0
-                num_new = it_src_month[11].get(key)
-                num_old = it_src_month[10].get(key)
+                num_new = site_table[11].get(key)
+                num_old = site_table[10].get(key)
                 if num_new != None and num_old != None and num_old != 0:
                     cm = round((num_new / num_old - 1) * 100)
                     col_cm[key] = cm
                 try: col_ft[key] = obj_cur_month.get(row=key).val
                 except: col_ft[key] = ''
-            it_src_month.append(col_gr)  # 13 колонка "График"
-            it_src_month.append(col_cm)  # 14 колонка "Сравн. мес"
-            it_src_month.append(col_ft)  # 14 колонка "месяц ФАКТ"
+            site_table.append(col_gr)  # 13 колонка "График"
+            site_table.append(col_cm)  # 14 колонка "Сравн. мес"
+            site_table.append(col_ft)  # 14 колонка "месяц ФАКТ"
+            item_sites['site_table'] = site_table
             
-            item_source['months'] = it_src_month
-            source_tables.append(item_source)
+            # Проход по источникам сайта
+            source_tables = []
+            sources = DcSourceSEO.objects.filter(site=obj_site).order_by('num')
+            for source in sources:
+                item_source = {'name_source': source.source}
+                it_src_month = []
+                src_date = datetime.today()
+                for _ in range(12):
+                    s_date = f'01.{src_date.month}.{src_date.year}'
+                    f_date = datetime.strptime(s_date, '%d.%m.%Y')
+                    cash_source = DcCashSEO.objects.filter(val_date=f_date, num_site=obj_site.num, num_source=source.num).order_by('row')
+                    c_row = {}
+                    if src_date.month == cur_month and src_date.year == cur_year: forecast = True
+                    else: forecast = False
+                    for j in range(len(cash_source)):
+                        val = cash_source[j].val
+                        if forecast and j not in [4,]:
+                            c_row[cash_source[j].row] = val * coef_forecast
+                        else: c_row[cash_source[j].row] = val
+                        # c_row[str(cash_source[j].row)] = cash_source[j].val
+                    it_src_month.append(c_row)
+                    src_date = src_date - timedelta(days=src_date.day)
+                it_src_month.reverse()
 
-        item_sites['source_tables'] = source_tables
-        
-        data_sites.append(item_sites)
+                # Добавляем дополнительные столбцы "График" и "Сравн. мес"
+                col_fabula = {}  # Шаблон новых колонок
+                for i in range(1, len(row_source_names)+1): col_fabula[i] = ''
+                s_date = f'01.{cur_month}.{cur_year}'
+                f_date = datetime.strptime(s_date, '%d.%m.%Y')
+                obj_cur_month = DcCashSEO.objects.filter(val_date=f_date, num_site=obj_site.num, num_source=source.num)
+                col_gr = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
+                col_cm = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
+                col_ft = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
 
-    out_data['data_sites'] = data_sites
+                for key, _ in col_fabula.items():
+                    gr = []
+                    for i in range(12): 
+                        val = it_src_month[i].get(key)
+                        try: val = int(val)
+                        except: val = 0
+                        gr.append(val)
+                    col_gr[key] = gr
+                    # Для колонки "Сравн. мес" вычислим значение
+                    col_cm[key] = 0
+                    num_new = it_src_month[11].get(key)
+                    num_old = it_src_month[10].get(key)
+                    if num_new != None and num_old != None and num_old != 0:
+                        cm = round((num_new / num_old - 1) * 100)
+                        col_cm[key] = cm
+                    try: col_ft[key] = obj_cur_month.get(row=key).val
+                    except: col_ft[key] = ''
+                it_src_month.append(col_gr)  # 13 колонка "График"
+                it_src_month.append(col_cm)  # 14 колонка "Сравн. мес"
+                it_src_month.append(col_ft)  # 14 колонка "месяц ФАКТ"
+                
+                item_source['months'] = it_src_month
+                source_tables.append(item_source)
 
-    with open('seo_page.json', 'w', encoding='utf-8') as out_file:
-        json.dump(out_data, out_file, ensure_ascii=False, cls=DecimalEncoder)
+            item_sites['source_tables'] = source_tables
+            
+            data_sites.append(item_sites)
 
-    # return out_data
+        out_data['data_sites'] = data_sites
+
+        with open('seo_page.json', 'w', encoding='utf-8') as out_file:
+            json.dump(out_data, out_file, ensure_ascii=False, cls=DecimalEncoder)
+
+    except Exception as e:
+        loger.error(f'Ошибка make_seo_page: try: {e}')
 
 def make_csv_text(in_data):
-    in_data['data_month'].pop(-2)
-    in_data['data_month'].pop(-2)
-    in_data['data_month'] = [f'"{x}"' for x in in_data['data_month']]
-    header_month = '"";' + ';'.join(in_data['data_month'])
-    num_col = 13
+    out_str = ''
+    try:
+        in_data['data_month'].pop(-2)
+        in_data['data_month'].pop(-2)
+        in_data['data_month'] = [f'"{x}"' for x in in_data['data_month']]
+        header_month = '"";' + ';'.join(in_data['data_month'])
+        num_col = 13
 
-    ##### Основная таблица
-    row_names = [f'"{x}"' for x in row_0_names]
-    in_data['data_0_table'].pop(-2)
-    in_data['data_0_table'].pop(-2)
-    out_lst = [header_month,]
-    num_row = len(row_names)
-    tbl_0 = [[""] * num_col for i in range(num_row)]  # [num_row][num_col]
-    # Собираем промежуточную таблицу
-    for i in range(num_col):  # Проход по столбцам
-        col = in_data['data_0_table'][i]
-        if col:
-            for j in range(num_row):  # Проход по строкам
-                val = col.get(str(j+1))
-                if val: tbl_0[j][i] = val
-    # Собираем строки
-    for j in range(len(tbl_0)):
-        r_lst = [row_names[j],] + tbl_0[j]
-        out_lst.append(';'.join(r_lst))
-    out_lst.append('')
-    
-    ##### Сводные таблицы сайтов
-    row_st_names = [f'"{x}"' for x in row_site_names]
-    num_row_sites = len(row_st_names)
-    
-    row_src_names = [f'"{x}"' for x in row_source_names]
-    num_row_source = len(row_src_names)
-
-    for site in in_data['data_sites']:
-        name_site = site.get('name_site')
-        out_lst.append(f'"{name_site}"')
-        out_lst.append(header_month)
-        site_table = site.get('site_table')  # {}
-        site_table.pop(-2)
-        site_table.pop(-2)
-
-        tbl_site = [[""] * num_col for i in range(num_row_sites)]  # [num_row][num_col]
+        ##### Основная таблица
+        row_names = [f'"{x}"' for x in row_0_names]
+        in_data['data_0_table'].pop(-2)
+        in_data['data_0_table'].pop(-2)
+        out_lst = [header_month,]
+        num_row = len(row_names)
+        tbl_0 = [[""] * num_col for i in range(num_row)]  # [num_row][num_col]
         # Собираем промежуточную таблицу
         for i in range(num_col):  # Проход по столбцам
-            col = site_table[i]
+            col = in_data['data_0_table'][i]
             if col:
-                for j in range(num_row_sites):  # Проход по строкам
+                for j in range(num_row):  # Проход по строкам
                     val = col.get(str(j+1))
-                    if val: tbl_site[j][i] = val
+                    if val: tbl_0[j][i] = val
         # Собираем строки
-        for j in range(len(tbl_site)):
-            r_lst = [row_st_names[j],] + tbl_site[j]
+        for j in range(len(tbl_0)):
+            r_lst = [row_names[j],] + tbl_0[j]
             out_lst.append(';'.join(r_lst))
         out_lst.append('')
         
-        # Добавляем по каждому сайту таблицы с источниками
-        out_lst.append(f'"Источники {name_site}"')
-        out_lst.append(header_month)
+        ##### Сводные таблицы сайтов
+        row_st_names = [f'"{x}"' for x in row_site_names]
+        num_row_sites = len(row_st_names)
+        
+        row_src_names = [f'"{x}"' for x in row_source_names]
+        num_row_source = len(row_src_names)
 
-        source_tables = site.get('source_tables')  # []
-        for source in source_tables:
-            name_source = source.get('name_source')
-            out_lst.append(name_source)
-            source_table = source.get('months')
-            source_table.pop(-2)
-            source_table.pop(-2)
-            
-            tbl_source = [[""] * num_col for i in range(num_row_source)]  # [num_row][num_col]
+        for site in in_data['data_sites']:
+            name_site = site.get('name_site')
+            out_lst.append(f'"{name_site}"')
+            out_lst.append(header_month)
+            site_table = site.get('site_table')  # {}
+            site_table.pop(-2)
+            site_table.pop(-2)
+
+            tbl_site = [[""] * num_col for i in range(num_row_sites)]  # [num_row][num_col]
             # Собираем промежуточную таблицу
             for i in range(num_col):  # Проход по столбцам
-                col = source_table[i]
+                col = site_table[i]
                 if col:
-                    for j in range(num_row_source):  # Проход по строкам
+                    for j in range(num_row_sites):  # Проход по строкам
                         val = col.get(str(j+1))
-                        if val: tbl_source[j][i] = val
+                        if val: tbl_site[j][i] = val
             # Собираем строки
-            for j in range(len(tbl_source)):
-                r_lst = [row_src_names[j],] + tbl_source[j]
+            for j in range(len(tbl_site)):
+                r_lst = [row_st_names[j],] + tbl_site[j]
                 out_lst.append(';'.join(r_lst))
             out_lst.append('')
             
-    out_str = '\n'.join(out_lst)
+            # Добавляем по каждому сайту таблицы с источниками
+            out_lst.append(f'"Источники {name_site}"')
+            out_lst.append(header_month)
+
+            source_tables = site.get('source_tables')  # []
+            for source in source_tables:
+                name_source = source.get('name_source')
+                out_lst.append(name_source)
+                source_table = source.get('months')
+                source_table.pop(-2)
+                source_table.pop(-2)
+                
+                tbl_source = [[""] * num_col for i in range(num_row_source)]  # [num_row][num_col]
+                # Собираем промежуточную таблицу
+                for i in range(num_col):  # Проход по столбцам
+                    col = source_table[i]
+                    if col:
+                        for j in range(num_row_source):  # Проход по строкам
+                            val = col.get(str(j+1))
+                            if val: tbl_source[j][i] = val
+                # Собираем строки
+                for j in range(len(tbl_source)):
+                    r_lst = [row_src_names[j],] + tbl_source[j]
+                    out_lst.append(';'.join(r_lst))
+                out_lst.append('')
+                
+        out_str = '\n'.join(out_lst)
+    except Exception as e:
+        loger.error(f'Ошибка make_csv_text: try: {e}')
 
     return out_str
