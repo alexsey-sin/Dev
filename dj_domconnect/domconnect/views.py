@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 from django.http import JsonResponse
 from domconnect.lib_seo import run_upgrade_seo, make_seo_page, make_csv_text
 from threading import Thread
-import logging, json, threading, calendar
+import os, logging, json, threading, calendar
 
 
 logging.basicConfig(
@@ -44,11 +44,19 @@ def index(request):  # Статистика SEO
         label_seo = f'Последнее обновление: {last_datetime}'
     context['label_seo'] = label_seo
 
-    page_context = make_seo_page()
+    # page_context = make_seo_page()
+    page_context = {}
+    try:
+        with open('seo_page.json', 'r', encoding='utf-8') as file:
+            page_context = json.load(file)
+    except Exception as e:
+        context['label_seo'] = 'Ошибка загрузки данных из кэш.'
+        loger.error(str(e))
     # Переносим полученные данные
-    context['data_month'] = page_context['data_month']
-    context['data_0_table'] = page_context['data_0_table']
-    context['data_sites'] = page_context['data_sites'] 
+    if page_context:
+        context['data_month'] = page_context['data_month']
+        context['data_0_table'] = page_context['data_0_table']
+        context['data_sites'] = page_context['data_sites'] 
 
     context['segment'] = 'statseo'
     context['color_forecast'] = 'style="background: #FFFFE0;"'

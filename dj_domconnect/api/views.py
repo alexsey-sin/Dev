@@ -129,3 +129,7 @@ def get_pz_phrases(request, num_group):
 
 ###############################################################################
 ###############################################################################
+def get_bots_info(request):
+    mess = 'please, please, please...'
+
+    return HttpResponse(mess, content_type='text/plain; charset=utf-8')

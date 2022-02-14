@@ -401,6 +401,168 @@ def get_user_status():
     except:
         return 'Ошибка get_user_status: try: requests.post'
 
+def make_csv_text(in_data):
+    in_data['data_month'].pop(-2)
+    in_data['data_month'].pop(-2)
+    in_data['data_month'] = [f'"{x}"' for x in in_data['data_month']]
+    header_month = '"";' + ';'.join(in_data['data_month'])
+    num_col = 13
+
+    ##### Основная таблица
+    row_0_names = [
+        'Лиды',
+        'Реальные лиды(без ТП)',
+        '% реальных лидов',
+        'Лиды (все)',
+        'Будн. дней',
+        'Выходных дней',
+        'Лиды с ТхВ',
+        '% лидов с ТхВ',
+        'Сделки >50',
+        '%Лид=>Сд. >50',
+        'Конва реал. лид =>сделка >50',
+        'Сделки >50 (все)',
+        'Сделки 80',
+        'Сд. приоритет (БИ и МТС ФЛ)',
+        'Доля сделок ПРИОР от сд.>50',
+        'Ср. лид/день (будн.)',
+        'Ср. лид/день (вых.)',
+        'ТП SEO',
+        'Расход ТП',
+        '% ТП',
+        'Подключки по дате лида',
+        'Подключки по дате оплаты',
+        'ТП IVR Лиза',
+        '% ТП IVR',
+        '% ТП Лизы от всего ТП',
+        'Понедельник',
+        'Вторник',
+        'Среда',
+        'Четверг',
+        'Пятница',
+        'Суббота',
+        'Воскресенье',
+    ]
+    row_0_names = [f'"{x}"' for x in row_0_names]
+    in_data['data_0_table'].pop(-2)
+    in_data['data_0_table'].pop(-2)
+    out_lst = [header_month,]
+    num_row = len(row_0_names)
+    tbl_0 = [[""] * num_col for i in range(num_row)]  # [num_row][num_col]
+    # Собираем промежуточную таблицу
+    for i in range(num_col):  # Проход по столбцам
+        col = in_data['data_0_table'][i]
+        if col:
+            for j in range(num_row):  # Проход по строкам
+                val = col.get(str(j+1))
+                if val: tbl_0[j][i] = val
+    # Собираем строки
+    for j in range(len(tbl_0)):
+        r_lst = [row_0_names[j],] + tbl_0[j]
+        out_lst.append(';'.join(r_lst))
+    out_lst.append('')
+    
+    ##### Таблицы сайтов с вложенными таблицами источников
+    row_site_names = [
+        'Лиды',
+        'Конв. пос. => лид',
+        'Реальные лиды',
+        '% реал. лидов',
+        'Лиды ТхВ',
+        'Сделки',
+        'Конв. лиды => сделка',
+        'Конв. посет => сделка',			
+        'Сделки >50',
+        'Конв. >50',
+        'Сделки 80',
+        'Сд. приоритет (БИ и МТС ФЛ)',
+        'Конв. приоритет',
+        'Конв. реал. лид =>сделка',
+        'Кол-во звонков',
+        'Кол-во заявок',
+        '% звонков от заявок',
+        '% приор. сделок заявка',
+        '% приор. сделок звонок',
+        'Конв. посет => лид',
+        'Конв. посет => сделка',
+        'ТП',
+        'ТП IVR',
+        'Посетители',
+        'Ср. чек (сделки)',
+        'Сделки >50',
+    ]
+    row_site_names = [f'"{x}"' for x in row_site_names]
+    num_row_sites = len(row_site_names)
+    
+    row_source_names = [
+        'Лиды',
+        'Сделки',
+        'Сделки > 50',
+        'Сд. приоритет',
+        'Ср. чек',
+        'Подключки по дате лида',
+        'Подключки по дате оплаты',
+        'ТП',
+        'ТП IVR',
+        'SEO Лиды ТхВ',
+        'Сделки',
+        'Сделки >50 Билайн',
+    ]
+    row_source_names = [f'"{x}"' for x in row_source_names]
+    num_row_source = len(row_source_names)
+
+    for site in in_data['data_sites']:
+        name_site = site.get('name_site')
+        out_lst.append(f'"{name_site}"')
+        out_lst.append(header_month)
+        site_table = site.get('site_table')  # {}
+        site_table.pop(-2)
+        site_table.pop(-2)
+
+        tbl_site = [[""] * num_col for i in range(num_row_sites)]  # [num_row][num_col]
+        # Собираем промежуточную таблицу
+        for i in range(num_col):  # Проход по столбцам
+            col = site_table[i]
+            if col:
+                for j in range(num_row_sites):  # Проход по строкам
+                    val = col.get(str(j+1))
+                    if val: tbl_site[j][i] = val
+        # Собираем строки
+        for j in range(len(tbl_site)):
+            r_lst = [row_site_names[j],] + tbl_site[j]
+            out_lst.append(';'.join(r_lst))
+        out_lst.append('')
+        
+        # Добавляем по каждому сайту таблицы с источниками
+        out_lst.append(f'"Источники {name_site}"')
+        out_lst.append(header_month)
+
+        source_tables = site.get('source_tables')  # []
+        for source in source_tables:
+            name_source = source.get('name_source')
+            out_lst.append(name_source)
+            source_table = source.get('months')
+            source_table.pop(-2)
+            source_table.pop(-2)
+            
+            tbl_source = [[""] * num_col for i in range(num_row_source)]  # [num_row][num_col]
+            # Собираем промежуточную таблицу
+            for i in range(num_col):  # Проход по столбцам
+                col = source_table[i]
+                if col:
+                    for j in range(num_row_source):  # Проход по строкам
+                        val = col.get(str(j+1))
+                        if val: tbl_source[j][i] = val
+            # Собираем строки
+            for j in range(len(tbl_source)):
+                r_lst = [row_source_names[j],] + tbl_source[j]
+                out_lst.append(';'.join(r_lst))
+            out_lst.append('')
+            
+    out_str = '\n'.join(out_lst)
+
+    return out_str
+
 
 if __name__ == '__main__':
     pass
@@ -412,6 +574,24 @@ if __name__ == '__main__':
     # Сделки
     # Пример запроса https://dev.1c-bitrix.ru/rest_help/crm/cdeals/crm_deal_list.php
     
+    try:
+        with open('seo_page.json', 'r', encoding='utf-8') as file:
+            page_context = json.load(file)
+    except Exception as e: print('error', e)
+    
+    text = make_csv_text(page_context)
+    # print(text)
+    with open('out.csv', 'w', encoding='utf-8') as outfile:
+        outfile.write(text)
+
+
+
+
+
+
+
+
+
 
     # from_date = '2022-02-08T00:00:00'
     # # e = get_catalog()
@@ -419,9 +599,9 @@ if __name__ == '__main__':
     # e, lst_deal = get_deals(from_date)
     # if e: print(e)
     
-    e = get_user_status()
-    if e: print(e)
-    # if e:
+    # e = get_user_status()
+    # if e: print(e)
+    # # if e:
         # with open('deals_all_fields.json', 'w', encoding='utf-8') as out_file:
             # json.dump(e, out_file, ensure_ascii=False, indent=4)
 

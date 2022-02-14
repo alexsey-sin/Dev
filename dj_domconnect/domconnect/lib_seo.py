@@ -16,6 +16,8 @@ logging.basicConfig(
 # # # # loger.warning('And this, too')
 loger = logging.getLogger(__name__)  # запустили логгирование
 
+# date_create = '2021-01-01T00:00:00'
+date_create = '2021-11-01T00:00:00'
 
 typesource = {}
 typelid = {}
@@ -31,7 +33,91 @@ typelid = {}
 #         '194': 'Спутниковое ТВ',
 #         '3402': 'Видеонаблюдение',
 # }
+##### Основная таблица список строк
+row_0_names = [
+    'Лиды',
+    'Реальные лиды(без ТП)',
+    '% реальных лидов',
+    'Лиды (все)',
+    'Будн. дней',
+    'Выходных дней',
+    'Лиды с ТхВ',
+    '% лидов с ТхВ',
+    'Сделки >50',
+    '%Лид=>Сд. >50',
+    'Конва реал. лид =>сделка >50',
+    'Сделки >50 (все)',
+    'Сделки 80',
+    'Сд. приоритет (БИ и МТС ФЛ)',
+    'Доля сделок ПРИОР от сд.>50',
+    'Ср. лид/день (будн.)',
+    'Ср. лид/день (вых.)',
+    'ТП SEO',
+    'Расход ТП',
+    '% ТП',
+    'Подключки по дате лида',
+    'Подключки по дате оплаты',
+    'ТП IVR Лиза',
+    '% ТП IVR',
+    '% ТП Лизы от всего ТП',
+    'Понедельник',
+    'Вторник',
+    'Среда',
+    'Четверг',
+    'Пятница',
+    'Суббота',
+    'Воскресенье',
+]
+##### Сводные таблицы сайтов список строк
+row_site_names = [
+    'Лиды',
+    'Конв. пос. => лид',
+    'Реальные лиды',
+    '% реал. лидов',
+    'Лиды ТхВ',
+    'Сделки',
+    'Конв. лиды => сделка',
+    'Конв. посет => сделка',			
+    'Сделки >50',
+    'Конв. >50',
+    'Сделки 80',
+    'Сд. приоритет (БИ и МТС ФЛ)',
+    'Конв. приоритет',
+    'Конв. реал. лид =>сделка',
+    'Кол-во звонков',
+    'Кол-во заявок',
+    '% звонков от заявок',
+    '% приор. сделок заявка',
+    '% приор. сделок звонок',
+    'Конв. посет => лид',
+    'Конв. посет => сделка',
+    'ТП',
+    'ТП IVR',
+    'Посетители',
+    'Ср. чек (сделки)',
+    'Сделки >50',
+]
+##### Таблицы источников список строк
+row_source_names = [
+    'Лиды',
+    'Сделки',
+    'Сделки > 50',
+    'Сд. приоритет',
+    'Ср. чек',
+    'Подключки по дате лида',
+    'Подключки по дате оплаты',
+    'ТП',
+    'ТП IVR',
+    'SEO Лиды ТхВ',
+    'Сделки',
+    'Сделки >50 Билайн',
+]
 
+
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Decimal): return str(obj)
+        return json.JSONEncoder.default(self, obj)
 
 def run_upgrade_seo(*args, **options):
     # http_request = False
@@ -54,6 +140,7 @@ def run_upgrade_seo(*args, **options):
     download_deals()
     download_lids()
     calculateSEO()
+    make_seo_page()
 
     mess = 'Расчет и сохранение данных SEO в кэш закончено.'
     gvar_go = DcCrmGlobVar.objects.get(key='go_upgrade_seo')
@@ -154,9 +241,7 @@ def download_deals():
             'order': {'DATE_MODIFY': 'ASC'},  # С сортировкой
             'filter': {
                 'STAGE_ID': 'WON',  # Подключен. Оплачен провайдером** только для РОПа
-                # '>DATE_CREATE': '2020-01-01T00:00:00',  # '2021-10-01T00:00:00'
-                # '>DATE_CREATE': '2022-01-01T00:00:00',  # '2021-10-01T00:00:00'
-                '>DATE_CREATE': '2021-11-01T00:00:00',  # '2021-10-01T00:00:00'
+                '>DATE_CREATE': date_create,  # '2021-10-01T00:00:00'
             },
             'select': [
                 'ID',
@@ -250,9 +335,7 @@ def download_lids():
             'start': go_next,
             'order': {'DATE_MODIFY': 'ASC'},  # С сортировкой
             'filter': {
-                # '>DATE_CREATE': '2020-01-01T00:00:00',  # '2021-10-01T00:00:00'
-                # '>DATE_CREATE': '2022-01-01T00:00:00',  # '2021-10-01T00:00:00'
-                '>DATE_CREATE': '2021-11-01T00:00:00',  # '2021-10-01T00:00:00'
+                '>DATE_CREATE': date_create,  # '2021-10-01T00:00:00'
                 '!STATUS_ID': [17, 24],    # Дубль и ошибка в телефоне
             },
             'select': [
@@ -761,18 +844,19 @@ def make_seo_page():
     data_month.reverse()
     data_month += ['График', 'Сравн. мес', f'{str_month[cur_month]} ФАКТ']
     data_0_table.reverse()
-# 
-    # Добавляем дополнительные столбцы "График", "Сравн. мес" и "месяц ФАКТ"
-    col_fabula = data_0_table[-1]  # В качестве шаблона новых колонок берем последнюю (свежий месяц)
-    if len(col_fabula):
-        col_gr = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
-        col_cm = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
-        col_ft = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
 
-        s_date = f'01.{cur_month}.{cur_year}'
-        f_date = datetime.strptime(s_date, '%d.%m.%Y')
-        obj_cur_month = DcCashSEO.objects.filter(val_date=f_date, num_site=0, num_source=0)
-        for key, _ in col_fabula.items():
+    # Добавляем дополнительные столбцы "График", "Сравн. мес" и "месяц ФАКТ"
+    col_fabula = {}  # Шаблон новых колонок
+    for i in range(1, len(row_0_names)+1): col_fabula[str(i)] = ''
+    col_gr = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
+    col_cm = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
+    col_ft = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
+
+    s_date = f'01.{cur_month}.{cur_year}'
+    f_date = datetime.strptime(s_date, '%d.%m.%Y')
+    obj_cur_month = DcCashSEO.objects.filter(val_date=f_date, num_site=0, num_source=0)
+    for key, _ in col_fabula.items():
+        try:
             gr = []
             for i in range(12): 
                 val = data_0_table[i].get(key)
@@ -780,17 +864,19 @@ def make_seo_page():
                 except: val = 0
                 gr.append(val)
             col_gr[key] = gr
-            # Для колонки "Сравн. мес" вычислим значение
-            col_cm[key] = 0
-            num_new = data_0_table[11].get(key)
-            num_old = data_0_table[10].get(key)
-            if num_new != None and num_old != None and num_old != 0:
-                cm = round((num_new / num_old - 1) * 100)
-                col_cm[key] = cm
-            col_ft[key] = obj_cur_month.get(row=key).val
-        data_0_table.append(col_gr)  # 13 колонка "График"
-        data_0_table.append(col_cm)  # 14 колонка "Сравн. мес"
-        data_0_table.append(col_ft)  # 14 колонка "месяц ФАКТ"
+        except: col_gr[key] = ''
+        # Для колонки "Сравн. мес" вычислим значение
+        col_cm[key] = 0
+        num_new = data_0_table[11].get(key)
+        num_old = data_0_table[10].get(key)
+        if num_new != None and num_old != None and num_old != 0:
+            cm = round((num_new / num_old - 1) * 100)
+            col_cm[key] = cm
+        try: col_ft[key] = obj_cur_month.get(row=key).val
+        except: col_ft[key] = ''
+    data_0_table.append(col_gr)  # 13 колонка "График"
+    data_0_table.append(col_cm)  # 14 колонка "Сравн. мес"
+    data_0_table.append(col_ft)  # 14 колонка "месяц ФАКТ"
 
     out_data['data_month'] = data_month
     out_data['data_0_table'] = data_0_table
@@ -824,16 +910,17 @@ def make_seo_page():
         site_table.reverse()
 
         # Добавляем дополнительные столбцы "График" и "Сравн. мес" и "месяц ФАКТ"
-        col_fabula = site_table[-1]  # В качестве шаблона новых колонок берем последнюю (свежий месяц)
+        col_fabula = {}  # Шаблон новых колонок
+        for i in range(1, len(row_site_names)+1): col_fabula[str(i)] = ''
         s_date = f'01.{cur_month}.{cur_year}'
         f_date = datetime.strptime(s_date, '%d.%m.%Y')
         obj_cur_month = DcCashSEO.objects.filter(val_date=f_date, num_site=obj_site.num, num_source=0)
-        if len(col_fabula):
-            col_gr = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
-            col_cm = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
-            col_ft = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
+        col_gr = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
+        col_cm = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
+        col_ft = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
 
-            for key, _ in col_fabula.items():
+        for key, _ in col_fabula.items():
+            try:
                 gr = []
                 for i in range(12): 
                     val = site_table[i].get(key)
@@ -841,17 +928,19 @@ def make_seo_page():
                     except: val = 0
                     gr.append(val)
                 col_gr[key] = gr
-                # Для колонки "Сравн. мес" вычислим значение
-                col_cm[key] = 0
-                num_new = site_table[11].get(key)
-                num_old = site_table[10].get(key)
-                if num_new != None and num_old != None and num_old != 0:
-                    cm = round((num_new / num_old - 1) * 100)
-                    col_cm[key] = cm
-                col_ft[key] = obj_cur_month.get(row=key).val
-            site_table.append(col_gr)  # 13 колонка "График"
-            site_table.append(col_cm)  # 14 колонка "Сравн. мес"
-            site_table.append(col_ft)  # 14 колонка "месяц ФАКТ"
+            except: col_gr[key] = ''
+            # Для колонки "Сравн. мес" вычислим значение
+            col_cm[key] = 0
+            num_new = site_table[11].get(key)
+            num_old = site_table[10].get(key)
+            if num_new != None and num_old != None and num_old != 0:
+                cm = round((num_new / num_old - 1) * 100)
+                col_cm[key] = cm
+            try: col_ft[key] = obj_cur_month.get(row=key).val
+            except: col_ft[key] = ''
+        site_table.append(col_gr)  # 13 колонка "График"
+        site_table.append(col_cm)  # 14 колонка "Сравн. мес"
+        site_table.append(col_ft)  # 14 колонка "месяц ФАКТ"
         item_sites['site_table'] = site_table
         
         # Проход по источникам сайта
@@ -879,16 +968,17 @@ def make_seo_page():
             it_src_month.reverse()
 
             # Добавляем дополнительные столбцы "График" и "Сравн. мес"
-            col_fabula = it_src_month[-1]  # В качестве шаблона новых колонок берем последнюю (свежий месяц)
+            col_fabula = {}  # Шаблон новых колонок
+            for i in range(1, len(row_source_names)+1): col_fabula[str(i)] = ''
             s_date = f'01.{cur_month}.{cur_year}'
             f_date = datetime.strptime(s_date, '%d.%m.%Y')
             obj_cur_month = DcCashSEO.objects.filter(val_date=f_date, num_site=obj_site.num, num_source=source.num)
-            if len(col_fabula):
-                col_gr = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
-                col_cm = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
-                col_ft = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
+            col_gr = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
+            col_cm = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
+            col_ft = copy.deepcopy(col_fabula)  # словарь с ключами строк таблицы
 
-                for key, _ in col_fabula.items():
+            for key, _ in col_fabula.items():
+                try:
                     gr = []
                     for i in range(12): 
                         val = it_src_month[i].get(key)
@@ -896,17 +986,19 @@ def make_seo_page():
                         except: val = 0
                         gr.append(val)
                     col_gr[key] = gr
-                    # Для колонки "Сравн. мес" вычислим значение
-                    col_cm[key] = 0
-                    num_new = it_src_month[11].get(key)
-                    num_old = it_src_month[10].get(key)
-                    if num_new != None and num_old != None and num_old != 0:
-                        cm = round((num_new / num_old - 1) * 100)
-                        col_cm[key] = cm
-                    col_ft[key] = obj_cur_month.get(row=key).val
-                it_src_month.append(col_gr)  # 13 колонка "График"
-                it_src_month.append(col_cm)  # 14 колонка "Сравн. мес"
-                it_src_month.append(col_ft)  # 14 колонка "месяц ФАКТ"
+                except: col_gr[key] = ''
+                # Для колонки "Сравн. мес" вычислим значение
+                col_cm[key] = 0
+                num_new = it_src_month[11].get(key)
+                num_old = it_src_month[10].get(key)
+                if num_new != None and num_old != None and num_old != 0:
+                    cm = round((num_new / num_old - 1) * 100)
+                    col_cm[key] = cm
+                try: col_ft[key] = obj_cur_month.get(row=key).val
+                except: col_ft[key] = ''
+            it_src_month.append(col_gr)  # 13 колонка "График"
+            it_src_month.append(col_cm)  # 14 колонка "Сравн. мес"
+            it_src_month.append(col_ft)  # 14 колонка "месяц ФАКТ"
             
             item_source['months'] = it_src_month
             source_tables.append(item_source)
@@ -917,20 +1009,93 @@ def make_seo_page():
 
     out_data['data_sites'] = data_sites
 
-    # with open('data_sites.json', 'w', encoding='utf-8') as out_file:
-    #     json.dump(data_sites, out_file, ensure_ascii=False, indent=4)
+    with open('seo_page.json', 'w', encoding='utf-8') as out_file:
+        json.dump(out_data, out_file, ensure_ascii=False, cls=DecimalEncoder)
 
-    return out_data
+    # return out_data
 
 def make_csv_text(in_data):
-    out_str = ';'
-    out_str += ';'.join(in_data['data_month'])
+    in_data['data_month'].pop(-2)
+    in_data['data_month'].pop(-2)
+    in_data['data_month'] = [f'"{x}"' for x in in_data['data_month']]
+    header_month = '"";' + ';'.join(in_data['data_month'])
+    num_col = 13
 
-    # in_data['data_month']
-    # in_data['str_cur_month']
-    # in_data['data_0_table']
-    # in_data['data_sites'] 
+    ##### Основная таблица
+    row_names = [f'"{x}"' for x in row_0_names]
+    in_data['data_0_table'].pop(-2)
+    in_data['data_0_table'].pop(-2)
+    out_lst = [header_month,]
+    num_row = len(row_names)
+    tbl_0 = [[""] * num_col for i in range(num_row)]  # [num_row][num_col]
+    # Собираем промежуточную таблицу
+    for i in range(num_col):  # Проход по столбцам
+        col = in_data['data_0_table'][i]
+        if col:
+            for j in range(num_row):  # Проход по строкам
+                val = col.get(str(j+1))
+                if val: tbl_0[j][i] = val
+    # Собираем строки
+    for j in range(len(tbl_0)):
+        r_lst = [row_names[j],] + tbl_0[j]
+        out_lst.append(';'.join(r_lst))
+    out_lst.append('')
+    
+    ##### Сводные таблицы сайтов
+    row_st_names = [f'"{x}"' for x in row_site_names]
+    num_row_sites = len(row_st_names)
+    
+    row_src_names = [f'"{x}"' for x in row_source_names]
+    num_row_source = len(row_src_names)
 
+    for site in in_data['data_sites']:
+        name_site = site.get('name_site')
+        out_lst.append(f'"{name_site}"')
+        out_lst.append(header_month)
+        site_table = site.get('site_table')  # {}
+        site_table.pop(-2)
+        site_table.pop(-2)
 
+        tbl_site = [[""] * num_col for i in range(num_row_sites)]  # [num_row][num_col]
+        # Собираем промежуточную таблицу
+        for i in range(num_col):  # Проход по столбцам
+            col = site_table[i]
+            if col:
+                for j in range(num_row_sites):  # Проход по строкам
+                    val = col.get(str(j+1))
+                    if val: tbl_site[j][i] = val
+        # Собираем строки
+        for j in range(len(tbl_site)):
+            r_lst = [row_st_names[j],] + tbl_site[j]
+            out_lst.append(';'.join(r_lst))
+        out_lst.append('')
+        
+        # Добавляем по каждому сайту таблицы с источниками
+        out_lst.append(f'"Источники {name_site}"')
+        out_lst.append(header_month)
+
+        source_tables = site.get('source_tables')  # []
+        for source in source_tables:
+            name_source = source.get('name_source')
+            out_lst.append(name_source)
+            source_table = source.get('months')
+            source_table.pop(-2)
+            source_table.pop(-2)
+            
+            tbl_source = [[""] * num_col for i in range(num_row_source)]  # [num_row][num_col]
+            # Собираем промежуточную таблицу
+            for i in range(num_col):  # Проход по столбцам
+                col = source_table[i]
+                if col:
+                    for j in range(num_row_source):  # Проход по строкам
+                        val = col.get(str(j+1))
+                        if val: tbl_source[j][i] = val
+            # Собираем строки
+            for j in range(len(tbl_source)):
+                r_lst = [row_src_names[j],] + tbl_source[j]
+                out_lst.append(';'.join(r_lst))
+            out_lst.append('')
+            
+    out_str = '\n'.join(out_lst)
 
     return out_str
