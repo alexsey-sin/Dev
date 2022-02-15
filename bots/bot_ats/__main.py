@@ -7,17 +7,17 @@ import copy
 
 
 
-# # общий канал бот @АТС приоритет
+# общий канал бот @АТС приоритет
 TELEGRAM_CHAT_ID = '-652685335'
 TELEGRAM_TOKEN = '526322367:AAEaw2vaeLl_f6Njfb952NopyxqCGRQXji8'
 
-# # личный бот @infra
+# личный бот @infra
 # TELEGRAM_CHAT_ID = '1740645090'
 # TELEGRAM_TOKEN = '2009560099:AAHtYot6EOHh_qr9EUoCoczQhjyRdulKHYo'
 
 PERIOD_SCAN = 1 * 60 * 60  # в секундах (1 час)
-PERIOD_BETWEEN = 60
-# PERIOD_SCAN = 120  # в секундах
+# PERIOD_BETWEEN = 60
+# PERIOD_SCAN = 600  # в секундах
 
 
 # url_dj_domconnect = 'http://127.0.0.1:8000/mobile/get_mobile_residue'  # тестовый
@@ -193,13 +193,12 @@ def checking_priorities(route_trunks, trunks_residue):
     change_list = []
     for route_trunk in route_trunks:  # Проход по каждой группе транков
         route_id = route_trunk['id']
-        trunks = route_trunk.get('trunks')
-        # print(trunks)
-        if trunks == None: continue
+        trunks = route_trunk['trunks']
         for trunk in trunks:
             trunk_id = trunk['trunk_id']
             trunk['residue'] = 0
             # к каждому транку добавляем значение residue
+            # к каждому транку добавляем поле residue
             for tr_resd in trunks_residue:
                 if tr_resd['id'] == trunk_id:
                     trunk['residue'] = tr_resd['residue']
@@ -227,7 +226,6 @@ def checking_priorities(route_trunks, trunks_residue):
                         change_list.append(new_seq)
         
     if change_list:
-        # print(change_list)
         out_rez, out_mess = change_seq(change_list)
     return out_rez, out_mess
 
@@ -255,7 +253,6 @@ def change_seq(change_list):
                 return 1, out_mess, routes
             
             out_mess = f'Изменена очередность {cnt_change} транков'
-            # out_mess = f'А-ля Изменена очередность {cnt_change} транков'
     except:
         return 1, 'Error: requests.post\n'
     
@@ -271,7 +268,6 @@ def run_ats():
     if rez: return rez, f'get_trunks(): {rez_str}'  # Если  что-то не так
     
     # Запрашиваем доступные минуты
-    # print('Запрашиваем доступные минуты')
     rez, rez_str, trunks = get_residue_trunks(trunks)
     if rez: print(rez_str)  # Если  что-то не так
     if rez == 1:  # Критическая ошибка
@@ -281,17 +277,14 @@ def run_ats():
         # out_mess += f'get_residue_trunks(): {rez_str}'
 
     # Запрашиваем список групп (ROUTE)
-    # print('Запрашиваем список групп (ROUTE)')
     rez, rez_str, routes = get_routes()
     if rez: return rez, f'get_routes(): {rez_str}'  # Если  что-то не так
     
     # Запрашиваем текущее состояние настроек route_trunks
-    # print('Запрашиваем текущее состояние настроек route_trunks')
     rez, rez_str, route_trunks = get_route_trunks(routes)
     if rez: return rez, f'get_route_trunks(): {rez_str}'  # Если  что-то не так
 
     # Меняем приоритеты транков
-    # print('Меняем приоритеты транков')
     rez, rez_str = checking_priorities(route_trunks, trunks)
     if rez: return rez, f'checking_priorities(): {rez_str}'  # Если  что-то не так
     out_mess += rez_str
@@ -300,7 +293,6 @@ def run_ats():
 def make_report(rez, rez_str):
     if rez_str:
         tlg_mess = f'ATS - смена приоритетов транков\n{rez_str}'
-        print(tlg_mess)
         send_telegram(tlg_mess)
 
 
