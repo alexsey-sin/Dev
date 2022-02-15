@@ -3,7 +3,9 @@ from django.db.models import Q, Avg
 from decimal import Decimal
 from datetime import datetime, timedelta
 import time, logging, requests, json, calendar, copy
-
+from django.http import HttpResponse
+import csv
+import codecs
 
 
 logging.basicConfig(
@@ -16,8 +18,8 @@ logging.basicConfig(
 # # # # loger.warning('And this, too')
 loger = logging.getLogger(__name__)  # запустили логгирование
 
-# date_create = '2021-01-01T00:00:00'
-date_create = '2021-11-01T00:00:00'
+date_create = '2021-01-01T00:00:00'
+# date_create = '2021-11-01T00:00:00'
 
 typesource = {}
 typelid = {}
@@ -1011,21 +1013,24 @@ def make_seo_page():
         loger.error(f'Ошибка make_seo_page: try: {e}')
 
 def make_csv_text(in_data):
-    out_str = ''
-    try:
-        in_data['data_month'].pop(-2)
-        in_data['data_month'].pop(-2)
-        in_data['data_month'] = [f'"{x}"' for x in in_data['data_month']]
-        header_month = '"";' + ';'.join(in_data['data_month'])
-        num_col = 13
+    filename = datetime.today().strftime('%d-%m-%Y.csv')
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = f'attachment; filename={filename}'
+    response.write(codecs.BOM_UTF8)
+    writer = csv.writer(response, lineterminator='\n', delimiter=';')
 
+    try:
+        num_col = 13
         ##### Основная таблица
-        row_names = [f'"{x}"' for x in row_0_names]
+        in_data['data_month'].pop(-2)
+        in_data['data_month'].pop(-2)
+        in_data['data_month'].insert(0, '')
+
+        writer.writerow(in_data['data_month'])
         in_data['data_0_table'].pop(-2)
         in_data['data_0_table'].pop(-2)
-        out_lst = [header_month,]
-        num_row = len(row_names)
-        tbl_0 = [[""] * num_col for i in range(num_row)]  # [num_row][num_col]
+        num_row = len(row_0_names)
+        tbl_0 = [[''] * num_col for i in range(num_row)]  # [num_row][num_col]
         # Собираем промежуточную таблицу
         for i in range(num_col):  # Проход по столбцам
             col = in_data['data_0_table'][i]
@@ -1035,26 +1040,24 @@ def make_csv_text(in_data):
                     if val: tbl_0[j][i] = val
         # Собираем строки
         for j in range(len(tbl_0)):
-            r_lst = [row_names[j],] + tbl_0[j]
-            out_lst.append(';'.join(r_lst))
-        out_lst.append('')
-        
+            r_lst = [row_0_names[j],] + tbl_0[j]
+            writer.writerow(r_lst)
+        writer.writerow([])
+
         ##### Сводные таблицы сайтов
-        row_st_names = [f'"{x}"' for x in row_site_names]
-        num_row_sites = len(row_st_names)
+        num_row_sites = len(row_site_names)
         
-        row_src_names = [f'"{x}"' for x in row_source_names]
-        num_row_source = len(row_src_names)
+        num_row_source = len(row_source_names)
 
         for site in in_data['data_sites']:
             name_site = site.get('name_site')
-            out_lst.append(f'"{name_site}"')
-            out_lst.append(header_month)
+            writer.writerow([name_site,])
+            writer.writerow(in_data['data_month'])
             site_table = site.get('site_table')  # {}
             site_table.pop(-2)
             site_table.pop(-2)
 
-            tbl_site = [[""] * num_col for i in range(num_row_sites)]  # [num_row][num_col]
+            tbl_site = [[''] * num_col for i in range(num_row_sites)]  # [num_row][num_col]
             # Собираем промежуточную таблицу
             for i in range(num_col):  # Проход по столбцам
                 col = site_table[i]
@@ -1064,23 +1067,23 @@ def make_csv_text(in_data):
                         if val: tbl_site[j][i] = val
             # Собираем строки
             for j in range(len(tbl_site)):
-                r_lst = [row_st_names[j],] + tbl_site[j]
-                out_lst.append(';'.join(r_lst))
-            out_lst.append('')
-            
+                r_lst = [row_site_names[j],] + tbl_site[j]
+                writer.writerow(r_lst)
+            writer.writerow([])
+
             # Добавляем по каждому сайту таблицы с источниками
-            out_lst.append(f'"Источники {name_site}"')
-            out_lst.append(header_month)
+            writer.writerow([f'Источники {name_site}',])
+            writer.writerow(in_data['data_month'])
 
             source_tables = site.get('source_tables')  # []
             for source in source_tables:
                 name_source = source.get('name_source')
-                out_lst.append(name_source)
+                writer.writerow([name_source,])
                 source_table = source.get('months')
                 source_table.pop(-2)
                 source_table.pop(-2)
                 
-                tbl_source = [[""] * num_col for i in range(num_row_source)]  # [num_row][num_col]
+                tbl_source = [[''] * num_col for i in range(num_row_source)]  # [num_row][num_col]
                 # Собираем промежуточную таблицу
                 for i in range(num_col):  # Проход по столбцам
                     col = source_table[i]
@@ -1090,12 +1093,11 @@ def make_csv_text(in_data):
                             if val: tbl_source[j][i] = val
                 # Собираем строки
                 for j in range(len(tbl_source)):
-                    r_lst = [row_src_names[j],] + tbl_source[j]
-                    out_lst.append(';'.join(r_lst))
-                out_lst.append('')
-                
-        out_str = '\n'.join(out_lst)
+                    r_lst = [row_source_names[j],] + tbl_source[j]
+                    writer.writerow(r_lst)
+                writer.writerow([])
+
     except Exception as e:
         loger.error(f'Ошибка make_csv_text: try: {e}')
 
-    return out_str
+    return response

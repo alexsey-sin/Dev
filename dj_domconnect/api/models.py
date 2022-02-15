@@ -1,5 +1,19 @@
 from django.db import models
 
+class BotVisit(models.Model):
+    name = models.CharField(
+        unique = True,
+        max_length = 200,
+        verbose_name = 'Название бота',
+    )
+    last_visit = models.DateTimeField(
+        verbose_name='Время посещения',
+    )
+    
+    def __str__(self):
+        return self.name
+
+
 class BidDomRu2(models.Model):
     STATUS_VAR = (
         (0, 'Заявка поступила'),

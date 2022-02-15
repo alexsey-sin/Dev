@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 from mobile.models import MobileNumber, MobileData
+from api.models import BotVisit
 from mobile.forms import MobileNumberForm
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404, redirect
@@ -249,6 +250,10 @@ def get_mobile_residue(request):
                     out_dict[num] = residue
         except ValueError as e:
             return HttpResponse(f'ERROR: {e}', status=status.HTTP_400_BAD_REQUEST)
+        
+        obj_visit, _ = BotVisit.objects.get_or_create(name='ATS-TRUNK')
+        obj_visit.last_visit = datetime.now()
+        obj_visit.save()
         
         data = json.dumps(out_dict)
         return HttpResponse(data, content_type='application/json; charset=utf-8', status=status.HTTP_200_OK)

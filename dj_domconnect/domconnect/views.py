@@ -12,6 +12,7 @@ from django.http import JsonResponse
 from domconnect.lib_seo import run_upgrade_seo, make_seo_page, make_csv_text
 from threading import Thread
 import os, logging, json, threading, calendar
+import codecs
 
 
 logging.basicConfig(
@@ -64,10 +65,7 @@ def index(request):  # Статистика SEO
     if request.method == 'POST':
         get_seo = request.POST.get('get_seo')
         if get_seo and bool(get_seo) == True:
-            filename = now_date.strftime('%d-%m-%Y.csv')
-            content = make_csv_text(page_context)
-            response = HttpResponse(content, content_type='text/plain')
-            response['Content-Disposition'] = f'attachment; filename={filename}'
+            response = make_csv_text(page_context)
             return response        
     
     

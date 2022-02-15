@@ -1,9 +1,19 @@
 from django.contrib import admin
 from api.models import BidDomRu2, BidBeeline, BidMTS, BidBeeline2
 from api.models import BidRostelecom2, BidRostelecom, BidDomRu, BidTtk
-from api.models import  BidOnlime, BidMGTS, TxV
+from api.models import  BidOnlime, BidMGTS, TxV, BotVisit
 from django.db import models
 from django.forms import NumberInput
+
+
+@admin.register(BotVisit)
+class BotVisitAdmin(admin.ModelAdmin):
+    list_display = ('name', 'last_visit')
+    search_fields = ('name',)
+    list_filter = ('last_visit', 'name')
+    empty_value_display = '-пусто-'
+    date_hierarchy = 'last_visit'
+
 
 @admin.register(BidDomRu2)
 class BidDomRuAdmin(admin.ModelAdmin):
