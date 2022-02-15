@@ -723,6 +723,7 @@ if __name__ == '__main__':
     
     # set_txv_to_dj_domconnect(pv_code)
     # rez, txv_list = get_txv_in_dj_domconnect(pv_code)
+    # print(rez)
     # for txv_dict in txv_list:
         # for k, v in txv_dict.items():
             # print(k, v)
@@ -741,7 +742,6 @@ if __name__ == '__main__':
 
 
 
-    
 
     
     

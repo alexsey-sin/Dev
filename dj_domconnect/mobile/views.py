@@ -69,6 +69,11 @@ def api(request):
             row.save()
             cnt += 1
         message = f'сохранено {cnt} записей.'
+
+        # Отметимся что бот был
+        obj_visit, _ = BotVisit.objects.get_or_create(name=f'Парсер ЛК {operator}')
+        obj_visit.last_visit = datetime.now()
+        obj_visit.save()
         if cnt_n:
             message += f' Новых {cnt_n}.'
         return HttpResponse(message, content_type='text/plain; charset=utf-8')
@@ -250,11 +255,12 @@ def get_mobile_residue(request):
                     out_dict[num] = residue
         except ValueError as e:
             return HttpResponse(f'ERROR: {e}', status=status.HTTP_400_BAD_REQUEST)
-        
+
+        # Отметимся что бот был
         obj_visit, _ = BotVisit.objects.get_or_create(name='ATS-TRUNK')
         obj_visit.last_visit = datetime.now()
         obj_visit.save()
-        
+
         data = json.dumps(out_dict)
         return HttpResponse(data, content_type='application/json; charset=utf-8', status=status.HTTP_200_OK)
     

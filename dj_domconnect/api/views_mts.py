@@ -1,7 +1,7 @@
 from django.http.request import HttpRequest
 from django.http import HttpResponse
 from rest_framework import status
-from api.models import BidMTS
+from api.models import BidMTS, BotVisit
 from django.forms.models import model_to_dict
 import json
 from datetime import datetime
@@ -93,6 +93,12 @@ def get_bid_mts(request):
         for bid in tmp_bids:
             bid.status = 1
             bid.save()
+
+        # Отметимся что бот был
+        obj_visit, _ = BotVisit.objects.get_or_create(name=f'Бот автозаявки МТС')
+        obj_visit.last_visit = datetime.now()
+        obj_visit.save()
+
         return HttpResponse(data, content_type='application/json; charset=utf-8')
     return HttpResponse('Use GET request, please.', content_type='text/plain; charset=utf-8')
 

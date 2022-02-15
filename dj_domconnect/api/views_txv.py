@@ -1,7 +1,7 @@
 from django.http.request import HttpRequest
 from django.http import HttpResponse
 from rest_framework import status
-from api.models import TxV
+from api.models import TxV, BotVisit, PV_VARS
 from django.forms.models import model_to_dict
 import json
 from datetime import datetime
@@ -89,6 +89,18 @@ def get_txv(request):
         for txv in tmp_txvs:
             txv.status = 1
             txv.save()
+        
+        pv_name = ''
+        for cort in PV_VARS:
+            if cort[0] == pv:
+                pv_name = cort[1]
+                break
+        if pv_name:
+            # Отметимся что бот был
+            obj_visit, _ = BotVisit.objects.get_or_create(name=f'Бот ТХВ {pv_name}')
+            obj_visit.last_visit = datetime.now()
+            obj_visit.save()
+        
         return HttpResponse(data, content_type='application/json; charset=utf-8')
     return HttpResponse('Use GET request, please.', content_type='text/plain; charset=utf-8')
 

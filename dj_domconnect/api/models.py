@@ -1,5 +1,17 @@
 from django.db import models
 
+
+PV_VARS = (
+    (1, 'Билайн'),
+    (2, 'ДомРу'),
+    (3, 'МТС'),
+    (4, 'Ростелеком'),
+    (5, 'ТТК'),
+    (6, 'ОнЛайм'),
+    (7, 'МГТС'),
+)
+
+
 class BotVisit(models.Model):
     name = models.CharField(
         unique = True,
@@ -7,6 +19,8 @@ class BotVisit(models.Model):
         verbose_name = 'Название бота',
     )
     last_visit = models.DateTimeField(
+        null = True,
+        blank = True,
         verbose_name='Время посещения',
     )
     
@@ -1015,17 +1029,8 @@ class TxV(models.Model):
         (2, 'Ошибка обработки запроса'),
         (3, 'Запрос отработан'),
     )
-    PV_VAR = (
-        (1, 'Билайн'),
-        (2, 'ДомРу'),
-        (3, 'МТС'),
-        (4, 'Ростелеком'),
-        (5, 'ТТК'),
-        (6, 'ОнЛайм'),
-        (7, 'МГТС'),
-    )
     pv_code = models.PositiveSmallIntegerField(
-        choices = PV_VAR,
+        choices = PV_VARS,
         verbose_name = 'Оператор',
     )
     login = models.CharField(
