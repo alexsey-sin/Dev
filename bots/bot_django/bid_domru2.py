@@ -5,6 +5,8 @@ import requests  # pip install requests
 from bs4 import BeautifulSoup  # pip install beautifulsoup4
 import json
 
+# url_host = 'http://127.0.0.1:8000/'
+url_host = 'http://django.domconnect.ru/'
 
 def set_bid_status(id, status):
     # url = 'http://127.0.0.1:8000/api/set_bid_domru2_status'
@@ -25,7 +27,7 @@ def set_bid_status(id, status):
     except:
         pass
 
-def get_did():
+def get_bid_in_dj_domconnect():
     # url = 'http://127.0.0.1:8000/api/get_bid_domru2'
     url = 'http://django.domconnect.ru/api/get_bid_domru2'
     
@@ -115,7 +117,7 @@ def get_street():
         f.write(resp.text)
 
 
-def send_zayavka(form):
+def set_bid(form):
     user_agent_val = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36'
     headers = {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -167,63 +169,74 @@ def send_zayavka(form):
 def send_crm_bid(bid_dict):
     user_agent_val = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36'
 
-    url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.add'
+    url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.update'
 
     headers = {
         'Content-Type': 'application/json',
         'Connection': 'Keep-Alive',
         'User-Agent': user_agent_val,
     }
-    address = f'{bid_dict.get("city")}, {bid_dict.get("street")}, дом {bid_dict.get("house")}, кв. {bid_dict.get("apartment")}'
     params = {
-        'fields[STATUS_ID]': 'NEW',
-        'fields[ASSIGNED_BY_ID]': 60,
-        'fields[PHONE][0][VALUE]': bid_dict.get('phone'),
-        'fields[PHONE][0][VALUE_TYPE]': 'WORK',
-        'fields[SOURCE_ID]': 326,
-        'fields[UF_CRM_1612190067]': address,
-        'fields[UF_CRM_1613745046]': bid_dict.get('comment'),
-        'fields[NAME]': bid_dict.get('name'),
+        'id': bid_dict.get('id_lid'),
+        'fields[UF_CRM_5864F4DAAC508]': bid_dict.get("bid_number"),
+        'fields[UF_CRM_1493413514]': '1',
+        'fields[UF_CRM_1499386906]': '523',
     }
-    result = ''
+    error_message = bid_dict.get("bot_log")
+    if error_message:
+        params['fields[UF_CRM_5864F4DAAC508]'] = error_message
     try:
         responce = requests.post(url, headers=headers, params=params)
-        if responce.status_code == 200:
-            ans = eval(responce.text)
-            result = ans.get('result')
-            # print('result:', result)
-            # посмотреть результат https://crm.domconnect.ru/crm/lead/details/номер_из_result/
-            # посмотреть результат https://crm.domconnect.ru/crm/lead/details/1161321/
+        if responce.status_code != 200: return f'Ошибка post ответа сервера CRM {responce.status_code}'
     except:
-        pass
-    # print(responce.status_code)
-    return result
+        return 'Ошибка post запроса сервера CRM'
+    # посмотреть результат https://crm.domconnect.ru/crm/lead/details/1163386/
+    return ''
 
+def send_telegram(chat: str, token: str, text: str):
+    url = "https://api.telegram.org/bot" + token + "/sendMessage"
+    try:
+        r = requests.post(url, data={
+            "chat_id": chat,
+            "text": text
+        })
+    except:
+        return 600
+    return r.status_code
 
-def run_domru2():
-
-    glob_rez = {}
-    rez, bid_list = get_did()
-    if rez:
-        glob_rez['Ошибка'] = f'при загрузке заявок из domconnect.ru: {rez}'
-        return glob_rez
-    if len(bid_list) == 0:
-        return glob_rez
+def run_domru2(logger, tlg_chat, tlg_token):
+    tlg_mess = ''
     
+    # личный бот @infra
+    TELEGRAM_CHAT_ID = '1740645090'
+    TELEGRAM_TOKEN = '2009560099:AAHtYot6EOHh_qr9EUoCoczQhjyRdulKHYo'
+
+    rez, bid_list = get_bid_in_dj_domconnect()
+    if rez:
+        tlg_mess = 'ДомРу2: Ошибка при загрузке запросов из domconnect.ru'
+        r = send_telegram(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN, tlg_mess)
+        logger.error(tlg_mess)
+        return
+    if len(bid_list) == 0:
+        logger.info('bid_domru2: Заявок нет')
+        return
+
     rez, citys_dict = get_form_sample()
     if rez:
-        # Ошибка при загрузке формы dealers.dom.ru
-        return glob_rez
-    time.sleep(2)
+        tlg_mess = 'ДомРу2: Ошибка при загрузке формы dealers.dom.ru'
+        r = send_telegram(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN, tlg_mess)
+        logger.error(tlg_mess)
+        return
     
     # Перелистываем список словарей с заявками
     for bid_dict in bid_list:
         id_bid = bid_dict.get('id')
         str_city = bid_dict.get('city').strip()
         if str_city not in citys_dict:
-            print(f'Заявка id {id_bid}: ошибка распознавания города "{str_city}".')
+            tlg_mess = f'Заявка id {id_bid}: ошибка распознавания города "{str_city}".')
             set_bid_status(bid_dict.get('id'), 3)  # посылаем в домконнект сообщение об ошибке
-            glob_rez[bid_dict.get('id')] = 3
+            send_telegram(tlg_chat, tlg_token, tlg_mess)
+            logger.info(tlg_mess)
             # отправляем оператору заявку для ручного ввода
             send_crm_bid(bid_dict)
             continue
@@ -260,21 +273,34 @@ def run_domru2():
             'WidgetForm[tv]': service_tv,
             'WidgetForm[telephony]': service_phone,
         }
-        rez = send_zayavka(form)
-        if rez:  # если какая-то ошибка
-            set_bid_status(bid_dict.get('id'), 3)  # посылаем в домконнект сообщение об ошибке
-            glob_rez[bid_dict.get('id')] = 3
-            # отправляем оператору заявку для ручного ввода
-            send_crm_bid(bid_dict)
-        else:
-            set_bid_status(bid_dict.get('id'), 4)  # посылаем в домконнект сообщение об об успешной отправке заявки
-            glob_rez[bid_dict.get('id')] = 4
-        # r = send_crm_bid(bid_dict)
-        # glob_rez['CRM'] = r
+        rez = set_bid(form)
+        if rez == '':  # заявка успешно создана
+            set_bid_status(3, data)
+            tlg_mess = 'ДомРу2: - создана заявка\n'
+            tlg_mess += f'Лид: {data.get("id_lid")}\n'
+            tlg_mess += f'Номер заявки: {data.get("bid_number")}\n'
+        else:  # не прошло
+            set_bid_status(2, data)
+            tlg_mess = 'ДомРу2: - ошибка\n'
+            tlg_mess += f'Лид: {data.get("id_lid")}\n'
+            tlg_mess += f'Ошибка: {data.get("bot_log")}\n'
+        r = send_telegram(tlg_chat, tlg_token, tlg_mess)
+        logger.info(tlg_mess)
+        logger.info('TelegramMessage:', r)
+        # if rez:  # если какая-то ошибка
+            # set_bid_status(bid_dict.get('id'), 3)  # посылаем в домконнект сообщение об ошибке
+            # # glob_rez[bid_dict.get('id')] = 3
+            # # отправляем оператору заявку для ручного ввода
+            # send_crm_bid(bid_dict)
+        # else:
+            # set_bid_status(bid_dict.get('id'), 4)  # посылаем в домконнект сообщение об об успешной отправке заявки
+            # # glob_rez[bid_dict.get('id')] = 4
+        # # r = send_crm_bid(bid_dict)
+        # # glob_rez['CRM'] = r
 
-        time.sleep(2)
+        time.sleep(1)
     #============================================================
-    return glob_rez
+    # return glob_rez
     
     
 if __name__ == '__main__':

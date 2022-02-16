@@ -1,1 +1,0 @@
-curl  -X POST -H "Content-Type: application/json"  -H "Cookie: MTSWebSSO=AQIC5wM2LY4SfczgAFomqlpK4pyIc6hP0BwXaWqpVnTFzfw.*AAJTSQACMDQAAlNLABM3MDAyMjc5ODYzOTE2MzE0NDMwAAJTMQACMTI.*" -H "Authorization: Bearer 35734616-e607-3451-b838-a564b7f66c8e"   --data @JsonFile  https://login.mts.ru:443/wss/api-manager/PublicApi/Sandbox/WebSSORegistration/v1

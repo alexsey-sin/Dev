@@ -7,6 +7,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from datetime import datetime
 from rest_framework import status
 import json
+from django.views.decorators.csrf import csrf_exempt
 
 
 def index(request):
@@ -19,6 +20,7 @@ def index(request):
     return HttpResponse('Страница пока не готова.', content_type='text/plain; charset=utf-8')
 
 
+@csrf_exempt
 def api(request):
     if request.method == 'POST':
         data = json.loads(request.body)
