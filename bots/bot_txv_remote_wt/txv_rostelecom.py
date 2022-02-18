@@ -108,6 +108,30 @@ oblasti = [
     ('Ставропольский край', 7, 11),
     ('Чеченская республика', 7, 12),
 ]
+street_abbr = {
+    'улица': 'ул.',
+    'проспект': 'пр-кт',
+    'переулок': 'пер.',
+    'бульвар': 'б-р',
+    'шоссе': 'ш.',
+    'аллея': 'аллея',
+    'тупик': 'туп.',
+    'проезд': 'проезд',
+    'набережная': 'наб.',
+    'площадь': 'пл.',
+}
+street_exc_abbr = {  # исключаем их из поиска
+    'район': 'р-н',
+    'микрорайон': 'мкр.',
+}
+city_abbr = {
+    'дачный поселок': 'дп.',
+    'рабочий поселок': 'рп.',
+    'городской поселок': 'пгт.',
+    'поселок': 'п.',
+    'село': 'с.',
+    'деревня': 'д.',
+}
 
 def ordering_region(in_region: str):  # Преобразование строки регион
     '''
@@ -130,7 +154,7 @@ def ordering_region(in_region: str):  # Преобразование строк�
             return reg[len(tp):].strip()
     return in_region
 
-def find_regions(lst: list, regs: list, in_str: str):  # Поиск вхождения фразы в списке фраз
+def find_regions(obls: list, regs: list, in_str: str):  # Поиск вхождения фразы в списке фраз
     '''
         Поиск вхождения фразы в списке фраз
         Поиск ведется последовательно начиная с первой буквы in_str
@@ -146,13 +170,20 @@ def find_regions(lst: list, regs: list, in_str: str):  # Поиск вхожде
     ret_id = -1
     ret_group_id = -1
     
+    # Если "Республика вначале"
+    if in_str.find('Республика') == 0:
+        lst = in_str.split(' ')
+        lst.pop(0)
+        lst.append('республика')
+        in_str = ' '.join(lst)
+    
     # поиск с циклом по набиранию подстроки
     for i_s in range(len(in_str)):
         sub_str = in_str[0:i_s+1]
         cnt_phr = 0
         # просмотрим список на вхождение
-        for i_lst in range(len(lst)):
-            if lst[i_lst][0].find(sub_str) >= 0:
+        for i_lst in range(len(obls)):
+            if obls[i_lst][0].find(sub_str) >= 0:
                 cnt_phr += 1
                 ret_id = i_lst
         if cnt_phr > 1:
@@ -161,8 +192,8 @@ def find_regions(lst: list, regs: list, in_str: str):  # Поиск вхожде
             break
     
     if ret_id >= 0:
-        id_group = lst[ret_id][1]
-        id_reg = lst[ret_id][2]
+        id_group = obls[ret_id][1]
+        id_reg = obls[ret_id][2]
         id_code = regs[id_group][1]
         return (id_group, id_reg, id_code)  # похожая фраза найдена и она в единственной строке
     
@@ -237,30 +268,18 @@ def find_string_to_substrs(lst: list, substr: str):  # Поиск вхожден
         return i_max
     else: return -1
 
-def ordering_street(in_street: str):  # Преобразование строки улица
+def ordering_string(in_street: str, in_abbr: dict):  # Преобразование строки населенный пункт, улица
     '''
         разбиваем строку по запятым, и каждый фрагмент проверяем на
-        изветсный тип улицы
+        известный тип улицы
         выдаем список [тип_улицы, название]
         если известный тип не найден - возвращаем пустой список
     '''
-    lst_type_street = [
-        'улица',
-        'проспект',
-        'переулок',
-        'бульвар',
-        'шоссе',
-        'аллея',
-        'тупик',
-        'проезд',
-        'набережная',
-        'площадь',
-    ]
     out_cort = []
     lst = in_street.split(',')
     for sub in lst:
         rez = False
-        for ts in lst_type_street:
+        for ts in in_abbr:
             if sub.find(ts) >= 0:
                 rez = True
                 out_cort.append(ts)
@@ -268,22 +287,25 @@ def ordering_street(in_street: str):  # Преобразование строк�
                 break
         if rez: break
     return out_cort
-    
-def get_abbreviation_street(type_street: str):  # Поиск аббревиатуры по типу улицы
-    type_abbr = {
-        'улица': 'ул.',
-        'проспект': 'пр-кт',
-        'переулок': 'пер.',
-        'бульвар': 'б-р',
-        'шоссе': 'ш.',
-        'аллея': 'аллея',
-        'тупик': 'туп.',
-        'проезд': 'проезд',
-        'набережная': 'наб.',
-        'площадь': 'пл.',
-    }
-    return type_abbr.get(type_street)
 
+def remove_street_exc_abbr(in_street: str):
+    '''
+        разбиваем строку по запятым, и каждый фрагмент проверяем на
+        известный тип района, удаляем его
+        возвращаем что осталось
+    '''
+    out_lst = []
+    lst = in_street.split(',')
+    for sub in lst:
+        rez = False
+        for ex in street_exc_abbr:
+            if sub.find(ex) >= 0:
+                rez = True
+                break
+        if rez == False: out_lst.append(sub.strip())
+        
+    return ','.join(out_lst)
+    
 def find_short(f_lst):
     '''
         Поиск самой короткой фразы в списке и выдача её индекса
@@ -303,7 +325,7 @@ def wait_spinner(driver):  # Ожидаем крутящийся спинер
         time.sleep(1)
         els = driver.find_elements(By.XPATH, '//div[contains(@class, "ju-spinner")]')
         if len(els):
-            print('ju-spinner')
+            # print('ju-spinner')
         else: break
     driver.implicitly_wait(10)
     time.sleep(2)
@@ -470,6 +492,7 @@ def get_txv(data):
         # Вводим населенный пункт
         city = data.get('city')
         if city == None: raise Exception('Ошибка Город не задан')
+        str_city = city.replace('ё', 'е')
         els = els_fieldset_addr[0].find_elements(By.XPATH, './/input[@data-field="city"]')
         if len(els) != 1: raise Exception('Ошибка нет поля ввода населенного пункта')
         # Передвинем страницу чтоб элемент стал видимым
@@ -477,8 +500,18 @@ def get_txv(data):
         time.sleep(1)
         driver.execute_script('window.scrollBy(-100, -200)')  # прокручивает страницу относительно её текущего положения
         time.sleep(1)
+
+        l_tp_st = ordering_string(str_city, city_abbr)  # попробуем распознать тип населенный пункт
+        s_city = ''
+        t_city = ''
+        if len(l_tp_st) == 0:  # не распознали
+            t_city = 'г.'
+            s_city = city # как есть
+        else:
+            t_city = city_abbr.get(l_tp_st[0])
+            s_city = l_tp_st[1]
         try:
-            els[0].send_keys(city)
+            els[0].send_keys(s_city)
             time.sleep(1)
             els[0].send_keys(Keys.ENTER)
         except: raise Exception('Ошибка ввода населенного пункта')
@@ -495,30 +528,32 @@ def get_txv(data):
         for el in els_li:
             l_c = el.text.split('\n')
             lst_city.append(l_c[0])
-        # возьмем коротрое
+        # Поищем по вхождению
+        f_city = f'{t_city};{s_city}'
+        i_fnd = find_string_to_substrs(lst_city, f_city)
+        # возьмем короткое
         i_fnd = find_short(lst_city)
-        # Пробежим по списку подсказки
-        try:
-            for _ in range(i_fnd):
-                els[0].send_keys(Keys.ARROW_DOWN)
-                time.sleep(0.2)
-            time.sleep(0.2)
-            els[0].send_keys(Keys.ENTER)
+        if i_fnd < 0: raise Exception(f'Ошибка поиск населенного пункта по ключу {f_city}: вариантов нет')
+        try:els_li[i_fnd].click()
         except: raise Exception('Ошибка выбора населенного пункта из списка')
         time.sleep(3)
+        
         # Вводим улицу
         # преобразование по типу улицы
         street = data.get('street')
         if street == None: raise Exception('Ошибка Улица не задана')
         str_street = street.replace('ё', 'е')
-        l_tp_st = ordering_street(str_street)  # попробуем распознать тип улицы
+        # Удалим из строки районы и микрорайоны
+        str_street = remove_street_exc_abbr(str_street)
+        l_tp_st = ordering_string(str_street, street_abbr)  # попробуем распознать тип улицы
         s_street = ''
         t_street = ''
         if len(l_tp_st) == 0:  # не распознали
-            t_street = 'ул.'
+            t_street = 'ул'
+            # t_street = ''
             s_street = str_street # как есть
         else:
-            t_street = get_abbreviation_street(l_tp_st[0])
+            t_street = street_abbr.get(l_tp_st[0])
             s_street = l_tp_st[1]
             
         els_fieldset_addr = driver.find_elements(By.XPATH, '//fieldset[@class="form-1-fieldset addressConnectFs"]')
@@ -539,22 +574,21 @@ def get_txv(data):
         # Собираем список подсказок
         lst_street = []
         for el in els_li:
-            lst_street.append(el.text)
-        # Поищем по вхождению
-        f_street = f'{city};{t_street} {s_street}'
-        
+            l_c = el.text.split('\n')
+            lst_street.append(l_c[0])
+        # Поищем по вхождению город, тип и улице
+        f_street = f'{s_city};{t_street} {s_street}'
         i_fnd = find_string_to_substrs(lst_street, f_street)
+        if i_fnd < 0:
+            # Пробуем просто по типу и улице
+            f_street = f'{t_street};{s_street}'
+            i_fnd = find_string_to_substrs(lst_street, f_street)
+        
         if i_fnd < 0: raise Exception(f'Ошибка поиск улицы по ключу {f_street}: вариантов нет')
         
-        # Пробежим по списку подсказки
-        try:
-            for _ in range(i_fnd):
-                els[0].send_keys(Keys.ARROW_DOWN)
-                time.sleep(0.2)
-            time.sleep(0.2)
-            els[0].send_keys(Keys.ENTER)
+        try: els_li[i_fnd].click()
         except: raise Exception('Ошибка выбора улицы из списка')
-        time.sleep(1)
+        time.sleep(3)
         
         # Вводим дом
         house = data.get('house')
@@ -848,18 +882,48 @@ if __name__ == '__main__':
 
     
     # txv_dict = {
-        # 'login': 'sz_v_an',
-        # 'password': '@hgfjdhjhQ54564',
+        # # 'login': 'sz_v_an',
+        # # 'password': 'АтсорВvnjhfv48556vfdf+',
+        # 'login': 'sz_ivan',
+        # 'password': 'АтсорВvnjhfv48556vfdf+',
         # 'id_lid': '1215557',
         
         # # 'region': 'Московская область',
-        # # 'city': 'Орехово-Зуево',
-        # # 'street': 'улица Володарского',
-        # 'region': 'Калужская область',         # область или город областного значения
-        # 'city': 'Калуга',           # город
-        # 'street': 'улица Ленина',         # улица
-        # 'house': '3',          # дом
+        # # 'city': 'Балашиха',
+        # # 'street': 'микрорайон Авиаторов, бульвар Нестерова',
+        # # 'house': '1',          # дом
+        # # 'apartment': '10',          # квартира
+        
+        # # 'region': 'Новосибирская область',
+        # # 'city': 'Новосибирск',
+        # # 'street': 'Советский район, микрорайон Академгородок, Ляпунова',
+        # # 'house': '2',          # дом
+        # # 'apartment': '10',          # квартира
+        
+        # # 'region': 'Приморский край',
+        # # 'city': 'Владивосток',
+        # # 'street': 'Гульбиновича',
+        # # 'house': '29/2',          # дом
+        # # 'apartment': '40',          # квартира
+        
+        # 'region': 'Московская область',
+        # 'city': 'Кашира',
+        # 'street': 'микрорайон Кашира-1, Кирпичный Посёлок',
+        # 'house': '5',          # дом
         # 'apartment': '2',          # квартира
+        
+        # # 'region': 'Республика Алтай',
+        # # 'city': 'село Усть-Кокса',
+        # # 'street': 'Ленина',
+        # # 'house': '20А',          # дом
+        # # 'apartment': '10',          # квартира
+        
+        # # 'region': 'Ростовская область',         # область или город областного значения
+        # # 'city': 'Ростов-на-Дону',           # город
+        # # 'street': 'садовое товарищество Садовод-Любитель, 2-й Хлопковый переулок',         # улица
+        # # 'house': '12',          # дом
+        # # 'apartment': '10',          # квартира
+        
         # # 'region': 'Ярославская область',         # область или город областного значения
         # # 'city': 'Ярославль',           # город
         # # 'street': 'улица Труфанова',         # улица
@@ -871,13 +935,14 @@ if __name__ == '__main__':
         # 'pv_address': '',
     # }
     
-    
     # e, data = get_txv(txv_dict)
     # if e: print(e)
     # print('pv_address:', data['pv_address'])
     # print('available_connect:')
     # print(data['available_connect'])
-    # # print(data['tarifs_all'])
+    
+    # s = remove_street_exc_abbr(txv_dict['street'])
+    # print(find_regions(oblasti, regions, txv_dict['region']))
     
     
     # set_txv_to_dj_domconnect(pv_code)

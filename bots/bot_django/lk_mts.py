@@ -48,9 +48,15 @@ def get_bill_plan_info(token, msisdn):  # Запрос действующего 
         'fields': 'productCharacteristic,place.role,place.externalID,productOffering.name,productOffering.href,productOffering.externalID,productOffering.validFor',
         'productLine.name': 'MobileConnectivity',
     }
-
+    # , data={}
+    cnt_try = 5
     try:
-        resp = requests.get(url, headers=headers, params=params, data={}, timeout=30)
+        while cnt_try:
+            cnt_try -= 1
+            resp = requests.get(url, headers=headers, params=params, timeout=300)
+            if resp.status_code == 200: break
+            time.sleep(2)
+
         if resp.status_code == 200:
             dct_answer = json.loads(resp.text)
             if type(dct_answer) != dict: raise Exception('Invalid answer 1')
@@ -117,9 +123,15 @@ def get_validity_info(token, msisdn, tarif):  # Получение остатк�
         'customerAccount.accountNo': msisdn,
         'customerAccount.productRelationship.product.productLine.name': 'Counters',
     }
-
+     # data={},
+    cnt_try = 5
     try:
-        resp = requests.get(url, headers=headers, params=params, data={}, timeout=30)
+        while cnt_try:
+            cnt_try -= 1
+            resp = requests.get(url, headers=headers, params=params, timeout=300)
+            if resp.status_code == 200: break
+            time.sleep(2)
+
         if resp.status_code == 200:
             while True:
                 lst_answer = json.loads(resp.text)
@@ -183,7 +195,7 @@ def get_validity_info(token, msisdn, tarif):  # Получение остатк�
                 # json.dump(prRel, out_file, ensure_ascii=False, indent=4)
             # print(json.dumps(lst_answer, indent=2))
 
-        else: mess = f'ERROR get_validity_info: requests.status_code: {resp.status_code}'
+        else: mess = f'ERROR get_validity_info: requests.status_code: {resp.status_code} {resp.text}'
     except Exception as e:
         mess = f'ERROR get_validity_info: try: {e}'
     return mess, dct_info
@@ -246,7 +258,7 @@ def run_lk_mts(logger, tlg_chat, tlg_token):
         'operator': 'mts',
         'numbers': [],
     }
-    res_mess = 'Parsing MTS:\n'
+    res_mess = 'Parsing mts:\n'
     cnt_avlb_min = 0
     cnt_totl_min = 0
     cnt_avlb_sms = 0
@@ -263,6 +275,8 @@ def run_lk_mts(logger, tlg_chat, tlg_token):
             return
         time.sleep(2)
         
+        if mob_num == mob_numbers[0]:
+            res_mess += f'balance: {balance}\n'
         # Возьмем тарифный план (пакет)
         e, plan = get_bill_plan_info(token, mob_num)
         if e:
@@ -288,8 +302,12 @@ def run_lk_mts(logger, tlg_chat, tlg_token):
         
         dct_info['balance'] = balance  # Добавим баланс
         out_dict['numbers'].append(dct_info)  # И внесем в общий список
-        res_mess += f'{mob_num} [min {dct_info["mobile_available"]}/{dct_info["mobile_total"]}][sms {dct_info["sms_available"]}/{dct_info["sms_total"]}]\n'
-    res_mess += f'Итого: [min {cnt_avlb_min}/{cnt_totl_min}][sms {cnt_avlb_sms}/{cnt_totl_sms}]'
+        ma = dct_info["mobile_available"]
+        mt = dct_info["mobile_total"]
+        sa = dct_info["sms_available"]
+        st = dct_info["sms_total"]
+        if ma or mt or sa or st: res_mess += f'{mob_num} [min {ma}/{mt}][sms {sa}/{st}]\n'
+    res_mess += f'Итого: [min {cnt_avlb_min}/{cnt_totl_min}][sms {cnt_avlb_sms}/{cnt_totl_sms}]\nВсего номеров: {len(mob_numbers)}'
     e = send_api(out_dict)
     if e:
         mess = f'run_lk_mts ERROR: send_api: {e}'
