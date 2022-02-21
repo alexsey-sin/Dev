@@ -1,0 +1,3 @@
+sudo crontab -e    (редактор vi задача будет от имени root)
+
+5 0 * * * cd /var/www/dj_domconnect && /var/www/dj_domconnect/venv/bin/python /var/www/dj_domconnect/manage.py upgrade_seo

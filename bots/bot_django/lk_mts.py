@@ -27,7 +27,7 @@ def get_token():  # Получение токена по логину и пар�
                 if fault: mess = f'ERROR: {fault.get("message")} {fault.get("description")}'
         else: mess = f'ERROR get_token: requests.status_code: {resp.status_code}'
     except Exception as e:
-        mess = f'ERROR get_token: try: {e}'
+        mess = f'ERROR get_token: try: {str(e)[:100]}'
     return mess, token
 
 def get_bill_plan_info(token, msisdn):  # Запрос действующего тарифного плана
@@ -68,7 +68,7 @@ def get_bill_plan_info(token, msisdn):  # Запрос действующего 
             if len(plan) == 0: raise Exception('Invalid answer 4')
         else: mess = f'ERROR get_bill_plan_info: requests.status_code: {resp.status_code}'
     except Exception as e:
-        mess = f'ERROR get_bill_plan_info: try: {e}'
+        mess = f'ERROR get_bill_plan_info: try: {str(e)[:100]}'
     return mess, plan
 
 def get_balance(token, msisdn):  # Получение баланса по номеру MSISDN (7...)
@@ -97,7 +97,7 @@ def get_balance(token, msisdn):  # Получение баланса по ном
             if amount == None: raise Exception('Invalid answer 5')
         else: mess = f'ERROR get_balance: requests.status_code: {resp.status_code}'
     except Exception as e:
-        mess = f'ERROR get_balance: try: {e}'
+        mess = f'ERROR get_balance: try: {str(e)[:100]}'
     return mess, amount
 
 def get_validity_info(token, msisdn, tarif):  # Получение остатков пакетов минут, интернет, смс по номеру MSISDN (7...)
@@ -197,7 +197,7 @@ def get_validity_info(token, msisdn, tarif):  # Получение остатк�
 
         else: mess = f'ERROR get_validity_info: requests.status_code: {resp.status_code} {resp.text}'
     except Exception as e:
-        mess = f'ERROR get_validity_info: try: {e}'
+        mess = f'ERROR get_validity_info: try: {str(e)[:100]}'
     return mess, dct_info
 
 def send_telegram(chat: str, token: str, text: str):
@@ -221,7 +221,7 @@ def send_api(data):
     try:
         res = requests.post(url, headers=headers, json=data)
         if res.status_code != 200: raise Exception(f'requests.status_code:{res.status_code}')
-    except Exception as e: return str(e)
+    except Exception as e: return str(e)[:100]
     
     return ''
 
