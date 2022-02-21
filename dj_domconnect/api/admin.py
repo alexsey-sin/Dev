@@ -173,11 +173,10 @@ class TxVAdmin(admin.ModelAdmin):
         return u"%s..." % (self.bot_log[:30],)
     list_display = ['id', 'pv_code', 'id_lid', 'region', 'city', connect, tarifs, 'pv_address', 'status', 'change_date', 'pub_date', logs]
     # list_display = [field.name for field in TxvRostelecom._meta.get_fields()]
-    search_fields = ('change_date',)
-    list_filter = ('id', 'id_lid', 'pv_code', 'change_date')
+    search_fields = ('id_lid',)
+    list_filter = ('pv_code', 'region', 'city')
     empty_value_display = '-пусто-'
     date_hierarchy = 'pub_date'
     formfield_overrides = {
         models.IntegerField: {'widget': NumberInput(attrs={'size':'150'})},
     }
-    # list_display = ['id', 'id_lid', 'region', t_all30, 'mts_address', 'status', 'change_date', 'pub_date', 'bot_log']

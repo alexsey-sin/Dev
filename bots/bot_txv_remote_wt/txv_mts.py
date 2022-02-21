@@ -403,7 +403,7 @@ def get_txv(data):
         # time.sleep(3)
         
     except Exception as e:
-        return str(e), data
+        return str(e)[:100], data
     finally:
         if driver: driver.quit()
    

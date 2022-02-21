@@ -808,7 +808,7 @@ def set_bid(data):  # Заведение заявки
             # outfile.write(driver.page_source)
         
     except Exception as e:
-        return e, data
+        return str(e)[:100], data
     finally:
         if driver: driver.quit()
     

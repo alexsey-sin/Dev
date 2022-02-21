@@ -532,6 +532,13 @@ def set_bid(data):
         except: raise Exception('Ошибка клика 12')
         time.sleep(10)
         
+        # Проверим не влючен ли тариф TVE - если включен - выключим
+        els_tve = driver.find_elements(By.XPATH, '//input[contains(@id, "TVE_")]')
+        for i_tve in els_tve:
+            if i_tve.is_selected():
+                try: i_tve.click()
+                except: raise Exception('Ошибка клика 13')
+        
         # Страница возможно сдвинулась и верхняя кнопка не видна, прокрутим страницу вниз
         driver.execute_script('window.scrollTo(0, document.body.scrollHeight)')
         time.sleep(1)
@@ -723,7 +730,7 @@ def set_bid(data):
         # raise Exception('Finish')
         
     except Exception as e:
-        rez_set_bid = str(e)
+        rez_set_bid = str(e)[:100]
     finally:
         if driver: driver.quit()
    
@@ -943,14 +950,17 @@ if __name__ == '__main__':
         # 'partner_workercode': '1999999222',
         # 'partner_password': '8GFysus@kffs7',
         # 'id_lid': '1259587',
-        # 'city': 'Москва',
-        # 'street': 'Новощукинская улица',
-        # 'house': '4',
-        # 'apartment': '151',
+        
+        # 'city': 'Ростов-на-Дону',
+        # 'street': 'Буденновский проспект',
+        # 'house': '1А',
+        # 'apartment': '49',
+        
         # # 'city': 'Иннополис',
         # # 'street': 'Спортивная улица',
         # # 'house': '138',
         # # 'apartment': '91',
+        
         # 'firstname': 'Валерия',
         # 'lastname': '-',
         # 'patronymic': '-',
@@ -966,10 +976,11 @@ if __name__ == '__main__':
     # }
     # rez, data = set_bid(data)
     # if rez: print(rez)
+    # print(data)
     # # gr_e = data['grafic_error']
-    # if gr_e:
-        # print('gr_e')
-        # print(gr_e)
+    # # if gr_e:
+        # # print('gr_e')
+        # # print(gr_e)
     
     
 

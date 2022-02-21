@@ -60,5 +60,5 @@ urlpatterns = [
     path('get_txv', views_txv.get_txv),
     path('set_txv_status', views_txv.set_txv_status),
 
-    path('get_bots_info', views.get_bots_info),
+    path('get_bots_info/<str:from_date>', views.get_bots_info),
 ]

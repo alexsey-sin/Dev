@@ -606,7 +606,7 @@ def set_bid(data):
 
     except Exception as e:
         print(e)
-        return e, data,
+        return str(e)[:100], data,
     finally:
         if driver: driver.quit()
     

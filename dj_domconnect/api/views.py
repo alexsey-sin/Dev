@@ -7,6 +7,7 @@ from api.models import BidRostelecom2, BidRostelecom, BidDomRu, BidTtk
 from api.models import  BidOnlime, BidMGTS, TxV
 from django.contrib.auth import get_user_model
 import json
+from datetime import datetime
 
 
 User = get_user_model()
@@ -132,9 +133,17 @@ def get_pz_phrases(request, num_group):
 
 ###############################################################################
 ###############################################################################
-def get_bots_info(request):
+def get_bots_info(request, from_date):
     mess = ''
-
+    f_data = None
+    try:
+        f_data = datetime.strptime(from_date, '%d.%m.%Y')
+    except Exception as e:
+        return HttpResponse(str(e), content_type='text/plain; charset=utf-8')
+    
+    if f_data == None:
+        return HttpResponse('Дата начала не задана.\nПример: get_bots_info/18.02.2022', content_type='text/plain; charset=utf-8')
+    
     pv_cort = (
         (BidDomRu2, 'BidDomRu2'),
         (BidBeeline, 'BidBeeline'),
@@ -148,25 +157,17 @@ def get_bots_info(request):
         (BidMGTS, 'BidMGTS'),
     )
     for model, name in pv_cort:
-        objs = model.objects.all()
+        objs = model.objects.filter(pub_date__gte = f_data)
         all_cnt = objs.count()
         ok_cnt = objs.filter(status=3).count()
-        mess += f'BID {name} => {ok_cnt}/{all_cnt}\n'
+        try: percent = round((ok_cnt/all_cnt)*100, 2)
+        except: percent = 0
+        mess += f'BID {name} => {ok_cnt}/{all_cnt} => {percent}%\n'
 
     # objs = BidTtk.objects.all()
     # all_cnt = objs.count()
     # ok_cnt = objs.filter(status=3).count()
     # mess += f'BidTtk {ok_cnt}/{all_cnt}\n'
-
-    # objs = BidOnlime.objects.all()
-    # all_cnt = objs.count()
-    # ok_cnt = objs.filter(status=3).count()
-    # mess += f'BidOnlime {ok_cnt}/{all_cnt}\n'
-
-    # objs = BidMGTS.objects.all()
-    # all_cnt = objs.count()
-    # ok_cnt = objs.filter(status=3).count()
-    # mess += f'BidMGTS {ok_cnt}/{all_cnt}\n'
 
     pv_code = (
         (1, 'Билайн'),
@@ -178,10 +179,12 @@ def get_bots_info(request):
         (7, 'МГТС'),
     )
     for code, name in pv_code:
-        objs = TxV.objects.filter(pv_code=code)
+        objs = TxV.objects.filter(pv_code=code, pub_date__gte = f_data)
         all_cnt = objs.count()
         ok_cnt = objs.filter(status=3).count()
-        mess += f'TXV {name} => {ok_cnt}/{all_cnt}\n'
+        try: percent = round((ok_cnt/all_cnt)*100, 2)
+        except: percent = 0
+        mess += f'TXV {name} => {ok_cnt}/{all_cnt} => {percent}%\n'
 
 
     return HttpResponse(mess, content_type='text/plain; charset=utf-8')

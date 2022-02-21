@@ -1,0 +1,34 @@
+PostgreSQL
+база: django
+user: alex
+password: J3UHx4rwWR
+host: 127.0.0.1
+port: 5432
+django.domconnect.ru
+
+master-pasword: root
+=========================================
+
+
+SELECT pub_date FROM public.api_txv
+WHERE "pub_date" < '2022-02-15 00:00:00'
+ORDER BY pub_date DESC
+
+
+DELETE FROM public.api_txv
+WHERE "pub_date" < '2022-02-15 00:00:00'
+
+
+SELECT count(*) as cnt FROM public.mobile_mobiledata
+
+
+ТХВ Ростелеком
+SELECT count(*) as cnt FROM public.api_txv
+WHERE "pv_code" = 4 AND "pub_date" > '2022-02-18 11:30:00'
+
+SELECT count(*) as cnt FROM public.api_txv
+WHERE "pv_code" = 4 AND "pub_date" > '2022-02-18 11:30:00' AND "status" = 3
+
+
+
+
