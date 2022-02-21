@@ -134,7 +134,6 @@ def get_pz_phrases(request, num_group):
 ###############################################################################
 ###############################################################################
 def get_bots_info(request, from_date):
-    mess = ''
     f_data = None
     try:
         f_data = datetime.strptime(from_date, '%d.%m.%Y')
@@ -144,6 +143,9 @@ def get_bots_info(request, from_date):
     if f_data == None:
         return HttpResponse('Дата начала не задана.\nПример: get_bots_info/18.02.2022', content_type='text/plain; charset=utf-8')
     
+    str_f_date = f_data.strftime('%d.%m.%Y %H:%M:%S')
+    str_today = datetime.today().strftime('%d.%m.%Y %H:%M:%S')
+    mess = f'Результаты работы ботов с {str_f_date} по {str_today}\n\n'
     pv_cort = (
         (BidDomRu2, 'BidDomRu2'),
         (BidBeeline, 'BidBeeline'),
