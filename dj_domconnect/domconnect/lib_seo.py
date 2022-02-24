@@ -458,7 +458,11 @@ def calculateSEO():
         last_month = last_record.val_date.month
         last_year = last_record.val_date.year
 
-    for _ in range(12):
+    # Вычислим количество месяцев (столбцов) для вывода начиная с 01.01.2021г.
+    date_start = datetime(2020, 12, 31)
+    num_months = (ask_date.year - date_start.year) * 12 + ask_date.month - date_start.month
+    
+    for _ in range(num_months):
         empty_data_month = True
         # Расчет основной таблицы (Метка SEO)
         dct = calculate_0_table(ask_date)

@@ -157,7 +157,7 @@ MEDIAFILES_DIRS = (
 #         'file': {
 #             'level': 'INFO',
 #             'class': 'logging.FileHandler',
-#             'filename': 'info.log',
+#             'filename': 'main.log',
 #         },
 #     },
 #     'loggers': {
