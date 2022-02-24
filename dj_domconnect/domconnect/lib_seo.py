@@ -2,21 +2,20 @@ from domconnect.models import DcCrmGlobVar, DcCrmLid, DcCashSEO, DcSiteSEO, DcCr
 from django.db.models import Q, Avg
 from decimal import Decimal
 from datetime import datetime, timedelta
-import time, logging, requests, json, calendar, copy
+import os, time, logging, requests, json, calendar, copy
 from django.http import HttpResponse
-import csv
-import codecs
+import csv, codecs
 
 
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.INFO,     # DEBUG, INFO, WARNING, ERROR и CRITICAL По возрастанию
     filename='main.log',
     format='%(asctime)s:%(name)s:%(message)s'
 )
-# loger.info('So should this')
-# # # # loger.debug('This message should go to the log file')
-# # # # loger.warning('And this, too')
-loger = logging.getLogger(__name__)  # запустили логгирование
+# logger.info('So should this')
+# # # # logger.debug('This message should go to the log file')
+# # # # logger.warning('And this, too')
+logger = logging.getLogger(__name__)  # запустили логгирование
 
 date_create = '2021-01-01T00:00:00'
 # date_create = '2021-11-01T00:00:00'
@@ -134,7 +133,7 @@ def run_upgrade_seo(*args, **options):
     gvar_go.val_datetime = datetime.today()
     gvar_go.descriptions = mess
     gvar_go.save()
-    loger.info(mess)
+    logger.info(mess)
     print(mess)
 
     download_typesource()
@@ -150,7 +149,7 @@ def run_upgrade_seo(*args, **options):
     gvar_go.val_datetime = datetime.today()
     gvar_go.descriptions = mess
     gvar_go.save()
-    loger.info(mess)
+    logger.info(mess)
     print(mess)
 
 
@@ -178,11 +177,11 @@ def download_typesource():  # Обновление Типов источника
             for res in result:
                 status_id = res.get('STATUS_ID')
                 if not status_id:
-                    loger.info(f'Ошибка download_typesource: error status_id: {status_id}')
+                    logger.info(f'Ошибка download_typesource: error status_id: {status_id}')
                     continue
                 typesource[status_id] = res.get('NAME')
-        else: return loger.info(f'Ошибка download_typesource: responce.status_code: {responce.status_code}\n{responce.text}')
-    except Exception as e: loger.info(f'Ошибка download_typesource: try: requests.post {e}')
+        else: return logger.info(f'Ошибка download_typesource: responce.status_code: {responce.status_code}\n{responce.text}')
+    except Exception as e: logger.info(f'Ошибка download_typesource: try: requests.post {e}')
 
 def download_typelid():  # Обновление Типов лида
     '''
@@ -209,8 +208,8 @@ def download_typelid():  # Обновление Типов лида
                 id_tl = f_lst.get('ID')
                 val_tl = f_lst.get('VALUE')
                 typelid[id_tl] = val_tl
-        else: return loger.info(f'Ошибка download_typelid: responce.status_code: {responce.status_code}\n{responce.text}')
-    except Exception as e: loger.info(f'Ошибка download_typelid: try: requests.post {e}')
+        else: return logger.info(f'Ошибка download_typelid: responce.status_code: {responce.status_code}\n{responce.text}')
+    except Exception as e: logger.info(f'Ошибка download_typelid: try: requests.post {e}')
 
 def download_deals():
     key_crm = get_key_crm()
@@ -269,11 +268,11 @@ def download_deals():
                 ok, err = append_deals(result)
                 cnt_ok += ok; cnt_err += err
                 if not go_next: break
-            else: loger.info(f'Ошибка download_deals: responce.status_code: {responce.status_code}\n{responce.text}')
-        except Exception as e: loger.info(f'Ошибка download_deals: try: requests.post {e}')
+            else: logger.info(f'Ошибка download_deals: responce.status_code: {responce.status_code}\n{responce.text}')
+        except Exception as e: logger.info(f'Ошибка download_deals: try: requests.post {e}')
         time.sleep(1)
     
-    loger.info(f'Загрузка завершена. Обработано сделок: {cnt_ok}. Ошибок: {cnt_err}')
+    logger.info(f'Загрузка завершена. Обработано сделок: {cnt_ok}. Ошибок: {cnt_err}')
 
 def append_deals(deals):
     cnt_err = 0
@@ -303,7 +302,7 @@ def append_deals(deals):
             cnt_ok += 1
         except Exception as e:
             DcCrmDeal.objects.filter(id_deal=new_deal.get('ID')).delete()
-            loger.info(f'Ошибка append_deals: {new_deal.get("ID")} try: {e}')
+            logger.info(f'Ошибка append_deals: {new_deal.get("ID")} try: {e}')
         if err: cnt_err += 1
     return cnt_ok, cnt_err
 
@@ -380,11 +379,11 @@ def download_lids():
                 ok, err = append_lids(result)
                 cnt_ok += ok; cnt_err += err
                 if not go_next: break
-            else: loger.info(f'Ошибка download_lids: responce.status_code: {responce.status_code}\n{responce.text}')
-        except Exception as e: loger.info(f'Ошибка download_lids: try: requests.post {e}')
+            else: logger.info(f'Ошибка download_lids: responce.status_code: {responce.status_code}\n{responce.text}')
+        except Exception as e: logger.info(f'Ошибка download_lids: try: requests.post {e}')
         time.sleep(1)
     
-    loger.info(f'Загрузка завершена. Обработано лидов: {cnt_ok}. Ошибок: {cnt_err}')
+    logger.info(f'Загрузка завершена. Обработано лидов: {cnt_ok}. Ошибок: {cnt_err}')
 
 def append_lids(lids):
     cnt_err = 0
@@ -445,7 +444,7 @@ def append_lids(lids):
             cnt_ok += 1
         except Exception as e:
             DcCrmLid.objects.filter(id_lid=new_lid.get('ID')).delete()
-            loger.info(f'Ошибка append_lids: {new_lid.get("ID")} try: {e}')
+            logger.info(f'Ошибка append_lids: {new_lid.get("ID")} try: {e}')
         if err: cnt_err += 1
     return cnt_ok, cnt_err
 
@@ -824,12 +823,16 @@ def make_seo_page():
             coef_forecast = Decimal(cnt_min_in_month / cur_min)  # Коэфициент полного месяца (для прогноза если месяйц не полный с учетом минут)
         else: coef_forecast = Decimal(cnt_days_in_month / cur_day)  # Коэфициент полного месяца (для прогноза если месяйц не полный)
 
+        # Вычислим количество месяцев (столбцов) для вывода начиная с 01.01.2021г.
+        date_start = datetime(2020, 12, 31)
+        num_months = (now_date.year - date_start.year) * 12 + now_date.month - date_start.month
+
         # Собираем строку заголовков и основную таблицу
         str_month = ['', 'Янв.', 'Фев.', 'Мар.', 'Апр.', 'Май', 'Июн.', 'Июл.', 'Авг.', 'Сен.', 'Окт.', 'Ноя.', 'Дек.']
         col_date = datetime.today()
         data_month = []
         data_0_table = []
-        for _ in range(12):
+        for _ in range(num_months):  # old=12
             s_date = f'01.{col_date.month}.{col_date.year}'
             f_date = datetime.strptime(s_date, '%d.%m.%Y')
             c_data = DcCashSEO.objects.filter(val_date=f_date, num_site=0, num_source=0).order_by('row')
@@ -840,7 +843,7 @@ def make_seo_page():
             for j in range(len(c_data)):
                 val = c_data[j].val
                 if forecast and j not in [2, 4, 5, 7, 9, 10, 14, 19, 23, 24]:
-                    c_row[c_data[j].row] = val * coef_forecast
+                    c_row[c_data[j].row] = round(val * coef_forecast, 2)
                 else: c_row[c_data[j].row] = val
             data_0_table.append(c_row)
             col_date = col_date - timedelta(days=col_date.day)
@@ -860,7 +863,7 @@ def make_seo_page():
         obj_cur_month = DcCashSEO.objects.filter(val_date=f_date, num_site=0, num_source=0)
         for key, _ in col_fabula.items():
             gr = []
-            for i in range(12): 
+            for i in range(num_months): 
                 val = data_0_table[i].get(key)
                 try: val = int(val)
                 except: val = 0
@@ -868,8 +871,8 @@ def make_seo_page():
             col_gr[key] = gr
             # Для колонки "Сравн. мес" вычислим значение
             col_cm[key] = 0
-            num_new = data_0_table[11].get(key)
-            num_old = data_0_table[10].get(key)
+            num_new = data_0_table[num_months-1].get(key)
+            num_old = data_0_table[num_months-2].get(key)
             if num_new != None and num_old != None and num_old != 0:
                 cm = round((num_new / num_old - 1) * 100)
                 col_cm[key] = cm
@@ -894,7 +897,7 @@ def make_seo_page():
             # Таблицы сайта по месяцам
             site_table = []  # Список словарей по месяцам сводной таблицы сайта
             col_date = datetime.today()
-            for _ in range(12):
+            for _ in range(num_months):
                 s_date = f'01.{col_date.month}.{col_date.year}'
                 f_date = datetime.strptime(s_date, '%d.%m.%Y')
                 c_data = DcCashSEO.objects.filter(val_date=f_date, num_site=obj_site.num, num_source=0).order_by('row')
@@ -904,7 +907,7 @@ def make_seo_page():
                 for j in range(len(c_data)):
                     val = c_data[j].val
                     if forecast and j not in [1, 3, 6, 7, 9, 12, 13, 16, 17, 18, 19, 20]:
-                        c_row[c_data[j].row] = val * coef_forecast
+                        c_row[c_data[j].row] = round(val * coef_forecast, 2)
                     else: c_row[c_data[j].row] = val
                 site_table.append(c_row)
                 col_date = col_date - timedelta(days=col_date.day)
@@ -922,7 +925,7 @@ def make_seo_page():
 
             for key, _ in col_fabula.items():
                 gr = []
-                for i in range(12): 
+                for i in range(num_months): 
                     val = site_table[i].get(key)
                     try: val = int(val)
                     except: val = 0
@@ -930,8 +933,8 @@ def make_seo_page():
                 col_gr[key] = gr
                 # Для колонки "Сравн. мес" вычислим значение
                 col_cm[key] = 0
-                num_new = site_table[11].get(key)
-                num_old = site_table[10].get(key)
+                num_new = site_table[num_months-1].get(key)
+                num_old = site_table[num_months-2].get(key)
                 if num_new != None and num_old != None and num_old != 0:
                     cm = round((num_new / num_old - 1) * 100)
                     col_cm[key] = cm
@@ -949,7 +952,7 @@ def make_seo_page():
                 item_source = {'name_source': source.source}
                 it_src_month = []
                 src_date = datetime.today()
-                for _ in range(12):
+                for _ in range(num_months):
                     s_date = f'01.{src_date.month}.{src_date.year}'
                     f_date = datetime.strptime(s_date, '%d.%m.%Y')
                     cash_source = DcCashSEO.objects.filter(val_date=f_date, num_site=obj_site.num, num_source=source.num).order_by('row')
@@ -959,7 +962,7 @@ def make_seo_page():
                     for j in range(len(cash_source)):
                         val = cash_source[j].val
                         if forecast and j not in [4,]:
-                            c_row[cash_source[j].row] = val * coef_forecast
+                            c_row[cash_source[j].row] = round(val * coef_forecast, 2)
                         else: c_row[cash_source[j].row] = val
                         # c_row[str(cash_source[j].row)] = cash_source[j].val
                     it_src_month.append(c_row)
@@ -978,7 +981,7 @@ def make_seo_page():
 
                 for key, _ in col_fabula.items():
                     gr = []
-                    for i in range(12): 
+                    for i in range(num_months): 
                         val = it_src_month[i].get(key)
                         try: val = int(val)
                         except: val = 0
@@ -986,8 +989,8 @@ def make_seo_page():
                     col_gr[key] = gr
                     # Для колонки "Сравн. мес" вычислим значение
                     col_cm[key] = 0
-                    num_new = it_src_month[11].get(key)
-                    num_old = it_src_month[10].get(key)
+                    num_new = it_src_month[num_months-1].get(key)
+                    num_old = it_src_month[num_months-2].get(key)
                     if num_new != None and num_old != None and num_old != 0:
                         cm = round((num_new / num_old - 1) * 100)
                         col_cm[key] = cm
@@ -1006,21 +1009,31 @@ def make_seo_page():
 
         out_data['data_sites'] = data_sites
 
-        with open('seo_page.json', 'w', encoding='utf-8') as out_file:
-            json.dump(out_data, out_file, ensure_ascii=False, cls=DecimalEncoder)
-
+        try:
+            folder_path = 'seo_archive'
+            dy = now_date - timedelta(days=1)
+            filename = dy.strftime(f'{folder_path}/%d-%m-%Y.json')
+            if not os.path.exists(folder_path): #Если пути не существует создаем его
+                os.makedirs(folder_path)
+            with open(filename, 'w', encoding='utf-8') as out_file:
+                json.dump(out_data, out_file, ensure_ascii=False, cls=DecimalEncoder)
+        except: raise Exception('Ошибка записи кэш2 в файл')
     except Exception as e:
-        loger.error(f'Ошибка make_seo_page: try: {e}')
+        logger.error(f'Ошибка make_seo_page: try: {e}')
 
-def make_csv_text(in_data):
-    filename = datetime.today().strftime('%d-%m-%Y.csv')
+def make_csv_text(in_data, fname):
+    filename = f'{fname}.csv'
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = f'attachment; filename={filename}'
     response.write(codecs.BOM_UTF8)
     writer = csv.writer(response, lineterminator='\n', delimiter=';')
 
     try:
-        num_col = 13
+        # Вычислим количество месяцев (столбцов) для вывода начиная с 01.01.2021г.
+        now_date = datetime.today()
+        date_start = datetime(2020, 12, 31)
+        num_col = (now_date.year - date_start.year) * 12 + now_date.month - date_start.month + 1
+
         ##### Основная таблица
         in_data['data_month'].pop(-2)
         in_data['data_month'].pop(-2)
@@ -1098,6 +1111,6 @@ def make_csv_text(in_data):
                 writer.writerow([])
 
     except Exception as e:
-        loger.error(f'Ошибка make_csv_text: try: {e}')
+        logger.error(f'Ошибка make_csv_text: try: {e}')
 
     return response

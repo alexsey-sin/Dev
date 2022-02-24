@@ -27,8 +27,8 @@ def get_token():  # Получение токена по логину и пар�
                 if fault: mess = f'ERROR: {fault.get("message")} {fault.get("description")}'
         else: mess = f'ERROR get_token: requests.status_code: {resp.status_code}'
     except Exception as e:
-        mess = f'ERROR get_token: try: {str(e)[:100]}'
-    return mess, token
+        mess = f'ERROR get_token: try: {str(e)}'
+    return mess[:200], token
 
 def get_bill_plan_info(token, msisdn):  # Запрос действующего тарифного плана
     url = 'https://api.mts.ru/b2b/v1/Product/BillPlanInfo'
@@ -68,8 +68,8 @@ def get_bill_plan_info(token, msisdn):  # Запрос действующего 
             if len(plan) == 0: raise Exception('Invalid answer 4')
         else: mess = f'ERROR get_bill_plan_info: requests.status_code: {resp.status_code}'
     except Exception as e:
-        mess = f'ERROR get_bill_plan_info: try: {str(e)[:100]}'
-    return mess, plan
+        mess = f'ERROR get_bill_plan_info: try: {str(e)}'
+    return mess[:200], plan
 
 def get_balance(token, msisdn):  # Получение баланса по номеру MSISDN (7...)
     url = 'https://api.mts.ru/b2b/v1/Bills/CheckBalanceByMSISDN'
@@ -97,8 +97,8 @@ def get_balance(token, msisdn):  # Получение баланса по ном
             if amount == None: raise Exception('Invalid answer 5')
         else: mess = f'ERROR get_balance: requests.status_code: {resp.status_code}'
     except Exception as e:
-        mess = f'ERROR get_balance: try: {str(e)[:100]}'
-    return mess, amount
+        mess = f'ERROR get_balance: try: {str(e)}'
+    return mess[:200], amount
 
 def get_validity_info(token, msisdn, tarif):  # Получение остатков пакетов минут, интернет, смс по номеру MSISDN (7...)
     url = 'https://api.mts.ru/b2b/v1/Bills/ValidityInfo'
@@ -189,16 +189,16 @@ def get_validity_info(token, msisdn, tarif):  # Получение остатк�
                                             val = pscv.get('value')
                                             try: dct_info['sms_available'] = int(val)
                                             except: raise Exception('Invalid answer 8')
+                with open('validity_info2.json', 'w', encoding='utf-8') as out_file:
+                    json.dump(lst_answer, out_file, ensure_ascii=False, indent=4)
+                # print(json.dumps(lst_answer, indent=2))
                 break
                         
-            # with open('validity_info2.json', 'w', encoding='utf-8') as out_file:
-                # json.dump(prRel, out_file, ensure_ascii=False, indent=4)
-            # print(json.dumps(lst_answer, indent=2))
 
         else: mess = f'ERROR get_validity_info: requests.status_code: {resp.status_code} {resp.text}'
     except Exception as e:
-        mess = f'ERROR get_validity_info: try: {str(e)[:100]}'
-    return mess, dct_info
+        mess = f'ERROR get_validity_info: try: {str(e)}'
+    return mess[:200], dct_info
 
 def send_telegram(chat: str, token: str, text: str):
     url = "https://api.telegram.org/bot" + token + "/sendMessage"
@@ -419,5 +419,18 @@ if __name__ == '__main__':
         }
 
 
+    '''
+    '''
+        Здравствуйте.
+        Перешли на ваш новый продукт и уже не рады.
+        АПИ нам нужно чтобы оперативно получать информацию по балансам и по остаткам минут и смс на телефонных номерах.
+        Да улучшения есть в плане того что упростились запросы.
+        Но! В новой версии пропали API функции по которым можно запросить перечень лицевых счетов
+        и перечень своих номеров телефонов.
+        А сейчас перестал сервер отвечать на запросы по https://api.mts.ru/b2b/v1/Bills/ValidityInfo
+        Идут ответы 504 или 503 в дневные часы. Утром и вечером все работает.
+        По этому запросу сервер возвращает много лишней информации общим объемом около мегабайта.
+        Подскажите в чем дело?
+        Просьба ответить на alexey-sin@yandex.ru
     '''
     pass

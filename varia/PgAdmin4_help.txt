@@ -23,6 +23,7 @@ SELECT count(*) as cnt FROM public.mobile_mobiledata
 
 
 ТХВ Ростелеком
+=========================================================
 SELECT count(*) as cnt FROM public.api_txv
 WHERE "pv_code" = 4 AND "pub_date" > '2022-02-18 11:30:00'
 
@@ -30,5 +31,13 @@ SELECT count(*) as cnt FROM public.api_txv
 WHERE "pv_code" = 4 AND "pub_date" > '2022-02-18 11:30:00' AND "status" = 3
 
 
+
+Проблемные заявки АВТО Билайн ФЛ
+=========================================================
+SELECT id_lid, city, street, house, apartment, tarif,
+pub_date, bot_log
+FROM public.api_bidbeeline
+WHERE "pub_date" > '2022-01-01 00:00:00'
+AND "status" = 2
 
 

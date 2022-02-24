@@ -16,14 +16,14 @@ import codecs
 
 
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.INFO,     # DEBUG, INFO, WARNING, ERROR и CRITICAL По возрастанию
     filename='main.log',
     format='%(asctime)s:%(name)s:%(message)s'
     # log.info('So should this')
     # # # # log.debug('This message should go to the log file')
     # # # # log.warning('And this, too')
 )
-loger = logging.getLogger(__name__)  # запустили логгирование
+logger = logging.getLogger(__name__)  # запустили логгирование
 
 
 @login_required(login_url='/login/')
@@ -35,6 +35,7 @@ def index(request):  # Статистика SEO
     context = {'u_name': u_name}
     now_date = datetime.today()
 
+    seo_archive_folder_path = 'seo_archive'
     label_seo = ''
     # Посмотрим состояние загрузки в глобальной переменной
     gvar_go, _ = DcCrmGlobVar.objects.get_or_create(key='go_upgrade_seo')
@@ -45,17 +46,27 @@ def index(request):  # Статистика SEO
         label_seo = f'Последнее обновление: {last_datetime}'
     context['label_seo'] = label_seo
 
-    # page_context = make_seo_page()
     page_context = {}
     try:
-        with open('seo_page.json', 'r', encoding='utf-8') as file:
+        dy = now_date - timedelta(days=1)
+        filename = dy.strftime(f'{seo_archive_folder_path}/%d-%m-%Y.json')
+        with open(filename, 'r', encoding='utf-8') as file:
             page_context = json.load(file)
+        # Возьмем список всех файлов в папке
+        list_archives = os.listdir(seo_archive_folder_path)
+        list_archives = [s.split('.js')[0] for s in list_archives]
+        list_archives.sort(reverse=True)
+        context['list_archives'] = list_archives
     except Exception as e:
         context['label_seo'] = 'Ошибка загрузки данных из кэш.'
-        loger.error(str(e))
+        logger.error(str(e))
+    
     # Переносим полученные данные
     if page_context:
         context['data_month'] = page_context['data_month']
+        context['cnt_month'] = len(page_context['data_month']) - 3  # количество месяцев вывода
+        context['col_grafic'] = context['cnt_month'] + 1  # Номер колонки "График"
+        context['col_compare'] = context['cnt_month'] + 2  # Номер колонки "Сравн. мес"
         context['data_0_table'] = page_context['data_0_table']
         context['data_sites'] = page_context['data_sites'] 
 
@@ -64,13 +75,20 @@ def index(request):  # Статистика SEO
 
     if request.method == 'POST':
         get_seo = request.POST.get('get_seo')
-        if get_seo and bool(get_seo) == True:
-            response = make_csv_text(page_context)
-            return response        
-    
+        if get_seo:
+            arch_filename = f'{seo_archive_folder_path}/{get_seo}.json'
+            try:
+                with open(arch_filename, 'r', encoding='utf-8') as file:
+                    page_context = json.load(file)
+                response = make_csv_text(page_context, get_seo)
+                return response 
+            except Exception as e:
+                context['label_seo'] = 'Ошибка загрузки файла.'
+                logger.error(str(e))
     
     return render(request, 'domconnect/statseo.html', context)
-    
+
+
 @login_required(login_url='/login/')
 def dataCrm(request):  # Данные SEO
 
@@ -83,7 +101,8 @@ def dataCrm(request):  # Данные SEO
 
     context['segment'] = 'datacrm'
     return render(request, 'domconnect/datacrm.html', context)
-    
+
+
 @login_required(login_url='/login/')
 def dataAjax(request):
     # thread_name = 'DownLoadLidsFromCRM'
@@ -208,14 +227,14 @@ def upgradeSiteSource(request):  # Удаление и загрузка данн
         err = f'Ошибка upgradeSiteSource: try: {e}'
 
     if err:
-        loger.error(err)
+        logger.error(err)
         context = {
             'result': 'Error',
             'message': f'{err}',
             'result_style': 'danger',
         }
     else:
-        loger.info('Site Source Service обновлены.')
+        logger.info('Site Source Service обновлены.')
         context = {
             'result': 'Ok',
             'message': 'Записи Site Source обновлены.',

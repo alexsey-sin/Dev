@@ -12,8 +12,8 @@ from datetime import datetime, timedelta  # это класс.
 s_date = '23.01.2022'
 # dt = datetime.datetime.strptime(s_date, '%d.%m.%Y')
 dt = datetime.strptime(s_date, '%d.%m.%Y')
-print(type(dt))
-print(dt)
+# print(type(dt))
+# print(dt)
 
 dt2 = dt + timedelta(days=10)
 
@@ -21,7 +21,7 @@ dt2 = dt + timedelta(days=10)
 
 # Дату в строку
 s = dt2.strftime('%d.%m.%Y')
-print(s)  # -> '19.08.2018'
+# print(s)  # -> '19.08.2018'
 
 
 
@@ -30,12 +30,12 @@ cal = calendar.Calendar()
 now = datetime.now()
 # Количество рабочих дней в текущем месяце
 working_days = len([x for x in cal.itermonthdays2(now.year, now.month) if x[0] !=0 and x[1] < 5])
-print('Рабочих дней: ', working_days)
+# print('Рабочих дней: ', working_days)
 cur_day = now.day      # Номер текущего дня
 cur_month = now.month  # Номер текущего меяца
 cur_year = now.year    # Номер текущего года
 cnt_days_in_cur_month = calendar.monthrange(cur_year, cur_month)[1] # Количество дней в текущем месяце
-print(cur_day, cur_month, cur_year)
+# print(cur_day, cur_month, cur_year)
 
 
 '''
@@ -72,3 +72,27 @@ print(cur_day, cur_month, cur_year)
     %%  Буквальный символ «%». %
 '''
 
+import os
+# Количество месяцев между двумя датами
+# from dateutil import rrule
+date_start = datetime(2020, 12, 31)
+date_now = datetime.today()
+# months = rrule.rrule(rrule.MONTHLY, dtstart=date_start, utils=date_now).count()
+months = (date_now.year - date_start.year) * 12 + date_now.month - date_start.month
+
+folder_path = 'seo_archive'
+dy = date_now - timedelta(days=1)
+filename = dy.strftime(f'{folder_path}/%d-%m-%Y.json')
+if not os.path.exists(folder_path): #Если пути не существует создаем его
+    os.makedirs(folder_path)
+
+
+# directory_folder = r"c:\Folder\file.txt"
+# folder_path = os.path.dirname(directory_folder) # Путь к папке с файлом
+# print('folder_path', folder_path)
+# if not os.path.exists(folder_path): #Если пути не существует создаем его
+    # os.makedirs(folder_path)
+
+# with open(filename, 'w') as file: # Открываем фаил и пишем
+    # file.write("этот текст создан автоматически")
+print(filename)

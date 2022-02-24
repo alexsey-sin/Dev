@@ -322,6 +322,7 @@ def set_bid(data):
         if len(els) != 1: raise Exception('Ошибка нет поля ввод города')
         city = data.get('city')
         if city:
+            city = city.replace('ё', 'е')
             try: els[0].send_keys(city)
             except: raise Exception('Ошибка ввода 4')
         else: raise Exception('Ошибка не задан город')

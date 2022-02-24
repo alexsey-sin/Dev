@@ -22,7 +22,7 @@
                     <tr>
                         <th scope="col" style="min-width: 200px; max-width: 200px;">Тип</th>
                         {% for month in data_month %}
-                            <th scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month }}</th>
+                            <th scope="col" {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ month }}</th>
                         {% endfor %}
                     </tr>
                 </thead>
@@ -34,33 +34,33 @@
                     <tr>
                         <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Лиды</td>
                         {% for col in data_0_table %}
-                            {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                            {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                 <td class="td_grafic" gr_data="{{ col.1 }}"></td>
-                            {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                            {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.1|floatformat:0 }}%</td>
                             {% else %}
-                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.1|floatformat:0 }}</td>
+                                <td {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ col.1|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
                     <tr>
                         <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Реальные лиды(без ТП)</td>
                         {% for col in data_0_table %}
-                            {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                            {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                 <td class="td_grafic" gr_data="{{ col.2 }}"></td>
-                            {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                            {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.2|floatformat:0 }}%</td>
                             {% else %}
-                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.2|floatformat:0 }}</td>
+                                <td {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ col.2|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
                     <tr>
                         <td style="font-weight: bold; min-width: 200px; max-width: 200px;">% реальных лидов</td>
                         {% for col in data_0_table %}
-                            {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                            {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                 <td class="td_grafic" gr_data="{{ col.3 }}"></td>
-                            {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                            {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.3|floatformat:0 }}%</td>
                             {% else %}
                                 <td>{% if col.3 %}{{ col.3|floatformat:0 }}%{% endif %}</td>
@@ -73,21 +73,21 @@
                             Лиды (все)
                         </td>
                         {% for col in data_0_table %}
-                            {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                            {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                 <td class="td_grafic" gr_data="{{ col.4 }}"></td>
-                            {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                            {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.4|floatformat:0 }}%</td>
                             {% else %}
-                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.4|floatformat:0 }}</td>
+                                <td {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ col.4|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
                     <tr class="group-5 group-s tr-close" style="background-color: rgba(173, 180, 178, 0.5);">
                         <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Будн. дней</td>
                         {% for col in data_0_table %}
-                            {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                            {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                 <td class="td_grafic" gr_data="{{ col.5 }}"></td>
-                            {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                            {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.5|floatformat:0 }}%</td>
                             {% else %}
                                 <td>{{ col.5|floatformat:0 }}</td>
@@ -97,9 +97,9 @@
                     <tr class="group-5 group-s tr-close" style="background-color: rgba(173, 180, 178, 0.5)">
                         <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Выходных дней</td>
                         {% for col in data_0_table %}
-                            {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                            {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                 <td class="td_grafic" gr_data="{{ col.6 }}"></td>
-                            {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                            {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.6|floatformat:0 }}%</td>
                             {% else %}
                                 <td>{{ col.6|floatformat:0 }}</td>
@@ -109,21 +109,21 @@
                     <tr>
                         <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Лиды с ТхВ</td>
                         {% for col in data_0_table %}
-                            {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                            {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                 <td class="td_grafic" gr_data="{{ col.7 }}"></td>
-                            {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                            {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.7|floatformat:0 }}%</td>
                             {% else %}
-                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.7|floatformat:0 }}</td>
+                                <td {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ col.7|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
                     <tr>
                         <td style="font-weight: bold; min-width: 200px; max-width: 200px;">% лидов с ТхВ</td>
                         {% for col in data_0_table %}
-                            {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                            {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                 <td class="td_grafic" gr_data="{{ col.8 }}"></td>
-                            {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                            {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.8|floatformat:0 }}%</td>
                             {% else %}
                                 <td>{% if col.8 %}{{ col.8|floatformat:0 }}%{% endif %}</td>
@@ -133,21 +133,21 @@
                     <tr>
                         <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Сделки &gt;50</td>
                         {% for col in data_0_table %}
-                            {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                            {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                 <td class="td_grafic" gr_data="{{ col.9 }}"></td>
-                            {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                            {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.9|floatformat:0 }}%</td>
                             {% else %}
-                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.9|floatformat:0 }}</td>
+                                <td {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ col.9|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
                     <tr>
                         <td style="font-weight: bold; min-width: 200px; max-width: 200px;">%Лид=&gt;Сд. &gt;50</td>
                         {% for col in data_0_table %}
-                            {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                            {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                 <td class="td_grafic" gr_data="{{ col.10 }}"></td>
-                            {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                            {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.10|floatformat:0 }}%</td>
                             {% else %}
                                 <td>{% if col.10 %}{{ col.10|floatformat:2 }}%{% endif %}</td>
@@ -157,9 +157,9 @@
                     <tr>
                         <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Конва реал. лид =&gt;сделка &gt;50</td>
                         {% for col in data_0_table %}
-                            {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                            {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                 <td class="td_grafic" gr_data="{{ col.11 }}"></td>
-                            {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                            {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.11|floatformat:0 }}%</td>
                             {% else %}
                                 <td>{% if col.11 %}{{ col.11|floatformat:0 }}%{% endif %}</td>
@@ -169,45 +169,45 @@
                     <tr>
                         <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Сделки &gt;50 (все)</td>
                         {% for col in data_0_table %}
-                            {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                            {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                 <td class="td_grafic" gr_data="{{ col.12 }}"></td>
-                            {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                            {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.12|floatformat:0 }}%</td>
                             {% else %}
-                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.12|floatformat:0 }}</td>
+                                <td {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ col.12|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
                     <tr>
                         <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Сделки 80</td>
                         {% for col in data_0_table %}
-                            {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                            {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                 <td class="td_grafic" gr_data="{{ col.13 }}"></td>
-                            {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                            {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.13|floatformat:0 }}%</td>
                             {% else %}
-                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.13|floatformat:0 }}</td>
+                                <td {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ col.13|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
                     <tr>
                         <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Сд. приоритет (БИ и МТС ФЛ)</td>
                         {% for col in data_0_table %}
-                            {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                            {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                 <td class="td_grafic" gr_data="{{ col.14 }}"></td>
-                            {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                            {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.14|floatformat:0 }}%</td>
                             {% else %}
-                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.14|floatformat:0 }}</td>
+                                <td {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ col.14|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
                     <tr>
                         <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Доля сделок ПРИОР от сд.&gt;50</td>
                         {% for col in data_0_table %}
-                            {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                            {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                 <td class="td_grafic" gr_data="{{ col.15 }}"></td>
-                            {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                            {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.15|floatformat:0 }}%</td>
                             {% else %}
                                 <td>{% if col.15 %}{{ col.15|floatformat:2 }}%{% endif %}</td>
@@ -217,57 +217,57 @@
                     <tr>
                         <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Ср. лид/день (будн.)</td>
                         {% for col in data_0_table %}
-                            {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                            {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                 <td class="td_grafic" gr_data="{{ col.16 }}"></td>
-                            {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                            {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.16|floatformat:0 }}%</td>
                             {% else %}
-                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.16|floatformat:0 }}</td>
+                                <td {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ col.16|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
                     <tr>
                         <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Ср. лид/день (вых.)</td>
                         {% for col in data_0_table %}
-                            {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                            {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                 <td class="td_grafic" gr_data="{{ col.17 }}"></td>
-                            {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                            {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.17|floatformat:0 }}%</td>
                             {% else %}
-                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.17|floatformat:0 }}</td>
+                                <td {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ col.17|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
                     <tr>
                         <td style="font-weight: bold; min-width: 200px; max-width: 200px;">ТП SEO</td>
                         {% for col in data_0_table %}
-                            {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                            {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                 <td class="td_grafic" gr_data="{{ col.18 }}"></td>
-                            {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                            {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.18|floatformat:0 }}%</td>
                             {% else %}
-                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.18|floatformat:0 }}</td>
+                                <td {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ col.18|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
                     <tr>
                         <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Расход ТП</td>
                         {% for col in data_0_table %}
-                            {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                            {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                 <td class="td_grafic" gr_data="{{ col.19 }}"></td>
-                            {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                            {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.19|floatformat:0 }}%</td>
                             {% else %}
-                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{% if col.19 %}{{ col.19|floatformat:0 }}р.{% endif %}</td>
+                                <td {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{% if col.19 %}{{ col.19|floatformat:0 }}р.{% endif %}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
                     <tr>
                         <td style="font-weight: bold; min-width: 200px; max-width: 200px;">% ТП</td>
                         {% for col in data_0_table %}
-                            {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                            {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                 <td class="td_grafic" gr_data="{{ col.20 }}"></td>
-                            {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                            {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.20|floatformat:0 }}%</td>
                             {% else %}
                                 <td>{% if col.20 %}{{ col.20|floatformat:2 }}%{% endif %}</td>
@@ -277,45 +277,45 @@
                     <tr>
                         <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Подключки по дате лида</td>
                         {% for col in data_0_table %}
-                            {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                            {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                 <td class="td_grafic" gr_data="{{ col.21 }}"></td>
-                            {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                            {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.21|floatformat:0 }}%</td>
                             {% else %}
-                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.21|floatformat:0 }}</td>
+                                <td {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ col.21|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
                     <tr>
                         <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Подключки по дате оплаты</td>
                         {% for col in data_0_table %}
-                            {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                            {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                 <td class="td_grafic" gr_data="{{ col.22 }}"></td>
-                            {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                            {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.22|floatformat:0 }}%</td>
                             {% else %}
-                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.22|floatformat:0 }}</td>
+                                <td {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ col.22|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
                     <tr>
                         <td style="font-weight: bold; min-width: 200px; max-width: 200px;">ТП IVR Лиза</td>
                         {% for col in data_0_table %}
-                            {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                            {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                 <td class="td_grafic" gr_data="{{ col.23 }}"></td>
-                            {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                            {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.23|floatformat:0 }}%</td>
                             {% else %}
-                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.23|floatformat:0 }}</td>
+                                <td {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ col.23|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
                     <tr>
                         <td style="font-weight: bold; min-width: 200px; max-width: 200px;">% ТП IVR</td>
                         {% for col in data_0_table %}
-                            {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                            {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                 <td class="td_grafic" gr_data="{{ col.24 }}"></td>
-                            {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                            {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.24|floatformat:0 }}%</td>
                             {% else %}
                                 <td>{% if col.24 %}{{ col.24|floatformat:2 }}%{% endif %}</td>
@@ -328,9 +328,9 @@
                             % ТП Лизы от всего ТП
                         </td> 
                         {% for col in data_0_table %}
-                            {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                            {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                 <td class="td_grafic" gr_data="{{ col.25 }}"></td>
-                            {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                            {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.25|floatformat:0 }}%</td>
                             {% else %}
                                 <td>{% if col.25 %}{{ col.25|floatformat:2 }}%{% endif %}</td>
@@ -340,84 +340,84 @@
                     <tr class="group-6 group-s tr-close" style="background-color: rgba(173, 180, 178, 0.5);">
                         <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Понедельник</td>
                         {% for col in data_0_table %}
-                            {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                            {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                 <td class="td_grafic" gr_data="{{ col.26 }}"></td>
-                            {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                            {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.26|floatformat:0 }}%</td>
                             {% else %}
-                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.26|floatformat:0 }}</td>
+                                <td {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ col.26|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
                     <tr class="group-6 group-s tr-close" style="background-color: rgba(173, 180, 178, 0.5)">
                         <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Вторник</td>
                         {% for col in data_0_table %}
-                            {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                            {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                 <td class="td_grafic" gr_data="{{ col.27 }}"></td>
-                            {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                            {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.27|floatformat:0 }}%</td>
                             {% else %}
-                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.27|floatformat:0 }}</td>
+                                <td {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ col.27|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
                     <tr class="group-6 group-s tr-close" style="background-color: rgba(173, 180, 178, 0.5)">
                         <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Среда</td>
                         {% for col in data_0_table %}
-                            {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                            {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                 <td class="td_grafic" gr_data="{{ col.28 }}"></td>
-                            {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                            {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.28|floatformat:0 }}%</td>
                             {% else %}
-                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.28|floatformat:0 }}</td>
+                                <td {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ col.28|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
                     <tr class="group-6 group-s tr-close" style="background-color: rgba(173, 180, 178, 0.5)">
                         <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Четверг</td>
                         {% for col in data_0_table %}
-                            {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                            {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                 <td class="td_grafic" gr_data="{{ col.29 }}"></td>
-                            {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                            {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.29|floatformat:0 }}%</td>
                             {% else %}
-                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.29|floatformat:0 }}</td>
+                                <td {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ col.29|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
                     <tr class="group-6 group-s tr-close" style="background-color: rgba(173, 180, 178, 0.5)">
                         <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Пятница</td>
                         {% for col in data_0_table %}
-                            {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                            {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                 <td class="td_grafic" gr_data="{{ col.30 }}"></td>
-                            {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                            {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.30|floatformat:0 }}%</td>
                             {% else %}
-                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.30|floatformat:0 }}</td>
+                                <td {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ col.30|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
                     <tr class="group-6 group-s tr-close" style="background-color: rgba(173, 180, 178, 0.5)">
                         <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Суббота</td>
                         {% for col in data_0_table %}
-                            {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                            {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                 <td class="td_grafic" gr_data="{{ col.31 }}"></td>
-                            {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                            {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.31|floatformat:0 }}%</td>
                             {% else %}
-                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.31|floatformat:0 }}</td>
+                                <td {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ col.31|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
                     <tr class="group-6 group-s tr-close" style="background-color: rgba(173, 180, 178, 0.5)">
                         <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Воскресенье</td>
                         {% for col in data_0_table %}
-                            {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                            {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                 <td class="td_grafic" gr_data="{{ col.32 }}"></td>
-                            {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                            {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                 <td>{{ col.32|floatformat:0 }}%</td>
                             {% else %}
-                                <td {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.32|floatformat:0 }}</td>
+                                <td {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ col.32|floatformat:0 }}</td>
                             {% endif %}
                         {% endfor %}
                     </tr>
@@ -451,7 +451,7 @@
                                         <tr>
                                             <th scope="col" style="min-width: 200px; max-width: 200px;">Тип</th>
                                             {% for month in data_month %}
-                                                <th scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month }}</th>
+                                                <th scope="col" {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ month }}</th>
                                             {% endfor %}
                                         </tr>
                                     </thead>
@@ -459,45 +459,45 @@
                                         <tr>
                                             <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Лиды</td>
                                             {% for month in site.site_table %}
-                                                {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                     <td class="td_grafic" gr_data="{{ month.1 }}"></td>
-                                                {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.1|floatformat:0 }}%</td>
                                                 {% else %}
-                                                    <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.1|floatformat:0 }}</td>
+                                                    <td scope="col" {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ month.1|floatformat:0 }}</td>
                                                 {% endif %}
                                             {% endfor %}
                                         </tr>
                                         <tr>
                                             <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Конв. пос. =&gt; лид</td>
                                             {% for month in site.site_table %}
-                                                {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                     <td class="td_grafic" gr_data="{{ month.2 }}"></td>
-                                                {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.2|floatformat:0 }}%</td>
                                                 {% else %}
-                                                    <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.2|floatformat:0 }}</td>
+                                                    <td scope="col" {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ month.2|floatformat:0 }}</td>
                                                 {% endif %}
                                             {% endfor %}
                                         </tr>
                                         <tr>
                                             <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Реальные лиды</td>
                                             {% for month in site.site_table %}
-                                                {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                     <td class="td_grafic" gr_data="{{ month.3 }}"></td>
-                                                {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.3|floatformat:0 }}%</td>
                                                 {% else %}
-                                                    <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.3|floatformat:0 }}</td>
+                                                    <td scope="col" {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ month.3|floatformat:0 }}</td>
                                                 {% endif %}
                                             {% endfor %}
                                         </tr>
                                         <tr>
                                             <td style="font-weight: bold; min-width: 200px; max-width: 200px;">% реал. лидов</td>
                                             {% for month in site.site_table %}
-                                                {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                     <td class="td_grafic" gr_data="{{ month.4 }}"></td>
-                                                {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.4|floatformat:0 }}%</td>
                                                 {% else %}
                                                     <td scope="col">{% if month.4 %}{{ month.4|floatformat:0 }}%{% endif %}</td>
@@ -507,33 +507,33 @@
                                         <tr>
                                             <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Лиды ТхВ</td>
                                             {% for month in site.site_table %}
-                                                {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                     <td class="td_grafic" gr_data="{{ month.5 }}"></td>
-                                                {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.5|floatformat:0 }}%</td>
                                                 {% else %}
-                                                    <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.5|floatformat:0 }}</td>
+                                                    <td scope="col" {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ month.5|floatformat:0 }}</td>
                                                 {% endif %}
                                             {% endfor %}
                                         </tr>
                                         <tr>
                                             <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Сделки</td>
                                             {% for month in site.site_table %}
-                                                {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                     <td class="td_grafic" gr_data="{{ month.6 }}"></td>
-                                                {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.6|floatformat:0 }}%</td>
                                                 {% else %}
-                                                    <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.6|floatformat:0 }}</td>
+                                                    <td scope="col" {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ month.6|floatformat:0 }}</td>
                                                 {% endif %}
                                             {% endfor %}
                                         </tr>
                                         <tr>
                                             <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Конв. лиды =&gt; сделка</td>
                                             {% for month in site.site_table %}
-                                                {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                     <td class="td_grafic" gr_data="{{ month.7 }}"></td>
-                                                {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.7|floatformat:0 }}%</td>
                                                 {% else %}
                                                     <td scope="col">{% if month.7 %}{{ month.7|floatformat:0 }}%{% endif %}</td>
@@ -543,9 +543,9 @@
                                         <tr>
                                             <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Конв. посет =&gt; сделка</td>
                                             {% for month in site.site_table %}
-                                                {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                     <td class="td_grafic" gr_data="{{ month.8 }}"></td>
-                                                {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.8|floatformat:0 }}%</td>
                                                 {% else %}
                                                     <td scope="col">{% if month.8 %}{{ month.8|floatformat:0 }}%{% endif %}</td>
@@ -555,21 +555,21 @@
                                         <tr>
                                             <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Сделки &gt;50</td>
                                             {% for month in site.site_table %}
-                                                {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                     <td class="td_grafic" gr_data="{{ month.9 }}"></td>
-                                                {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.9|floatformat:0 }}%</td>
                                                 {% else %}
-                                                    <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.9|floatformat:0 }}</td>
+                                                    <td scope="col" {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ month.9|floatformat:0 }}</td>
                                                 {% endif %}
                                             {% endfor %}
                                         </tr>
                                         <tr>
                                             <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Конв. &gt;50</td>
                                             {% for month in site.site_table %}
-                                                {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                     <td class="td_grafic" gr_data="{{ month.10 }}"></td>
-                                                {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.10|floatformat:0 }}%</td>
                                                 {% else %}
                                                     <td scope="col">{% if month.10 %}{{ month.10|floatformat:0 }}%{% endif %}</td>
@@ -579,33 +579,33 @@
                                         <tr>
                                             <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Сделки 80</td>
                                             {% for month in site.site_table %}
-                                                {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                     <td class="td_grafic" gr_data="{{ month.11 }}"></td>
-                                                {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.11|floatformat:0 }}%</td>
                                                 {% else %}
-                                                    <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.11|floatformat:0 }}</td>
+                                                    <td scope="col" {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ month.11|floatformat:0 }}</td>
                                                 {% endif %}
                                             {% endfor %}
                                         </tr>
                                         <tr>
                                             <td style="font-weight: bold; min-width: 200px; max-width: 200px;" title="Сд. приоритет (БИ и МТС ФЛ) но для СРМ учитываем т. инт или переезд">Сд. приоритет (БИ и МТС ФЛ)</td>
                                             {% for month in site.site_table %}
-                                                {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                     <td class="td_grafic" gr_data="{{ month.12 }}"></td>
-                                                {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.12|floatformat:0 }}%</td>
                                                 {% else %}
-                                                    <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.12|floatformat:0 }}</td>
+                                                    <td scope="col" {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ month.12|floatformat:0 }}</td>
                                                 {% endif %}
                                             {% endfor %}
                                         </tr>
                                         <tr>
                                             <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Конв. приоритет</td>
                                             {% for month in site.site_table %}
-                                                {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                     <td class="td_grafic" gr_data="{{ month.13 }}"></td>
-                                                {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.13|floatformat:0 }}%</td>
                                                 {% else %}
                                                     <td scope="col">{% if month.13 %}{{ month.13|floatformat:0 }}%{% endif %}</td>
@@ -615,9 +615,9 @@
                                         <tr>
                                             <td style="font-weight: bold; min-width: 200px; max-width: 200px;" title="Конв. реальный лид =&gt; приор. сделка">Конв. реал. лид =&gt;сделка</td>
                                             {% for month in site.site_table %}
-                                                {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                     <td class="td_grafic" gr_data="{{ month.14 }}"></td>
-                                                {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.14|floatformat:0 }}%</td>
                                                 {% else %}
                                                     <td scope="col">{% if month.14 %}{{ month.14|floatformat:0 }}%{% endif %}</td>
@@ -627,33 +627,33 @@
                                         <tr>
                                             <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Кол-во звонков</td>
                                             {% for month in site.site_table %}
-                                                {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                     <td class="td_grafic" gr_data="{{ month.15 }}"></td>
-                                                {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.15|floatformat:0 }}%</td>
                                                 {% else %}
-                                                    <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.15|floatformat:0 }}</td>
+                                                    <td scope="col" {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ month.15|floatformat:0 }}</td>
                                                 {% endif %}
                                             {% endfor %}
                                         </tr>
                                         <tr>
                                             <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Кол-во заявок</td>
                                             {% for month in site.site_table %}
-                                                {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                     <td class="td_grafic" gr_data="{{ month.16 }}"></td>
-                                                {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.16|floatformat:0 }}%</td>
                                                 {% else %}
-                                                    <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.16|floatformat:0 }}</td>
+                                                    <td scope="col" {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ month.16|floatformat:0 }}</td>
                                                 {% endif %}
                                             {% endfor %}
                                         </tr>
                                         <tr>
                                             <td style="font-weight: bold; min-width: 200px; max-width: 200px;">% звонков от заявок</td>
                                             {% for month in site.site_table %}
-                                                {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                     <td class="td_grafic" gr_data="{{ month.17 }}"></td>
-                                                {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.17|floatformat:0 }}%</td>
                                                 {% else %}
                                                     <td scope="col">{% if month.17 %}{{ month.17|floatformat:0 }}%{% endif %}</td>
@@ -663,9 +663,9 @@
                                         <tr>
                                             <td style="font-weight: bold; min-width: 200px; max-width: 200px;">% приор. сделок заявка</td>
                                             {% for month in site.site_table %}
-                                                {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                     <td class="td_grafic" gr_data="{{ month.18 }}"></td>
-                                                {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.18|floatformat:0 }}%</td>
                                                 {% else %}
                                                     <td scope="col">{% if month.18 %}{{ month.18|floatformat:0 }}%{% endif %}</td>
@@ -675,9 +675,9 @@
                                         <tr>
                                             <td style="font-weight: bold; min-width: 200px; max-width: 200px;">% приор. сделок звонок</td>
                                             {% for month in site.site_table %}
-                                                {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                     <td class="td_grafic" gr_data="{{ month.19 }}"></td>
-                                                {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.19|floatformat:0 }}%</td>
                                                 {% else %}
                                                     <td scope="col">{% if month.19 %}{{ month.19|floatformat:0 }}%{% endif %}</td>
@@ -687,9 +687,9 @@
                                         <tr>
                                             <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Конв. посет =&gt; лид</td>
                                             {% for month in site.site_table %}
-                                                {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                     <td class="td_grafic" gr_data="{{ month.20 }}"></td>
-                                                {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.20|floatformat:0 }}%</td>
                                                 {% else %}
                                                     <td scope="col">{% if month.20 %}{{ month.20|floatformat:0 }}%{% endif %}</td>
@@ -699,9 +699,9 @@
                                         <tr>
                                             <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Конв. посет =&gt; сделка</td>
                                             {% for month in site.site_table %}
-                                                {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                     <td class="td_grafic" gr_data="{{ month.21 }}"></td>
-                                                {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.21|floatformat:0 }}%</td>
                                                 {% else %}
                                                     <td scope="col">{% if month.21 %}{{ month.21|floatformat:0 }}%{% endif %}</td>
@@ -711,60 +711,60 @@
                                         <tr>
                                             <td style="font-weight: bold; min-width: 200px; max-width: 200px;">ТП</td>
                                             {% for month in site.site_table %}
-                                                {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                     <td class="td_grafic" gr_data="{{ month.22 }}"></td>
-                                                {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.22|floatformat:0 }}%</td>
                                                 {% else %}
-                                                    <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.22|floatformat:0 }}</td>
+                                                    <td scope="col" {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ month.22|floatformat:0 }}</td>
                                                 {% endif %}
                                             {% endfor %}
                                         </tr>
                                         <tr>
                                             <td style="font-weight: bold; min-width: 200px; max-width: 200px;">ТП IVR</td>
                                             {% for month in site.site_table %}
-                                                {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                     <td class="td_grafic" gr_data="{{ month.23 }}"></td>
-                                                {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.23|floatformat:0 }}%</td>
                                                 {% else %}
-                                                    <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.23|floatformat:0 }}</td>
+                                                    <td scope="col" {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ month.23|floatformat:0 }}</td>
                                                 {% endif %}
                                             {% endfor %}
                                         </tr>
                                         <tr>
                                             <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Посетители</td>
                                             {% for month in site.site_table %}
-                                                {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                     <td class="td_grafic" gr_data="{{ month.24 }}"></td>
-                                                {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.24|floatformat:0 }}%</td>
                                                 {% else %}
-                                                    <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.24|floatformat:0 }}</td>
+                                                    <td scope="col" {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ month.24|floatformat:0 }}</td>
                                                 {% endif %}
                                             {% endfor %}
                                         </tr>
                                         <tr>
                                             <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Ср. чек (сделки)</td>
                                             {% for month in site.site_table %}
-                                                {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                     <td class="td_grafic" gr_data="{{ month.25 }}"></td>
-                                                {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.25|floatformat:0 }}%</td>
                                                 {% else %}
-                                                    <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{% if month.25 %}{{ month.25|floatformat:0 }}р.{% endif %}</td>
+                                                    <td scope="col" {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{% if month.25 %}{{ month.25|floatformat:0 }}р.{% endif %}</td>
                                                 {% endif %}
                                             {% endfor %}
                                         </tr>
                                         <tr>
                                             <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Сделки &gt;50 Билайн</td>
                                             {% for month in site.site_table %}
-                                                {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                     <td class="td_grafic" gr_data="{{ month.26 }}"></td>
-                                                {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                     <td>{{ month.26|floatformat:0 }}%</td>
                                                 {% else %}
-                                                    <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month.26|floatformat:0 }}</td>
+                                                    <td scope="col" {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ month.26|floatformat:0 }}</td>
                                                 {% endif %}
                                             {% endfor %}
                                         </tr>
@@ -785,7 +785,7 @@
                                         <tr>
                                             <th scope="col" style="min-width: 200px; max-width: 200px;">Тип</th>
                                             {% for month in data_month %}
-                                                <th scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ month }}</th>
+                                                <th scope="col" {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ month }}</th>
                                             {% endfor %}
                                         </tr>
                                     </thead>
@@ -798,57 +798,57 @@
                                             <tr>
                                                 <td style="font-weight: normal; min-width: 200px; max-width: 200px;">Лиды</td>
                                                 {% for col in source.months %}
-                                                    {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                    {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                         <td class="td_grafic" gr_data="{{ col.1 }}"></td>
-                                                    {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                    {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                         <td>{{ col.1|floatformat:0 }}%</td>
                                                     {% else %}
-                                                        <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.1|floatformat:0 }}</td>
+                                                        <td scope="col" {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ col.1|floatformat:0 }}</td>
                                                     {% endif %}
                                                 {% endfor %}
                                             </tr>
                                             <tr>
                                                 <td style="font-weight: normal; min-width: 200px; max-width: 200px;">Сделки</td>
                                                 {% for col in source.months %}
-                                                    {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                    {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                         <td class="td_grafic" gr_data="{{ col.2 }}"></td>
-                                                    {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                    {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                         <td>{{ col.2|floatformat:0 }}%</td>
                                                     {% else %}
-                                                        <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.2|floatformat:0 }}</td>
+                                                        <td scope="col" {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ col.2|floatformat:0 }}</td>
                                                     {% endif %}
                                                 {% endfor %}
                                             </tr>
                                             <tr>
                                                 <td style="font-weight: normal; min-width: 200px; max-width: 200px;">Сделки > 50</td>
                                                 {% for col in source.months %}
-                                                    {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                    {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                         <td class="td_grafic" gr_data="{{ col.3 }}"></td>
-                                                    {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                    {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                         <td>{{ col.3|floatformat:0 }}%</td>
                                                     {% else %}
-                                                        <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.3|floatformat:0 }}</td>
+                                                        <td scope="col" {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ col.3|floatformat:0 }}</td>
                                                     {% endif %}
                                                 {% endfor %}
                                             </tr>
                                             <tr>
                                                 <td style="font-weight: normal; min-width: 200px; max-width: 200px;">Сд. приоритет</td>
                                                 {% for col in source.months %}
-                                                    {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                    {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                         <td class="td_grafic" gr_data="{{ col.4 }}"></td>
-                                                    {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                    {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                         <td>{{ col.4|floatformat:0 }}%</td>
                                                     {% else %}
-                                                        <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.4|floatformat:0 }}</td>
+                                                        <td scope="col" {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ col.4|floatformat:0 }}</td>
                                                     {% endif %}
                                                 {% endfor %}
                                             </tr>
                                             <tr>
                                                 <td style="font-weight: normal; min-width: 200px; max-width: 200px;">Ср. чек</td>
                                                 {% for col in source.months %}
-                                                    {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                    {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                         <td class="td_grafic" gr_data="{{ col.5 }}"></td>
-                                                    {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                    {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                         <td>{{ col.5|floatformat:0 }}%</td>
                                                     {% else %}
                                                         <td scope="col">{% if col.5 %}{{ col.5|floatformat:0 }}р.{% endif %}</td>
@@ -858,84 +858,84 @@
                                             <tr>
                                                 <td style="font-weight: normal; min-width: 200px; max-width: 200px;">Подключки по дате лида</td>
                                                 {% for col in source.months %}
-                                                    {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                    {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                         <td class="td_grafic" gr_data="{{ col.6 }}"></td>
-                                                    {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                    {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                         <td>{{ col.6|floatformat:0 }}%</td>
                                                     {% else %}
-                                                        <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.6|floatformat:0 }}</td>
+                                                        <td scope="col" {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ col.6|floatformat:0 }}</td>
                                                     {% endif %}
                                                 {% endfor %}
                                             </tr>
                                             <tr>
                                                 <td style="font-weight: normal; min-width: 200px; max-width: 200px;">Подключки по дате оплаты</td>
                                                 {% for col in source.months %}
-                                                    {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                    {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                         <td class="td_grafic" gr_data="{{ col.7 }}"></td>
-                                                    {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                    {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                         <td>{{ col.7|floatformat:0 }}%</td>
                                                     {% else %}
-                                                        <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.7|floatformat:0 }}</td>
+                                                        <td scope="col" {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ col.7|floatformat:0 }}</td>
                                                     {% endif %}
                                                 {% endfor %}
                                             </tr>
                                             <tr>
                                                 <td style="font-weight: normal; min-width: 200px; max-width: 200px;">ТП</td>
                                                 {% for col in source.months %}
-                                                    {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                    {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                         <td class="td_grafic" gr_data="{{ col.8 }}"></td>
-                                                    {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                    {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                         <td>{{ col.8|floatformat:0 }}%</td>
                                                     {% else %}
-                                                        <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.8|floatformat:0 }}</td>
+                                                        <td scope="col" {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ col.8|floatformat:0 }}</td>
                                                     {% endif %}
                                                 {% endfor %}
                                             </tr>
                                             <tr>
                                                 <td style="font-weight: normal; min-width: 200px; max-width: 200px;">ТП IVR</td>
                                                 {% for col in source.months %}
-                                                    {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                    {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                         <td class="td_grafic" gr_data="{{ col.9 }}"></td>
-                                                    {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                    {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                         <td>{{ col.9|floatformat:0 }}%</td>
                                                     {% else %}
-                                                        <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.9|floatformat:0 }}</td>
+                                                        <td scope="col" {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ col.9|floatformat:0 }}</td>
                                                     {% endif %}
                                                 {% endfor %}
                                             </tr>
                                             <tr>
                                                 <td style="font-weight: normal; min-width: 200px; max-width: 200px;">SEO Лиды ТхВ</td>
                                                 {% for col in source.months %}
-                                                    {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                    {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                         <td class="td_grafic" gr_data="{{ col.10 }}"></td>
-                                                    {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                    {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                         <td>{{ col.10|floatformat:0 }}%</td>
                                                     {% else %}
-                                                        <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.10|floatformat:0 }}</td>
+                                                        <td scope="col" {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ col.10|floatformat:0 }}</td>
                                                     {% endif %}
                                                 {% endfor %}
                                             </tr>
                                             <tr>
                                                 <td style="font-weight: normal; min-width: 200px; max-width: 200px;">Сделки 80</td>
                                                 {% for col in source.months %}
-                                                    {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                    {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                         <td class="td_grafic" gr_data="{{ col.11 }}"></td>
-                                                    {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                    {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                         <td>{{ col.11|floatformat:0 }}%</td>
                                                     {% else %}
-                                                        <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.11|floatformat:0 }}</td>
+                                                        <td scope="col" {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ col.11|floatformat:0 }}</td>
                                                     {% endif %}
                                                 {% endfor %}
                                             </tr>
                                             <tr>
                                                 <td style="font-weight: normal; min-width: 200px; max-width: 200px;">Сделки >50 Билайн</td>
                                                 {% for col in source.months %}
-                                                    {% if forloop.counter == 13 %} <!-- Колонка "График" -->
+                                                    {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                                         <td class="td_grafic" gr_data="{{ col.12 }}"></td>
-                                                    {% elif forloop.counter == 14 %} <!-- Колонка "Сравн. мес" -->
+                                                    {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
                                                         <td>{{ col.12|floatformat:0 }}%</td>
                                                     {% else %}
-                                                        <td scope="col" {% if forloop.counter == 12 %} {{ color_forecast|safe }} {% endif %}>{{ col.12|floatformat:0 }}</td>
+                                                        <td scope="col" {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ col.12|floatformat:0 }}</td>
                                                     {% endif %}
                                                 {% endfor %}
                                             </tr>
@@ -950,14 +950,18 @@
                 {% endfor %}
         </div>
         <!-- Конец цикла по сайтам -->
-        <div style="height: 30px; padding: 20px 50px;">
+        <div style="padding: 20px 50px;">
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
-                <input type="hidden" id="id_get_seo" name="get_seo" value="True">
-                <button type="submit" style="background-color: aqua;">Скачать в .csv</button>
+                <p>Доступно для скачивания данные в формате .csv</p>
+                {% for arch in list_archives %}
+                    <input type="submit" name="get_seo" value="{{ arch }}" />
+                    {% if forloop.counter|divisibleby:10 %}<br>{% endif %}
+                {% endfor %}
             </form>
         </div>
         <div style="height: 30px;">
+            &#9;
         </div>
     </body>
     
@@ -983,7 +987,6 @@
             var gr_elems = document.getElementsByClassName("td_grafic");
             for(let i = 0; i < gr_elems.length; i++){
                 if(gr_elems[i].getElementsByTagName("canvas").length > 0){continue;}
-                // gr_elems[i].setAttribute("gr_data")
                 in_data = JSON.parse(gr_elems[i].getAttribute("gr_data"));
                 var draw_data = new Array();
                 for(var j = 0; j < in_data.length; ++j){draw_data[j] = [j, in_data[j]];}

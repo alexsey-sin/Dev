@@ -315,6 +315,7 @@ def get_txv(data):
         if len(els) != 1: raise Exception('Ошибка нет поля ввода города')
         city = data.get('city')
         try:
+            city = city.replace('ё', 'е')
             if city: els[0].send_keys(city)
             else: raise Exception('Ошибка не задан город')
         except: raise Exception('Ошибка действий 06')
@@ -359,16 +360,27 @@ def get_txv(data):
         # Вводим название улицы
         els_street = driver.find_elements(By.XPATH, '//input[@placeholder="Улица"]')
         if len(els_street) != 1: raise Exception('Ошибка не найдено поле ввода названия улицы')
-        street = data.get('street')
-        if street == '': raise Exception('Ошибка не задана улица')
+        el_street = els_street[0]
+        # Удалим если что-то уже введено
+        try: el_street.send_keys(Keys.CONTROL + 'a')
+        except: raise Exception('Ошибка ввода 5')
+        time.sleep(0.2)
+        try: el_street.send_keys(Keys.DELETE)
+        except: raise Exception('Ошибка ввода 6')
+        time.sleep(0.2)
+
         # Преобразуем в нормальный вид [тип, название]
+        street = data.get('street')
+        if not street: raise Exception('Ошибка не задано поле улица')
+        street = street.replace('ё', 'е')
         lst_street = ordering_street(street)
         if lst_street:  # если распознали по типу
-            try: els_street[0].send_keys(lst_street[1])
-            except: raise Exception('Ошибка действий 11')
+            try: el_street.send_keys(lst_street[1])
+            except: raise Exception('Ошибка ввода 7')
         else:  # если нет - вводим как есть
-            try: els_street[0].send_keys(street)
-            except: raise Exception('Ошибка действий 12')
+            try: el_street.send_keys(street)
+            except: raise Exception('Ошибка ввода 8')
+            lst_street = ('улица', street)
         
         # Нажимаем кнопку найти
         els_button = driver.find_elements(By.XPATH, '//button[@ng-click="checkaddressAbstractController.searchPattern()"]')

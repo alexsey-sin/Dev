@@ -148,7 +148,6 @@ def send_crm_bid(bid_dict):
     params = {
         'id': bid_dict.get('id_lid'),
         'fields[UF_CRM_5864F4DAAC508]': bid_dict.get("bid_number"),
-        'fields[UF_CRM_1493413514]': 'OTHER',
         'fields[UF_CRM_1499386906]': '523',
     }
     error_message = bid_dict.get("bot_log")

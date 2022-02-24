@@ -57,7 +57,7 @@ def set_bid(data):
         els_input = els_div[0].find_elements(By.TAG_NAME, 'input')
         if len(els_input) != 1: raise Exception('Ошибка поиска поля ввода фамилии')
         lastname = data['lastname']
-        if len(lastname) < 3: lastname = 'Клиент'
+        if len(lastname) < 3: lastname = 'Клиентов'
         els_input[0].send_keys(lastname)
         time.sleep(1)
         # Телефон
@@ -99,7 +99,7 @@ def set_bid(data):
         els_input = els_div[0].find_elements(By.TAG_NAME, 'input')
         if len(els_input) != 1: raise Exception('Ошибка поиска поля ввода адреса')
         els_input[0].send_keys(data['address'])
-        time.sleep(2)
+        time.sleep(5)
         els_li = els_div[0].find_elements(By.TAG_NAME, 'li')
         if len(els_li) > 0: els_li[0].click()
         time.sleep(1)
@@ -113,7 +113,7 @@ def set_bid(data):
         els_input = els_div[0].find_elements(By.TAG_NAME, 'input')
         if len(els_input) != 1: raise Exception('Ошибка поиска поля ввода ИНН/Организация')
         els_input[0].send_keys(data['inn_organisation'])
-        time.sleep(2)
+        time.sleep(5)
         els_span = els_div[0].find_elements(By.TAG_NAME, 'span')
         if len(els_span) > 0: els_span[0].click()
         time.sleep(1)
@@ -177,7 +177,7 @@ def set_bid(data):
             # outfile.write(driver.page_source)
         
     except Exception as e:
-        return str(e)[:100], data
+        return str(e)[:200], data
     finally:
         if driver: driver.quit()
 
@@ -272,7 +272,6 @@ def send_crm_bid(bid_dict):
     params = {
         'id': bid_dict.get('id_lid'),
         'fields[UF_CRM_5864F4DAAC508]': number_bid_ctn,
-        'fields[UF_CRM_1493413514]': 'OTHER',
         'fields[UF_CRM_5864F4DA85D5A]': bid_dict.get('service'),
         'fields[UF_CRM_1499386906]': bid_dict.get("login")  # PartnerWEB
     }
@@ -339,37 +338,10 @@ def run_bid_rostelecom2(tlg_chat, tlg_token):
         print('TelegramMessage:', r)
     #================================================
 
-
-
-    # glob_rez = {
-        # 'result': 0,  # 0 - спрокойно, не обрабатываем; 1 - успешная заявка; 2 - ошибка
-        # 'comment': '',
-    # }
-    # rez, bid_list = get_did_in_dj_domconnect()
-    # if rez:
-        # glob_rez['result'] = 2
-        # glob_rez['comment'] = 'Ошибка при загрузке заявок из domconnect.ru'
-        # return glob_rez
-    # if len(bid_list) == 0:
-        # return glob_rez
-
-    # # Перелистываем список словарей с заявками
-    # for bid_dict in bid_list:
-        # rez, data = set_bid(bid_dict)
-        # data['bot_log'] = rez
-        # send_crm_bid(data)  # ответ в CRM
-        # glob_rez['data'] = data
-        # if rez == '':  # заявка успешно создана
-            # glob_rez['result'] = 1
-            # set_bid_status(3, data)
-        # else:  # не прошло
-            # glob_rez['result'] = 2
-            # set_bid_status(2, data)
-        
-    # return glob_rez
-    # #================================================
-
 if __name__ == '__main__':
+    # https://client.rt.ru/admin/uniapp
+    # mos.domconnect@gmail.com
+    # bvo[7dGr
     pass
     # set_did_to_dj_domconnect()
     
@@ -394,9 +366,4 @@ if __name__ == '__main__':
     # rez, data = set_bid(data)
     # if rez: print(rez)
     
-    
-# https://client.rt.ru/admin/uniapp
 
-# mos.domconnect@gmail.com
-
-# bvo[7dGr
