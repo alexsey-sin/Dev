@@ -264,7 +264,7 @@ def upgradeSeo(request):
     if is_run:
         context = {
             'result': 'Ok',
-            'message': f'Поток обновления и расчета уже идет.',
+            'message': 'Поток обновления и расчета уже идет.',
             'result_style': 'info',
         }
     else:
@@ -273,7 +273,7 @@ def upgradeSeo(request):
         th.start()
         context = {
             'result': 'Ok',
-            'message': f'Поток обновления и расчета запущен.',
+            'message': 'Поток обновления и расчета запущен.',
             'result_style': 'success',
         }
 

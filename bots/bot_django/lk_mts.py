@@ -55,7 +55,7 @@ def get_bill_plan_info(token, msisdn):  # Запрос действующего 
             cnt_try -= 1
             resp = requests.get(url, headers=headers, params=params, timeout=300)
             if resp.status_code == 200: break
-            time.sleep(2)
+            time.sleep(5)
 
         if resp.status_code == 200:
             dct_answer = json.loads(resp.text)
@@ -130,7 +130,7 @@ def get_validity_info(token, msisdn, tarif):  # Получение остатк�
             cnt_try -= 1
             resp = requests.get(url, headers=headers, params=params, timeout=300)
             if resp.status_code == 200: break
-            time.sleep(2)
+            time.sleep(5)
 
         if resp.status_code == 200:
             while True:
@@ -273,7 +273,7 @@ def run_lk_mts(logger, tlg_chat, tlg_token):
             send_telegram(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN, mess)
             logger.error(mess)
             return
-        time.sleep(2)
+        time.sleep(5)
         
         if mob_num == mob_numbers[0]:
             res_mess += f'balance: {balance}\n'
@@ -284,7 +284,7 @@ def run_lk_mts(logger, tlg_chat, tlg_token):
             send_telegram(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN, mess)
             logger.error(mess)
             return
-        time.sleep(2)
+        time.sleep(5)
         
         # Возьмем остатки минут, смс
         e, dct_info = get_validity_info(token, mob_num, plan)
@@ -293,7 +293,7 @@ def run_lk_mts(logger, tlg_chat, tlg_token):
             send_telegram(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN, mess)
             logger.error(mess)
             return
-        time.sleep(2)
+        time.sleep(5)
         # Добавим в суммарные данные
         cnt_avlb_min += dct_info['mobile_available']
         cnt_totl_min += dct_info['mobile_total']

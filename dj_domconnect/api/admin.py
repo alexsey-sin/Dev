@@ -20,9 +20,7 @@ class BidDomRuAdmin(admin.ModelAdmin):
     list_display = ('id', 'city', 'street', 'house', 'apartment', 'name',
         'phone', 'service_tv', 'service_net', 'service_phone', 'comment',
         'status', 'change_date', 'pub_date')
-    search_fields = ('change_date',)
-    list_filter = ('id', 'city','street', 'house', 'apartment', 'name',
-        'phone', 'change_date')
+    list_filter = ('status', 'pub_date')
     empty_value_display = '-пусто-'
     date_hierarchy = 'pub_date'
     formfield_overrides = {
@@ -49,14 +47,10 @@ class BidBeelineAdmin(admin.ModelAdmin):
     def b_log(self):
         return f'{self.bot_log[:20]}...'
     b_log.short_description = 'Лог'
-    def p_date(self):
-        return self.pub_date.strftime('%d.%m.%Y %H:%M')
-    p_date.short_description = 'Создано'
 
-    # list_display = [field.name for field in BidBeeline._meta.get_fields()]
-    list_display = ['id_lid', address, field_FIO, 'status', p_date, gr_dop_info, gr_error, b_log]
+    list_display = ['id_lid', address, field_FIO, 'status', 'pub_date', gr_dop_info, gr_error, b_log]
     search_fields = ('id_lid',)  # Верхнее поле "Найти"
-    list_filter = ('pub_date', 'city')
+    list_filter = ('status', 'pub_date')
     empty_value_display = '-пусто-'
     date_hierarchy = 'pub_date'
     formfield_overrides = {
@@ -69,8 +63,7 @@ class BidBeelineAdmin(admin.ModelAdmin):
 class BidMTSlineAdmin(admin.ModelAdmin):
     list_display = [field.name for field in BidMTS._meta.get_fields()]
     search_fields = ('change_date',)
-    list_filter = ('id', 'city','street', 'house', 'apartment', 'firstname',
-        'phone', 'change_date')
+    list_filter = ('status', 'pub_date')
     empty_value_display = '-пусто-'
     date_hierarchy = 'pub_date'
     formfield_overrides = {
@@ -83,10 +76,7 @@ class BidBeeline2Admin(admin.ModelAdmin):
     def b_log(self):
         return f'{self.bot_log[:20]}...'
     b_log.short_description = 'Лог'
-    def p_date(self):
-        return self.pub_date.strftime('%d.%m.%Y %H:%M')
-    p_date.short_description = 'Создано'
-    list_display = ['id_lid', 'status', 'client_name', 'contact_name', p_date, b_log, 'phone']
+    list_display = ['id_lid', 'status', 'client_name', 'contact_name', 'pub_date', b_log, 'phone']
     search_fields = ('id_lid',)  # Верхнее поле "Найти"
     list_filter = ('status', 'pub_date')
     empty_value_display = '-пусто-'
@@ -106,19 +96,11 @@ class BidRostelecom2Admin(admin.ModelAdmin):
     def b_log(self):
         return f'{self.bot_log[:20]}...'
     b_log.short_description = 'Лог'
-    def p_date(self):
-        return self.pub_date.strftime('%d.%m.%Y %H:%M')
-    p_date.short_description = 'Создано'
-    list_display = ['id_lid', 'status', address, field_FIO, p_date, b_log, 'phone']
+    list_display = ['id_lid', 'status', address, field_FIO, 'pub_date', b_log, 'phone']
     search_fields = ('id_lid',)  # Верхнее поле "Найти"
     list_filter = ('status', 'pub_date')
     empty_value_display = '-пусто-'
     date_hierarchy = 'pub_date'
-    # list_display = [field.name for field in BidRostelecom2._meta.get_fields()]
-    # search_fields = ('change_date',)
-    # list_filter = ('id', 'phone', 'change_date')
-    # empty_value_display = '-пусто-'
-    # date_hierarchy = 'pub_date'
     formfield_overrides = {
         models.IntegerField: {'widget': NumberInput(attrs={'size':'150'})},
     }
@@ -128,7 +110,7 @@ class BidRostelecom2Admin(admin.ModelAdmin):
 class BidRostelecomAdmin(admin.ModelAdmin):
     list_display = [field.name for field in BidRostelecom._meta.get_fields()]
     search_fields = ('change_date',)
-    list_filter = ('id', 'phone', 'change_date')
+    list_filter = ('status', 'pub_date')
     empty_value_display = '-пусто-'
     date_hierarchy = 'pub_date'
     formfield_overrides = {
@@ -140,7 +122,7 @@ class BidRostelecomAdmin(admin.ModelAdmin):
 class BidDomRuAdmin(admin.ModelAdmin):
     list_display = [field.name for field in BidDomRu._meta.get_fields()]
     search_fields = ('change_date',)
-    list_filter = ('id', 'phone', 'change_date')
+    list_filter = ('status', 'pub_date')
     empty_value_display = '-пусто-'
     date_hierarchy = 'pub_date'
     formfield_overrides = {
@@ -152,7 +134,7 @@ class BidDomRuAdmin(admin.ModelAdmin):
 class BidTtkAdmin(admin.ModelAdmin):
     list_display = [field.name for field in BidTtk._meta.get_fields()]
     search_fields = ('change_date',)
-    list_filter = ('id', 'phone', 'change_date')
+    list_filter = ('status', 'pub_date')
     empty_value_display = '-пусто-'
     date_hierarchy = 'pub_date'
     formfield_overrides = {
@@ -164,7 +146,7 @@ class BidTtkAdmin(admin.ModelAdmin):
 class BidOnlimeAdmin(admin.ModelAdmin):
     list_display = [field.name for field in BidOnlime._meta.get_fields()]
     search_fields = ('change_date',)
-    list_filter = ('id', 'phone', 'change_date')
+    list_filter = ('status', 'pub_date')
     empty_value_display = '-пусто-'
     date_hierarchy = 'pub_date'
     formfield_overrides = {
@@ -176,7 +158,7 @@ class BidOnlimeAdmin(admin.ModelAdmin):
 class BidMGTSAdmin(admin.ModelAdmin):
     list_display = [field.name for field in BidMGTS._meta.get_fields()]
     search_fields = ('change_date',)
-    list_filter = ('id', 'phone', 'change_date')
+    list_filter = ('status', 'pub_date')
     empty_value_display = '-пусто-'
     date_hierarchy = 'pub_date'
     formfield_overrides = {
@@ -196,7 +178,7 @@ class TxVAdmin(admin.ModelAdmin):
     list_display = ['id', 'pv_code', 'id_lid', 'region', 'city', connect, tarifs, 'pv_address', 'status', 'change_date', 'pub_date', logs]
     # list_display = [field.name for field in TxvRostelecom._meta.get_fields()]
     search_fields = ('id_lid',)
-    list_filter = ('pv_code', 'region', 'city')
+    list_filter = ('pv_code', 'status', 'pub_date')
     empty_value_display = '-пусто-'
     date_hierarchy = 'pub_date'
     formfield_overrides = {

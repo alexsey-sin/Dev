@@ -449,7 +449,8 @@ def append_lids(lids):
     return cnt_ok, cnt_err
 
 def calculateSEO():
-    ask_date = datetime.today()
+    # Расчетная дата будет начиная со вчера. Т.о. в расчет не берутся сегодняшние данные как неполные
+    calc_date = datetime.today() - timedelta(days=1)
     last_month = 0
     last_year = 0
     dcCash = DcCashSEO.objects.all()
@@ -460,16 +461,16 @@ def calculateSEO():
 
     # Вычислим количество месяцев (столбцов) для вывода начиная с 01.01.2021г.
     date_start = datetime(2020, 12, 31)
-    num_months = (ask_date.year - date_start.year) * 12 + ask_date.month - date_start.month
+    num_months = (calc_date.year - date_start.year) * 12 + calc_date.month - date_start.month
     
     for _ in range(num_months):
         empty_data_month = True
         # Расчет основной таблицы (Метка SEO)
-        dct = calculate_0_table(ask_date)
+        dct = calculate_0_table(calc_date)
         if len(dct) > 0:
             empty_data_month = False
             # Сохранение в кэш основной таблицы (Метка SEO)
-            save_cash(0, 0, dct, ask_date)
+            save_cash(0, 0, dct, calc_date)
 
         # Берем список сайтов
         objs_site = DcSiteSEO.objects.all().order_by('num')
@@ -483,11 +484,11 @@ def calculateSEO():
                 source_name = src.source
                 source_num = src.num
                 # По каждому источнику делаем вычисления
-                dct_source = calculate_source_table(ask_date, source_name, site_provider)
+                dct_source = calculate_source_table(calc_date, source_name, site_provider)
                 if len(dct_source) > 0:
                     empty_data_month = False
                     # Сохранение в кэш таблицы источника
-                    save_cash(site_num, source_num, dct_source, ask_date)
+                    save_cash(site_num, source_num, dct_source, calc_date)
                     lst_res_source.append(dct_source)
 
             if len(lst_res_source) > 0:
@@ -495,14 +496,14 @@ def calculateSEO():
                 if len(dct_site) > 0:
                     empty_data_month = False
                     # Сохранение в кэш таблицы источника
-                    save_cash(site_num, 0, dct_site, ask_date)
+                    save_cash(site_num, 0, dct_site, calc_date)
         
-        if last_month == ask_date.month and last_year == ask_date.year: break
-        ask_date = ask_date - timedelta(days=ask_date.day)
+        if last_month == calc_date.month and last_year == calc_date.year: break
+        calc_date = calc_date - timedelta(days=calc_date.day)
         if empty_data_month: break
 
-def save_cash(num_site, num_source, in_dct, ask_date):
-    str_save_date = f'01.{ask_date.month}.{ask_date.year}'
+def save_cash(num_site, num_source, in_dct, calc_date):
+    str_save_date = f'01.{calc_date.month}.{calc_date.year}'
     save_date = datetime.strptime(str_save_date, '%d.%m.%Y')
     for cell, val in in_dct.items():
         row = cell.split('_')[1]
@@ -511,6 +512,11 @@ def save_cash(num_site, num_source, in_dct, ask_date):
         rec.save()
 
 def calculate_0_table(ask_date):
+    yest_date = datetime.today() - timedelta(days=1)
+    # Является ли запрашиваемый месяц текущим
+    is_current_month = False
+    if yest_date.year == ask_date.year and yest_date.month == ask_date.month: is_current_month = True
+
     cur_month = ask_date.month  # Номер меяца
     cur_year = ask_date.year    # Номер года
     cnt_days_in_month = calendar.monthrange(cur_year, cur_month)[1] # Количество дней в месяце
@@ -518,12 +524,17 @@ def calculate_0_table(ask_date):
     weekenddays = cnt_days_in_month - working_days  # выходных дней
     
     out_dict = {}
-    lids_all = DcCrmLid.objects.filter(create_date__year=cur_year, create_date__month=cur_month)
+    if is_current_month:  # __lte <= ;  __gte >=
+        lids_all = DcCrmLid.objects.filter(create_date__year=cur_year, create_date__month=cur_month, create_date__day__lte=ask_date.day)
+    else:
+        lids_all = DcCrmLid.objects.filter(create_date__year=cur_year, create_date__month=cur_month)
     count_lids_all = lids_all.count()
     if count_lids_all == 0: return out_dict
 
     lids_seo = lids_all.filter(crm_1592566018='SEO')
     lids_seo_conv = lids_seo.filter(crm_1493416385__gt=50, status_id__contains='CONVERTED')  # Подключаем (SOURCE)
+    
+    cell_02 = cell_03 = cell_08 = cell_10 = cell_11 = cell_15 = cell_20 = cell_24 = cell_25  = 0
     # (1) Лиды
     cell_01 = lids_seo.count()
     # (4) Лиды (все)
@@ -536,12 +547,10 @@ def calculate_0_table(ask_date):
     cell_07 = lids_seo.exclude(Q(crm_1571987728429='')|Q(crm_1571987728429=None)).count()  # Провайдеры ДК (длина больше 0)
     # (8) % лидов с ТхВ
     if cell_01: cell_08 = round((cell_07 / cell_01) * 100, 2)
-    else: cell_08 = 0
     # (9) Сделки >50
     cell_09 = lids_seo_conv.count()
     # (10) %Лид=>Сд. >50
     if cell_01: cell_10 = round((cell_09 / cell_01) * 100, 2)
-    else: cell_10 = 0
     # (12) Сделки >50 (все)
     cell_12 = lids_all.filter(crm_1493416385__gt=50, status_id__contains='CONVERTED').count()
     # (13) Сделки 80
@@ -553,7 +562,6 @@ def calculate_0_table(ask_date):
     cell_14 = lids_seo_conv.filter(crm_1493413514__in=['OTHER', '2']).count()  # Провайдер (INDUSTRY)
     # (15) Доля сделок ПРИОР от сд. >50
     if cell_09: cell_15 = round((cell_14 / cell_09) * 100, 2)
-    else: cell_15 = 0
     # (16) Ср. лид/день (будн.)
     cell = lids_seo.filter(create_date__week_day__range=(2,6)).count() # Дни недели пронумерованы от 1(воскресение) до 7(суббота)
     cell_16 = round(cell / working_days)
@@ -569,26 +577,28 @@ def calculate_0_table(ask_date):
     if cell_01: cell_20 = round((cell_18 / cell_01) * 100, 2)
     else: cell_20 = 0
     # (21) Подключки по дате лида
-    cell_21 = DcCrmDeal.objects.filter(crm_5EECA3B76309E__year=cur_year, crm_5EECA3B76309E__month=cur_month).count()
+    if is_current_month:
+        cell_21 = DcCrmDeal.objects.filter(crm_5EECA3B76309E__year=cur_year, crm_5EECA3B76309E__month=cur_month, crm_5EECA3B76309E__day__lte=ask_date.day).count()
+    else:
+        cell_21 = DcCrmDeal.objects.filter(crm_5EECA3B76309E__year=cur_year, crm_5EECA3B76309E__month=cur_month).count()
     # (22) Подключки по дате оплаты
-    cell_22 = DcCrmDeal.objects.filter(crm_5904FB99DBF0C__year=cur_year, crm_5904FB99DBF0C__month=cur_month).count()
+    if is_current_month:
+        cell_22 = DcCrmDeal.objects.filter(crm_5904FB99DBF0C__year=cur_year, crm_5904FB99DBF0C__month=cur_month, crm_5904FB99DBF0C__day__lte=ask_date.day).count()
+    else:
+        cell_22 = DcCrmDeal.objects.filter(crm_5904FB99DBF0C__year=cur_year, crm_5904FB99DBF0C__month=cur_month).count()
     # (23) ТП IVR Лиза  (ТП_IVR)
     cell_23 = lids_seo.filter(status_id='52').count()  # Статус (STATUS)
     # (24) % ТП IVR 
-    cell_24 = round((cell_23 / cell_01) * 100, 2)
+    if cell_01: cell_24 = round((cell_23 / cell_01) * 100, 2)
     # (2) Реальные лиды (без ТП)
     if cell_01: cell_02 = cell_01 - cell_18 - cell_23
-    else: cell_02 = 0
     if cell_02:
         # (3) % реальных лидов
         if cell_01: cell_03 = round((cell_02 / cell_01) * 100, 2)
-        else: cell_03 = 0
         # (11) Конва реал. лид => сделка >50
         if cell_02: cell_11 = round((cell_09 / cell_02) * 100, 2)
-        else: cell_11 = 0
     # (25) % ТП Лизы от всего ТП
     if (cell_23 + cell_18): cell_25 = round((cell_23 / (cell_23 + cell_18)) * 100, 2)
-    else: cell_25 = 0
 
     # (26) Понедельник
     cell_26 = lids_all.filter(create_date__week_day=2).count() # Дни недели пронумерованы от 1(воскресение) до 7(суббота)
@@ -641,11 +651,19 @@ def calculate_0_table(ask_date):
     return out_dict
 
 def calculate_source_table(ask_date, ask_source, ask_provider):
+    yest_date = datetime.today() - timedelta(days=1)
+    # Является ли запрашиваемый месяц текущим
+    is_current_month = False
+    if yest_date.year == ask_date.year and yest_date.month == ask_date.month: is_current_month = True
+
     cur_month = ask_date.month  # Номер меяца
     cur_year = ask_date.year    # Номер года
     
     out_dict = {}
-    lids_all = DcCrmLid.objects.filter(create_date__year=cur_year, create_date__month=cur_month, source_id=ask_source)
+    if is_current_month:
+        lids_all = DcCrmLid.objects.filter(create_date__year=cur_year, create_date__month=cur_month, create_date__day__lte=ask_date.day, source_id=ask_source)
+    else:
+        lids_all = DcCrmLid.objects.filter(create_date__year=cur_year, create_date__month=cur_month, source_id=ask_source)
     count_lids_all = lids_all.count()
     if count_lids_all == 0: return out_dict
 
@@ -666,9 +684,15 @@ def calculate_source_table(ask_date, ask_source, ask_provider):
     if avg: cell_05 = round(avg)
     else: cell_05 = 0
     # (6) Подключки по дате лида
-    cell_06 = DcCrmDeal.objects.filter(crm_5EECA3B76309E__year=cur_year, crm_5EECA3B76309E__month=cur_month, source_id=ask_source).count()
+    if is_current_month:
+        cell_06 = DcCrmDeal.objects.filter(crm_5EECA3B76309E__year=cur_year, crm_5EECA3B76309E__month=cur_month, crm_5EECA3B76309E__day__lte=ask_date.day, source_id=ask_source).count()
+    else:
+        cell_06 = DcCrmDeal.objects.filter(crm_5EECA3B76309E__year=cur_year, crm_5EECA3B76309E__month=cur_month, source_id=ask_source).count()
     # (7) Подключки по дате оплаты
-    cell_07 = DcCrmDeal.objects.filter(crm_5904FB99DBF0C__year=cur_year, crm_5904FB99DBF0C__month=cur_month, source_id=ask_source).count()
+    if is_current_month:
+        cell_07 = DcCrmDeal.objects.filter(crm_5904FB99DBF0C__year=cur_year, crm_5904FB99DBF0C__month=cur_month, crm_5904FB99DBF0C__day__lte=ask_date.day, source_id=ask_source).count()
+    else:
+        cell_07 = DcCrmDeal.objects.filter(crm_5904FB99DBF0C__year=cur_year, crm_5904FB99DBF0C__month=cur_month, source_id=ask_source).count()
     # (8) ТП
     # ('ТП_пр' или 'ТП_нраб' или 'ТП_моб')
     cell_08 = lids_all.filter(status_id__in=['1', '16', '21', '31', '32', '33']).count()
@@ -815,25 +839,23 @@ def make_seo_page():
     try:
         out_data = {}
 
+        # Расчетная дата будет начиная со вчера. Т.о. в расчет не берутся сегодняшние данные как неполные
+        calc_date = datetime.today() - timedelta(days=1)
+
         # Вычислим коэфициент для прогноза на текущий месяц
-        now_date = datetime.today()
-        cur_day = now_date.day      # Номер дня
-        cur_month = now_date.month  # Номер меяца
-        cur_year = now_date.year    # Номер года
+        cur_day = calc_date.day      # Номер дня
+        cur_month = calc_date.month  # Номер меяца
+        cur_year = calc_date.year    # Номер года
         cnt_days_in_month = calendar.monthrange(cur_year, cur_month)[1] # Количество дней в месяце
-        if cur_day < 5:
-            cnt_min_in_month = cnt_days_in_month * 1440
-            cur_min = (cur_day - 1) * 1440 + (now_date.hour * 60) + now_date.minute
-            coef_forecast = Decimal(cnt_min_in_month / cur_min)  # Коэфициент полного месяца (для прогноза если месяйц не полный с учетом минут)
-        else: coef_forecast = Decimal(cnt_days_in_month / cur_day)  # Коэфициент полного месяца (для прогноза если месяйц не полный)
+        coef_forecast = Decimal(cnt_days_in_month / cur_day)  # Коэфициент полного месяца (для прогноза если месяйц не полный)
 
         # Вычислим количество месяцев (столбцов) для вывода начиная с 01.01.2021г.
         date_start = datetime(2020, 12, 31)
-        num_months = (now_date.year - date_start.year) * 12 + now_date.month - date_start.month
+        num_months = (cur_year - date_start.year) * 12 + cur_month - date_start.month
 
         # Собираем строку заголовков и основную таблицу
         str_month = ['', 'Янв.', 'Фев.', 'Мар.', 'Апр.', 'Май', 'Июн.', 'Июл.', 'Авг.', 'Сен.', 'Окт.', 'Ноя.', 'Дек.']
-        col_date = datetime.today()
+        col_date = copy.deepcopy(calc_date)
         data_month = []
         data_0_table = []
         for _ in range(num_months):  # old=12
@@ -900,7 +922,7 @@ def make_seo_page():
             
             # Таблицы сайта по месяцам
             site_table = []  # Список словарей по месяцам сводной таблицы сайта
-            col_date = datetime.today()
+            col_date = copy.deepcopy(calc_date)
             for _ in range(num_months):
                 s_date = f'01.{col_date.month}.{col_date.year}'
                 f_date = datetime.strptime(s_date, '%d.%m.%Y')
@@ -955,7 +977,7 @@ def make_seo_page():
             for source in sources:
                 item_source = {'name_source': source.source}
                 it_src_month = []
-                src_date = datetime.today()
+                src_date = copy.deepcopy(calc_date)
                 for _ in range(num_months):
                     s_date = f'01.{src_date.month}.{src_date.year}'
                     f_date = datetime.strptime(s_date, '%d.%m.%Y')
@@ -1015,8 +1037,7 @@ def make_seo_page():
 
         try:
             folder_path = 'seo_archive'
-            dy = now_date - timedelta(days=1)
-            filename = dy.strftime(f'{folder_path}/%d-%m-%Y.json')
+            filename = calc_date.strftime(f'{folder_path}/%d-%m-%Y.json')
             if not os.path.exists(folder_path): #Если пути не существует создаем его
                 os.makedirs(folder_path)
             with open(filename, 'w', encoding='utf-8') as out_file:
@@ -1033,14 +1054,10 @@ def make_csv_text(in_data, fname):
     writer = csv.writer(response, lineterminator='\n', delimiter=';')
 
     try:
-        # Вычислим количество месяцев (столбцов) для вывода начиная с 01.01.2021г.
-        now_date = datetime.today()
-        date_start = datetime(2020, 12, 31)
-        num_col = (now_date.year - date_start.year) * 12 + now_date.month - date_start.month + 1
-
         ##### Основная таблица
         in_data['data_month'].pop(-2)
         in_data['data_month'].pop(-2)
+        num_col = len(in_data['data_month'])
         in_data['data_month'].insert(0, '')
 
         writer.writerow(in_data['data_month'])
@@ -1116,5 +1133,6 @@ def make_csv_text(in_data, fname):
 
     except Exception as e:
         logger.error(f'Ошибка make_csv_text: try: {e}')
+        print(e)
 
     return response

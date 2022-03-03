@@ -57,3 +57,79 @@ django.template.exceptions.TemplateSyntaxError: Invalid block tag on line 958: '
 2022-02-24 16:02:12,647:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
 2022-02-24 16:15:10,673:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
 2022-02-24 16:18:04,493:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-02-28 10:37:52,681:domconnect.views:[Errno 2] No such file or directory: 'seo_archive/27-02-2022.json'
+2022-02-28 10:37:53,075:django.request:Not Found: /favicon.ico
+2022-02-28 10:38:13,530:domconnect.lib_seo:Обновение данных SEO запущено.
+2022-02-28 10:38:14,179:domconnect.lib_seo:Загрузка завершена. Обработано сделок: 1. Ошибок: 0
+2022-02-28 10:38:22,033:domconnect.views:[Errno 2] No such file or directory: 'seo_archive/27-02-2022.json'
+2022-02-28 10:40:09,352:domconnect.lib_seo:Загрузка завершена. Обработано лидов: 2933. Ошибок: 0
+2022-02-28 10:43:34,822:domconnect.lib_seo:Расчет и сохранение данных SEO в кэш закончено.
+2022-02-28 10:51:54,168:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\lib_seo.py changed, reloading.
+2022-02-28 11:09:18,394:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\lib_seo.py changed, reloading.
+2022-02-28 11:09:49,533:domconnect.lib_seo:Обновение данных SEO запущено.
+2022-02-28 11:09:50,215:domconnect.lib_seo:Загрузка завершена. Обработано сделок: 1. Ошибок: 0
+2022-02-28 11:09:54,112:domconnect.lib_seo:Загрузка завершена. Обработано лидов: 121. Ошибок: 0
+2022-02-28 11:12:03,366:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\lib_seo.py changed, reloading.
+2022-02-28 11:12:16,737:domconnect.views:[Errno 2] No such file or directory: 'seo_archive/27-02-2022.json'
+2022-02-28 11:13:13,904:domconnect.views:[Errno 2] No such file or directory: 'seo_archive/27-02-2022.json'
+2022-02-28 11:14:03,782:domconnect.lib_seo:Обновение данных SEO запущено.
+2022-02-28 11:14:04,323:domconnect.lib_seo:Загрузка завершена. Обработано сделок: 1. Ошибок: 0
+2022-02-28 11:14:04,859:domconnect.lib_seo:Загрузка завершена. Обработано лидов: 26. Ошибок: 0
+2022-02-28 11:14:06,944:domconnect.views:[Errno 2] No such file or directory: 'seo_archive/27-02-2022.json'
+2022-02-28 11:19:52,068:domconnect.lib_seo:Расчет и сохранение данных SEO в кэш закончено.
+2022-02-28 11:22:30,083:domconnect.lib_seo:Обновение данных SEO запущено.
+2022-02-28 11:22:30,627:domconnect.lib_seo:Загрузка завершена. Обработано сделок: 1. Ошибок: 0
+2022-02-28 11:22:31,375:domconnect.lib_seo:Загрузка завершена. Обработано лидов: 44. Ошибок: 0
+2022-02-28 11:22:33,213:domconnect.views:[Errno 2] No such file or directory: 'seo_archive/27-02-2022.json'
+2022-02-28 11:53:35,033:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\lib_seo.py changed, reloading.
+2022-02-28 11:53:48,856:domconnect.views:[Errno 2] No such file or directory: 'seo_archive/27-02-2022.json'
+2022-02-28 11:54:09,570:domconnect.lib_seo:Обновение данных SEO запущено.
+2022-02-28 11:54:10,108:domconnect.lib_seo:Загрузка завершена. Обработано сделок: 1. Ошибок: 0
+2022-02-28 11:54:12,588:domconnect.lib_seo:Загрузка завершена. Обработано лидов: 95. Ошибок: 0
+2022-02-28 11:54:12,734:domconnect.views:[Errno 2] No such file or directory: 'seo_archive/27-02-2022.json'
+2022-02-28 12:00:03,007:domconnect.lib_seo:Расчет и сохранение данных SEO в кэш закончено.
+2022-02-28 12:02:23,437:domconnect.views:[Errno 2] No such file or directory: 'seo_archive/27-02-2022.json'
+2022-02-28 12:02:30,191:domconnect.lib_seo:Обновение данных SEO запущено.
+2022-02-28 12:02:30,684:domconnect.lib_seo:Загрузка завершена. Обработано сделок: 1. Ошибок: 0
+2022-02-28 12:02:32,964:domconnect.lib_seo:Загрузка завершена. Обработано лидов: 90. Ошибок: 0
+2022-02-28 12:02:33,402:domconnect.views:[Errno 2] No such file or directory: 'seo_archive/27-02-2022.json'
+2022-02-28 12:24:54,660:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\lib_seo.py changed, reloading.
+2022-02-28 12:25:34,391:domconnect.views:[Errno 2] No such file or directory: 'seo_archive/27-02-2022.json'
+2022-02-28 12:25:37,609:domconnect.lib_seo:Обновение данных SEO запущено.
+2022-02-28 12:25:38,126:domconnect.lib_seo:Загрузка завершена. Обработано сделок: 1. Ошибок: 0
+2022-02-28 12:25:40,582:domconnect.lib_seo:Загрузка завершена. Обработано лидов: 88. Ошибок: 0
+2022-02-28 12:25:43,719:domconnect.views:[Errno 2] No such file or directory: 'seo_archive/27-02-2022.json'
+2022-02-28 12:43:34,529:domconnect.lib_seo:Расчет и сохранение данных SEO в кэш закончено.
+2022-02-28 13:00:02,229:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-02-28 13:00:23,900:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-02-28 13:01:00,821:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-02-28 13:01:15,521:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-02-28 13:03:25,722:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\lib_seo.py changed, reloading.
+2022-02-28 13:03:36,120:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-02-28 13:04:00,981:domconnect.views:[Errno 2] No such file or directory: 'seo_archive/27-02-2022.json'
+2022-02-28 13:04:04,487:domconnect.lib_seo:Обновение данных SEO запущено.
+2022-02-28 13:04:05,092:domconnect.lib_seo:Загрузка завершена. Обработано сделок: 1. Ошибок: 0
+2022-02-28 13:04:10,545:domconnect.lib_seo:Загрузка завершена. Обработано лидов: 157. Ошибок: 0
+2022-02-28 13:25:33,444:domconnect.lib_seo:Расчет и сохранение данных SEO в кэш закончено.
+2022-02-28 13:27:46,779:domconnect.lib_seo:Ошибка make_csv_text: try: list index out of range
+2022-02-28 13:29:23,758:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\lib_seo.py changed, reloading.
+2022-02-28 13:30:08,926:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\lib_seo.py changed, reloading.
+2022-02-28 13:31:42,997:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\lib_seo.py changed, reloading.
+2022-02-28 13:31:47,753:domconnect.lib_seo:Ошибка make_csv_text: try: list index out of range
+2022-02-28 13:33:05,920:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\lib_seo.py changed, reloading.
+2022-02-28 13:49:50,261:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\lib_seo.py changed, reloading.
+2022-02-28 13:50:21,538:domconnect.lib_seo:Обновение данных SEO запущено.
+2022-02-28 13:50:24,750:domconnect.views:[Errno 2] No such file or directory: 'seo_archive/27-02-2022.json'
+2022-02-28 13:50:31,370:domconnect.lib_seo:Загрузка завершена. Обработано сделок: 1. Ошибок: 0
+2022-02-28 13:50:36,690:domconnect.lib_seo:Загрузка завершена. Обработано лидов: 152. Ошибок: 0
+2022-02-28 13:56:40,342:domconnect.lib_seo:Расчет и сохранение данных SEO в кэш закончено.
+2022-03-03 09:49:59,173:django.utils.autoreload:C:\Dev\dj_domconnect\api\admin.py changed, reloading.
+2022-03-03 09:50:13,913:django.request:Not Found: /favicon.ico
+2022-03-03 10:00:39,703:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-03-03 10:01:45,610:django.utils.autoreload:C:\Dev\dj_domconnect\core\settings.py changed, reloading.
+2022-03-03 10:07:01,565:django.utils.autoreload:C:\Dev\dj_domconnect\core\settings.py changed, reloading.
+2022-03-03 10:08:55,919:django.request:Not Found: /favicon.ico
+2022-03-03 10:12:11,381:django.utils.autoreload:C:\Dev\dj_domconnect\core\settings.py changed, reloading.
+2022-03-03 10:13:54,359:django.utils.autoreload:C:\Dev\dj_domconnect\core\formats\ru\formats.py changed, reloading.
+2022-03-03 10:20:08,438:django.utils.autoreload:C:\Dev\dj_domconnect\api\admin.py changed, reloading.
+2022-03-03 10:25:01,100:django.utils.autoreload:C:\Dev\dj_domconnect\core\settings.py changed, reloading.

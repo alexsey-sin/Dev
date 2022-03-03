@@ -101,7 +101,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+FORMAT_MODULE_PATH = 'core.formats'
 LANGUAGE_CODE = 'ru-ru'
 
 TIME_ZONE = 'Europe/Moscow'
@@ -150,6 +150,7 @@ MEDIAFILES_DIRS = (
     os.path.join(BASE_DIR, 'media'),
 )
 
+# для сервера
 # LOGGING = {
 #     'version': 1,
 #     'disable_existing_loggers': True,

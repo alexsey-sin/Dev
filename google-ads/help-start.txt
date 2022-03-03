@@ -1,0 +1,275 @@
+Корневой аккаунт DC-Ads
+
+Токен разработчика 
+2U4I4-v_ibpa-qMQa3VOcw
+
+spushkin06@gmail.com     679-681-0439
+
+Проект
+My Project 24314
+
+Пользователь
+sinitcinas1@gmail.com
+
+
+Классическое приложение
+Client ID
+789672148561-54r28ljqj03sbp348gss99flbq67bb37.apps.googleusercontent.com
+Secret Key
+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
+======================================================================================
+Создание маркера обновления     (https://developers.google.com/google-ads/api/docs/client-libs/python/oauth-desktop)
+переходим cd examples/authentication
+запускаем python authenticate_in_desktop_application.py --client_secrets_path=client_secret.json
+Предложат ссылку - откроем его в браузере
+
+Выбираем клиента sinitcinas1@gmail.com - подтверждаем
+Получаем код
+4/1AX4XfWiwr3h3F1tYSnAMCNjgKjOCeP4GIfRzjfeJG_7UF92WslbC9gkkvhs
+вставляем его в консоли
+И получаем:
+
+Access token:
+ya29.A0ARrdaM-f4Hzy45Fdgc8dSc5FmCKv1MVi1gQU0sytGfe57Bpriu20Tr_GWIsPVmf6jD5yBLl11CbI2RE2vCiMMqE5VftGqOY0TA_ajodi5oaAe_VDoTixgYlA9BWAm_G8rvQVC2TRjPnhl3ORjP16Gx0VcCue
+Refresh token:
+1//0cBT4cYSQ8dw8CgYIARAAGAwSNwF-L9IrmD9hgAFCGovF1A6LQCJSuVgJ9x_pMEehO92BNuLu38_QOwlhp1AMEsXLybaCp7vi4D8
+======================================================================================
+
+
+
+
+
+
+
+
+
+
+
+Мой аккаунт 745-120-3980    7451203980
+
+Аккаунт DC-test 530-022-8043     5300228043
+
+            Ключ АПИ
+            API_key_DC          Используйте этот ключ в приложении, передав ему параметр key=API_KEY
+            AIzaSyA1tGHaw9kbYg1KfylvxB4-qjhBtRFoYAY
+
+Имя приложения
+DC-google-ads
+
+Через консоль   https://console.cloud.google.com/apis/credentials/consent/edit?hl=ru&project=dc-project-30688
+Добавляем тестовых пользователей
+
+Пользователь
+sinitcinas1@gmail.com
+Аккаунт: eLama Google Ads customer
+Customer ID: 794-454-4741
+Customer ID: 763-630-7846
+
+https://ads.google.com/aw/overview?ocid=824789197&euid=603403824&__u=8544166576&uscid=824789197&__c=7665113253&authuser=1
+https://ads.google.com/aw/overview?ocid=821534794&workspaceId=0&euid=603403824&__u=8544166576&uscid=821534794&__c=1823210106&authuser=1&subid=ww-ww-et-g-aw-a-vasquette_ads_cons_1%21o2
+
+
+
+Генерим ключи OAuth2
+https://console.cloud.google.com/apis/credentials?hl=ru&project=dc-project-30688
+
+Классическое приложение
+DC Client
+Client ID
+724613478382-n1m0jofrnh9mtlv6h1be0cb16m5pp8ke.apps.googleusercontent.com
+Secret Key
+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
+
+Классическое приложение
+Desktop client 2
+Client ID
+724613478382-p9b5ardiba6pvad7fmc5ans2epim7e2a.apps.googleusercontent.com
+Secret Key
+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
+
+======================================================================================
+======================================================================================
+Установка библиотеки
+Необходимы версии Python 3.6 3.7
+pyenv позволяет использовать несколько версий python
+Устанавливаем pyenv (https://github.com/pyenv-win/pyenv-win)
+pip install pyenv-win --target %USERPROFILE%\.pyenv
+
+Настраиваем пути
+Win + X выбираем Windows PowerShell
+[System.Environment]::SetEnvironmentVariable('PYENV',$env:USERPROFILE + "\.pyenv\pyenv-win\","User")
+[System.Environment]::SetEnvironmentVariable('PYENV_ROOT',$env:USERPROFILE + "\.pyenv\pyenv-win\","User")
+[System.Environment]::SetEnvironmentVariable('PYENV_HOME',$env:USERPROFILE + "\.pyenv\pyenv-win\","User")
+
+[System.Environment]::SetEnvironmentVariable('path', $env:USERPROFILE + "\.pyenv\pyenv-win\bin;" + $env:USERPROFILE + "\.pyenv\pyenv-win\shims;" + [System.Environment]::GetEnvironmentVariable('path', "User"),"User")
+Закрываем и заново открываем терминал и проверяем
+pyenv --version
+
+переключаемся на python3.6
+pyenv global 3.6
+
+Клонируйте клиентскую библиотеку из GitHub:
+git clone git@github.com:googleads/google-ads-python.git
+
+Войдите в репозиторий и установите его:
+cd google-ads-python
+python -m pip install .
+
+Устанавливаем python3.6 3.7
+pyenv install --list
+Из списка находим последние
+3.6.8 и 3.7.9
+pyenv install 3.6.8
+pyenv install 3.7.9
+
+переключаемся на python3.6 3.7
+pyenv global 3.6 3.7
+
+Проверяем тесты
+nox
+
+    Вернуть обратно
+    pyenv install 3.9.4
+    pyenv global 3.9.4
+
+======================================================================================
+======================================================================================
+Получение токена разработчика
+https://developers.google.com/google-ads/api/docs/first-call/dev-token
+С личного аккаунта DC-Ads (745-120-3980)  7451203980
+DEVELOPER_TOKEN = ycgcXthqbaaBCSapzWsV0g
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Google-ads
+Имя проекта
+DC Project 30688
+
+Идентификотор проекта
+dc-project-30688
+
+Номер проекта
+724613478382
+
+
+
+https://developers.google.com/google-ads/api/rest/auth
+
+Создание новых маркеров доступа
+Получив идентификатор клиента, секрет клиента и маркер обновления, можно создать новый маркер доступа для использования в вызовах API с помощью средства командной строки curl:
+=== Образец ===
+curl \
+  --data "grant_type=refresh_token" \
+  --data "client_id=CLIENT_ID" \
+  --data "client_secret=CLIENT_SECRET" \
+  --data "refresh_token=REFRESH_TOKEN" \
+  https://www.googleapis.com/oauth2/v3/token
+
+=== Отправляем ===
+curl \
+  --data "grant_type=refresh_token" \
+  --data "client_id=724613478382-f22190u3suije4p22rputi73nilhdv7r.apps.googleusercontent.com" \
+  --data "client_secret=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" \
+  --data "refresh_token=1//0cDFPBykDkqhqCgYIARAAGAwSNwF-L9IrzGFJJ2sf1jvjEN-YNRMSdNuMKuf79dwNIAdaH6M1YTogHapZsO1qiDowae9tY9fOX8I" \
+  https://www.googleapis.com/oauth2/v3/token
+
+        import requests
+        url = 'https://www.googleapis.com/oauth2/v3/token'
+
+        data = {
+            'grant_type': 'refresh_token',
+            'client_id': '724613478382-f22190u3suije4p22rputi73nilhdv7r.apps.googleusercontent.com',
+            'client_secret': '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',
+            'refresh_token': '1//0cDFPBykDkqhqCgYIARAAGAwSNwF-L9IrzGFJJ2sf1jvjEN-YNRMSdNuMKuf79dwNIAdaH6M1YTogHapZsO1qiDowae9tY9fOX8I',
+        }
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        response = requests.post(url, headers=headers, json=data)
+        print(response.text)
+
+
+=== Получаем ответ ===
+{
+    "access_token": "ya29.A0ARrdaM_5ZwLXwWXGDGwmtEAMt6OX4wkuG8C7v-S1Y3QSvhrYZh9dBk5fNEMIBuhb9ENWVPvb6ncX3hrVJMKiKeCcY3EbW7bQBnhbsNWz59uEMAI4pZvxtsw9k6riOep_xqXbh658odR-XGNTpKIejmKVadiD",
+    "expires_in": 3599,
+    "scope": "https://www.googleapis.com/auth/adwords",
+    "token_type": "Bearer"
+}
+
+
+=====================================
+API key 1
+AIzaSyA1tGHaw9kbYg1KfylvxB4-qjhBtRFoYAY
+
+Service account
+name: account_1
+id: account-1-285
+Unique ID: 115098519011545688079
+
+
+============================================================
+нам нужно работать с 
+https://ads.google.com/aw/overview?ocid=821534794&workspaceId=0&authuser=1&__u=8544166576&__c=1823210106
+
+Аккаунт: eLama Google Ads customer
+Customer ID: 794-454-4741
+============================================================
+
+python get_account_hierarchy.py C:\Dev\google-ads\google-ads.yaml
+
+
+
+Токен разработчика: Уровень доступа - тестовый аккаунт
+По АПИ доступ только к тестовым аккаунтам
+    Создание аккаунта связана с настройкой оплаты, настройкой платежного профиля и способов оплаты привязанной ко мне - не рискнул
+    
+    Создание тестового аккаунта только через АПИ 
+
+
+
+У нас есть кто работает с Google Ads API?
+
+У меня токен разработчика для работы только с тестовыми аккаунтами
+Запрос на обновление до рабочего уровня отправлен еще вчера - ответа нет
+Тестовый аккаунт не получается создать, уже больше 4 новых чистых аккаунтов google
+завел с разными способами создания аккаунта и всегда получается не тестовый.
+И попробовать делать запросы не получается.
+Для работы с аккаунтом который дал Евгений
+для выгрузки данных нужны ключи и токены
+
+developer_token                через Центр АПИ
+
+client_id               берется в https://console.cloud.google.com/apis/credentials         здесь же подключается библиотека google ads api
+client_secret           там же скачивается файл.json
+
+                    настроить экран согласия и добавить пользователя sinitcinas1@gmail.com
+                    из этого генерится refresh_token
+            refresh_token
+
+login_customer_id      это номер управляющей записи
+
+и customer_id           это номер менеджера
+
+
+
+python authenticate_in_desktop_application.py --client_secrets_path=client_secret.json
+
+eLama Google Ads customer
+763-630-7846
+
+eLama Google Ads customer
+763-630-7846
+
