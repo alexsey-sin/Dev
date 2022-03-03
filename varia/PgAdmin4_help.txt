@@ -45,3 +45,11 @@ AND "status" = 2
 =========================================================
 DELETE FROM public.domconnect_dccashseo
 WHERE "val_date" >= '2022-02-01 00:00:00'
+
+Сколько лидов за несколько дней
+=========================================================
+SELECT count(*) as cnt FROM public.domconnect_dccrmlid
+WHERE "create_date" >= '2022-03-01 00:00:00' AND "create_date" < '2022-03-03 00:00:00'
+
+
+

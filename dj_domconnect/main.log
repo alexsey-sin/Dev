@@ -133,3 +133,48 @@ django.template.exceptions.TemplateSyntaxError: Invalid block tag on line 958: '
 2022-03-03 10:13:54,359:django.utils.autoreload:C:\Dev\dj_domconnect\core\formats\ru\formats.py changed, reloading.
 2022-03-03 10:20:08,438:django.utils.autoreload:C:\Dev\dj_domconnect\api\admin.py changed, reloading.
 2022-03-03 10:25:01,100:django.utils.autoreload:C:\Dev\dj_domconnect\core\settings.py changed, reloading.
+2022-03-03 10:56:55,974:domconnect.views:[Errno 2] No such file or directory: 'seo_archive/02-03-2022.json'
+2022-03-03 10:57:41,873:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-03-03 10:57:46,009:domconnect.views:[Errno 2] No such file or directory: 'seo_archive/02-03-2022.json'
+2022-03-03 11:03:30,898:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-03-03 11:03:39,460:domconnect.views:[WinError 2] Не удается найти указанный файл: '27-02-2022.json'
+2022-03-03 11:04:06,378:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-03-03 11:04:14,376:domconnect.views:[WinError 2] Не удается найти указанный файл: '27-02-2022.json'
+2022-03-03 11:05:04,451:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-03-03 11:05:45,368:domconnect.views:[WinError 2] Не удается найти указанный файл: '25-02-2022.json'
+2022-03-03 11:07:45,076:domconnect.views:[WinError 2] Не удается найти указанный файл: '25-02-2022.json'
+2022-03-03 11:08:08,893:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-03-03 11:08:15,247:domconnect.views:[WinError 2] Не удается найти указанный файл: '25-02-2022.json'
+2022-03-03 11:09:13,433:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-03-03 11:09:17,326:domconnect.views:[WinError 2] Не удается найти указанный файл: '25-02-2022.json'
+2022-03-03 11:10:27,580:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-03-03 11:10:52,534:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-03-03 11:11:06,948:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-03-03 11:11:11,921:domconnect.views:[WinError 2] Не удается найти указанный файл: '25-02-2022.json'
+2022-03-03 11:12:55,698:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-03-03 11:15:50,939:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-03-03 11:15:55,796:domconnect.views:[WinError 3] Системе не удается найти указанный путь: 'seo_archive'
+2022-03-03 11:18:12,347:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-03-03 11:18:17,064:domconnect.views:sort() takes no positional arguments
+2022-03-03 11:19:22,423:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-03-03 11:19:27,501:domconnect.views:'WindowsPath' object has no attribute 'split'
+2022-03-03 11:20:09,458:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-03-03 11:21:08,249:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-03-03 11:21:30,908:domconnect.views:'resverse' is an invalid keyword argument for sort()
+2022-03-03 11:24:19,251:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-03-03 11:31:18,003:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-03-03 11:31:24,303:domconnect.views:[Errno 2] No such file or directory: '29-02-2022.json'
+2022-03-03 11:32:22,578:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-03-03 11:34:52,780:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-03-03 11:36:48,424:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\lib_seo.py changed, reloading.
+2022-03-03 11:37:41,447:domconnect.lib_seo:Обновение данных SEO запущено.
+2022-03-03 11:38:16,576:domconnect.lib_seo:Загрузка завершена. Обработано сделок: 839. Ошибок: 0
+2022-03-03 11:40:50,385:domconnect.lib_seo:Загрузка завершена. Обработано лидов: 3901. Ошибок: 0
+2022-03-03 11:48:57,463:domconnect.lib_seo:Расчет и сохранение данных SEO в кэш закончено.
+2022-03-03 11:53:22,680:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-03-03 12:08:53,014:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-03-03 12:09:45,923:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-03-03 12:13:47,133:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-03-03 12:46:08,409:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-03-03 14:24:20,187:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\lib_seo.py changed, reloading.
+2022-03-03 14:25:04,038:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.

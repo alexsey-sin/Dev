@@ -12,7 +12,7 @@ from django.http import JsonResponse
 from domconnect.lib_seo import run_upgrade_seo, make_seo_page, make_csv_text
 from threading import Thread
 import os, logging, json, threading, calendar
-import codecs
+from pathlib import Path
 
 
 logging.basicConfig(
@@ -33,7 +33,6 @@ def index(request):  # Статистика SEO
     if u_name.strip() == '':
         u_name = user.username
     context = {'u_name': u_name}
-    now_date = datetime.today()
 
     seo_archive_folder_path = 'seo_archive'
     label_seo = ''
@@ -46,17 +45,20 @@ def index(request):  # Статистика SEO
         label_seo = f'Последнее обновление: {last_datetime}'
     context['label_seo'] = label_seo
 
+    # Берем последний сохраненный архив
     page_context = {}
     try:
-        dy = now_date - timedelta(days=1)
-        filename = dy.strftime(f'{seo_archive_folder_path}/%d-%m-%Y.json')
-        with open(filename, 'r', encoding='utf-8') as file:
-            page_context = json.load(file)
         # Возьмем список всех файлов в папке
         list_archives = os.listdir(seo_archive_folder_path)
-        list_archives = [s.split('.js')[0] for s in list_archives]
-        list_archives.sort(reverse=True)
-        context['list_archives'] = list_archives
+        if list_archives:
+            # Отсортируем по дате создания
+            list_archives_sort = sorted(list_archives, key=lambda x: os.path.getctime(os.path.join(seo_archive_folder_path, x)), reverse=True)
+            # Соберем без расширения
+            list_namefiles = [s.split('.js')[0] for s in list_archives_sort]
+            context['list_archives'] = list_namefiles
+
+            with open(f'{seo_archive_folder_path}/{list_archives_sort[0]}', 'r', encoding='utf-8') as file:
+                page_context = json.load(file)
     except Exception as e:
         context['label_seo'] = 'Ошибка загрузки данных из кэш.'
         logger.error(str(e))
