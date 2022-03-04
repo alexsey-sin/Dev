@@ -366,4 +366,4 @@ if __name__ == '__main__':
     # rez, data = set_bid(data)
     # if rez: print(rez)
     
-
+    

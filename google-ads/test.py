@@ -72,7 +72,9 @@ def run_google_ads():
     
     
 if __name__ == '__main__':
+    client = GoogleAdsClient.load_from_storage("google-ads.yaml")
     # # run_google_ads()
+    #==============================  ====================
     # googleads_client = GoogleAdsClient.load_from_storage("google-ads.yaml")
     # ga_service = googleads_client.get_service("GoogleAdsService")
 
@@ -106,17 +108,16 @@ if __name__ == '__main__':
                 # f"Campaign with ID {row.campaign.id} and name "
                 # f'"{row.campaign.name}" was found.'
             # )
-    #============================== работает ====================
-    client = GoogleAdsClient.load_from_storage("google-ads.yaml")
-    customer_service = client.get_service("CustomerService")
+    #============================== list_accessible_customers.py ==================== работает
+    # customer_service = client.get_service("CustomerService")
 
-    accessible_customers = customer_service.list_accessible_customers()
-    result_total = len(accessible_customers.resource_names)
-    print(f"Total results: {result_total}")
+    # accessible_customers = customer_service.list_accessible_customers()
+    # result_total = len(accessible_customers.resource_names)
+    # print(f"Total results: {result_total}")
 
-    resource_names = accessible_customers.resource_names
-    for resource_name in resource_names:
-        print(f'Customer resource name: "{resource_name}"')
+    # resource_names = accessible_customers.resource_names
+    # for resource_name in resource_names:
+        # print(f'Customer resource name: "{resource_name}"')
     #==============================  ====================
     # client = GoogleAdsClient.load_from_storage("google-ads.yaml")
     # ga_service = client.get_service("GoogleAdsService")
@@ -147,6 +148,49 @@ if __name__ == '__main__':
     # print(f"\tTime zone: {customer.time_zone}")
     # print(f"\tTracking URL template: {customer.tracking_url_template}")
     # print(f"\tAuto tagging enabled: {customer.auto_tagging_enabled}")
+    #============================== create_customer.py ==================== никак
+    # try:
+        # manager_customer_id = '6796810439'
+        # # manager_customer_id = '7944544741'
+        # # manager_customer_id = '7944544741'
+        # customer_service = client.get_service("CustomerService")
+        # customer = client.get_type("Customer")
+        # now = datetime.today().strftime("%Y%m%d %H:%M:%S")
+        # customer.descriptive_name = f"Account created with CustomerService on {now}"
+        # # For a list of valid currency codes and time zones see this documentation:
+        # # https://developers.google.com/google-ads/api/reference/data/codes-formats
+        # customer.currency_code = "RU"
+        # customer.time_zone = "Europe/Moscow"
+        # # The below values are optional. For more information about URL
+        # # options see: https://support.google.com/google-ads/answer/6305348
+        # customer.tracking_url_template = "{lpurl}?device={device}"
+        # customer.final_url_suffix = (
+            # "keyword={keyword}&matchtype={matchtype}" "&adgroupid={adgroupid}"
+        # )
+
+        # response = customer_service.create_customer_client(
+            # customer_id=manager_customer_id, customer_client=customer
+        # )
+        # print(
+            # f'Customer created with resource name "{response.resource_name}" '
+            # f'under manager account with ID "{manager_customer_id}".'
+        # )
+    # except GoogleAdsException as ex:
+        # print(
+            # f'Request with ID "{ex.request_id}" failed with status '
+            # f'"{ex.error.code().name}" and includes the following errors:'
+        # )
+        # for error in ex.failure.errors:
+            # print(f'\tError with message "{error.message}".')
+            # if error.location:
+                # for field_path_element in error.location.field_path_elements:
+                    # print(f"\t\tOn field: {field_path_element.field_name}")
+        # sys.exit(1)
+
+    #==============================  ====================
+    #==============================  ====================
+    #==============================  ====================
+    #==============================  ====================
    
     
     

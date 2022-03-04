@@ -325,7 +325,7 @@ def wait_spinner(driver):  # Ожидаем крутящийся спинер
         time.sleep(1)
         els = driver.find_elements(By.XPATH, '//div[contains(@class, "ju-spinner")]')
         if len(els):
-            # print('ju-spinner')
+            print('ju-spinner')
         else: break
     driver.implicitly_wait(10)
     time.sleep(2)
@@ -372,7 +372,7 @@ def ordering_house(in_house: str):  # Преобразование строки 
     # Проверка на дробь
     lst_house = in_house.split('/')
     if len(lst_house) > 2: return ('', 'Много слешей')
-    if len(lst_house) == 2: return (lst_house[0], in_house)
+    if len(lst_house) == 2: return (lst_house[0], ' '.join(lst_house))
     # Остались корп, лит, буква
     lst_house = in_house.split(' ')
     if len(lst_house) > 3: return ('', 'В номере много позиций')
@@ -569,6 +569,10 @@ def get_txv(data):
         time.sleep(3)
         
         # Ищем блок с подсказкой улиц
+        els_fieldset_addr = driver.find_elements(By.XPATH, '//fieldset[@class="form-1-fieldset addressConnectFs"]')
+        if len(els_fieldset_addr) == 0: raise Exception('Ошибка нет блока адреса4')
+        els_div = els_fieldset_addr[0].find_elements(By.XPATH, './/div[@class="field-col-in4cols relative-position"]')
+        if len(els_div) < 2: raise Exception('Ошибка нет вложенного блока с подсказкой улиц')
         els_li = els_div[1].find_elements(By.TAG_NAME, 'li')
         if len(els_li) == 0: raise Exception('Ошибка нет вариантов выбора улиц')
         # Собираем список подсказок
@@ -585,8 +589,13 @@ def get_txv(data):
             i_fnd = find_string_to_substrs(lst_street, f_street)
         
         if i_fnd < 0: raise Exception(f'Ошибка поиск улицы по ключу {f_street}: вариантов нет')
-        
-        try: els_li[i_fnd].click()
+        # Пробежим по списку подсказки
+        try:
+            for _ in range(i_fnd):
+                els[0].send_keys(Keys.ARROW_DOWN)
+                time.sleep(0.2)
+            time.sleep(0.2)
+            els[0].send_keys(Keys.ENTER)
         except: raise Exception('Ошибка выбора улицы из списка')
         time.sleep(3)
         
@@ -870,6 +879,7 @@ def run_txv_rostelecom(tlg_chat, tlg_token):
         r = send_telegram(tlg_chat, tlg_token, tlg_mess)
         print(tlg_mess)
         print('TelegramMessage:', r)
+        time.sleep(1)
     #================================================
 
 
@@ -888,16 +898,16 @@ if __name__ == '__main__':
         # 'password': 'АтсорВvnjhfv48556vfdf+',
         # 'id_lid': '1215557',
         
-        # # 'region': 'Московская область',
-        # # 'city': 'Балашиха',
-        # # 'street': 'микрорайон Авиаторов, бульвар Нестерова',
-        # # 'house': '1',          # дом
-        # # 'apartment': '10',          # квартира
+        # # 'region': 'Республика Северная Осетия — Алания',
+        # # 'city': 'Владикавказ',
+        # # 'street': 'Братьев Темировых',
+        # # 'house': '69/4',          # дом
+        # # 'apartment': '255',          # квартира
         
-        # # 'region': 'Новосибирская область',
-        # # 'city': 'Новосибирск',
-        # # 'street': 'Советский район, микрорайон Академгородок, Ляпунова',
-        # # 'house': '2',          # дом
+        # # 'region': 'Республика Алтай',
+        # # 'city': 'Горно-Алтайск',
+        # # 'street': 'Проточная улица',
+        # # 'house': '10/1к2',          # дом
         # # 'apartment': '10',          # квартира
         
         # # 'region': 'Приморский край',
@@ -906,10 +916,10 @@ if __name__ == '__main__':
         # # 'house': '29/2',          # дом
         # # 'apartment': '40',          # квартира
         
-        # 'region': 'Московская область',
-        # 'city': 'Кашира',
-        # 'street': 'микрорайон Кашира-1, Кирпичный Посёлок',
-        # 'house': '5',          # дом
+        # 'region': 'Республика Марий Эл',
+        # 'city': 'Йошкар-Ола',
+        # 'street': 'Машиностроителей',
+        # 'house': '4А',          # дом
         # 'apartment': '2',          # квартира
         
         # # 'region': 'Республика Алтай',
@@ -937,6 +947,7 @@ if __name__ == '__main__':
     
     # e, data = get_txv(txv_dict)
     # if e: print(e)
+    
     # print('pv_address:', data['pv_address'])
     # print('available_connect:')
     # print(data['available_connect'])

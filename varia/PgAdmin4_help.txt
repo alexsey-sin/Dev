@@ -51,5 +51,9 @@ WHERE "val_date" >= '2022-02-01 00:00:00'
 SELECT count(*) as cnt FROM public.domconnect_dccrmlid
 WHERE "create_date" >= '2022-03-01 00:00:00' AND "create_date" < '2022-03-03 00:00:00'
 
-
-
+Скачать ошибки
+=========================================================
+SELECT region, city, street, house, apartment, bot_log FROM public.api_txv
+WHERE "pv_code" = 4 AND "status" = 2
+ORDER BY pub_date DESC
+LIMIT 100

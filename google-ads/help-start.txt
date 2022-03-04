@@ -273,3 +273,33 @@ eLama Google Ads customer
 eLama Google Ads customer
 763-630-7846
 
+Через консоль   https://console.cloud.google.com/apis/credentials/consent/edit?hl=ru&project=dc-project-30688
+Добавляем тестовых пользователей
+
+Пользователь
+sinitcinas1@gmail.com
+Аккаунт: eLama Google Ads customer
+Customer ID: 794-454-4741 (Домконнект Билайн)
+Customer ID: 763-630-7846 (Домконнект МТС)
+
+https://ads.google.com/aw/overview?ocid=824789197&euid=603403824&__u=8544166576&uscid=824789197&__c=7665113253&authuser=1
+https://ads.google.com/aw/overview?ocid=821534794&workspaceId=0&euid=603403824&__u=8544166576&uscid=821534794&__c=1823210106&authuser=1&subid=ww-ww-et-g-aw-a-vasquette_ads_cons_1%21o2
+
+
+python C:\Dev\google-ads\google-ads-python\examples\account_management\create_customer.py -m 7636307846
+
+python C:\Dev\google-ads\google-ads-python\examples\basic_operations\add_campaigns.py -c 7636307846
+python C:\Dev\google-ads\google-ads-python\examples\basic_operations\add_campaigns.py -c 7451203980  МОЙ
+
+GOOGLE
+
+ap9112365@gmail.ru
+Ap15071971
+
+spushkin06@gmail.ru
+Spushkin
+
+
+
+
+

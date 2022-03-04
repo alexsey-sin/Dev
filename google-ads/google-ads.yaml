@@ -4,8 +4,9 @@
 # независимо от того, используете ли вы конфигурации OAuth2 или сервисной учетной записи. Чтобы получить         #
 # токен разработчика см.:                                                                    #
 # https://developers.google.com/google-ads/api/docs/first-call/dev-token                 #
+# 7451203980
 ##########################################################################################
-developer_token: 2U4I4-v_ibpa-qMQa3VOcw
+developer_token: Ng584qFPTPZ6-cLzM9pE8Q
 
 # Use proto plus
 ##########################################################################################
@@ -23,9 +24,9 @@ use_proto_plus: False
 # Поток OAuth2. Для получения дополнительной информации об аутентификации с помощью OAuth2 см.:                   #
 # https://developers.google.com/google-ads/api/docs/oauth/overview                       #
 ##########################################################################################
-client_id: 789672148561-54r28ljqj03sbp348gss99flbq67bb37.apps.googleusercontent.com
-client_secret: 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
-refresh_token: 1//0cBT4cYSQ8dw8CgYIARAAGAwSNwF-L9IrmD9hgAFCGovF1A6LQCJSuVgJ9x_pMEehO92BNuLu38_QOwlhp1AMEsXLybaCp7vi4D8
+client_id: 724613478382-n1m0jofrnh9mtlv6h1be0cb16m5pp8ke.apps.googleusercontent.com
+client_secret: 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
+refresh_token: 1//0c8nR8NSa8udMCgYIARAAGAwSNwF-L9IraELkYiKX6Hxoi3F3Fy9_opDL4puWzS-sT3VvECQrNfXKvP94eSUe3zIJ8_IViPtmUPs
 
 # Service Account configuration
 ##########################################################################################
@@ -48,8 +49,8 @@ refresh_token: 1//0cBT4cYSQ8dw8CgYIARAAGAwSNwF-L9IrmD9hgAFCGovF1A6LQCJSuVgJ9x_pM
 # Пары OAuth. #
 ##########################################################################################
 # Управляющая учетная запись
-# login_customer_id: 5300228043
-login_customer_id: 6796810439
+# login_customer_id: 6796810439
+
 # login_customer_id: 7944544741
 # login_customer_id: 7636307846
 
