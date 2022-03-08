@@ -8,7 +8,7 @@ from django.forms import NumberInput
 
 @admin.register(BotVisit)
 class BotVisitAdmin(admin.ModelAdmin):
-    list_display = ('name', 'last_visit')
+    list_display = ('name', 'last_visit', 'omission_min')
     search_fields = ('name',)
     list_filter = ('last_visit', 'name')
     empty_value_display = '-пусто-'

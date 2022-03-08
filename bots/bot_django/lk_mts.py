@@ -4,6 +4,13 @@ from datetime import datetime
 
 # url_host = 'http://127.0.0.1:8000/'
 url_host = 'http://django.domconnect.ru/'
+emj_red_mark = '❗️'
+emj_red_ball = '🔴'
+emj_yellow_ball = '🟡'
+emj_green_ball = '🟢'
+emj_red_rhomb = '♦️'
+emj_yellow_rhomb = '🔸'
+
 
 def get_token():  # Получение токена по логину и паролю
     login = 'YrxF9TvrPlK6fbkJNBilUqCw0vUa'
@@ -276,7 +283,13 @@ def run_lk_mts(logger, tlg_chat, tlg_token):
         time.sleep(5)
         
         if mob_num == mob_numbers[0]:
-            res_mess += f'balance: {balance}\n'
+            emj = ''
+            try:
+                bal = int(balance)
+                if bal < 100: emj = emj_yellow_ball
+                if bal <= 0: emj = emj_red_ball
+            except: pass
+            res_mess += f'{emj}balance: {balance}\n'
         # Возьмем тарифный план (пакет)
         e, plan = get_bill_plan_info(token, mob_num)
         if e:
@@ -306,7 +319,14 @@ def run_lk_mts(logger, tlg_chat, tlg_token):
         mt = dct_info["mobile_total"]
         sa = dct_info["sms_available"]
         st = dct_info["sms_total"]
-        if ma or mt or sa or st: res_mess += f'{mob_num} [min {ma}/{mt}][sms {sa}/{st}]\n'
+        if ma or mt or sa or st:
+            emj = ''
+            try:
+                mob = int(ma)
+                if mob < 100: emj = emj_yellow_rhomb
+                if mob <= 50: emj = emj_red_rhomb
+            except: pass
+            res_mess += f'{emj}{mob_num} [min {ma}/{mt}][sms {sa}/{st}]\n'
     res_mess += f'Итого: [min {cnt_avlb_min}/{cnt_totl_min}][sms {cnt_avlb_sms}/{cnt_totl_sms}]\nВсего номеров: {len(mob_numbers)}'
     e = send_api(out_dict)
     if e:

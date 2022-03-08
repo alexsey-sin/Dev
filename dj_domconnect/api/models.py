@@ -23,6 +23,10 @@ class BotVisit(models.Model):
         blank = True,
         verbose_name='Время посещения',
     )
+    omission_min = models.PositiveSmallIntegerField(
+        default = 120,
+        verbose_name = 'Бездействие мин',
+    )
     
     def __str__(self):
         return self.name

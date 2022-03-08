@@ -4,10 +4,12 @@ from app.models import LizaGroupPhrase, LizaPhrase, Name
 from app.models import NdzGroupPhrase, NdzPhrase, PzGroupPhrase, PzPhrase
 from api.models import BidDomRu2, BidBeeline, BidMTS, BidBeeline2
 from api.models import BidRostelecom2, BidRostelecom, BidDomRu, BidTtk
-from api.models import  BidOnlime, BidMGTS, TxV
+from api.models import  BidOnlime, BidMGTS, TxV, BotVisit
 from django.contrib.auth import get_user_model
+from django.forms.models import model_to_dict
 import json
 from datetime import datetime
+from rest_framework import status
 
 
 User = get_user_model()
@@ -190,3 +192,17 @@ def get_bots_info(request, from_date):
 
 
     return HttpResponse(mess, content_type='text/plain; charset=utf-8')
+
+def get_bots_vizit(request):
+    if request.method == 'GET':
+        try:
+            key = request.GET.get('key')
+            if key != 'Q8kGM1HfWz': raise ValueError('ERROR key.')
+            
+            obj_bots_vizit = BotVisit.objects.all()
+            lst_bots_vizit = [model_to_dict(row) for row in obj_bots_vizit]
+            data = json.dumps(lst_bots_vizit, default=str, indent=1)
+        except ValueError as e:
+            return HttpResponse(f'ERROR: {e}', status=status.HTTP_400_BAD_REQUEST)
+    return HttpResponse(data, content_type='application/json; charset=utf-8', status=status.HTTP_200_OK)
+
