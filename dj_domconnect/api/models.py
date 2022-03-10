@@ -27,6 +27,10 @@ class BotVisit(models.Model):
         default = 120,
         verbose_name = 'Бездействие мин',
     )
+    check = models.BooleanField(
+        default = True,
+        verbose_name = 'Проверять',
+    )
     
     def __str__(self):
         return self.name

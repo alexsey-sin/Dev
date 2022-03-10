@@ -412,3 +412,5 @@ TypeError: isinstance() arg 2 must be a type or tuple of types
 2022-03-08 16:22:07,566:django.utils.autoreload:C:\Dev\dj_domconnect\api\views.py changed, reloading.
 2022-03-08 16:26:22,866:django.utils.autoreload:C:\Dev\dj_domconnect\api\views.py changed, reloading.
 2022-03-08 16:26:58,748:django.utils.autoreload:C:\Dev\dj_domconnect\api\views.py changed, reloading.
+2022-03-10 08:33:04,402:django.request:Not Found: /favicon.ico
+2022-03-10 08:33:44,367:django.utils.autoreload:C:\Dev\dj_domconnect\api\admin.py changed, reloading.

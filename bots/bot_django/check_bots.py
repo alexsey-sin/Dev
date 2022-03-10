@@ -40,7 +40,7 @@ def get_bots_vizit():
 if __name__ == '__main__':
     cur_time = datetime.now()
     # Рабочее время ботов с 6 до 23
-    if cur_time.hour < 6 or cur_time.hour >= 23: exit(0)
+    if cur_time.hour < 7 or cur_time.hour >= 23: exit(0)
     
     # Запросим данные о последних посещениях ботов
     e, lst_bots = get_bots_vizit()
@@ -48,6 +48,8 @@ if __name__ == '__main__':
     
     lst_mess = []
     for bot in lst_bots:
+        check = bot.get('check')
+        if check and check == False: continue 
         name = bot.get('name')
         last_visit = bot.get('last_visit')
         omission = bot.get('omission_min')
@@ -69,7 +71,7 @@ if __name__ == '__main__':
     
         crontab -e    (редактор vi задача будет от имени тек. пользователя (alex))
         Каждый час
-        * */1 * * * cd /var/www/bots && /var/www/bots/venv/bin/python /var/www/bots/check_bots.py
+        0 */1 * * * cd /var/www/bots && /var/www/bots/venv/bin/python /var/www/bots/check_bots.py
     
     '''
         

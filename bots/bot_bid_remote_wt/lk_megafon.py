@@ -4,6 +4,13 @@ import requests  # pip install requests
 from selenium import webdriver  # $ pip install selenium
 from selenium.webdriver.common.by import By
 
+emj_red_mark = '❗️'
+emj_red_ball = '🔴'
+emj_yellow_ball = '🟡'
+emj_green_ball = '🟢'
+emj_red_rhomb = '♦️'
+emj_yellow_rhomb = '🔸'
+
 
 def run_lk_megafon():
     start_time = datetime.now()
@@ -121,7 +128,15 @@ def run_lk_megafon():
 
         ###################### Вывод ######################
         buff = f'Parsing {data.get("operator")}:\n'
-        buff += f'balance: {data.get("balance")}\n'
+        str_bal = data.get("balance")
+        emj = ''
+        if str_bal:
+            str_bal = str_bal.replace(',', '.')
+            bal = float(str_bal)
+            if bal < 100: emj = emj_yellow_ball
+            if bal <= 0: emj = emj_red_ball
+        else: bal = '---'
+        buff += f'{emj}balance: {bal}\n'
         nums = data.get('numbers')
         cnt_nums = len(nums)
         cnt_avlb_min = 0
@@ -132,20 +147,17 @@ def run_lk_megafon():
             str_avlb_min = dct.get('mobile_available')
             str_avlb_sms = dct.get('sms_available')
             try:
-                sub_str = ''
-                if str_avlb_min or str_avlb_sms:
-                    sub_str += f'{str_number} '
-                if str_avlb_min:
-                    cnt_avlb_min += int(str_avlb_min)
-                    sub_str += f'[min {str_avlb_min}]'
-                if str_avlb_sms:
-                    cnt_avlb_sms += int(str_avlb_sms)
-                    sub_str += f'[sms {str_avlb_sms}]'
+                emj = ''
+                avlb_min = int(str_avlb_min)
+                avlb_sms = int(str_avlb_sms)
+                if avlb_min == 0 and avlb_sms == 0: continue
+                if avlb_min < 500: emj = emj_yellow_rhomb
+                if avlb_min < 100: emj = emj_red_rhomb
+                cnt_avlb_min += avlb_min
+                cnt_avlb_sms += avlb_sms
                 
-                if len(sub_str) > 0:
-                    buff += sub_str + '\n'
-            except:
-                continue
+                buff += f'{emj}{str_number} [min {avlb_min}][sms {avlb_sms}]\n'
+            except: continue
         end_time = datetime.now()
         time_str = '\nDuration: {}'.format(end_time - start_time)
         buff += f'Итого: [min {cnt_avlb_min}][sms {cnt_avlb_sms}]\n'
@@ -178,11 +190,19 @@ def run_lk_megafon():
     ###################### Всем спасибо, все свободны ######################
     return ['', data, time_str, buff]
 
+def send_telegram(chat: str, token: str, text: str):
+    url = "https://api.telegram.org/bot" + token + "/sendMessage"
+    try: requests.post(url, data={'chat_id': chat, 'text': text})
+    except: print('ERROR telegram send message.')
+
 
 if __name__ == '__main__':
-    pass
+    # личный бот @infra     TELEGRAM_CHAT_ID, TELEGRAM_TOKEN
+    TELEGRAM_CHAT_ID = '1740645090'
+    TELEGRAM_TOKEN = '2009560099:AAHtYot6EOHh_qr9EUoCoczQhjyRdulKHYo'
+
     rez = run_lk_megafon()
     if rez:
         str_rez = 'Парсинг ЛК Мегафон: ERROR - ' + str(rez)
         print(str_rez)
-        # send_telegram(str_rez)
+        send_telegram(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN, rez[3])

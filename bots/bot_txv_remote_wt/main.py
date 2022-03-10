@@ -80,18 +80,6 @@ if __name__ == '__main__':
 
         #===============================================#
 
-        # Скрипт Проверка ТхВ rostelecom
-        if start_time_txv_rostelecom:
-            passed = (cur_time - start_time_txv_rostelecom).seconds
-        if start_time_txv_rostelecom == None or passed >= PERIOD_SCAN_TXV_ROSTELECOM:
-            start_time_txv_rostelecom = cur_time
-            print(f'start txv_rostelecom {str_time}')
-            run_txv_rostelecom(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
-            # run_txv_rostelecom(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN)
-            continue
-
-        #===============================================#
-
         # Скрипт Проверка ТхВ ttk
         if start_time_txv_ttk:
             passed = (cur_time - start_time_txv_ttk).seconds
@@ -124,6 +112,18 @@ if __name__ == '__main__':
             print(f'start txv_mgts {str_time}')
             # run_txv_mgts(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
             run_txv_mgts(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN)
+            continue
+
+        #===============================================#
+
+        # Скрипт Проверка ТхВ rostelecom
+        if start_time_txv_rostelecom:
+            passed = (cur_time - start_time_txv_rostelecom).seconds
+        if start_time_txv_rostelecom == None or passed >= PERIOD_SCAN_TXV_ROSTELECOM:
+            start_time_txv_rostelecom = cur_time
+            print(f'start txv_rostelecom {str_time}')
+            run_txv_rostelecom(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
+            # run_txv_rostelecom(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN)
             continue
 
         #===============================================#

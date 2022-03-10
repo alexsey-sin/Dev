@@ -330,6 +330,17 @@ def wait_spinner(driver):  # Ожидаем крутящийся спинер
     driver.implicitly_wait(10)
     time.sleep(2)
 
+def replace_part_house(lst: list):
+    new_lst = []
+    for s in lst:
+        if s.find('к') >= 0: continue
+        if s.find('л') >= 0: continue
+        if s.find('с') >= 0: continue
+        new_lst.append(s)
+        
+    
+    return new_lst
+
 def ordering_house(in_house: str):  # Преобразование строки дом
     '''
         Варианты домов
@@ -343,15 +354,18 @@ def ordering_house(in_house: str):  # Преобразование строки 
         Заменяем двойные пробелы на одинарные и преобразуем в нижний регистр
         
         
-        На выходе кортеж (N, str_num) где N первая цифра дома,
-        а str_num преобразованный полный номер
-        Если ошибка парсинга - ('', 'тип ошибки')
+        На выходе кортеж (N, lst_num) где N первая цифра дома,
+        а lst_num список частей номера 
+        Если ошибка парсинга - ('', [])
         
     '''
-    in_house = in_house.strip()
-    if len(in_house) == 0: return ('', 'Не задан номер')
-    if in_house.isdigit(): return (in_house, in_house)
-    if len(in_house) < 2 and in_house[0].isalpha(): return ('', 'Номер из одной буквы')  # Номер дома не может быть из одной буквы
+    # '14', '30А', '31/41', '30 корп 3', '30 корп3', '12 лит А(АД)', '30 лит 3', '30 стр. 3', '31/41корп2', '31/41 корп2', '31/41 корп 2', '1', '205', 'й'
+    
+    
+    in_house = in_house.strip().lower()
+    if len(in_house) == 0: return ('', [])
+    if in_house.isdigit(): return (in_house, [in_house, ])
+    if len(in_house) < 2 and in_house[0].isalpha(): return ('', [])  # Номер дома не может быть из одной буквы
     # Проходим по строке и если цифры сливаются с буквами вставляем пробел
     n_house = ''
     lst_house = [in_house[0],]
@@ -371,24 +385,49 @@ def ordering_house(in_house: str):  # Преобразование строки 
         in_house = in_house.replace('  ', ' ')
     # Проверка на дробь
     lst_house = in_house.split('/')
-    if len(lst_house) > 2: return ('', 'Много слешей')
-    if len(lst_house) == 2: return (lst_house[0], ' '.join(lst_house))
-    # Остались корп, лит, буква
-    lst_house = in_house.split(' ')
-    if len(lst_house) > 3: return ('', 'В номере много позиций')
-    if len(lst_house) == 2:  # значит буква - склеиваем как 30а
-        lst_house[1] = lst_house[1].lower()
-        return (lst_house[0], ''.join(lst_house))
-    # анализируем  корп, литер
-    if lst_house[1].find('к') >= 0:
-        lst_house[1] = ' '
-        return (lst_house[0], ''.join(lst_house))
-    if lst_house[1].find('л') >= 0:
-        lst_house[1] = ' '
-        return (lst_house[0], ''.join(lst_house))
-    
-    return ('', 'Номер не распознан')
+    if len(lst_house) > 2: return ('', [])
+    if len(lst_house) == 2:
+        lst2_house = lst_house[1].split(' ')
+        lst2_house = [lst_house[0], ] + replace_part_house(lst2_house)  # Заменим корп, лит, стр на к, л, с
+        return (lst_house[0], lst2_house)
+    # Разделяем по пробелу
+    lst2_house = in_house.split(' ')
+    lst2_house = replace_part_house(lst2_house)  # Заменим корп, лит, стр на к, л, с
+    return (lst2_house[0], lst2_house)
 
+def find_string_to_listsubstrs(in_lst: list, f_lst: list):  # Поиск строки в in_lst по вхождению списка подстрок
+    sub_lst = []
+    for x in f_lst:
+        x = x.lower().strip()
+        if x != '': sub_lst.append(x)
+    
+    in_lst = [x.lower().strip() for x in in_lst]
+    
+    rez_lst = []
+    for i in range(len(in_lst)):  # цикл по списку фраз
+        f_ok = True
+        in_str = in_lst[i]
+        for s_sub in sub_lst:  # цикл по подстрокам
+            if in_str.find(s_sub) >= 0:
+                in_str = in_str.replace(s_sub, '')
+                continue
+            f_ok = False
+            break
+                
+        if f_ok: rez_lst.append((i, in_lst[i]))
+    if len(rez_lst) == 1:
+        return rez_lst[0][0]
+    elif len(rez_lst) > 1:
+        l_max = 10000
+        i_max = 0
+        for tup in rez_lst:
+            l_tup = len(tup[1])
+            if l_tup < l_max:
+                l_max = l_tup
+                i_max = tup[0]
+        return i_max
+    else: return -1
+    
 # =========================================================
 
 def get_txv(data):
@@ -603,7 +642,7 @@ def get_txv(data):
         house = data.get('house')
         if house == None: raise Exception('Ошибка Дом не задан')
         c_house = ordering_house(house)
-        if c_house[0] == '': raise Exception(f'Ошибка: Дом \"{house}\" {c_house[1]}')
+        if c_house[0] == '': raise Exception(f'Ошибка: Номер дома {house} не распознан.')
 
         els_fieldset_addr = driver.find_elements(By.XPATH, '//fieldset[@class="form-1-fieldset addressConnectFs"]')
         if len(els_fieldset_addr) == 0: raise Exception('Ошибка нет блока адреса4')
@@ -628,8 +667,9 @@ def get_txv(data):
         for el in els_li:
             lst_house.append(el.text)
         # Поищем по вхождению
-        i_fnd = find_string_to_substrs(lst_house, c_house[1])
-        if i_fnd < 0: raise Exception(f'Ошибка поиск дома по номеру {c_house[1]}: вариантов нет')
+        i_fnd = find_string_to_listsubstrs(lst_house, c_house[1])
+        
+        if i_fnd < 0: raise Exception(f'Ошибка поиск дома по номеру {house}: вариантов нет')
         # Пробежим по списку подсказки
         try:
             for _ in range(i_fnd):
@@ -916,17 +956,17 @@ if __name__ == '__main__':
         # # 'house': '29/2',          # дом
         # # 'apartment': '40',          # квартира
         
-        # 'region': 'Республика Марий Эл',
-        # 'city': 'Йошкар-Ола',
-        # 'street': 'Машиностроителей',
-        # 'house': '4А',          # дом
-        # 'apartment': '2',          # квартира
+        # # 'region': 'Республика Марий Эл',
+        # # 'city': 'Йошкар-Ола',
+        # # 'street': 'Машиностроителей',
+        # # 'house': '4А',          # дом
+        # # 'apartment': '2',          # квартира
         
-        # # 'region': 'Республика Алтай',
-        # # 'city': 'село Усть-Кокса',
-        # # 'street': 'Ленина',
-        # # 'house': '20А',          # дом
-        # # 'apartment': '10',          # квартира
+        # 'region': 'Республика Алтай',
+        # 'city': 'село Усть-Кокса',
+        # 'street': 'Ленина',
+        # 'house': '20А',          # дом
+        # 'apartment': '10',          # квартира
         
         # # 'region': 'Ростовская область',         # область или город областного значения
         # # 'city': 'Ростов-на-Дону',           # город
@@ -965,10 +1005,17 @@ if __name__ == '__main__':
     # r = set_txv_status(0, data)
     # print(r)
 
-    pass
-    
-    end_time = datetime.now()
-    time_str = '\nDuration: {}'.format(end_time - start_time)
-    print(time_str)
+
+    # houses = ['14', '30А', '31/41', '30 корп 3', '30 корп3', '12 лит А(АД)', '30 лит 3', '30 стр. 3', '31/41корп2', '31/41 корп2', '31/41 корп 2', '1', '205', 'й']
+    # # for h in houses:
+        # # rez = ordering_house(h)
+        # # print(rez)
+    # i_fnd = find_string_to_listsubstrs(houses, ['41', '31', '2'])
+    # print(i_fnd)
+        
+    # end_time = datetime.now()
+    # time_str = '\nDuration: {}'.format(end_time - start_time)
+    # print(time_str)
     # limit_request_line
+    pass
 

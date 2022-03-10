@@ -5,6 +5,13 @@ import requests  # pip install requests
 from selenium import webdriver  # $ pip install selenium
 from selenium.webdriver.common.by import By
 
+emj_red_mark = '❗️'
+emj_red_ball = '🔴'
+emj_yellow_ball = '🟡'
+emj_green_ball = '🟢'
+emj_red_rhomb = '♦️'
+emj_yellow_rhomb = '🔸'
+
 
 def run_lk_beeline() -> int:
     start_time = datetime.now()
@@ -170,24 +177,29 @@ def run_lk_beeline() -> int:
             str_avlb_sms = dct.get('sms_available')
             str_totl_sms = dct.get('sms_packet')
             try:
-                sub_str = ''
-                if str_avlb_min or str_totl_min or str_avlb_sms or str_totl_sms:
-                    sub_str += f'{str_number} '
-                if str_avlb_min:
-                    cnt_avlb_min += int(str_avlb_min)
-                if str_totl_min:
-                    cnt_totl_min += int(str_totl_min)
-                if str_avlb_min or str_totl_min:
-                    sub_str += f'[min {str_avlb_min}/{str_totl_min}]'
-                if str_avlb_sms:
-                    cnt_avlb_sms += int(str_avlb_sms)
-                if str_totl_sms:
-                    cnt_totl_sms += int(str_totl_sms)
-                if str_avlb_sms or str_totl_sms:
-                    sub_str += f'[sms {str_avlb_sms}/{str_totl_sms}]'
+                avlb_min = totl_min = avlb_sms = totl_sms = 0
                 
-                if len(sub_str) > 0:
-                    buff += sub_str + '\n'
+                if str_avlb_min: avlb_min = int(str_avlb_min)
+                if str_totl_min: totl_min = int(str_totl_min)
+                if str_avlb_sms: avlb_sms = int(str_avlb_sms)
+                if str_totl_sms: totl_sms = int(str_totl_sms)
+                
+                if avlb_min == 0 and totl_min == 0 and avlb_sms == 0 and totl_sms == 0: continue
+                
+                cnt_avlb_min += avlb_min
+                cnt_totl_min += totl_min
+                cnt_avlb_sms += avlb_sms
+                cnt_totl_sms += totl_sms
+                
+                emj = ''
+                if avlb_min < 500: emj = emj_yellow_rhomb
+                if avlb_min < 100: emj = emj_red_rhomb
+                sub_str = f'{emj}{str_number} [min {avlb_min}/{totl_min}]'
+
+                if avlb_sms or totl_sms:
+                    sub_str += f'[sms {avlb_sms}/{totl_sms}]'
+                
+                buff += sub_str + '\n'
             except:
                 continue
         end_time = datetime.now()
@@ -223,14 +235,21 @@ def run_lk_beeline() -> int:
     ###################### Всем спасибо, все свободны ######################
     return ['', data, time_str, buff]
 
+def send_telegram(chat: str, token: str, text: str):
+    url = "https://api.telegram.org/bot" + token + "/sendMessage"
+    try: requests.post(url, data={'chat_id': chat, 'text': text})
+    except: print('ERROR telegram send message.')
 
 if __name__ == '__main__':
-    pass
+    # личный бот @infra     TELEGRAM_CHAT_ID, TELEGRAM_TOKEN
+    TELEGRAM_CHAT_ID = '1740645090'
+    TELEGRAM_TOKEN = '2009560099:AAHtYot6EOHh_qr9EUoCoczQhjyRdulKHYo'
+    
     rez = run_lk_beeline()
     if rez:
         str_rez = 'Парсинг ЛК Билайн: ERROR - ' + str(rez)
         print(str_rez)
-        # send_telegram(str_rez)
+        send_telegram(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN, rez[3])
 
 
 # https://yaroslavl.beeline.ru/customers/products/mobile/profile/#/home

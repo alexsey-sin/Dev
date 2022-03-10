@@ -323,8 +323,8 @@ def run_lk_mts(logger, tlg_chat, tlg_token):
             emj = ''
             try:
                 mob = int(ma)
-                if mob < 100: emj = emj_yellow_rhomb
-                if mob <= 50: emj = emj_red_rhomb
+                if mob < 500: emj = emj_yellow_rhomb
+                if mob < 100: emj = emj_red_rhomb
             except: pass
             res_mess += f'{emj}{mob_num} [min {ma}/{mt}][sms {sa}/{st}]\n'
     res_mess += f'Итого: [min {cnt_avlb_min}/{cnt_totl_min}][sms {cnt_avlb_sms}/{cnt_totl_sms}]\nВсего номеров: {len(mob_numbers)}'
