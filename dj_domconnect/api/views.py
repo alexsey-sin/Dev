@@ -163,10 +163,13 @@ def get_bots_info(request, from_date):
     for model, name in pv_cort:
         objs = model.objects.filter(pub_date__gte = f_data)
         all_cnt = objs.count()
-        ok_cnt = objs.filter(status=3).count()
-        try: percent = round((ok_cnt/all_cnt)*100, 2)
-        except: percent = 0
-        mess += f'BID {name} => {ok_cnt}/{all_cnt} => {percent}%\n'
+        ok_cnt = objs.filter(status=3).count()  # Успешно отработано
+        fil_cnt = objs.filter(status=2).count()  # Ошибка
+        try:
+            percent_ok = round((ok_cnt/all_cnt)*100, 2)
+            percent_fil = round((fil_cnt/all_cnt)*100, 2)
+        except: percent_ok = percent_fil = 0
+        mess += f'BID {name} => Всего: {all_cnt} => Успешно: {percent_ok}%; Ошибок: {percent_fil}%\n'
 
     # objs = BidTtk.objects.all()
     # all_cnt = objs.count()
@@ -186,9 +189,12 @@ def get_bots_info(request, from_date):
         objs = TxV.objects.filter(pv_code=code, pub_date__gte = f_data)
         all_cnt = objs.count()
         ok_cnt = objs.filter(status=3).count()
-        try: percent = round((ok_cnt/all_cnt)*100, 2)
-        except: percent = 0
-        mess += f'TXV {name} => {ok_cnt}/{all_cnt} => {percent}%\n'
+        fil_cnt = objs.filter(status=2).count()  # Ошибка
+        try:
+            percent_ok = round((ok_cnt/all_cnt)*100, 2)
+            percent_fil = round((fil_cnt/all_cnt)*100, 2)
+        except: percent_ok = percent_fil = 0
+        mess += f'TXV {name} => Всего: {all_cnt} => Успешно: {percent_ok}%; Ошибок: {percent_fil}%\n'
 
 
     return HttpResponse(mess, content_type='text/plain; charset=utf-8')

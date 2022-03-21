@@ -830,20 +830,46 @@ def set_txv_status(status, data):
 
 def send_crm_txv(txv_dict, opsos):
     user_agent_val = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36'
-
-    url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.update'
-    
-    # Данные для СРМ
-    # 'available_connect': '',
-    # 'tarifs_all': '',
-    # 'pv_address': '',
-    
     headers = {
         'Content-Type': 'application/json',
         'Connection': 'Keep-Alive',
         'User-Agent': user_agent_val,
     }
 
+    # HELP: https://dev.1c-bitrix.ru/rest_help/crm/leads
+    
+    available_connect = txv_dict.get('available_connect')
+    
+    '''
+        Алексей, по боту РТК ТхВ
+
+        Когда бот проверяет ТХВ, добавить в конце проверку. 
+        Если в результате есть строка "Есть ТхВ" (или как там пишет ртк), то:
+
+        Смотрим статус лида через rest. 
+        Если статус лида id 77 (Новые (Нет ТхВ РТК))
+        Меняем статус на id 72 (Новые (РТК))
+    '''
+    # Проверим статус лида
+    upgrade_status = False
+    if available_connect.find('Есть ТхВ') >= 0:
+        url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.get'
+        params = {
+            'id': txv_dict.get('id_lid'),
+        }
+        try:
+            responce = requests.post(url, headers=headers, params=params)
+            st_code = responce.status_code
+            if st_code != 200: return st_code
+            lid = json.loads(responce.text)
+            result = lid.get('result')
+            status = result.get('STATUS_ID')
+            if status and status == '77': upgrade_status = True
+        except Exception as e:
+            return str(e)
+    
+    url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.update'
+    
     restrictions = ''
     error_message = txv_dict.get('bot_log')
     if error_message: restrictions += f'{error_message}\n'
@@ -851,14 +877,13 @@ def send_crm_txv(txv_dict, opsos):
     pv_address = txv_dict.get('pv_address')
     if pv_address: restrictions += f'{opsos} определил адрес как: {pv_address}\n'
     
-    available_connect = txv_dict.get('available_connect')
     if available_connect: restrictions += f'Возможность подключения: {available_connect}\n'
     
     params = {
         'id': txv_dict.get('id_lid'),
         'fields[UF_CRM_1638779781554][]': restrictions[:500],  # вся инфа
     }
-
+    if upgrade_status: params['fields[STATUS_ID]'] = '72'
     try:
         responce = requests.post(url, headers=headers, params=params)
         st_code = responce.status_code
@@ -924,7 +949,20 @@ def run_txv_rostelecom(tlg_chat, tlg_token):
 
 
 if __name__ == '__main__':
-    start_time = datetime.now()
+    # личный бот @infra     TELEGRAM_CHAT_ID, TELEGRAM_TOKEN
+    TELEGRAM_CHAT_ID = '1740645090'
+    TELEGRAM_TOKEN = '2009560099:AAHtYot6EOHh_qr9EUoCoczQhjyRdulKHYo'
+
+    # общий канал бот @Domconnect_bot Автозаявки        BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN
+    BID_TELEGRAM_CHAT_ID = '-1001646764735'
+    BID_TELEGRAM_TOKEN = '526322367:AAEaw2vaeLl_f6Njfb952NopyxqCGRQXji8'
+    
+    
+    # start_time = datetime.now()
+    
+    
+    run_txv_rostelecom(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
+    
     
     # url: https://eissd.rt.ru/login
     # login: sz_v_an
@@ -962,11 +1000,11 @@ if __name__ == '__main__':
         # # 'house': '4А',          # дом
         # # 'apartment': '2',          # квартира
         
-        # 'region': 'Республика Алтай',
-        # 'city': 'село Усть-Кокса',
-        # 'street': 'Ленина',
-        # 'house': '20А',          # дом
-        # 'apartment': '10',          # квартира
+        # # 'region': 'Республика Алтай',
+        # # 'city': 'село Усть-Кокса',
+        # # 'street': 'Ленина',
+        # # 'house': '20А',          # дом
+        # # 'apartment': '10',          # квартира
         
         # # 'region': 'Ростовская область',         # область или город областного значения
         # # 'city': 'Ростов-на-Дону',           # город
@@ -974,11 +1012,11 @@ if __name__ == '__main__':
         # # 'house': '12',          # дом
         # # 'apartment': '10',          # квартира
         
-        # # 'region': 'Ярославская область',         # область или город областного значения
-        # # 'city': 'Ярославль',           # город
-        # # 'street': 'улица Труфанова',         # улица
-        # # 'house': '29 корп 2',          # дом
-        # # 'apartment': '63',          # квартира
+        # 'region': 'Ярославская область',         # область или город областного значения
+        # 'city': 'Ярославль',           # город
+        # 'street': 'улица Труфанова',         # улица
+        # 'house': '29 корп 2',          # дом
+        # 'apartment': '63',          # квартира
 
         # 'available_connect': '',  # Возможность подключения
         # 'tarifs_all': '', # список названий тарифных планов

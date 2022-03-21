@@ -1,9 +1,11 @@
-import os
-import time
-from datetime import datetime
-import requests  # pip install requests
-from selenium import webdriver  # $ pip install selenium
-from selenium.webdriver.common.by import By
+import os, time, threading
+from datetime import datetime, timedelta
+# import os
+# import time
+# from datetime import datetime
+# import requests  # pip install requests
+# from selenium import webdriver  # $ pip install selenium
+# from selenium.webdriver.common.by import By
 
 from lk_megafon import run_lk_megafon
 from lk_beeline import run_lk_beeline
@@ -30,203 +32,190 @@ BID_TELEGRAM_TOKEN = '526322367:AAEaw2vaeLl_f6Njfb952NopyxqCGRQXji8'
 
 TIME_1_HOUR = 1 * 60 * 60  # в секундах
 TIME_30_SECONDS = 30  # в секундах, 
-
-PERIOD_SCAN_BID_BEELINE = TIME_30_SECONDS  # Периодичность работы скрипта заведение заявок BEELINE
-PERIOD_SCAN_BID_MTS = TIME_30_SECONDS  # Периодичность работы скрипта заведение заявок MTS
-PERIOD_SCAN_BID_ROSTELECOM2 = TIME_30_SECONDS  # Периодичность работы скрипта заведение заявок ROSTELECOM2
-PERIOD_SCAN_BID_ROSTELECOM = TIME_30_SECONDS  # Периодичность работы скрипта заведение заявок ROSTELECOM
-PERIOD_SCAN_BID_DOMRU = TIME_30_SECONDS  # Периодичность работы скрипта заведение заявок DOMRU
-PERIOD_SCAN_BID_TTK = TIME_30_SECONDS  # Периодичность работы скрипта заведение заявок TTK
-PERIOD_SCAN_BID_ONLIME = TIME_30_SECONDS  # Периодичность работы скрипта заведение заявок ONLIME
-PERIOD_SCAN_BID_MGTS = TIME_30_SECONDS  # Периодичность работы скрипта заведение заявок MGTS
-PERIOD_SCAN_LK_MEGAFON = TIME_1_HOUR  # Периодичность работы парсинг ЛК MEGAFON
-PERIOD_SCAN_LK_BEELINE = TIME_1_HOUR  # Периодичность работы парсинг ЛК BEELINE
+TIME_10_SECONDS = 10  # в секундах, 
+TIME_3_SECONDS = 3  # в секундах, 
 PERIOD_BETWEEN = 1  # в секундах, Пауза
-
-def send_telegram(chat: str, token: str, text: str):
-    url = "https://api.telegram.org/bot" + token + "/sendMessage"
-    try:
-        r = requests.post(url, data={
-            "chat_id": chat,
-            "text": text
-        })
-    except:
-        return 600
-    return r.status_code
-
-def send_api(data):
-    # API_MOBILE_URL = 'http://127.0.0.1:8000/mobile/api'
-    # BSE_URL = 'http://127.0.0.1:8000/'
-
-    API_MOBILE_URL = 'http://37.46.128.40/mobile/api'
-    BSE_URL = 'http://37.46.128.40/'
-
-    try:
-        client = requests.session()
-        resp = client.get(BSE_URL)
-        csrftoken = resp.cookies.get('csrftoken')
-        header = {
-            "Content-type": "application/json",
-            "X-CSRFToken": csrftoken,
-        }
-        resp = client.post(API_MOBILE_URL, headers=header, json=data)
-    except:
-        return 1
-
-    return 0
-    # print(resp.status_code)
-    # print(resp.text)
-
-# def write_log(buff, prefix):
-    # if not os.path.exists('log/'):
-        # os.mkdir('log/')
-
-    # now = datetime.now()
-    # filename = now.strftime(f'log/{prefix}_%H-%M_%d-%m-%Y.txt')
-
-    # with open(filename, 'w', encoding='utf-8') as outfile:
-        # outfile.write(buff)
-
-def make_lk_report(rez, opsos):
-    tlg_mess = 'not message'
-    if rez[0]:  # если ошибка
-        tlg_mess = f'Parsing {opsos} - ERROR: {rez[0]}'
-        print(tlg_mess)
-    else:  # если всё хорошо
-        print(f'Parsing {opsos} is OK. See logs')
-        print(rez[2])
-        send_api(rez[1])
-        # write_log(rez[3], opsos)
-        tlg_mess = rez[3]
-    ans = send_telegram(LK_TELEGRAM_CHAT_ID, LK_TELEGRAM_TOKEN, tlg_mess)
-    s_ans = 'OK'
-    if ans != 200:
-        s_ans = str(ans)
-    print('Send TELEGRAMM:', s_ans)
 
 
 if __name__ == '__main__':
-    start_time_bid_beeline = None
-    start_time_bid_mts = None
-    start_time_bid_rostelecom2 = None
-    start_time_bid_rostelecom = None
-    start_time_bid_domru = None
-    start_time_bid_ttk = None
-    start_time_bid_onlime = None
-    start_time_bid_mgts = None
-    start_time_lk_megafon = None
-    start_time_lk_beeline = None
+    dtn = datetime.now()  # Стартовать с отсрочкой PERIOD_BETWEEN
+    dtn = dtn - timedelta(hours=5)  # Стартовать сразу
+
+    start_time_bid_beeline = dtn
+    start_time_bid_mts = dtn
+    start_time_bid_rostelecom2 = dtn
+    start_time_bid_rostelecom = dtn
+    start_time_bid_domru = dtn
+    start_time_bid_ttk = dtn
+    start_time_bid_onlime = dtn
+    start_time_bid_mgts = dtn
+    start_time_lk_megafon = dtn
+    start_time_lk_beeline = dtn
     
     while True:
         time.sleep(PERIOD_BETWEEN)
         # Рабочее время ботов с 6 до 23
         cur_time = datetime.now()
         if cur_time.hour < 6 or cur_time.hour >= 23: continue
-        str_time = cur_time.strftime('%H:%M:%S %d-%m-%Y')
         
         #===============================================#
         # Скрипт Заведение заявок beeline
-        if start_time_bid_beeline:
-            passed = (cur_time - start_time_bid_beeline).seconds
-        if start_time_bid_beeline == None or passed >= PERIOD_SCAN_BID_BEELINE:
-            start_time_bid_beeline = cur_time
-            print(f'start bid_beeline {str_time}')
-            # run_bid_beeline(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
-            run_bid_beeline(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN)
-            continue
+        cur_time = datetime.now()
+        if (cur_time - start_time_bid_beeline).seconds >= TIME_3_SECONDS:
+            thread_name = 'bid_beeline'
+            is_run = False
+            for thread in threading.enumerate():
+                if thread.getName() == thread_name: is_run = True; break
+            if is_run == False:
+                # th = threading.Thread(target=run_bid_beeline, name=thread_name, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
+                th = threading.Thread(target=run_bid_beeline, name=thread_name, args=(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN))
+                th.start()
+                print(f'Bot: {thread_name} is running.')
+                start_time_bid_beeline = cur_time
+                time.sleep(0.2)
 
         #===============================================#
         # Скрипт Заведение заявок mts
-        if start_time_bid_mts:
-            passed = (cur_time - start_time_bid_mts).seconds
-        if start_time_bid_mts == None or passed >= PERIOD_SCAN_BID_MTS:
-            start_time_bid_mts = cur_time
-            print(f'start bid_mts {str_time}')
-            run_bid_mts(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
-            continue
+        cur_time = datetime.now()
+        if (cur_time - start_time_bid_mts).seconds >= TIME_3_SECONDS:
+            thread_name = 'bid_mts'
+            is_run = False
+            for thread in threading.enumerate():
+                if thread.getName() == thread_name: is_run = True; break
+            if is_run == False:
+                # th = threading.Thread(target=run_bid_mts, name=thread_name, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
+                th = threading.Thread(target=run_bid_mts, name=thread_name, args=(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN))
+                th.start()
+                print(f'Bot: {thread_name} is running.')
+                start_time_bid_mts = cur_time
+                time.sleep(0.2)
 
         #===============================================#
         # Скрипт Заведение заявок rostelecom2
-        if start_time_bid_rostelecom2:
-            passed = (cur_time - start_time_bid_rostelecom2).seconds
-        if start_time_bid_rostelecom2 == None or passed >= PERIOD_SCAN_BID_ROSTELECOM2:
-            start_time_bid_rostelecom2 = cur_time
-            print(f'start bid_rostelecom2 {str_time}')
-            run_bid_rostelecom2(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
-            continue
+        cur_time = datetime.now()
+        if (cur_time - start_time_bid_rostelecom2).seconds >= TIME_3_SECONDS:
+            thread_name = 'bid_rostelecom2'
+            is_run = False
+            for thread in threading.enumerate():
+                if thread.getName() == thread_name: is_run = True; break
+            if is_run == False:
+                # th = threading.Thread(target=run_bid_rostelecom2, name=thread_name, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
+                th = threading.Thread(target=run_bid_rostelecom2, name=thread_name, args=(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN))
+                th.start()
+                print(f'Bot: {thread_name} is running.')
+                start_time_bid_rostelecom2 = cur_time
+                time.sleep(0.2)
 
         #===============================================#
         # Скрипт Заведение заявок rostelecom
-        if start_time_bid_rostelecom:
-            passed = (cur_time - start_time_bid_rostelecom).seconds
-        if start_time_bid_rostelecom == None or passed >= PERIOD_SCAN_BID_ROSTELECOM:
-            start_time_bid_rostelecom = cur_time
-            print(f'start bid_rostelecom {str_time}')
-            run_bid_rostelecom(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
-            continue
+        cur_time = datetime.now()
+        if (cur_time - start_time_bid_rostelecom).seconds >= TIME_3_SECONDS:
+            thread_name = 'bid_rostelecom'
+            is_run = False
+            for thread in threading.enumerate():
+                if thread.getName() == thread_name: is_run = True; break
+            if is_run == False:
+                # th = threading.Thread(target=run_bid_rostelecom, name=thread_name, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
+                th = threading.Thread(target=run_bid_rostelecom, name=thread_name, args=(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN))
+                th.start()
+                print(f'Bot: {thread_name} is running.')
+                start_time_bid_rostelecom = cur_time
+                time.sleep(0.2)
 
         #===============================================#
         # Скрипт Заведение заявок domru
-        if start_time_bid_domru:
-            passed = (cur_time - start_time_bid_domru).seconds
-        if start_time_bid_domru == None or passed >= PERIOD_SCAN_BID_DOMRU:
-            start_time_bid_domru = cur_time
-            print(f'start bid_domru {str_time}')
-            run_bid_domru(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
-            continue
+        cur_time = datetime.now()
+        if (cur_time - start_time_bid_domru).seconds >= TIME_3_SECONDS:
+            thread_name = 'bid_domru'
+            is_run = False
+            for thread in threading.enumerate():
+                if thread.getName() == thread_name: is_run = True; break
+            if is_run == False:
+                # th = threading.Thread(target=run_bid_domru, name=thread_name, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
+                th = threading.Thread(target=run_bid_domru, name=thread_name, args=(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN))
+                th.start()
+                print(f'Bot: {thread_name} is running.')
+                start_time_bid_domru = cur_time
+                time.sleep(0.2)
 
         #===============================================#
         # Скрипт Заведение заявок ttk
-        if start_time_bid_ttk:
-            passed = (cur_time - start_time_bid_ttk).seconds
-        if start_time_bid_ttk == None or passed >= PERIOD_SCAN_BID_TTK:
-            start_time_bid_ttk = cur_time
-            print(f'start bid_ttk {str_time}')
-            run_bid_ttk(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
-            continue
+        cur_time = datetime.now()
+        if (cur_time - start_time_bid_ttk).seconds >= TIME_3_SECONDS:
+            thread_name = 'bid_ttk'
+            is_run = False
+            for thread in threading.enumerate():
+                if thread.getName() == thread_name: is_run = True; break
+            if is_run == False:
+                # th = threading.Thread(target=run_bid_ttk, name=thread_name, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
+                th = threading.Thread(target=run_bid_ttk, name=thread_name, args=(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN))
+                th.start()
+                print(f'Bot: {thread_name} is running.')
+                start_time_bid_ttk = cur_time
+                time.sleep(0.2)
 
         # #===============================================#
         # # Скрипт Заведение заявок onlime
-        # if start_time_bid_onlime:
-            # passed = (cur_time - start_time_bid_onlime).seconds
-        # if start_time_bid_onlime == None or passed >= PERIOD_SCAN_BID_ONLIME:
-            # start_time_bid_onlime = cur_time
-            # print(f'start bid_onlime {str_time}')
-            # # run_bid_onlime(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
-            # run_bid_onlime(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN)
-            # continue
+        # cur_time = datetime.now()
+        # if (cur_time - start_time_bid_onlime).seconds >= TIME_3_SECONDS:
+            # thread_name = 'bid_onlime'
+            # is_run = False
+            # for thread in threading.enumerate():
+                # if thread.getName() == thread_name: is_run = True; break
+            # if is_run == False:
+                # # th = threading.Thread(target=run_bid_onlime, name=thread_name, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
+                # th = threading.Thread(target=run_bid_onlime, name=thread_name, args=(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN))
+                # th.start()
+                # print(f'Bot: {thread_name} is running.')
+                # start_time_bid_onlime = cur_time
+                # time.sleep(0.2)
 
         #===============================================#
         # Скрипт Заведение заявок mgts
-        if start_time_bid_mgts:
-            passed = (cur_time - start_time_bid_mgts).seconds
-        if start_time_bid_mgts == None or passed >= PERIOD_SCAN_BID_MGTS:
-            start_time_bid_mgts = cur_time
-            print(f'start bid_mgts {str_time}')
-            # run_bid_mgts(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
-            run_bid_mgts(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN)
-            continue
+        cur_time = datetime.now()
+        if (cur_time - start_time_bid_mgts).seconds >= TIME_3_SECONDS:
+            thread_name = 'bid_mgts'
+            is_run = False
+            for thread in threading.enumerate():
+                if thread.getName() == thread_name: is_run = True; break
+            if is_run == False:
+                # th = threading.Thread(target=run_bid_mgts, name=thread_name, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
+                th = threading.Thread(target=run_bid_mgts, name=thread_name, args=(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN))
+                th.start()
+                print(f'Bot: {thread_name} is running.')
+                start_time_bid_mgts = cur_time
+                time.sleep(0.2)
 
-        # #===============================================#
-        # # Скрипт парсинг ЛК megafon
-        # if start_time_lk_megafon:
-            # passed = (cur_time - start_time_lk_megafon).seconds
-        # if start_time_lk_megafon == None or passed >= PERIOD_SCAN_LK_MEGAFON:
-            # start_time_lk_megafon = cur_time
-            # print(f'start lk_megafon {str_time}')
-            # rez = run_lk_megafon()
-            # make_lk_report(rez, 'megafon')
-            # continue
+        #===============================================#
+        # Скрипт парсинг ЛК megafon
+        cur_time = datetime.now()
+        if (cur_time - start_time_lk_megafon).seconds >= TIME_1_HOUR:
+            thread_name = 'lk_megafon'
+            is_run = False
+            for thread in threading.enumerate():
+                if thread.getName() == thread_name: is_run = True; break
+            if is_run == False:
+                # th = threading.Thread(target=run_lk_megafon, name=thread_name, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
+                th = threading.Thread(target=run_lk_megafon, name=thread_name, args=(LK_TELEGRAM_CHAT_ID, LK_TELEGRAM_TOKEN))
+                th.start()
+                print(f'Bot: {thread_name} is running.')
+                start_time_lk_megafon = cur_time
+                time.sleep(0.2)
 
-        # #===============================================#
-        # # Скрипт парсинг ЛК beeline
-        # if start_time_lk_beeline:
-            # passed = (cur_time - start_time_lk_beeline).seconds
-        # if start_time_lk_beeline == None or passed >= PERIOD_SCAN_LK_BEELINE:
-            # start_time_lk_beeline = cur_time
-            # print(f'start lk_beeline {str_time}')
-            # rez = run_lk_beeline()
-            # make_lk_report(rez, 'beeline')
-            # continue
+        #===============================================#
+        # Скрипт парсинг ЛК beeline
+        cur_time = datetime.now()
+        if (cur_time - start_time_lk_beeline).seconds >= TIME_1_HOUR:
+            thread_name = 'lk_beeline'
+            is_run = False
+            for thread in threading.enumerate():
+                if thread.getName() == thread_name: is_run = True; break
+            if is_run == False:
+                # th = threading.Thread(target=run_lk_beeline, name=thread_name, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
+                th = threading.Thread(target=run_lk_beeline, name=thread_name, args=(LK_TELEGRAM_CHAT_ID, LK_TELEGRAM_TOKEN))
+                th.start()
+                print(f'Bot: {thread_name} is running.')
+                start_time_lk_beeline = cur_time
+                time.sleep(0.2)
 
     #####################################################

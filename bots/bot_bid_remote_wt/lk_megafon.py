@@ -4,6 +4,8 @@ import requests  # pip install requests
 from selenium import webdriver  # $ pip install selenium
 from selenium.webdriver.common.by import By
 
+opsos = 'megafon'
+
 emj_red_mark = '❗️'
 emj_red_ball = '🔴'
 emj_yellow_ball = '🟡'
@@ -11,11 +13,15 @@ emj_green_ball = '🟢'
 emj_red_rhomb = '♦️'
 emj_yellow_rhomb = '🔸'
 
+# личный бот @infra     TELEGRAM_CHAT_ID, TELEGRAM_TOKEN
+TELEGRAM_CHAT_ID = '1740645090'
+TELEGRAM_TOKEN = '2009560099:AAHtYot6EOHh_qr9EUoCoczQhjyRdulKHYo'
 
-def run_lk_megafon():
-    start_time = datetime.now()
-    ###########################################################################
-    ###########################################################################
+# общий канал бот @Domconnect_bot Парсинг ЛК       LK_TELEGRAM_CHAT_ID, LK_TELEGRAM_TOKEN
+LK_TELEGRAM_CHAT_ID = '-1001580291081'
+LK_TELEGRAM_TOKEN = '526322367:AAEaw2vaeLl_f6Njfb952NopyxqCGRQXji8'
+
+def run_lk_parsing():
     # https://b2blk.megafon.ru/login		9201337110	dkk3D2
     driver = None
     try:
@@ -62,12 +68,6 @@ def run_lk_megafon():
         driver.get(base_url + '/subscribers/mobile')
         time.sleep(30)
         ###################### Абоненты ######################
-        # #===========
-        # # time.sleep(10)
-        # with open('out_lk.html', 'w', encoding='utf-8') as outfile:
-            # outfile.write(driver.page_source)
-        # raise Exception('Финиш.')
-        # #===========
         # need_rows = 18  # (кол-во номеров + строка заголовка)
         # cnt = 0
         # while(1):
@@ -158,15 +158,19 @@ def run_lk_megafon():
                 
                 buff += f'{emj}{str_number} [min {avlb_min}][sms {avlb_sms}]\n'
             except: continue
-        end_time = datetime.now()
-        time_str = '\nDuration: {}'.format(end_time - start_time)
         buff += f'Итого: [min {cnt_avlb_min}][sms {cnt_avlb_sms}]\n'
         buff += f'Всего номеров: {cnt_nums}\n'
     except Exception as e:
-        return [str(e)[:100], {}, 'error', '']
+        return str(e)[:100], {}, ''
     finally:
         if driver: driver.quit()
 
+    # #===========
+    # # time.sleep(10)
+    # with open('out_lk.html', 'w', encoding='utf-8') as outfile:
+        # outfile.write(driver.page_source)
+    # raise Exception('Финиш.')
+    # #===========
     ###################### Формируем POST запрос в базу данных ######################
     '''
     структура отправляемых данных:
@@ -188,21 +192,48 @@ def run_lk_megafon():
 
     '''
     ###################### Всем спасибо, все свободны ######################
-    return ['', data, time_str, buff]
+    return '', data, buff
 
 def send_telegram(chat: str, token: str, text: str):
     url = "https://api.telegram.org/bot" + token + "/sendMessage"
     try: requests.post(url, data={'chat_id': chat, 'text': text})
     except: print('ERROR telegram send message.')
 
+def send_api(data):
+    # API_MOBILE_URL = 'http://127.0.0.1:8000/mobile/api'
+    # BSE_URL = 'http://127.0.0.1:8000/'
 
+    API_MOBILE_URL = 'http://37.46.128.40/mobile/api'
+    BSE_URL = 'http://37.46.128.40/'
+
+    try:
+        client = requests.session()
+        resp = client.get(BSE_URL)
+        csrftoken = resp.cookies.get('csrftoken')
+        header = {
+            "Content-type": "application/json",
+            "X-CSRFToken": csrftoken,
+        }
+        resp = client.post(API_MOBILE_URL, headers=header, json=data)
+    except: return f'Parsing {opsos} Error send API'
+
+    return ''
+
+def run_lk_megafon(chat, token):
+    print(f'Start parsing {opsos}')
+    tlg_mess = ''
+    e, data, mess = run_lk_parsing()
+    if e:
+        tlg_mess = f'Parsing {opsos} - ERROR: {e}'
+    else:
+        e = send_api(data)
+        if e: tlg_mess = e
+        else: tlg_mess = mess
+    send_telegram(chat, token, tlg_mess)
+    print(tlg_mess)
+        
+        
 if __name__ == '__main__':
-    # личный бот @infra     TELEGRAM_CHAT_ID, TELEGRAM_TOKEN
-    TELEGRAM_CHAT_ID = '1740645090'
-    TELEGRAM_TOKEN = '2009560099:AAHtYot6EOHh_qr9EUoCoczQhjyRdulKHYo'
-
-    rez = run_lk_megafon()
-    if rez:
-        str_rez = 'Парсинг ЛК Мегафон: ERROR - ' + str(rez)
-        print(str_rez)
-        send_telegram(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN, rez[3])
+    
+    run_lk_megafon(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN)  # В личный infra чат
+    # run_lk_megafon(LK_TELEGRAM_CHAT_ID, LK_TELEGRAM_TOKEN)  # В общий чат

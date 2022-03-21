@@ -5,12 +5,12 @@ import requests  # pip install requests
 import json
 from selenium import webdriver  # $ pip install selenium
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 
 # url_host = 'http://127.0.0.1:8000/'
 url_host = 'http://django.domconnect.ru/'
 opsos = 'Билайн'
 pv_code = 1
-workercode = '1010000101'
 
 
 def find_string_to_substrs(lst: list, substr: str):  # Поиск вхождения подстрок в списке фраз с названиями тарифов, адресов
@@ -282,7 +282,9 @@ def get_txv(data):
             else: raise Exception('Ошибка не задан логин')
         except: raise Exception('Ошибка действий 01')
         time.sleep(1)
-
+        
+        workercode = data.get('login_2')
+        if not workercode: raise Exception('Ошибка не задан PartnerWeb (login2)')
         els = driver.find_elements(By.ID, 'id_workercode')
         if len(els) != 1: raise Exception('Ошибка нет поля workercode')
         try: els[0].send_keys(workercode)
@@ -305,7 +307,7 @@ def get_txv(data):
         time.sleep(5)
         ###################### Главная страница ######################
         els_a = driver.find_elements(By.XPATH, '//a[@href="/ngapp#!/checkaddress/search"]')
-        if len(els_a) != 1: raise Exception('Ошибка нет ссылки перейти к списку городов')
+        if len(els_a) != 1: raise Exception('Ошибка авторизации')
         try: els_a[0].click()
         except: raise Exception('Ошибка действий 05')
         time.sleep(5)
@@ -362,12 +364,14 @@ def get_txv(data):
         if len(els_street) != 1: raise Exception('Ошибка не найдено поле ввода названия улицы')
         el_street = els_street[0]
         # Удалим если что-то уже введено
-        try: el_street.send_keys(Keys.CONTROL + 'a')
+        try:
+            el_street.click()
+            time.sleep(0.2)
+            el_street.send_keys(Keys.CONTROL + 'a')
+            time.sleep(0.2)
+            el_street.send_keys(Keys.DELETE)
+            time.sleep(0.2)
         except: raise Exception('Ошибка ввода 5')
-        time.sleep(0.2)
-        try: el_street.send_keys(Keys.DELETE)
-        except: raise Exception('Ошибка ввода 6')
-        time.sleep(0.2)
 
         # Преобразуем в нормальный вид [тип, название]
         street = data.get('street')
@@ -781,12 +785,14 @@ def run_txv_beeline(tlg_chat, tlg_token):
 
 
 if __name__ == '__main__':
-    start_time = datetime.now()
-    
     # https://partnerweb.beeline.ru
     # set_txv_to_dj_domconnect(pv_code)
     
+    # личный бот @infra     TELEGRAM_CHAT_ID, TELEGRAM_TOKEN
+    TELEGRAM_CHAT_ID = '1740645090'
+    TELEGRAM_TOKEN = '2009560099:AAHtYot6EOHh_qr9EUoCoczQhjyRdulKHYo'
     
+    run_txv_beeline(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN)
     # rez, txv_list = get_txv_in_dj_domconnect(pv_code)
     # for val in txv_list:
         # print(val)

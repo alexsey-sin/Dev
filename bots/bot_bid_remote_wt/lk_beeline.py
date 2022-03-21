@@ -5,6 +5,8 @@ import requests  # pip install requests
 from selenium import webdriver  # $ pip install selenium
 from selenium.webdriver.common.by import By
 
+opsos = 'beeline'
+
 emj_red_mark = '❗️'
 emj_red_ball = '🔴'
 emj_yellow_ball = '🟡'
@@ -12,11 +14,15 @@ emj_green_ball = '🟢'
 emj_red_rhomb = '♦️'
 emj_yellow_rhomb = '🔸'
 
+# личный бот @infra     TELEGRAM_CHAT_ID, TELEGRAM_TOKEN
+TELEGRAM_CHAT_ID = '1740645090'
+TELEGRAM_TOKEN = '2009560099:AAHtYot6EOHh_qr9EUoCoczQhjyRdulKHYo'
 
-def run_lk_beeline() -> int:
-    start_time = datetime.now()
-    ###########################################################################
-    ###########################################################################
+# общий канал бот @Domconnect_bot Парсинг ЛК       LK_TELEGRAM_CHAT_ID, LK_TELEGRAM_TOKEN
+LK_TELEGRAM_CHAT_ID = '-1001580291081'
+LK_TELEGRAM_TOKEN = '526322367:AAEaw2vaeLl_f6Njfb952NopyxqCGRQXji8'
+
+def run_lk_parsing():
     # https://my.beeline.ru		S715792964	MuE8$lVGpo
     driver = None
     try:
@@ -89,7 +95,7 @@ def run_lk_beeline() -> int:
 
         ###################### Страницы каждого абонента ######################
         data = {
-            'operator': 'beeline',
+            'operator': opsos,
             'numbers': [],
         }
         # num_urls = [
@@ -202,12 +208,10 @@ def run_lk_beeline() -> int:
                 buff += sub_str + '\n'
             except:
                 continue
-        end_time = datetime.now()
-        time_str = '\nDuration: {}'.format(end_time - start_time)
         buff += f'Итого: [min {cnt_avlb_min}/{cnt_totl_min}][sms {cnt_avlb_sms}/{cnt_totl_sms}]\n'
         buff += f'Всего номеров: {cnt_nums}\n'
     except Exception as e:
-        return [str(e)[:100], {}, 'error', '']
+        return str(e)[:100], {}, ''
     finally:
         if driver: driver.quit()
 
@@ -233,25 +237,53 @@ def run_lk_beeline() -> int:
 
     '''
     ###################### Всем спасибо, все свободны ######################
-    return ['', data, time_str, buff]
+    return '', data, buff
 
 def send_telegram(chat: str, token: str, text: str):
     url = "https://api.telegram.org/bot" + token + "/sendMessage"
     try: requests.post(url, data={'chat_id': chat, 'text': text})
     except: print('ERROR telegram send message.')
 
+def send_api(data):
+    # API_MOBILE_URL = 'http://127.0.0.1:8000/mobile/api'
+    # BSE_URL = 'http://127.0.0.1:8000/'
+
+    API_MOBILE_URL = 'http://37.46.128.40/mobile/api'
+    BSE_URL = 'http://37.46.128.40/'
+
+    try:
+        client = requests.session()
+        resp = client.get(BSE_URL)
+        csrftoken = resp.cookies.get('csrftoken')
+        header = {
+            "Content-type": "application/json",
+            "X-CSRFToken": csrftoken,
+        }
+        resp = client.post(API_MOBILE_URL, headers=header, json=data)
+    except: return f'Parsing {opsos} Error send API'
+
+    return ''
+
+def run_lk_beeline(chat, token):
+    print(f'Start parsing {opsos}')
+    tlg_mess = ''
+    e, data, mess = run_lk_parsing()
+    if e:
+        tlg_mess = f'Parsing {opsos} - ERROR: {e}'
+    else:
+        e = send_api(data)
+        if e: tlg_mess = e
+        else: tlg_mess = mess
+    send_telegram(chat, token, tlg_mess)
+    print(tlg_mess)
+        
+        
 if __name__ == '__main__':
-    # личный бот @infra     TELEGRAM_CHAT_ID, TELEGRAM_TOKEN
-    TELEGRAM_CHAT_ID = '1740645090'
-    TELEGRAM_TOKEN = '2009560099:AAHtYot6EOHh_qr9EUoCoczQhjyRdulKHYo'
     
-    rez = run_lk_beeline()
-    if rez:
-        str_rez = 'Парсинг ЛК Билайн: ERROR - ' + str(rez)
-        print(str_rez)
-        send_telegram(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN, rez[3])
+    run_lk_beeline(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN)  # В личный infra чат
+    # run_lk_beeline(LK_TELEGRAM_CHAT_ID, LK_TELEGRAM_TOKEN)  # В общий чат
 
 
-# https://yaroslavl.beeline.ru/customers/products/mobile/profile/#/home
-# 7 962 208-70-00
-# MnIAarB78R
+    # https://yaroslavl.beeline.ru/customers/products/mobile/profile/#/home
+    # 7 962 208-70-00
+    # MnIAarB78R
