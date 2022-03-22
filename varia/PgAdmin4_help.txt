@@ -57,3 +57,20 @@ SELECT region, city, street, house, apartment, bot_log FROM public.api_txv
 WHERE "pv_code" = 4 AND "status" = 2
 ORDER BY pub_date DESC
 LIMIT 100
+
+
+Удаляем заявки ТхВ старые ДомРу
+=========================================================
+DELETE FROM public.api_txv
+WHERE "pv_code" = 2 AND "pub_date" < '2022-03-22 15:00:00'
+
+
+Удаляем заявки ТхВ старые Ростелеком
+которые бот забрал заявки и работа его была прервана
+=========================================================
+DELETE FROM public.api_txv
+WHERE "pv_code" = 4 AND "pub_date" < '2022-03-22 15:00:00' AND "status" = 1
+
+
+
+

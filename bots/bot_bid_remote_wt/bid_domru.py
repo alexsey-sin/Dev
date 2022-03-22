@@ -142,6 +142,7 @@ def set_bid(data):
         time.sleep(3)
         
         ###################### Страница ссылок городов ######################
+        region = data.get('region')
         city = data.get('city')
         els = driver.find_elements(By.XPATH, '//div[@id="b12356"]')
         if len(els) != 1: raise Exception('Ошибка: нет блока городов')
@@ -150,7 +151,7 @@ def set_bid(data):
         f_ok = False
         url_city = ''
         for el_a in els_a:
-            if el_a.text == city:
+            if el_a.text == city or el_a.text == region:
                 url_city = el_a.get_attribute('href')
         if url_city == False: raise Exception(f'Ошибка: город \"{city}\" в списке городов не найден')
 
@@ -202,6 +203,43 @@ def set_bid(data):
         els_addr = driver.find_elements(By.XPATH, '//div[@id="adress_content"]')
         if len(els_addr) != 1: raise Exception('Ошибка: Нет блока адреса')
         el_addr = els_addr[0]
+        
+        # Вводим город
+        els_city = el_addr.find_elements(By.XPATH, './/input[@id="city_area_name"]')
+        if len(els_city) != 1: raise Exception('Ошибка Нет поля ввода город')
+        el_city = els_city[0]
+        # Удалим если что-то уже введено
+        try:
+            el_city.click()
+            time.sleep(0.2)
+            el_city.send_keys(Keys.CONTROL + 'a')
+            time.sleep(0.2)
+            el_city.send_keys(Keys.DELETE)
+            time.sleep(0.2)
+            el_city.send_keys(city)
+        except: raise Exception('Ошибка ввода город')
+        time.sleep(5)
+        # отлавливаем подсказку
+        f_ok = False
+        f_str = []
+        els_ul = driver.find_elements(By.TAG_NAME, 'ul')
+        for el_ul in els_ul:
+            str_class = el_ul.get_attribute('class')
+            if str_class.find('display: none') >= 0: continue
+            els_li = el_ul.find_elements(By.TAG_NAME, 'li')
+            if len(els_li) > 0:
+                for i in range(len(els_li)):
+                    a_s = els_li[i].find_elements(By.TAG_NAME, 'a')
+                    if len(a_s[0].text) > 0: f_str.append(a_s[0].text)
+                if len(f_str) > 0:
+                    f_ok = True
+                    i_sh = find_short(f_str)
+                    try: els_li[i_sh].click()
+                    except: raise Exception('Ошибка клика выбора город')
+                    time.sleep(5)
+                
+            if f_ok == True: break
+        if f_ok == False: raise Exception(f'Ошибка Город: {city} не найден.')
         # Вводим улицу
         els = el_addr.find_elements(By.XPATH, './/input[@id="street_name"]')
         if len(els) != 1: raise Exception('Ошибка: Нет поля ввода Улица')
@@ -220,13 +258,15 @@ def set_bid(data):
             if str_class.find('display: none') >= 0: continue
             els_li = el_ul.find_elements(By.TAG_NAME, 'li')
             if len(els_li) > 0:
-                f_ok = True
                 for i in range(len(els_li)):
                     a_s = els_li[i].find_elements(By.TAG_NAME, 'a')
-                    f_str.append(a_s[0].text)
-                i_sh = find_short(f_str)
-                els_li[i_sh].click()
-                time.sleep(1)
+                    if len(a_s[0].text) > 0: f_str.append(a_s[0].text)
+                if len(f_str) > 0:
+                    f_ok = True
+                    i_sh = find_short(f_str)
+                    try: els_li[i_sh].click()
+                    except: raise Exception('Ошибка клика выбора улицы')
+                    time.sleep(5)
                 
             if f_ok == True: break
         if f_ok == False: raise Exception(f'Ошибка: Улица: {street} не найдена')
@@ -246,13 +286,15 @@ def set_bid(data):
             if str_class.find('display: none') >= 0: continue
             els_li = el_ul.find_elements(By.TAG_NAME, 'li')
             if len(els_li) > 0:
-                f_ok = True
                 for i in range(len(els_li)):
                     a_s = els_li[i].find_elements(By.TAG_NAME, 'a')
-                    f_str.append(a_s[0].text)
-                i_sh = find_short(f_str)
-                els_li[i_sh].click()
-                time.sleep(1)
+                    if len(a_s[0].text) > 0: f_str.append(a_s[0].text)
+                if len(f_str) > 0:
+                    f_ok = True
+                    i_sh = find_short(f_str)
+                    try: els_li[i_sh].click()
+                    except: raise Exception('Ошибка клика выбора дом')
+                    time.sleep(5)
                 
             if f_ok == True: break
         if f_ok == False: raise Exception(f'Ошибка: Дом: {house} не найден')
@@ -262,7 +304,16 @@ def set_bid(data):
         apartment = data.get('apartment')
         if apartment == None: raise Exception('Ошибка: Не задано значение Квартира')
         els[0].send_keys(apartment)
-        time.sleep(3)
+        time.sleep(5)
+        
+        # Если предлагается выбрать подъезд
+        els = el_addr.find_elements(By.XPATH, './/select[@name="pnum"]')
+        if len(els) > 0:
+            els_opt = els[0].find_elements(By.TAG_NAME, 'option')
+            try: els_opt[1].click()
+            except: raise Exception('Ошибка клика выбора подъезд')
+            time.sleep(2)
+        
         els = el_addr.find_elements(By.XPATH, './/textarea[@id="adress_comment"]')
         if len(els) != 1: raise Exception('Ошибка: Нет поля комментарий к адресу')
         els[0].click()
@@ -470,11 +521,14 @@ def set_bid(data):
             
         
         
-        # time.sleep(5)
+        
+        # # #===========
+        # # time.sleep(10)
         # with open('out.html', 'w', encoding='utf-8') as outfile:
             # outfile.write(driver.page_source)
-        # driver.quit()
-        # return '', data
+        # raise Exception('Финиш.')
+        # # #===========
+        
         
         
     except Exception as e:
@@ -672,12 +726,19 @@ if __name__ == '__main__':
         # 'password': 'BVNocturne20',
         # 'id_lid': '1163386',
         
+        # 'region': 'Санкт-Петербург',           # город
+        # 'city': 'Санкт-Петербург',           # город
+        # 'street': 'Богатырский проспект',         # улица
+        # 'house': '11',          # дом
+        # 'apartment': '10',          # квартира
+
+
         # # 'region': 'Калужская область',         # область или город областного значения
-        # 'city': 'Ярославль',           # город
+        # # 'city': 'Ярославль',           # город
         # # 'street': 'улица Пирогова',         # улица
-        # 'street': 'улица Индустриальн',         # улица
-        # 'house': '21',          # дом
-        # 'apartment': '2',          # квартира
+        # # 'street': 'улица Индустриальн',         # улица
+        # # 'house': '21',          # дом
+        # # 'apartment': '2',          # квартира
         
         # # В названиях тарифных планов, названиях роутеров, приставок и способов приобретения
         # # может быть указано либо название целиком либо набор ключевых фраз через точку с запятой

@@ -591,33 +591,40 @@ if __name__ == '__main__':
 
     # run_bid_mts()
     
-    # txv_dict = {
-        # 'pv_code': pv_code,
-        # 'login': 'GRYURYEV',
-        # 'password': 'UcoTWY',
-        # 'id_lid': '1215557',
+    txv_dict = {
+        'pv_code': pv_code,
+        'login': 'GRYURYEV',
+        'password': 'UcoTWY',
+        'id_lid': '1215557',
         
-        # # 'region': 'Калужская область',         # область или город областного значения
-        # # 'city': 'Калуга',           # город
-        # # 'street': 'улица Ленина',         # улица
-        # # 'house': '31',          # дом
-        # # 'apartment': '2',          # квартира
+        # 'region': 'Калужская область',         # область или город областного значения
+        # 'city': 'Калуга',           # город
+        # 'street': 'улица Ленина',         # улица
+        # 'house': '31',          # дом
+        # 'apartment': '2',          # квартира
+        
         # 'region': 'Ярославская область',         # область или город областного значения
         # 'city': 'Ярославль',           # город
         # 'street': 'улица Звездная',         # улица
         # 'house': '31/41',          # дом
         # 'apartment': '61',          # квартира
 
-        # 'available_connect': '',  # Возможность подключения
-        # 'tarifs_all': '', # список названий тарифных планов
-        # 'pv_address': '',
-    # }
+        'region': 'Удмуртская Республика',         # область или город областного значения
+        'city': 'Воткинск',           # город
+        'street': 'Чапаева',         # улица
+        'house': '5',          # дом
+        'apartment': '10',          # квартира
+
+        'available_connect': '',  # Возможность подключения
+        'tarifs_all': '', # список названий тарифных планов
+        'pv_address': '',
+    }
     
     
-    # e, data = get_txv(txv_dict)
-    # if e: print(e)
-    # print(data['tarifs_all'])
-    # print(data['available_connect'])
+    e, data = get_txv(txv_dict)
+    if e: print(e)
+    print(data['tarifs_all'])
+    print(data['available_connect'])
     
     
     # set_txv_to_dj_domconnect(pv_code)

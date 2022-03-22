@@ -5,8 +5,8 @@ import requests  # pip install requests
 import json
 from selenium import webdriver  # $ pip install selenium
 from selenium.webdriver.common.by import By
-# from selenium.webdriver.support.ui import WebDriverWait
-# from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.keys import Keys
+
 
 # url_host = 'http://127.0.0.1:8000/'
 url_host = 'http://django.domconnect.ru/'
@@ -201,6 +201,7 @@ def get_txv(data):
         time.sleep(3)
         
         ###################### Страница ссылок городов ######################
+        region = data.get('region')
         city = data.get('city')
         els = driver.find_elements(By.XPATH, '//div[@id="b12356"]')
         if len(els) != 1: raise Exception('Ошибка нет блока городов')
@@ -208,7 +209,7 @@ def get_txv(data):
         if len(els_a) == 0: raise Exception('Ошибка нет городов')
         url_city = ''
         for el_a in els_a:
-            if el_a.text == city:
+            if el_a.text == city or el_a.text == region:
                 url_city = el_a.get_attribute('href')
         if url_city: driver.get(url_city)
         else: raise Exception(f'Ошибка город \"{city}\" в списке городов не найден')
@@ -272,6 +273,44 @@ def get_txv(data):
         els_addr = driver.find_elements(By.XPATH, '//div[@id="adress_content"]')
         if len(els_addr) != 1: raise Exception('Ошибка Нет блока адреса')
         el_addr = els_addr[0]
+        
+        # Вводим город
+        els_city = el_addr.find_elements(By.XPATH, './/input[@id="city_area_name"]')
+        if len(els_city) != 1: raise Exception('Ошибка Нет поля ввода город')
+        el_city = els_city[0]
+        # Удалим если что-то уже введено
+        try:
+            el_city.click()
+            time.sleep(0.2)
+            el_city.send_keys(Keys.CONTROL + 'a')
+            time.sleep(0.2)
+            el_city.send_keys(Keys.DELETE)
+            time.sleep(0.2)
+            el_city.send_keys(city)
+        except: raise Exception('Ошибка ввода город')
+        time.sleep(5)
+        # отлавливаем подсказку
+        f_ok = False
+        f_str = []
+        els_ul = driver.find_elements(By.TAG_NAME, 'ul')
+        for el_ul in els_ul:
+            str_class = el_ul.get_attribute('class')
+            if str_class.find('display: none') >= 0: continue
+            els_li = el_ul.find_elements(By.TAG_NAME, 'li')
+            if len(els_li) > 0:
+                for i in range(len(els_li)):
+                    a_s = els_li[i].find_elements(By.TAG_NAME, 'a')
+                    if len(a_s[0].text) > 0: f_str.append(a_s[0].text)
+                if len(f_str) > 0:
+                    f_ok = True
+                    i_sh = find_short(f_str)
+                    try: els_li[i_sh].click()
+                    except: raise Exception('Ошибка клика выбора город')
+                    time.sleep(5)
+                
+            if f_ok == True: break
+        if f_ok == False: raise Exception(f'Ошибка Город: {city} не найден.')
+
         # Вводим улицу
         els_street = el_addr.find_elements(By.XPATH, './/input[@id="street_name"]')
         if len(els_street) != 1: raise Exception('Ошибка Нет поля ввода Улица')
@@ -332,12 +371,13 @@ def get_txv(data):
             if f_ok == True: break
         if f_ok == False: raise Exception(f'Ошибка Дом: {house} не найден')
         # Смотрим блок технической возможности дома
-        av_connect = ''
+        lst_av_connect = []
         els = el_addr.find_elements(By.XPATH, './/td[@id="house_connected"]')
         if len(els) != 1: raise Exception('Ошибка Нет поля ТхВ дома')
         els_div = els[0].find_elements(By.TAG_NAME, 'div')
         for el_div in els_div:
-            av_connect += f'{el_div.text}\n'
+            text = el_div.text.strip()
+            if text: lst_av_connect.append(text)
         
         # Вводим квартиру
         els_anum = el_addr.find_elements(By.XPATH, './/input[@id="anum"]')
@@ -359,14 +399,15 @@ def get_txv(data):
         if len(els_td) != 3: raise Exception('Ошибка Неправильная структура блока ТхВ')
         els_div = els_td[2].find_elements(By.TAG_NAME, 'div')
         for el_div in els_div:
-            av_connect += f'{el_div.text}\n'
+            text = el_div.text.strip()
+            if text: lst_av_connect.append(text)
         # Квартира подключена к интернет
         # Квартира подключена к ТВ
         # Квартира подключена к IPTV
         # Квартира не подключена к Домофонии
         # Квартира подключена к видеоконтролю
         # Промо-период доступен
-        data['available_connect'] = av_connect
+        data['available_connect'] = '\n'.join(lst_av_connect)
         # Соберем информацию об адресе
         address = ''
         els_city = el_addr.find_elements(By.XPATH, './/input[@id="city_area_name"]')
@@ -379,71 +420,9 @@ def get_txv(data):
             els_lbl = els_porche[0].find_elements(By.XPATH, './/td[@class="porche"]')
             if els_lbl[0]: address += 'подъезд ' + els_lbl[0].text
         data['pv_address'] = address
-        # Жмем кнопку Далее
-        els = el_addr.find_elements(By.XPATH, './/input[@value="Далее"]')
-        if len(els) != 1: raise Exception('Ошибка После адреса нет кнопки Далее')
-        try: els[0].click()
-        except: raise Exception('Ошибка клика кнопки Далее2')
-        time.sleep(3)
-        ###################### Блок операции с договором ######################
-        els_dog = driver.find_elements(By.XPATH, '//div[@id="operation_agreement_content"]')
-        if len(els_dog) != 1: raise Exception('Ошибка Нет блока операции с договором')
-        el_dog = els_dog[0]
-        # Выбираем создать новый договор
-        els_sel = el_dog.find_elements(By.XPATH, './/select[@id="sel_agreement"]')
-        if len(els_sel) != 1: raise Exception('Ошибка Нет списка операции с договором')
-        els_opt = els_sel[0].find_elements(By.TAG_NAME, 'option')
-        f_ok = False
-        for el_opt in els_opt:
-            if el_opt.text == 'Создать новый договор':
-                f_ok = True
-                try: el_opt.click()
-                except: raise Exception('Ошибка клика Создать новый договор')
-                time.sleep(0.5)
-                break
-        if f_ok == False: raise Exception('Ошибка пункт: Создать новый договор не найден')
-        # Жмем кнопку Далее
-        els = el_dog.find_elements(By.XPATH, './/input[@value="Далее"]')
-        if len(els) != 1: raise Exception('Ошибка После адреса нет кнопки Далее')
-        try: els[0].click()
-        except: raise Exception('Ошибка клика кнопки Далее3')
-        time.sleep(3)
-        ###################### Блок информация о клиенте ######################
-        els_clnt = driver.find_elements(By.XPATH, '//div[@id="client_info_content"]')
-        if len(els_clnt) != 1: raise Exception('Ошибка Нет блока информация о клиенте')
-        el_clnt = els_clnt[0]
-        # Вводим ФИО
-        els_fio = el_clnt.find_elements(By.XPATH, '//input[@id="client_fio"]')
-        if len(els_fio) != 1: raise Exception('Ошибка Нет поля ввода ФИО клиента')
-        try: els_fio[0].send_keys('Клиент Клиентович')
-        except: raise Exception('Ошибка ввода ФИО клиента')
-        time.sleep(1)
-        # Вводим телефон
-        els_tlf = el_clnt.find_elements(By.XPATH, '//input[@id="phone_mobile"]')
-        if len(els_tlf) != 1: raise Exception('Ошибка Нет поля ввода телефона')
-        try: els_tlf[0].click()
-        except: raise Exception('Ошибка клика активации поля ввода телефона')
-        time.sleep(0.5)
-        try: els_tlf[0].send_keys('011111111')
-        except: raise Exception('Ошибка ввода телефона')
-        time.sleep(1)
-        # Жмем кнопку Далее
-        els = el_clnt.find_elements(By.XPATH, './/input[@value="Далее"]')
-        if len(els) != 1: raise Exception('Ошибка После Блок информация о клиенте нет кнопки Далее')
-        try: els[0].click()
-        except: raise Exception('Ошибка клика кнопки Далее4')
-        time.sleep(3)
-        ###################### Блок пакетов услуг ######################
-        els_pack = driver.find_elements(By.XPATH, '//table[@id="products"]')
-        if len(els_pack) != 1: raise Exception('Ошибка Нет блока пакетов услуг')
-        els_div_pack = els_pack[0].find_elements(By.XPATH, './/div[@class="tarif_pack"]')
-        lst_tar = []
-        for el_div_pack in els_div_pack:
-            els_lbl = el_div_pack.find_elements(By.TAG_NAME, 'label')
-            if els_lbl[0]: lst_tar.append(els_lbl[0].text)
-        data['tarifs_all'] = '\n'.join(lst_tar)
-        ###################### Выбор оборудования интернет ######################
-        time.sleep(2)
+        
+        data['tarifs_all'] = ''
+        
 
         # #===========
         # time.sleep(10)
@@ -643,29 +622,28 @@ if __name__ == '__main__':
     # login: sinitsin
     # password: BVNocturne20
 
-    # run_bid_mts()
-    
     # txv_dict = {
         # 'pv_code': pv_code,
         # 'login': 'sinitsin',
         # 'password': 'BVNocturne20',
         # 'id_lid': '1215557',
         
-        # 'city': 'Ярославль',           # город
-        # # 'street': 'улица Пирогова',         # улица
-        # 'street': 'улица Индустриальн',         # улица
-        # 'house': '21',          # дом
-        # 'apartment': '2',          # квартира
+        # # 'city': 'Ярославль',           # город
+        # # # 'street': 'улица Пирогова',         # улица
+        # # 'street': 'улица Индустриальн',         # улица
+        # # 'house': '21',          # дом
+        # # 'apartment': '2',          # квартира
         
-        # # 'city': 'Тольятти',           # город
-        # # 'street': 'улица Карбышева',         # улица
-        # # 'house': '16',          # дом
-        # # 'apartment': '2',          # квартира
+        # # 'city': 'Сосновоборск',           # город
+        # # 'street': 'Юности',         # улица
+        # # 'house': '21',          # дом
+        # # 'apartment': '10',          # квартира
 
-        # # 'city': 'Краснодар',           # город
-        # # 'street': 'улица Троцкого',         # улица
-        # # 'house': '32',          # дом
-        # # 'apartment': '2',          # квартира
+        # 'region': 'Санкт-Петербург',           # город
+        # 'city': 'Санкт-Петербург',           # город
+        # 'street': 'Богатырский проспект',         # улица
+        # 'house': '11',          # дом
+        # 'apartment': '10',          # квартира
 
         # 'available_connect': '',
         # 'pv_address': '',
@@ -676,8 +654,8 @@ if __name__ == '__main__':
     # e, data = get_txv(txv_dict)
     # if e: print(e)
     # print('available_connect:\n', data['available_connect'])
-    # print('tarifs_all:\n', data['tarifs_all'])
     # print('pv_address:\n', data['pv_address'])
+    # print('tarifs_all:\n', data['tarifs_all'])
     
     
     # set_txv_to_dj_domconnect(pv_code)
