@@ -95,6 +95,20 @@ def find_short(f_lst):
             i_min = i
     return i_min
     
+def find_short_in_cort(f_lst):
+    '''
+        На входе список кортежей. (индекс, фраза)
+        Поиск самой короткой фразы в списке кортежей и выдача её индекса
+    '''
+    l_min = 10000
+    i_min = 0
+    for i in range(len(f_lst)):
+        l_phr = len(f_lst[i][1])
+        if l_phr < l_min:
+            l_min = l_phr
+            i_min = f_lst[i][0]
+    return i_min
+    
 def ordering_street(in_street: str):  # Преобразование строки улица
     '''
         разбиваем строку по запятым, и каждый фрагмент проверяем на
@@ -173,14 +187,14 @@ def ordering_house(in_house: str):  # Преобразование строки 
     lst_house = in_house.split(' ')
     if len(lst_house) > 3: return ('', 'В номере много позиций')
     if len(lst_house) == 2:  # значит буква - склеиваем как 30А
-        lst_house[1] = lst_house[1].upper()
+        lst_house[1] = lst_house[1].lower()
         return (lst_house[0], ''.join(lst_house))
     # анализируем  корп, литер
     if lst_house[1].find('к') >= 0:
-        lst_house[1] = ' к'
+        lst_house[1] = '/'
         return (lst_house[0], ''.join(lst_house))
     if lst_house[1].find('л') >= 0:
-        lst_house[1] = ' лит'
+        lst_house[1] = '/'
         return (lst_house[0], ''.join(lst_house))
     
     return ('', 'Номер не распознан')
@@ -202,7 +216,10 @@ def get_txv(data):
         
         ###################### Страница ссылок городов ######################
         region = data.get('region')
+        if region: region = region.replace('ё', 'е')
         city = data.get('city')
+        if city: city = city.replace('ё', 'е')
+        else: raise Exception('Ошибка город не задан.')
         els = driver.find_elements(By.XPATH, '//div[@id="b12356"]')
         if len(els) != 1: raise Exception('Ошибка нет блока городов')
         els_a = els[0].find_elements(By.TAG_NAME, 'a')
@@ -342,12 +359,14 @@ def get_txv(data):
                 
             if f_ok == True: break
         if f_ok == False: raise Exception(f'Ошибка Улица: {street} не найдена')
+        
         # Вводим дом
         els_house = el_addr.find_elements(By.XPATH, './/input[@id="house_id"]')
         if len(els_house) != 1: raise Exception('Ошибка Нет поля ввода Дом')
         house = data.get('house')
         if house == None: raise Exception('Ошибка Не задано значение Дом')
-        try: els_house[0].send_keys(house)
+        or_house = ordering_house(house)
+        try: els_house[0].send_keys(or_house[0])
         except: raise Exception('Ошибка ввода дома')
         time.sleep(5)
         # отлавливаем подсказку
@@ -361,15 +380,22 @@ def get_txv(data):
             if len(els_li) > 0:
                 for i in range(len(els_li)):
                     a_s = els_li[i].find_elements(By.TAG_NAME, 'a')
-                    if len(a_s[0].text) > 0: f_str.append(a_s[0].text)
+                    hs = a_s[0].text
+                    if len(hs) == 0: continue
+                    if hs.find(or_house[1]) >= 0:
+                        cort = (i, hs)
+                        f_str.append(cort)
                 if len(f_str) > 0:
                     f_ok = True
-                    i_sh = find_short(f_str)
+                    i_sh = find_short_in_cort(f_str)
                     try: els_li[i_sh].click()
                     except: raise Exception('Ошибка клика выбора дома')
                     time.sleep(5)
             if f_ok == True: break
         if f_ok == False: raise Exception(f'Ошибка Дом: {house} не найден')
+        
+        
+        
         # Смотрим блок технической возможности дома
         lst_av_connect = []
         els = el_addr.find_elements(By.XPATH, './/td[@id="house_connected"]')
@@ -639,10 +665,22 @@ if __name__ == '__main__':
         # # 'house': '21',          # дом
         # # 'apartment': '10',          # квартира
 
-        # 'region': 'Санкт-Петербург',           # город
-        # 'city': 'Санкт-Петербург',           # город
-        # 'street': 'Богатырский проспект',         # улица
-        # 'house': '11',          # дом
+        # # 'region': 'Санкт-Петербург',           # город
+        # # 'city': 'Санкт-Петербург',           # город
+        # # 'street': 'Богатырский проспект',         # улица
+        # # 'house': '11',          # дом
+        # # 'apartment': '10',          # квартира
+
+        # # 'region': 'Тверская область',           # город
+        # # 'city': 'Тверь',           # город
+        # # 'street': 'Хрустальная улица',         # улица
+        # # 'house': '41к3',          # дом
+        # # 'apartment': '10',          # квартира
+
+        # 'region': 'Нижегородская область',           # город
+        # 'city': 'Нижний Новгород',           # город
+        # 'street': 'проспект Ленина',         # улица
+        # 'house': '24Б',          # дом
         # 'apartment': '10',          # квартира
 
         # 'available_connect': '',
@@ -655,7 +693,7 @@ if __name__ == '__main__':
     # if e: print(e)
     # print('available_connect:\n', data['available_connect'])
     # print('pv_address:\n', data['pv_address'])
-    # print('tarifs_all:\n', data['tarifs_all'])
+
     
     
     # set_txv_to_dj_domconnect(pv_code)
