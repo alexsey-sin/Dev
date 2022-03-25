@@ -1041,6 +1041,10 @@ class TxV(models.Model):
         choices = PV_VARS,
         verbose_name = 'Оператор',
     )
+    provider_dc =  models.TextField(
+        blank = True,
+        verbose_name='Провайдеры ДК',
+    )
     login = models.CharField(
         verbose_name = 'Логин',
         max_length = 200,

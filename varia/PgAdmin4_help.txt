@@ -58,6 +58,13 @@ WHERE "pv_code" = 4 AND "status" = 2
 ORDER BY pub_date DESC
 LIMIT 100
 
+Скачать ошибки ТхВ Билайн
+=========================================================
+SELECT region, city, street, house, apartment, bot_log FROM public.api_txv
+WHERE "pv_code" = 1 AND "status" = 2
+ORDER BY pub_date DESC
+
+
 
 Удаляем заявки ТхВ старые ДомРу
 =========================================================

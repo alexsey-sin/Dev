@@ -341,10 +341,16 @@ def set_txv_to_dj_domconnect(pv_code):
     params = {
         'key': 'Q8kGM1HfWz',
         'pv_code': pv_code,
-        'login': 'ESubbotin',
-        'password': 'AsCbbb14',
-        'login_2': 'MChumakova',
-        'password_2': 'Zse@!5587',
+        
+        # 'login': 'ESubbotin',
+        # 'password': 'AsCbbb14',
+        # 'login_2': 'MChumakova',
+        # 'password_2': 'Zse@!5587',
+        
+        'login': 'MChumakova',
+        'password': 'Qhvv@!4817',
+        'login_2': 'ESubbotin',
+        'password_2': 'NbVDa5Ty',
         'id_lid': '1215557',
         
         'city': 'Москва',           # город
@@ -508,70 +514,75 @@ if __name__ == '__main__':
     # start_time = datetime.now()
     
     # url: https://oao.mgts.ru
-    # 'login': 'ESubbotin',
-    # 'password': 'AsCbbb14',
+
+
+    # 'login': 'MChumakova',
+    # 'password': 'Dn4xVB#B',
     # 'login_2': 'MChumakova',
-    # 'password_2': 'Zse@!5587',
+    # 'password_2': 'Qhvv@!4817',
+
+
+
 
     
-    # txv_dict = {
-        # 'pv_code': pv_code,
-        # 'login': 'ESubbotin',
-        # 'password': 'AsCbbb14',
-        # 'login_2': 'MChumakova',
-        # 'password_2': 'Zse@!5587',
+    txv_dict = {
+        'pv_code': pv_code,
+        'login': 'MChumakova',
+        'password': 'Dn4xVB#B',
+        'login_2': 'MChumakova',
+        'password_2': 'Qhvv@!4817',
         
-        # # 'id_lid': '1215557',
-        # # 'city': 'Москва',           # город
+        # 'id_lid': '1215557',
+        # 'city': 'Москва',           # город
         
-        # # 'street': 'улица Винокурова',         # улица
-        # # 'house': '7/5 кор. 2',          # дом
-        # # 'apartment': '6',          # квартира
-        
-        # 'street': 'Волоцкой переулок',         # улица
-        # 'house': '7к1',          # дом
+        # 'street': 'улица Винокурова',         # улица
+        # 'house': '7/5 кор. 2',          # дом
         # 'apartment': '6',          # квартира
         
-        # # 'street': 'Щёлковское шоссе',         # улица
-        # # 'house': '95',          # дом
-        # # 'apartment': '6',          # квартира
+        'street': 'Волоцкой переулок',         # улица
+        'house': '7к1',          # дом
+        'apartment': '6',          # квартира
         
-        # # 'street': 'Липовая аллея',         # улица
-        # # 'house': '16',          # дом
-        # # 'apartment': '6',          # квартира
+        # 'street': 'Щёлковское шоссе',         # улица
+        # 'house': '95',          # дом
+        # 'apartment': '6',          # квартира
         
-        # # 'street': 'проезд Черепановых',         # улица
-        # # 'house': '38к1',          # дом
-        # # 'apartment': '6',          # квартира
+        # 'street': 'Липовая аллея',         # улица
+        # 'house': '16',          # дом
+        # 'apartment': '6',          # квартира
         
-        # # 'street': 'Лужнецкая набережная',         # улица
-        # # 'house': '24с17',          # дом
-        # # 'apartment': '6',          # квартира
+        # 'street': 'проезд Черепановых',         # улица
+        # 'house': '38к1',          # дом
+        # 'apartment': '6',          # квартира
         
-        # # 'street': 'Биржевая площадь',         # улица
-        # # 'house': '1',          # дом
-        # # 'apartment': '6',          # квартира
+        # 'street': 'Лужнецкая набережная',         # улица
+        # 'house': '24с17',          # дом
+        # 'apartment': '6',          # квартира
         
-        # # 'street': 'Никитский бульвар',         # улица
-        # # 'house': '11/12с1',          # дом
-        # # 'apartment': '6',          # квартира
+        # 'street': 'Биржевая площадь',         # улица
+        # 'house': '1',          # дом
+        # 'apartment': '6',          # квартира
         
-        # # 'street': 'Зелёный проспект',         # улица
-        # # 'house': '44',          # дом
-        # # 'apartment': '6',          # квартира
+        # 'street': 'Никитский бульвар',         # улица
+        # 'house': '11/12с1',          # дом
+        # 'apartment': '6',          # квартира
+        
+        # 'street': 'Зелёный проспект',         # улица
+        # 'house': '44',          # дом
+        # 'apartment': '6',          # квартира
         
 
-        # 'available_connect': '',  # Возможность подключения
-        # 'tarifs_all': '', # список названий тарифных планов
-        # 'pv_address': '',
-    # }
+        'available_connect': '',  # Возможность подключения
+        'tarifs_all': '', # список названий тарифных планов
+        'pv_address': '',
+    }
     
     
-    # e, data = get_txv(txv_dict)
-    # if e: print(e)
-    # print('pv_address', data['pv_address'])
-    # # print(data['tarifs_all'])
-    # print('available_connect', data['available_connect'])
+    e, data = get_txv(txv_dict)
+    if e: print(e)
+    print('pv_address', data['pv_address'])
+    # print(data['tarifs_all'])
+    print('available_connect', data['available_connect'])
     
     
     # set_txv_to_dj_domconnect(pv_code)

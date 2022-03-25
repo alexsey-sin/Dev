@@ -435,10 +435,6 @@ def set_txv_to_dj_domconnect(pv_code):
         
         'city': 'Москва',           # город
         'street': 'улица Винокурова',         # улица
-        # 'street': 'Волжский Бульвар 95',         # улица
-        # 'street': 'ffkjsnsycvbt',         # улица
-        # 'street': 'ул. Ленина',         # улица
-        # 'street': 'Ленина',         # улица
         'house': '7/5 кор. 2',          # дом
         'apartment': '6',          # квартира
 

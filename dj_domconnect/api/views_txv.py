@@ -44,6 +44,9 @@ def set_txv(request):
             id_lid = request.GET.get('id_lid')
             if id_lid: txv.id_lid = id_lid
 
+            provider_dc = request.GET.get('provider_dc')
+            if provider_dc: txv.provider_dc = provider_dc
+
             region = request.GET.get('region')
             if region: txv.region = region
 

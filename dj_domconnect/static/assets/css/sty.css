@@ -11,16 +11,24 @@ table {
   /* min-width: 1300px; */
   padding: 0px;
   font-size: 13px;
-  border-spacing: 0px;
-  width: 100%;
-  max-width: 100%;
-  border-collapse: collapse;
+  /* border-spacing: 0px;
+  border-width: 1px 1px; */
+  /* width: 100%;
+  max-width: 100%; */
+  border-collapse: collapse; /* Убираем двойные линии между ячейками */
 }
 tr, td {
   min-width: 75px;
   max-width: 75px;
   margin: 0%;
   text-align: center;
+  border-width: 1px;
+  border-color: inherit;
+  border-style: solid;
+}
+tr:hover {
+  color: #212529;
+  background: rgba(0, 0, 0, 0.075); /* Цвет фона */
 }
 .wrap {
   position: relative;

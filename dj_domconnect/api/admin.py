@@ -173,9 +173,11 @@ class TxVAdmin(admin.ModelAdmin):
         return u"%s..." % (self.tarifs_all[:30],)
     def connect(self):
         return u"%s..." % (self.available_connect[:30],)
+    def prov_dc(self):
+        return u"%s..." % (self.provider_dc[:30],)
     def logs(self):
         return u"%s..." % (self.bot_log[:30],)
-    list_display = ['id', 'pv_code', 'id_lid', 'region', 'city', connect, tarifs, 'pv_address', 'status', 'change_date', 'pub_date', logs]
+    list_display = ['id', 'pv_code', 'id_lid', 'region', 'city', connect, tarifs, 'pv_address', 'status', prov_dc, 'change_date', 'pub_date', logs]
     # list_display = [field.name for field in TxvRostelecom._meta.get_fields()]
     search_fields = ('id_lid',)
     list_filter = ('pv_code', 'status', 'pub_date')

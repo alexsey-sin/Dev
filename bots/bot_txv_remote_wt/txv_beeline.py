@@ -169,6 +169,7 @@ def ordering_street(in_street: str):  # Преобразование строк�
         'проезд',
         'набережная',
         'площадь',
+        'микрорайон',
     ]
     out_cort = []
     lst = in_street.split(',')
@@ -239,13 +240,16 @@ def ordering_house(in_house: str):  # Преобразование строки 
     if lst_house[1].find('л') >= 0:
         lst_house[1] = ' лит'
         return (lst_house[0], ''.join(lst_house))
+    if lst_house[1].find('с') >= 0:
+        lst_house[1] = 'СТР'
+        return (lst_house[0], ''.join(lst_house))
     
     return ('', 'Номер не распознан')
 
 def find_short_tup(f_lst):
     '''
         На входе список кортежей.
-        в кортеже индкс фразы на странице и фраза
+        в кортеже индекс фразы на странице и фраза
         Поиск самой короткой фразы в списке и выдача её индекса на странице
     '''
     l_min = 10000
@@ -406,8 +410,19 @@ def get_txv(data):
             if len(els_div) != 1: raise Exception('Ошибка - нет всплывающее контекстное меню с подсказкой улицы')
             els_a = els_div[0].find_elements(By.XPATH, './/a[@class="link ng-binding"]')
             if len(els_a) == 0: raise Exception(f'Ошибка Улица: {street} не найдена2.')
-            try: els_a[0].click()
-            except: raise Exception('Ошибка действий 14')
+            f_lst = []
+            for i in range(len(els_a)):
+                txt = els_a[i].text
+                print(txt)
+                if txt.find(lst_street[0]) >= 0 and txt.find(lst_street[1]) >= 0: f_lst.append((i, txt))
+            if len(f_lst) == 0: raise Exception(f'Ошибка Улица: {street} не найдена3.')
+            elif len(f_lst) == 1:
+                try: els_a[f_lst[0][0]].click()
+                except: raise Exception('Ошибка действий 14')
+            else:
+                i_fnd = find_short_tup(f_lst)
+                try: els_a[i_fnd].click()
+                except: raise Exception('Ошибка действий 15')
             time.sleep(3)
 
         driver.implicitly_wait(10)
@@ -438,13 +453,15 @@ def get_txv(data):
         time.sleep(3)
         
         # Берем информацию об ограничениях по адресу
-        info_restrictions = ''
+        info_restrictions = 'Есть ТхВ\n'
         els = driver.find_elements(By.XPATH, '//div[@class="modal-content"]')
         if len(els) != 1: raise Exception('Ошибка нет всплывающего окна с информацией об ограничениях')
         els_b = els[0].find_elements(By.TAG_NAME, 'b')
         for el_b in els_b: info_restrictions += f'{el_b.text}\n'
         els_p = els[0].find_elements(By.TAG_NAME, 'p')
         for el_p in els_p: info_restrictions += f'{el_p.text}\n'
+        
+        data['available_connect'] = info_restrictions
         
         # Жмем продолжить
         els_btn = driver.find_elements(By.XPATH, '//button[@ng-click="ok()"]')
@@ -483,118 +500,118 @@ def get_txv(data):
         driver.implicitly_wait(1)
         # Проверяем блок если есть активный договор
         els_er = driver.find_elements(By.XPATH, '//div[@ng-if="$abonCtrl.addressErrorMessage"]')
-        if els_er:
-            err_txt = els_er[0].text
-            if err_txt.find('На адресе есть активный договор') >= 0:
-                data['available_connect'] = 'На адресе уже есть активный договор\n'
-            else: raise Exception(f'Ошибка {err_txt}')
-        time.sleep(3)
+        if els_er: data['available_connect'] = els_er[0].text
+            # err_txt = els_er[0].text
+            # if err_txt.find('На адресе есть активный договор') >= 0:
+                # data['available_connect'] = 'На адресе уже есть активный договор\n'
+            # else: data['available_connect'] = err_txt
+        # time.sleep(3)
 
-        # Смотрим тарифные планы
-        # По умолчанию открыта вкладка "Все в одном"
-        tarifs_all = '#Все в одном\n'
-        # Ищем тарифные предложения
-        els_tarifs = driver.find_elements(By.XPATH, '//label[@class="title cur-pointer ng-binding title--normal title--dotted"]')
-        lst_tarif = []
-        for el_tarif in els_tarifs:
-            tarif = el_tarif.text.strip()
-            if tarif: lst_tarif.append(tarif)
-        tarifs_all += '\n'.join(lst_tarif)
-        # Кликаем на  "Пакетные предложения"
-        els_pack = driver.find_elements(By.XPATH, '//div[@ng-click="$servCtrl.stype.tab = 3; $servCtrl.stype.presetsClicked = true;"]')
-        if len(els_pack) != 1: raise Exception('Ошибка - нет вкладки пакетные предложения')
-        try: els_pack[0].click()
-        except: raise Exception('Ошибка действий 19')
-        time.sleep(5)
-        tarifs_all += '\n#Пакетные предложения\n'
-        # Ищем тарифные предложения
-        els_tarifs = driver.find_elements(By.XPATH, '//label[@class="title cur-pointer ng-binding title--normal title--dotted"]')
-        lst_tarif = []
-        for el_tarif in els_tarifs:
-            tarif = el_tarif.text.strip()
-            if tarif: lst_tarif.append(tarif)
-        tarifs_all += '\n'.join(lst_tarif)
-        data['tarifs_all'] = tarifs_all
+        # # Смотрим тарифные планы
+        # # По умолчанию открыта вкладка "Все в одном"
+        # tarifs_all = '#Все в одном\n'
+        # # Ищем тарифные предложения
+        # els_tarifs = driver.find_elements(By.XPATH, '//label[@class="title cur-pointer ng-binding title--normal title--dotted"]')
+        # lst_tarif = []
+        # for el_tarif in els_tarifs:
+            # tarif = el_tarif.text.strip()
+            # if tarif: lst_tarif.append(tarif)
+        # tarifs_all += '\n'.join(lst_tarif)
+        # # Кликаем на  "Пакетные предложения"
+        # els_pack = driver.find_elements(By.XPATH, '//div[@ng-click="$servCtrl.stype.tab = 3; $servCtrl.stype.presetsClicked = true;"]')
+        # if len(els_pack) != 1: raise Exception('Ошибка - нет вкладки пакетные предложения')
+        # try: els_pack[0].click()
+        # except: raise Exception('Ошибка действий 19')
+        # time.sleep(5)
+        # tarifs_all += '\n#Пакетные предложения\n'
+        # # Ищем тарифные предложения
+        # els_tarifs = driver.find_elements(By.XPATH, '//label[@class="title cur-pointer ng-binding title--normal title--dotted"]')
+        # lst_tarif = []
+        # for el_tarif in els_tarifs:
+            # tarif = el_tarif.text.strip()
+            # if tarif: lst_tarif.append(tarif)
+        # tarifs_all += '\n'.join(lst_tarif)
+        # data['tarifs_all'] = tarifs_all
         
-        # Жмем Просмотр графика подключений
-        els_sp = driver.find_elements(By.XPATH, '//span[@ng-click="$abonCtrl.openScheduleHandler()"]')
-        if len(els_sp) < 2: raise Exception('Ошибка нет ссылки Просмотр графика подключений')
-        try: els_sp[0].click()
-        except: raise Exception('Ошибка действий 20')
-        time.sleep(3)
+        # # Жмем Просмотр графика подключений
+        # els_sp = driver.find_elements(By.XPATH, '//span[@ng-click="$abonCtrl.openScheduleHandler()"]')
+        # if len(els_sp) < 2: raise Exception('Ошибка нет ссылки Просмотр графика подключений')
+        # try: els_sp[0].click()
+        # except: raise Exception('Ошибка действий 20')
+        # time.sleep(3)
         
-        driver.implicitly_wait(10)
-        # Кликаем календарь
-        els_inp = driver.find_elements(By.XPATH, '//input[@ng-model="$abonCtrl.schedule.date"]')
-        if len(els_inp) != 1: raise Exception('Ошибка поля календарь')
-        try: els_inp[0].click()
-        except: raise Exception('Ошибка действий 21')
-        time.sleep(1)
+        # driver.implicitly_wait(10)
+        # # Кликаем календарь
+        # els_inp = driver.find_elements(By.XPATH, '//input[@ng-model="$abonCtrl.schedule.date"]')
+        # if len(els_inp) != 1: raise Exception('Ошибка поля календарь')
+        # try: els_inp[0].click()
+        # except: raise Exception('Ошибка действий 21')
+        # time.sleep(1)
         
-        els_btn_cld = driver.find_elements(By.XPATH, '//button[@ng-click="$abonCtrl.showCalendar()"]')
-        if len(els_btn_cld) != 1: raise Exception('Ошибка нет кнопки календарь')
-        try: els_btn_cld[0].click()
-        except: raise Exception('Ошибка действий 22')
-        time.sleep(3)
+        # els_btn_cld = driver.find_elements(By.XPATH, '//button[@ng-click="$abonCtrl.showCalendar()"]')
+        # if len(els_btn_cld) != 1: raise Exception('Ошибка нет кнопки календарь')
+        # try: els_btn_cld[0].click()
+        # except: raise Exception('Ошибка действий 22')
+        # time.sleep(3)
         
-        els_cld = driver.find_elements(By.TAG_NAME, 'schedules-calendar')
-        if len(els_cld) != 1: raise Exception('Ошибка нет блока календарь')
+        # els_cld = driver.find_elements(By.TAG_NAME, 'schedules-calendar')
+        # if len(els_cld) != 1: raise Exception('Ошибка нет блока календарь')
         
-        # Определяем дату
-        time.sleep(5)
-        txt_months = ['', 'январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь']
-        els_month = els_cld[0].find_elements(By.XPATH, './/div[@class="schedules-calendar"]')
-        if len(els_month) == 0: raise Exception('Календарь не содержит блоки месяцев.')
-        free_first_day = ''
-        el_ff_day = None
-        for el_month in els_month:
-            f_month = False
-            f_day = False
-            els_tit_month = el_month.find_elements(By.XPATH, './/div[@class="schedules-calendar__caption title title--s title--normal ng-binding"]')
-            if len(els_tit_month) != 1: raise Exception('Ошибка структуры календаря.Титул.')
-            els_days_yellow = el_month.find_elements(By.XPATH, './/div[@class="schedules-calendar__day schedules-calendar__day--hover-border ng-binding ng-scope schedules-calendar__day--color-yellow"]')
-            els_days_green = el_month.find_elements(By.XPATH, './/div[@class="schedules-calendar__day schedules-calendar__day--hover-border ng-binding ng-scope schedules-calendar__day--color-green"]')
-            els_days = els_days_yellow + els_days_green
-            try:
-                els_days.sort(key=lambda x: int(x.text))
-            except:
-                pass
-            for el_days in els_days:
-                if free_first_day == '':
-                    el_ff_day = el_days
-                    free_first_day = f'{el_days.text} {els_tit_month[0].text}'
-                    break
+        # # Определяем дату
+        # time.sleep(5)
+        # txt_months = ['', 'январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь']
+        # els_month = els_cld[0].find_elements(By.XPATH, './/div[@class="schedules-calendar"]')
+        # if len(els_month) == 0: raise Exception('Календарь не содержит блоки месяцев.')
+        # free_first_day = ''
+        # el_ff_day = None
+        # for el_month in els_month:
+            # f_month = False
+            # f_day = False
+            # els_tit_month = el_month.find_elements(By.XPATH, './/div[@class="schedules-calendar__caption title title--s title--normal ng-binding"]')
+            # if len(els_tit_month) != 1: raise Exception('Ошибка структуры календаря.Титул.')
+            # els_days_yellow = el_month.find_elements(By.XPATH, './/div[@class="schedules-calendar__day schedules-calendar__day--hover-border ng-binding ng-scope schedules-calendar__day--color-yellow"]')
+            # els_days_green = el_month.find_elements(By.XPATH, './/div[@class="schedules-calendar__day schedules-calendar__day--hover-border ng-binding ng-scope schedules-calendar__day--color-green"]')
+            # els_days = els_days_yellow + els_days_green
+            # try:
+                # els_days.sort(key=lambda x: int(x.text))
+            # except:
+                # pass
+            # for el_days in els_days:
+                # if free_first_day == '':
+                    # el_ff_day = el_days
+                    # free_first_day = f'{el_days.text} {els_tit_month[0].text}'
+                    # break
 
-        if free_first_day:
-            try: el_ff_day.click()
-            except: raise Exception('Ошибка действий 23')
-            time.sleep(5)
+        # if free_first_day:
+            # try: el_ff_day.click()
+            # except: raise Exception('Ошибка действий 23')
+            # time.sleep(5)
         
-            # Смотрим время
-            els_time = driver.find_elements(By.XPATH, '//span[@class="ui-select-toggle"]')
-            if len(els_time) != 1: raise Exception('Ошибка: Нет поля выбора время.')
-            try: els_time[0].click()
-            except: raise Exception('Ошибка действий 24')
-            time.sleep(2)
+            # # Смотрим время
+            # els_time = driver.find_elements(By.XPATH, '//span[@class="ui-select-toggle"]')
+            # if len(els_time) != 1: raise Exception('Ошибка: Нет поля выбора время.')
+            # try: els_time[0].click()
+            # except: raise Exception('Ошибка действий 24')
+            # time.sleep(2)
             
-            els_li_times = driver.find_elements(By.XPATH, '//li[@id="ui-select-choices-0"]')
-            if len(els_li_times) != 1: raise Exception('Ошибка: Нет блока время.')
-            els_times = els_li_times[0].find_elements(By.XPATH, './/span[@class="ng-binding ng-scope"]')
-            if len(els_times) == 0: raise Exception('Ошибка: Нет вариантов выбора время.')
+            # els_li_times = driver.find_elements(By.XPATH, '//li[@id="ui-select-choices-0"]')
+            # if len(els_li_times) != 1: raise Exception('Ошибка: Нет блока время.')
+            # els_times = els_li_times[0].find_elements(By.XPATH, './/span[@class="ng-binding ng-scope"]')
+            # if len(els_times) == 0: raise Exception('Ошибка: Нет вариантов выбора время.')
 
-            lst_tmp = []
-            available_timeslot = ''
-            try:
-                for el_times in els_times:
-                    l_time = el_times.text.strip()
-                    ll_time = l_time.split(' — ')
-                    t1_t = ll_time[0].split(':')
-                    t2_t = ll_time[1].split(':')
-                    lst_tmp.append(f'{t1_t[0]}-{t2_t[0]}')
-            except: raise Exception('Ошибка сбора списка времени.')
-            if lst_tmp: available_timeslot = ';'.join(lst_tmp)
-            data['available_connect'] += f'Возможно подключение {free_first_day}\n в {available_timeslot}\n'
-        data['available_connect'] += info_restrictions
+            # lst_tmp = []
+            # available_timeslot = ''
+            # try:
+                # for el_times in els_times:
+                    # l_time = el_times.text.strip()
+                    # ll_time = l_time.split(' — ')
+                    # t1_t = ll_time[0].split(':')
+                    # t2_t = ll_time[1].split(':')
+                    # lst_tmp.append(f'{t1_t[0]}-{t2_t[0]}')
+            # except: raise Exception('Ошибка сбора списка времени.')
+            # if lst_tmp: available_timeslot = ';'.join(lst_tmp)
+            # data['available_connect'] += f'Возможно подключение {free_first_day}\n в {available_timeslot}\n'
+        # data['available_connect'] += info_restrictions
 
         # #===========
         # time.sleep(10)
@@ -798,28 +815,31 @@ if __name__ == '__main__':
         # print(val)
     
     # # Красногорск	Красногорский бульвар	8
-    # data = {
-        # 'login': 'S24-61',
-        # 'password': 'Gf&dhdk234hfbbs4',
-        # 'pv_code': pv_code,
+    data = {
+        'login': 'S01-181',
+        'login_2': '1999999222',
+        'password': '8GFysus@kffs7',
+        'pv_code': pv_code,
 
-        # 'city': 'Красногорск',
-        # # 'street': 'улица Труфанова',
-        # # 'house': '29 корп 3',
-        # # 'apartment': '65',
-        # 'street': 'Красногорский бульвар',
-        # 'house': '8',
-        # 'apartment': '20',
+        # 'city': 'Энгельс',
+        # 'street': 'проспект Химиков',
+        # 'house': '3/1',
+        # 'apartment': '10',
         
-        # 'available_connect': '',  # Возможность подключения
-        # 'tarifs_all': '', # список названий тарифных планов
-        # 'pv_address': '',
-    # }
-    # rez, data = get_txv(data)
-    # if rez: print(rez)
+        'city': 'Ярославль',
+        'street': 'улица Звёздная',
+        'house': '31/41',
+        'apartment': '10',
+        
+        'available_connect': '',  # Возможность подключения
+        'tarifs_all': '', # список названий тарифных планов
+        'pv_address': '',
+    }
+    rez, data = get_txv(data)
+    if rez: print(rez)
 
-    # print('available_connect:', data['available_connect'])
-    # print('pv_address:', data['pv_address'])
+    print('available_connect:', data['available_connect'])
+    print('pv_address:', data['pv_address'])
     # print('tarifs_all:')
     # print(data['tarifs_all'])
     
