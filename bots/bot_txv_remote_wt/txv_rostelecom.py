@@ -8,8 +8,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
 
-# url_host = 'http://127.0.0.1:8000/'
-url_host = 'http://django.domconnect.ru/'
+url_host = 'http://127.0.0.1:8000/'
+# url_host = 'http://django.domconnect.ru/'
 opsos = 'Ростелесом'
 pv_code = 4
 
@@ -762,7 +762,7 @@ def set_txv_to_dj_domconnect(pv_code):
         'key': 'Q8kGM1HfWz',
         'pv_code': pv_code,
         'login': 'sz_v_an',
-        'password': '@hgfjdhjhQ54564',
+        'password': 'gBLnFexH6d1~vCZHRVEt3E',
         'id_lid': '1215557',
 
         'region': 'Ярославль',
@@ -961,19 +961,19 @@ if __name__ == '__main__':
     # start_time = datetime.now()
     
     
-    run_txv_rostelecom(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
+    # run_txv_rostelecom(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
     
     
     # url: https://eissd.rt.ru/login
     # login: sz_v_an
-    # password: @hgfjdhjhQ54564
+    # password: gBLnFexH6d1~vCZHRVEt3E
 
     
     # txv_dict = {
         # # 'login': 'sz_v_an',
-        # # 'password': 'АтсорВvnjhfv48556vfdf+',
+        # # 'password': 'gBLnFexH6d1~vCZHRVEt3E',
         # 'login': 'sz_ivan',
-        # 'password': 'АтсорВvnjhfv48556vfdf+',
+        # 'password': 'gBLnFexH6d1~vCZHRVEt3E',
         # 'id_lid': '1215557',
         
         # # 'region': 'Республика Северная Осетия — Алания',
@@ -1035,10 +1035,10 @@ if __name__ == '__main__':
     
     
     # set_txv_to_dj_domconnect(pv_code)
-    # rez, txv_list = get_txv_in_dj_domconnect(pv_code)
-    # for txv_dict in txv_list:
-        # for k, v in txv_dict.items():
-            # print(k, v)
+    rez, txv_list = get_txv_in_dj_domconnect(pv_code)
+    for txv_dict in txv_list:
+        for k, v in txv_dict.items():
+            print(k, v)
     # data = {'id': 1, 'pv_address': '55632145', 'bot_log': 'Заявка принята МТС'}
     # r = set_txv_status(0, data)
     # print(r)

@@ -85,15 +85,9 @@ def get_txv(request):
             try: pv = int(pv)
             except: raise ValueError('pv_code is not integer')
         else: raise ValueError('pv_code is absent')
-        tmp_txvs = TxV.objects.filter(pv_code=pv, status=0)
-        # queryset в список словарей с преобразованием объекта модели в словарь
-        txvs = [model_to_dict(row) for row in tmp_txvs]
-        data = json.dumps(txvs)
-        for txv in tmp_txvs:
-            txv.status = 1
-            txv.save()
-        
+
         pv_name = ''
+        yes_work = False
         for cort in PV_VARS:
             if cort[0] == pv:
                 pv_name = cort[1]
@@ -102,7 +96,18 @@ def get_txv(request):
             # Отметимся что бот был
             obj_visit, _ = BotVisit.objects.get_or_create(name=f'Бот ТХВ {pv_name}')
             obj_visit.last_visit = datetime.now()
+            yes_work = obj_visit.work
             obj_visit.save()
+
+        if yes_work:
+            tmp_txvs = TxV.objects.filter(pv_code=pv, status=0)
+            # queryset в список словарей с преобразованием объекта модели в словарь
+            txvs = [model_to_dict(row) for row in tmp_txvs]
+            data = json.dumps(txvs)
+            for txv in tmp_txvs:
+                txv.status = 1
+                txv.save()
+        else: data = json.dumps([])
         
         return HttpResponse(data, content_type='application/json; charset=utf-8')
     return HttpResponse('Use GET request, please.', content_type='text/plain; charset=utf-8')

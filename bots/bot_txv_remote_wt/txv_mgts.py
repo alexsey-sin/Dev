@@ -8,6 +8,8 @@ from selenium import webdriver  # $ pip install selenium
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
+
+
 # url_host = 'http://127.0.0.1:8000/'
 url_host = 'http://django.domconnect.ru/'
 opsos = 'МГТС'
@@ -123,22 +125,24 @@ def get_txv(data):
     driver = None
     try:
         # base_url = 'https://oao.mgts.ru'
-        
-        login = data.get('login')
-        pass_1 = data.get('password')
-        if not login or not pass_1: raise Exception('Не задан первичный логин/пароль')
-        base_url = f'https://{login}:{pass_1}@oao.mgts.ru'
+        try:
+            login = data.get('login')
+            pass_1 = data.get('password')
+            if not login or not pass_1: raise Exception('Не задан первичный логин/пароль')
+            base_url = f'https://{login}:{pass_1}@oao.mgts.ru'
 
-        EXE_PATH = 'driver/chromedriver.exe'
-        driver = webdriver.Chrome(executable_path=EXE_PATH)
-
-        driver.implicitly_wait(10)
-        driver.get(base_url)
+            EXE_PATH = 'driver/chromedriver.exe'
+            driver = webdriver.Chrome(executable_path=EXE_PATH)
+            time.sleep(1)
+            driver.implicitly_wait(10)
+            driver.get(base_url)
+        except: raise Exception('Ошибка первичной авторизации')
+        #===========
         time.sleep(3)
         
         ###################### Login ######################
         els = driver.find_elements(By.ID, 'loginform-username')
-        if len(els) != 1: raise Exception('Ошибка нет поля login')
+        if len(els) != 1: raise Exception('Ошибка нет поля login/Ошибка первичной авторизации')
         log_2 = data.get('login_2')
         try:
             if log_2: els[0].send_keys(log_2)
@@ -173,7 +177,6 @@ def get_txv(data):
         if not street: raise Exception('Ошибка не заполнено поле улица')
         c_street = ordering_street(street)
         if not c_street: raise Exception(f'Ошибка {street} не распознано')
-        # print(c_street)
         
         # Активируем поле ввода названия улицы
         els = driver.find_elements(By.XPATH, '//span[@aria-labelledby="select2-getStreet-container"]')
@@ -298,15 +301,12 @@ def get_txv(data):
                 
         if not f_techn:
             data['available_connect'] = 'Нет ТхВ'
-            raise Exception('Ошибка нет ТхВ')  # Для бота ТхВ
         else: data['available_connect'] = 'Есть ТхВ'
         
         # Смотрим адрес (для бота ТхВ) если нет адреса - ошибку не выкидываем - просто выходим
         els_1 = driver.find_elements(By.XPATH, '//div[contains(@class, "customer bs-callout bs-callout-mgts")]')
-        print('customer', len(els_1))
         for el_1 in els_1:
             els_2 = el_1.find_elements(By.XPATH, './/div[contains(@class, "rowCustomer")]')
-            print('rowCustomer', len(els_2))
             for el_2 in els_2:
                 if el_2.text.find('Адрес установки') >= 0:
                     els_3 = el_2.find_elements(By.XPATH, './/div[contains(@class, "rowDataCustomer")]')
@@ -522,67 +522,71 @@ if __name__ == '__main__':
     # 'password_2': 'Qhvv@!4817',
 
 
+    # 'login': 'ESubbotin',
+    # 'password': 'sr@8Cjmu',
+    # 'login_2': 'ESubbotin',
+    # 'password_2': 'NbVDa5Ty',
 
 
-    
-    txv_dict = {
-        'pv_code': pv_code,
-        'login': 'MChumakova',
-        'password': 'Dn4xVB#B',
-        'login_2': 'MChumakova',
-        'password_2': 'Qhvv@!4817',
+
+    # txv_dict = {
+        # 'pv_code': pv_code,
+        # 'login': 'ESubbotin',
+        # 'password': 'sr@8Cjmu',
+        # 'login_2': 'MChumakova',
+        # 'password_2': 'Qhvv@!4817',
         
-        # 'id_lid': '1215557',
+        # # 'id_lid': '1215557',
         # 'city': 'Москва',           # город
         
-        # 'street': 'улица Винокурова',         # улица
-        # 'house': '7/5 кор. 2',          # дом
+        # # 'street': 'улица Винокурова',         # улица
+        # # 'house': '7/5 кор. 2',          # дом
+        # # 'apartment': '6',          # квартира
+        
+        # 'street': 'проезд Шокальского',         # улица
+        # 'house': '35',          # дом
         # 'apartment': '6',          # квартира
         
-        'street': 'Волоцкой переулок',         # улица
-        'house': '7к1',          # дом
-        'apartment': '6',          # квартира
+        # # 'street': 'Щёлковское шоссе',         # улица
+        # # 'house': '95',          # дом
+        # # 'apartment': '6',          # квартира
         
-        # 'street': 'Щёлковское шоссе',         # улица
-        # 'house': '95',          # дом
-        # 'apartment': '6',          # квартира
+        # # 'street': 'Липовая аллея',         # улица
+        # # 'house': '16',          # дом
+        # # 'apartment': '6',          # квартира
         
-        # 'street': 'Липовая аллея',         # улица
-        # 'house': '16',          # дом
-        # 'apartment': '6',          # квартира
+        # # 'street': 'проезд Черепановых',         # улица
+        # # 'house': '38к1',          # дом
+        # # 'apartment': '6',          # квартира
         
-        # 'street': 'проезд Черепановых',         # улица
-        # 'house': '38к1',          # дом
-        # 'apartment': '6',          # квартира
+        # # 'street': 'Лужнецкая набережная',         # улица
+        # # 'house': '24с17',          # дом
+        # # 'apartment': '6',          # квартира
         
-        # 'street': 'Лужнецкая набережная',         # улица
-        # 'house': '24с17',          # дом
-        # 'apartment': '6',          # квартира
+        # # 'street': 'Биржевая площадь',         # улица
+        # # 'house': '1',          # дом
+        # # 'apartment': '6',          # квартира
         
-        # 'street': 'Биржевая площадь',         # улица
-        # 'house': '1',          # дом
-        # 'apartment': '6',          # квартира
+        # # 'street': 'Никитский бульвар',         # улица
+        # # 'house': '11/12с1',          # дом
+        # # 'apartment': '6',          # квартира
         
-        # 'street': 'Никитский бульвар',         # улица
-        # 'house': '11/12с1',          # дом
-        # 'apartment': '6',          # квартира
-        
-        # 'street': 'Зелёный проспект',         # улица
-        # 'house': '44',          # дом
-        # 'apartment': '6',          # квартира
+        # # 'street': 'Зелёный проспект',         # улица
+        # # 'house': '44',          # дом
+        # # 'apartment': '6',          # квартира
         
 
-        'available_connect': '',  # Возможность подключения
-        'tarifs_all': '', # список названий тарифных планов
-        'pv_address': '',
-    }
+        # 'available_connect': '',  # Возможность подключения
+        # 'tarifs_all': '', # список названий тарифных планов
+        # 'pv_address': '',
+    # }
     
     
-    e, data = get_txv(txv_dict)
-    if e: print(e)
-    print('pv_address', data['pv_address'])
-    # print(data['tarifs_all'])
-    print('available_connect', data['available_connect'])
+    # e, data = get_txv(txv_dict)
+    # if e: print(e)
+    # print('pv_address', data['pv_address'])
+    # # print(data['tarifs_all'])
+    # print('available_connect', data['available_connect'])
     
     
     # set_txv_to_dj_domconnect(pv_code)
