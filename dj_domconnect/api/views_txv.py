@@ -99,8 +99,8 @@ def get_txv(request):
             yes_work = obj_visit.work
             obj_visit.save()
 
-        if yes_work:
-            tmp_txvs = TxV.objects.filter(pv_code=pv, status=0)
+        if yes_work == True:
+            tmp_txvs = TxV.objects.filter(pv_code=pv, status=0)[:5]
             # queryset в список словарей с преобразованием объекта модели в словарь
             txvs = [model_to_dict(row) for row in tmp_txvs]
             data = json.dumps(txvs)

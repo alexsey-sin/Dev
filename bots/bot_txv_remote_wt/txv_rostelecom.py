@@ -1035,10 +1035,10 @@ if __name__ == '__main__':
     
     
     # set_txv_to_dj_domconnect(pv_code)
-    rez, txv_list = get_txv_in_dj_domconnect(pv_code)
-    for txv_dict in txv_list:
-        for k, v in txv_dict.items():
-            print(k, v)
+    # rez, txv_list = get_txv_in_dj_domconnect(pv_code)
+    # for txv_dict in txv_list:
+        # for k, v in txv_dict.items():
+            # print(k, v)
     # data = {'id': 1, 'pv_address': '55632145', 'bot_log': 'Заявка принята МТС'}
     # r = set_txv_status(0, data)
     # print(r)

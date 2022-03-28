@@ -86,3 +86,13 @@ SET password = 'gBLnFexH6d1~vCZHRVEt3E', status = 0
 WHERE "pv_code" = 4 AND "pub_date" > '2022-03-24 15:00:00' AND "status" = 2
 
 
+UPDATE public.api_txv
+SET password = 'gBLnFexH6d1~vCZHRVEt3E', status = 0
+WHERE "pv_code" = 4 AND "pub_date" > '2022-03-24 15:00:00' AND password != 'gBLnFexH6d1~vCZHRVEt3E'
+
+
+Исправляем пароли и логины в ТхВ МГТС и обновляем статус
+=========================================================
+UPDATE public.api_txv
+SET login = 'ESubbotin', password = 'sr@8Cjmu', login_2 = 'MChumakova', password_2 = 'Qhvv@!4817', status = 0
+WHERE "pv_code" = 7 AND status = 2

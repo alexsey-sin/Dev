@@ -97,19 +97,23 @@ def get_bid_beeline(request):
         if key != 'Q8kGM1HfWz':
             HttpResponse('ERROR key.', status=status.HTTP_403_FORBIDDEN)
         
-        tmp_bids = BidBeeline.objects.filter(status=0)
-        # queryset в список словарей с преобразованием объекта модели в словарь
-        bids = [model_to_dict(row) for row in tmp_bids]
-        data = json.dumps(bids)
-        for bid in tmp_bids:
-            bid.status = 1
-            bid.save()
-        
+        yes_work = False
         # Отметимся что бот был
         obj_visit, _ = BotVisit.objects.get_or_create(name=f'Бот автозаявки Билайн')
         obj_visit.last_visit = datetime.now()
+        yes_work = obj_visit.work
         obj_visit.save()
 
+        if yes_work == True:
+            tmp_bids = BidBeeline.objects.filter(status=0)[:5]
+            # queryset в список словарей с преобразованием объекта модели в словарь
+            bids = [model_to_dict(row) for row in tmp_bids]
+            data = json.dumps(bids)
+            for bid in tmp_bids:
+                bid.status = 1
+                bid.save()
+        else: data = json.dumps([])
+        
         return HttpResponse(data, content_type='application/json; charset=utf-8')
     return HttpResponse('Use GET request, please.', content_type='text/plain; charset=utf-8')
 
