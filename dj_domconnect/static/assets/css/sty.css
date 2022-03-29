@@ -17,13 +17,13 @@ table {
   max-width: 100%; */
   border-collapse: collapse; /* Убираем двойные линии между ячейками */
 }
-tr, td {
+th, tr, td {
   min-width: 75px;
   max-width: 75px;
   margin: 0%;
   text-align: center;
   border-width: 1px;
-  border-color: inherit;
+  border-color: #c6d0da;
   border-style: solid;
 }
 tr:hover {

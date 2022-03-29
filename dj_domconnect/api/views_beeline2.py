@@ -76,7 +76,7 @@ def get_bid_beeline2(request):
         obj_visit.save()
 
         if yes_work == True:
-            tmp_bids = BidBeeline2.objects.filter(status=0)[:5]
+            tmp_bids = BidBeeline2.objects.filter(status=0).order_by('-pub_date')[:5]
             # queryset в список словарей с преобразованием объекта модели в словарь
             bids = [model_to_dict(row) for row in tmp_bids]
             data = json.dumps(bids)

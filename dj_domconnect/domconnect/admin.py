@@ -58,7 +58,7 @@ class DcCashSEOAdmin(admin.ModelAdmin):
 
 @admin.register(DcSiteSEO)
 class DcSiteSEOAdmin(admin.ModelAdmin):
-    list_display = ('site', 'provider', 'num')
+    list_display = ('site', 'name', 'provider', 'num')
     search_fields = ('site', 'provider',)
     list_filter = ('site', 'provider')
 

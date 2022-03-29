@@ -425,3 +425,230 @@ TypeError: isinstance() arg 2 must be a type or tuple of types
 2022-03-25 11:57:40,633:django.request:Not Found: /favicon.ico
 2022-03-28 10:09:50,162:django.request:Not Found: /favicon.ico
 2022-03-28 10:14:50,101:django.utils.autoreload:C:\Dev\dj_domconnect\api\views_txv.py changed, reloading.
+2022-03-29 09:20:40,267:django.request:Not Found: /favicon.ico
+2022-03-29 11:29:34,778:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\models.py changed, reloading.
+2022-03-29 11:43:34,873:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\lib_seo.py changed, reloading.
+2022-03-29 11:45:50,287:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\lib_seo.py changed, reloading.
+2022-03-29 11:46:01,788:domconnect.lib_seo:Обновение данных SEO запущено.
+2022-03-29 11:46:41,921:domconnect.lib_seo:Загрузка завершена. Обработано сделок: 988. Ошибок: 0
+2022-03-29 11:52:12,988:django.request:Internal Server Error: /admin/domconnect/dcsiteseo/59/change/
+Traceback (most recent call last):
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\backends\utils.py", line 86, in _execute
+    return self.cursor.execute(sql, params)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\backends\sqlite3\base.py", line 396, in execute
+    return Database.Cursor.execute(self, query, params)
+sqlite3.OperationalError: database is locked
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\core\handlers\exception.py", line 34, in inner
+    response = get_response(request)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\core\handlers\base.py", line 115, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\core\handlers\base.py", line 113, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\contrib\admin\options.py", line 607, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\utils\decorators.py", line 130, in _wrapped_view
+    response = view_func(request, *args, **kwargs)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\views\decorators\cache.py", line 44, in _wrapped_view_func
+    response = view_func(request, *args, **kwargs)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\contrib\admin\sites.py", line 231, in inner
+    return view(request, *args, **kwargs)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\contrib\admin\options.py", line 1641, in change_view
+    return self.changeform_view(request, object_id, form_url, extra_context)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\utils\decorators.py", line 43, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\utils\decorators.py", line 130, in _wrapped_view
+    response = view_func(request, *args, **kwargs)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\contrib\admin\options.py", line 1522, in changeform_view
+    return self._changeform_view(request, object_id, form_url, extra_context)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\contrib\admin\options.py", line 1565, in _changeform_view
+    self.save_model(request, new_object, form, not add)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\contrib\admin\options.py", line 1081, in save_model
+    obj.save()
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\models\base.py", line 745, in save
+    self.save_base(using=using, force_insert=force_insert,
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\models\base.py", line 782, in save_base
+    updated = self._save_table(
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\models\base.py", line 864, in _save_table
+    updated = self._do_update(base_qs, using, pk_val, values, update_fields,
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\models\base.py", line 917, in _do_update
+    return filtered._update(values) > 0
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\models\query.py", line 771, in _update
+    return query.get_compiler(self.db).execute_sql(CURSOR)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\models\sql\compiler.py", line 1499, in execute_sql
+    cursor = super().execute_sql(result_type)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\models\sql\compiler.py", line 1151, in execute_sql
+    cursor.execute(sql, params)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\backends\utils.py", line 100, in execute
+    return super().execute(sql, params)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\backends\utils.py", line 68, in execute
+    return self._execute_with_wrappers(sql, params, many=False, executor=self._execute)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\backends\utils.py", line 77, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\backends\utils.py", line 86, in _execute
+    return self.cursor.execute(sql, params)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\utils.py", line 90, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\backends\utils.py", line 86, in _execute
+    return self.cursor.execute(sql, params)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\backends\sqlite3\base.py", line 396, in execute
+    return Database.Cursor.execute(self, query, params)
+django.db.utils.OperationalError: database is locked
+2022-03-29 11:52:35,137:django.request:Internal Server Error: /admin/domconnect/dcsiteseo/58/change/
+Traceback (most recent call last):
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\backends\utils.py", line 86, in _execute
+    return self.cursor.execute(sql, params)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\backends\sqlite3\base.py", line 396, in execute
+    return Database.Cursor.execute(self, query, params)
+sqlite3.OperationalError: database is locked
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\core\handlers\exception.py", line 34, in inner
+    response = get_response(request)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\core\handlers\base.py", line 115, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\core\handlers\base.py", line 113, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\contrib\admin\options.py", line 607, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\utils\decorators.py", line 130, in _wrapped_view
+    response = view_func(request, *args, **kwargs)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\views\decorators\cache.py", line 44, in _wrapped_view_func
+    response = view_func(request, *args, **kwargs)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\contrib\admin\sites.py", line 231, in inner
+    return view(request, *args, **kwargs)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\contrib\admin\options.py", line 1641, in change_view
+    return self.changeform_view(request, object_id, form_url, extra_context)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\utils\decorators.py", line 43, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\utils\decorators.py", line 130, in _wrapped_view
+    response = view_func(request, *args, **kwargs)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\contrib\admin\options.py", line 1522, in changeform_view
+    return self._changeform_view(request, object_id, form_url, extra_context)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\contrib\admin\options.py", line 1565, in _changeform_view
+    self.save_model(request, new_object, form, not add)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\contrib\admin\options.py", line 1081, in save_model
+    obj.save()
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\models\base.py", line 745, in save
+    self.save_base(using=using, force_insert=force_insert,
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\models\base.py", line 782, in save_base
+    updated = self._save_table(
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\models\base.py", line 864, in _save_table
+    updated = self._do_update(base_qs, using, pk_val, values, update_fields,
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\models\base.py", line 917, in _do_update
+    return filtered._update(values) > 0
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\models\query.py", line 771, in _update
+    return query.get_compiler(self.db).execute_sql(CURSOR)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\models\sql\compiler.py", line 1499, in execute_sql
+    cursor = super().execute_sql(result_type)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\models\sql\compiler.py", line 1151, in execute_sql
+    cursor.execute(sql, params)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\backends\utils.py", line 100, in execute
+    return super().execute(sql, params)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\backends\utils.py", line 68, in execute
+    return self._execute_with_wrappers(sql, params, many=False, executor=self._execute)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\backends\utils.py", line 77, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\backends\utils.py", line 86, in _execute
+    return self.cursor.execute(sql, params)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\utils.py", line 90, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\backends\utils.py", line 86, in _execute
+    return self.cursor.execute(sql, params)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\backends\sqlite3\base.py", line 396, in execute
+    return Database.Cursor.execute(self, query, params)
+django.db.utils.OperationalError: database is locked
+2022-03-29 11:52:38,642:django.request:Internal Server Error: /admin/domconnect/dcsiteseo/58/change/
+Traceback (most recent call last):
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\backends\utils.py", line 86, in _execute
+    return self.cursor.execute(sql, params)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\backends\sqlite3\base.py", line 396, in execute
+    return Database.Cursor.execute(self, query, params)
+sqlite3.OperationalError: database is locked
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\core\handlers\exception.py", line 34, in inner
+    response = get_response(request)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\core\handlers\base.py", line 115, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\core\handlers\base.py", line 113, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\contrib\admin\options.py", line 607, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\utils\decorators.py", line 130, in _wrapped_view
+    response = view_func(request, *args, **kwargs)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\views\decorators\cache.py", line 44, in _wrapped_view_func
+    response = view_func(request, *args, **kwargs)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\contrib\admin\sites.py", line 231, in inner
+    return view(request, *args, **kwargs)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\contrib\admin\options.py", line 1641, in change_view
+    return self.changeform_view(request, object_id, form_url, extra_context)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\utils\decorators.py", line 43, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\utils\decorators.py", line 130, in _wrapped_view
+    response = view_func(request, *args, **kwargs)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\contrib\admin\options.py", line 1522, in changeform_view
+    return self._changeform_view(request, object_id, form_url, extra_context)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\contrib\admin\options.py", line 1565, in _changeform_view
+    self.save_model(request, new_object, form, not add)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\contrib\admin\options.py", line 1081, in save_model
+    obj.save()
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\models\base.py", line 745, in save
+    self.save_base(using=using, force_insert=force_insert,
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\models\base.py", line 782, in save_base
+    updated = self._save_table(
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\models\base.py", line 864, in _save_table
+    updated = self._do_update(base_qs, using, pk_val, values, update_fields,
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\models\base.py", line 917, in _do_update
+    return filtered._update(values) > 0
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\models\query.py", line 771, in _update
+    return query.get_compiler(self.db).execute_sql(CURSOR)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\models\sql\compiler.py", line 1499, in execute_sql
+    cursor = super().execute_sql(result_type)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\models\sql\compiler.py", line 1151, in execute_sql
+    cursor.execute(sql, params)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\backends\utils.py", line 100, in execute
+    return super().execute(sql, params)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\backends\utils.py", line 68, in execute
+    return self._execute_with_wrappers(sql, params, many=False, executor=self._execute)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\backends\utils.py", line 77, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\backends\utils.py", line 86, in _execute
+    return self.cursor.execute(sql, params)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\utils.py", line 90, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\backends\utils.py", line 86, in _execute
+    return self.cursor.execute(sql, params)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\backends\sqlite3\base.py", line 396, in execute
+    return Database.Cursor.execute(self, query, params)
+django.db.utils.OperationalError: database is locked
+2022-03-29 12:23:29,217:domconnect.lib_seo:Загрузка завершена. Обработано лидов: 50045. Ошибок: 0
+2022-03-29 12:32:54,616:domconnect.lib_seo:Расчет и сохранение данных SEO в кэш закончено.
+2022-03-29 14:12:27,939:django.request:Not Found: /favicon.ico
+2022-03-29 14:13:54,805:django.request:Not Found: /favicon.ico
+2022-03-29 14:14:46,133:django.request:Not Found: /favicon.ico
+2022-03-29 14:15:28,911:django.request:Not Found: /favicon.ico
+2022-03-29 14:16:49,187:django.request:Not Found: /favicon.ico
+2022-03-29 14:21:06,321:django.request:Not Found: /favicon.ico
+2022-03-29 14:30:10,502:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\lib_seo.py changed, reloading.
+2022-03-29 14:30:38,877:domconnect.lib_seo:Обновение данных SEO запущено.
+2022-03-29 14:30:39,467:domconnect.lib_seo:Загрузка завершена. Обработано сделок: 1. Ошибок: 0
+2022-03-29 14:31:10,995:domconnect.lib_seo:Загрузка завершена. Обработано лидов: 867. Ошибок: 0
+2022-03-29 14:40:49,550:domconnect.lib_seo:Расчет и сохранение данных SEO в кэш закончено.
+2022-03-29 14:53:58,906:domconnect.lib_seo:Обновение данных SEO запущено.
+2022-03-29 14:53:59,384:domconnect.lib_seo:Загрузка завершена. Обработано сделок: 1. Ошибок: 0
+2022-03-29 14:54:06,783:domconnect.lib_seo:Загрузка завершена. Обработано лидов: 243. Ошибок: 0
+2022-03-29 15:03:41,697:domconnect.lib_seo:Расчет и сохранение данных SEO в кэш закончено.
+2022-03-29 15:09:05,046:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\lib_seo.py changed, reloading.
+2022-03-29 15:09:34,557:domconnect.lib_seo:Обновение данных SEO запущено.
+2022-03-29 15:09:35,189:domconnect.lib_seo:Загрузка завершена. Обработано сделок: 1. Ошибок: 0
+2022-03-29 15:09:42,144:domconnect.lib_seo:Загрузка завершена. Обработано лидов: 205. Ошибок: 0
+2022-03-29 15:19:34,015:domconnect.lib_seo:Расчет и сохранение данных SEO в кэш закончено.
+2022-03-29 15:27:04,443:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\lib_seo.py changed, reloading.

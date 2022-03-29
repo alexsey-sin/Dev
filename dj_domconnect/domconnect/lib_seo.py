@@ -111,7 +111,7 @@ row_source_names = [
     'ТП IVR',
     'SEO Лиды ТхВ',
     'Сделки',
-    'Сделки >50 Билайн',
+    'Сделки >50',
 ]
 
 
@@ -918,7 +918,7 @@ def make_seo_page():
         data_sites = []
         objs_site = DcSiteSEO.objects.all().order_by('num')
         for obj_site in objs_site:
-            item_sites = {'id': obj_site.num, 'name_site': obj_site.site}
+            item_sites = {'id': obj_site.num, 'url_site': obj_site.site, 'name_site': obj_site.name}
             
             # Таблицы сайта по месяцам
             site_table = []  # Список словарей по месяцам сводной таблицы сайта
@@ -1084,8 +1084,8 @@ def make_csv_text(in_data, fname):
         num_row_source = len(row_source_names)
 
         for site in in_data['data_sites']:
-            name_site = site.get('name_site')
-            writer.writerow([name_site,])
+            url_site = site.get('url_site')
+            writer.writerow([url_site,])
             writer.writerow(in_data['data_month'])
             site_table = site.get('site_table')  # {}
             site_table.pop(-2)
@@ -1101,12 +1101,14 @@ def make_csv_text(in_data, fname):
                         if val: tbl_site[j][i] = val
             # Собираем строки
             for j in range(len(tbl_site)):
-                r_lst = [row_site_names[j],] + tbl_site[j]
+                row_name = row_site_names[j]
+                if j == len(tbl_site) - 1: row_name += f' {site.get("name_site")}'
+                r_lst = [row_name,] + tbl_site[j]
                 writer.writerow(r_lst)
             writer.writerow([])
 
             # Добавляем по каждому сайту таблицы с источниками
-            writer.writerow([f'Источники {name_site}',])
+            writer.writerow([f'Источники {url_site}',])
             writer.writerow(in_data['data_month'])
 
             source_tables = site.get('source_tables')  # []
@@ -1127,7 +1129,9 @@ def make_csv_text(in_data, fname):
                             if val: tbl_source[j][i] = val
                 # Собираем строки
                 for j in range(len(tbl_source)):
-                    r_lst = [row_source_names[j],] + tbl_source[j]
+                    row_name = row_source_names[j]
+                    if j == len(tbl_source) - 1: row_name += f' {site.get("name_site")}'
+                    r_lst = [row_name,] + tbl_source[j]
                     writer.writerow(r_lst)
                 writer.writerow([])
 

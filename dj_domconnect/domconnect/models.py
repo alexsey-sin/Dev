@@ -247,10 +247,15 @@ class DcCashSEO(models.Model):  # Кэш SEO
 
 
 class DcSiteSEO(models.Model):  # Сайты для перечня тавлиц SEO
-    site = models.CharField(  # Название сайта
+    site = models.CharField(  # сайт
         max_length = 255,
         unique = True,
         verbose_name='Сайт',
+    )
+    name = models.CharField(  # Название сайта
+        max_length = 255,
+        blank = True,
+        verbose_name='Название',
     )
     provider = models.CharField( # КОДЫ!!! 
     # Для мультибрендовых сайтов названия провайдеров через ;

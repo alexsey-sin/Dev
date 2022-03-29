@@ -8,8 +8,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
 
-url_host = 'http://127.0.0.1:8000/'
-# url_host = 'http://django.domconnect.ru/'
+# url_host = 'http://127.0.0.1:8000/'
+url_host = 'http://django.domconnect.ru/'
 opsos = 'Ростелесом'
 pv_code = 4
 
@@ -695,11 +695,10 @@ def get_txv(data):
         # Возьмем определившийся адрес
         data['pv_address'] = ''
         driver.implicitly_wait(2)
-        els = driver.find_elements(By.XPATH, '//span[@class="hideOnSuccess addressCheckResultMessage error addrNotSelected"]')
         els_div_adr = driver.find_elements(By.XPATH, '//div[@id="addresse-form"]')
         if els_div_adr[0]:
             els_adr = els_div_adr[0].find_elements(By.XPATH, './/span[@class="fullAddress"]')
-            if els_adr[1]: data['pv_address'] = els_adr[1].text
+            if els_adr[0]: data['pv_address'] = els_adr[0].text
         driver.implicitly_wait(10)
         time.sleep(3)
         
@@ -972,7 +971,7 @@ if __name__ == '__main__':
     # txv_dict = {
         # # 'login': 'sz_v_an',
         # # 'password': 'gBLnFexH6d1~vCZHRVEt3E',
-        # 'login': 'sz_ivan',
+        # 'login': 'sz_v_an',
         # 'password': 'gBLnFexH6d1~vCZHRVEt3E',
         # 'id_lid': '1215557',
         
@@ -1035,10 +1034,10 @@ if __name__ == '__main__':
     
     
     # set_txv_to_dj_domconnect(pv_code)
-    # rez, txv_list = get_txv_in_dj_domconnect(pv_code)
-    # for txv_dict in txv_list:
-        # for k, v in txv_dict.items():
-            # print(k, v)
+    rez, txv_list = get_txv_in_dj_domconnect(pv_code)
+    for txv_dict in txv_list:
+        for k, v in txv_dict.items():
+            print(k, v)
     # data = {'id': 1, 'pv_address': '55632145', 'bot_log': 'Заявка принята МТС'}
     # r = set_txv_status(0, data)
     # print(r)

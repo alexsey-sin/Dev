@@ -434,7 +434,7 @@
                 <div style="margin: 3px auto;">
                     <div style="display: inline-block; margin: 3px auto; padding-left: 20px; width: 250px;">
                         <button style="border: 0;" type="button" onclick="one_open('site{{ site.id }}');">
-                        {{ site.name_site }}
+                        {{ site.url_site }}
                         </button>
                     </div>
                     <div style="display: inline-block; margin: 3px auto;">
@@ -756,7 +756,7 @@
                                 {% endfor %}
                             </tr>
                             <tr>
-                                <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Сделки &gt;50 Билайн</td>
+                                <td style="font-weight: bold; min-width: 200px; max-width: 200px;">Сделки &gt;50 {{ site.name_site }}</td>
                                 {% for month in site.site_table %}
                                     {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                         <td class="td_grafic" gr_data="{{ month.26 }}"></td>
@@ -921,7 +921,7 @@
                                     {% endfor %}
                                 </tr>
                                 <tr>
-                                    <td style="font-weight: normal; min-width: 200px; max-width: 200px;">Сделки >50 Билайн</td>
+                                    <td style="font-weight: normal; min-width: 200px; max-width: 200px;">Сделки >50 {{ site.name_site }}</td>
                                     {% for col in source.months %}
                                         {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
                                             <td class="td_grafic" gr_data="{{ col.12 }}"></td>

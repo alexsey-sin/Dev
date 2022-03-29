@@ -96,3 +96,11 @@ WHERE "pv_code" = 4 AND "pub_date" > '2022-03-24 15:00:00' AND password != 'gBLn
 UPDATE public.api_txv
 SET login = 'ESubbotin', password = 'sr@8Cjmu', login_2 = 'MChumakova', password_2 = 'Qhvv@!4817', status = 0
 WHERE "pv_code" = 7 AND status = 2
+
+
+SELECT count(*) FROM public.api_txv
+WHERE pv_code = 4 AND status = 2 AND bot_log LIKE '%list index out of range%'
+
+UPDATE public.api_txv
+SET status = 0, bot_log = ''
+WHERE pv_code = 4 AND status = 2 AND bot_log LIKE '%list index out of range%'

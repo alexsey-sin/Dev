@@ -87,7 +87,7 @@ def get_bid_rostelecom2(request):
         obj_visit.save()
 
         if yes_work == True:
-            tmp_bids = BidRostelecom2.objects.filter(status=0)[:5]
+            tmp_bids = BidRostelecom2.objects.filter(status=0).order_by('-pub_date')[:5]
             # queryset в список словарей с преобразованием объекта модели в словарь
             bids = [model_to_dict(row) for row in tmp_bids]
             data = json.dumps(bids)
