@@ -760,8 +760,8 @@ def set_txv_to_dj_domconnect(pv_code):
     params = {
         'key': 'Q8kGM1HfWz',
         'pv_code': pv_code,
-        'login': 'sz_v_an',
-        'password': 'gBLnFexH6d1~vCZHRVEt3E',
+        # 'login': 'sz_v_an',
+        # 'password': 'gBLnFexH6d1~vCZHRVEt3E',
         'id_lid': '1215557',
 
         'region': 'Ярославль',
@@ -965,14 +965,14 @@ if __name__ == '__main__':
     
     # url: https://eissd.rt.ru/login
     # login: sz_v_an
-    # password: gBLnFexH6d1~vCZHRVEt3E
+    # password: m~|HqEu~VB}|P1QDrDX%
 
     
     # txv_dict = {
         # # 'login': 'sz_v_an',
-        # # 'password': 'gBLnFexH6d1~vCZHRVEt3E',
+        # # 'password': 'm~|HqEu~VB}|P1QDrDX%',
         # 'login': 'sz_v_an',
-        # 'password': 'gBLnFexH6d1~vCZHRVEt3E',
+        # 'password': 'm~|HqEu~VB}|P1QDrDX%',
         # 'id_lid': '1215557',
         
         # # 'region': 'Республика Северная Осетия — Алания',
@@ -1034,10 +1034,12 @@ if __name__ == '__main__':
     
     
     # set_txv_to_dj_domconnect(pv_code)
-    rez, txv_list = get_txv_in_dj_domconnect(pv_code)
-    for txv_dict in txv_list:
-        for k, v in txv_dict.items():
-            print(k, v)
+    # rez, txv_list = get_txv_in_dj_domconnect(pv_code)
+    # for txv_dict in txv_list:
+        # for k, v in txv_dict.items():
+            # print(k, v)
+
+
     # data = {'id': 1, 'pv_address': '55632145', 'bot_log': 'Заявка принята МТС'}
     # r = set_txv_status(0, data)
     # print(r)

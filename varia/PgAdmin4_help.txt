@@ -99,8 +99,23 @@ WHERE "pv_code" = 7 AND status = 2
 
 
 SELECT count(*) FROM public.api_txv
-WHERE pv_code = 4 AND status = 2 AND bot_log LIKE '%list index out of range%'
+WHERE pv_code = 4 AND status = 2 AND bot_log LIKE '%Нет ссылки Создать заявку ФЛ%'
 
 UPDATE public.api_txv
-SET status = 0, bot_log = ''
-WHERE pv_code = 4 AND status = 2 AND bot_log LIKE '%list index out of range%'
+SET status = 0, bot_log = '', password = 'm~|HqEu~VB}|P1QDrDX%'
+WHERE pv_code = 4 AND status = 2 AND bot_log LIKE '%Нет ссылки Создать заявку ФЛ%'
+
+Исправляем статус в ТхВ МТС
+=========================================================
+UPDATE public.api_txv
+SET status = 0
+WHERE pv_code = 3 AND status = 2
+
+UPDATE public.api_txv
+SET status = 0, bot_log = '', password = 'm~|HqEu~VB}|P1QDrDX%'
+WHERE pv_code = 4 AND status = 2 AND bot_log LIKE '%Учетная запись пользователя заблокирована%'
+
+UPDATE public.api_txv
+SET status = 0, bot_log = '', password = 'm~|HqEu~VB}|P1QDrDX%'
+WHERE pv_code = 4 AND status = 2 AND bot_log LIKE '%Неверное имя пользователя или пароль%'
+

@@ -652,3 +652,9 @@ django.db.utils.OperationalError: database is locked
 2022-03-29 15:09:42,144:domconnect.lib_seo:Загрузка завершена. Обработано лидов: 205. Ошибок: 0
 2022-03-29 15:19:34,015:domconnect.lib_seo:Расчет и сохранение данных SEO в кэш закончено.
 2022-03-29 15:27:04,443:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\lib_seo.py changed, reloading.
+2022-03-31 10:29:48,345:django.request:Not Found: /favicon.ico
+2022-03-31 10:30:49,136:django.utils.autoreload:C:\Dev\dj_domconnect\api\models.py changed, reloading.
+2022-03-31 10:39:22,733:django.request:Bad Request: /api/set_txv
+2022-03-31 10:40:21,380:django.utils.autoreload:C:\Dev\dj_domconnect\api\views_txv.py changed, reloading.
+2022-03-31 10:40:30,337:django.request:Bad Request: /api/set_txv
+2022-03-31 10:41:32,667:django.utils.autoreload:C:\Dev\dj_domconnect\api\views_txv.py changed, reloading.

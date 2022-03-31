@@ -29,11 +29,31 @@ class BotVisit(models.Model):
     )
     check = models.BooleanField(
         default = True,
-        verbose_name = 'Проверять',
+        verbose_name = 'Проверять бездействие',
     )
     work = models.BooleanField(
         default = True,
-        verbose_name = 'Работать',
+        verbose_name = 'Работать разрешено',
+    )
+    login = models.CharField(
+        verbose_name = 'Логин',
+        max_length = 200,
+        default = 'login',
+    )
+    password = models.CharField(
+        verbose_name = 'Пароль',
+        max_length = 200,
+        default = 'password',
+    )
+    login_2 = models.CharField(
+        verbose_name = 'Логин_2',
+        max_length = 200,
+        blank = True,
+    )
+    password_2 = models.CharField(
+        verbose_name = 'Пароль_2',
+        max_length = 200,
+        blank = True,
     )
     
     def __str__(self):

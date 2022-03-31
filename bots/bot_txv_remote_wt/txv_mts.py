@@ -301,7 +301,7 @@ def get_txv(data):
 
         # Готовим адресную строку
         region = data.get('region')
-        if region == None: raise Exception('Ошибка не заполнено поле регион')
+        if region == None: region = ''
         city = data.get('city')
         if city == None: raise Exception('Ошибка не заполнено поле город')
         street = data.get('street')
@@ -311,8 +311,9 @@ def get_txv(data):
         # С дробями дома не проходят - откидываем дробь
         house = house.split('/')[0]
         apartment = data.get('apartment')
-        if apartment == None: raise Exception('Ошибка не заполнено поле квартира')
-        address = f'{region} {city} {street} д. {house} кв. {apartment}'
+        if apartment == None: apartment = ''
+        else: apartment = f' кв. {apartment}'
+        address = f'{region} {city} {street} д. {house}{apartment}'
         # Вводим адрес
         try: els[0].send_keys(address)
         except: raise Exception('Ошибка ввода адрес')
@@ -330,12 +331,10 @@ def get_txv(data):
             if len(els) == 1:
                 els_addr = driver.find_elements(By.XPATH, '//textarea[contains(@class, "SearchInput_textArea")]')
                 if els_addr[0]: data['pv_address'] = els_addr[0].text
-                if els[0].text.find('Есть возможность подключения') >= 0:
-                    data['available_connect'] = 'Есть ТхВ'
-                    break
-                if els[0].text.find('Нет технической возможности') >= 0:
-                    data['available_connect'] = 'Нет ТхВ'
-                    raise Exception(els[0].text)
+                lst_txt = els[0].text.split('\n')
+                lst_txt = [t.strip() for t in lst_txt if len(t.strip()) >= 8]
+                data['available_connect'] = '\n'.join(lst_txt)
+                break
             
             # Возможно множественный выбор
             els_m = driver.find_elements(By.XPATH, '//div[@data-testid="suggestions"]')
@@ -350,45 +349,29 @@ def get_txv(data):
                 except: raise Exception('Ошибка клика выбора адреса')
                 continue
             
-            raise Exception(f'Ошибка не распознан ответ на адрес: {address}')
+            raise Exception(f'Ошибка не распознан адрес: {address}')
         
-        driver.implicitly_wait(10)
-        # Ищем кнопочку перехода
-        els = driver.find_elements(By.XPATH, '//button[contains(@class, "SearchInput_Search__SubmitBtn")]')
-        if len(els) == 0: raise Exception('Ошибка после адреса нет кнопки активации перехода')
-        try: driver.execute_script("arguments[0].click();", els[0])
-        except: raise Exception('Ошибка клика кнопки активации перехода')
-        time.sleep(5)
-        ###################### Страница тарифных предложений ######################
-        els = driver.find_elements(By.XPATH, '//section[contains(@class, "OrderOffers_container")]')
-        if len(els) != 1: raise Exception('Ошибка на странице секции тарифов')
-        els_art = els[0].find_elements(By.TAG_NAME, 'article')
-        if len(els_art) == 0: raise Exception('Ошибка Нет тарифов')
-        lst_tar = []
-        for el_art in els_art:
-            els_n = el_art.find_elements(By.TAG_NAME, 'h4')
-            if len(els_n) == 0: raise Exception('Ошибка Нет заголовка тарифа')
-            lst_tar.append(els_n[0].text)
-        data['tarifs_all'] = '\n'.join(lst_tar)
-        # # Кликаем первый тариф чтоб пройти дальше
-        # try: els_art[0].click()
-        # except: raise Exception('Ошибка клика первый тариф чтоб пройти дальше')
-        # time.sleep(2)
-        # # Нажмем кнопочку перехода
-        # driver.execute_script('window.scrollTo(0, 0)')  # прокручивает страницу по координатам
-        # time.sleep(1)
-        # els_go = driver.find_elements(By.XPATH, '//button[contains(@class, "SearchInput_Search__SubmitBtn")]')
-        # if len(els_go) != 1: raise Exception('Ошибка Нет кнопки перехода')
-        # driver.execute_script("arguments[0].click();", els_go[0])
-        # time.sleep(5)
-        # ###################### Страница данныхо клиенте и мремени вызова монтажника ######################
-        # # Бывает появляется всплывашка с "Что-то пошло не так"
-        # # Жмем ссылку "Загрузить время визита монтажника"
-        # driver.implicitly_wait(1)
-        # els = driver.find_elements(By.XPATH, '//button[contains(@class, "Modal_Modal__ButtonClose")]')
-        # if len(els) > 0:
-            # driver.execute_script("arguments[0].click();", els[0])
-        # # driver.implicitly_wait(10)
+        if data['available_connect'].find('Нет технической возможности') < 0:
+            driver.implicitly_wait(10)
+            # Ищем кнопочку перехода
+            els = driver.find_elements(By.XPATH, '//button[contains(@class, "SearchInput_Search__SubmitBtn")]')
+            if len(els) == 0: raise Exception('Ошибка после адреса нет кнопки активации перехода')
+            attr = els[0].get_attribute('disabled')
+            if attr != None: raise Exception('')  # Кнопка не активна - выходим
+            
+            try: driver.execute_script("arguments[0].click();", els[0])
+            except: raise Exception('Ошибка клика кнопки активации перехода')
+            time.sleep(5)
+            ###################### Страница тарифных предложений ######################
+            els_section = driver.find_elements(By.XPATH, '//section[contains(@class, "OrderOffers_container")]')
+            lst_tar = []
+            for el_section in els_section:
+                els_art = el_section.find_elements(By.TAG_NAME, 'article')
+                for el_art in els_art:
+                    els_n = el_art.find_elements(By.TAG_NAME, 'h4')
+                    if len(els_n) > 0: lst_tar.append(els_n[0].text)
+                    
+            data['tarifs_all'] = '\n'.join(lst_tar)
         
         
         # #===========
@@ -591,40 +574,80 @@ if __name__ == '__main__':
 
     # run_bid_mts()
     
-    txv_dict = {
-        'pv_code': pv_code,
-        'login': 'GRYURYEV',
-        'password': 'UcoTWY',
-        'id_lid': '1215557',
+    # txv_dict = {
+        # 'pv_code': pv_code,
+        # 'login': 'GRYURYEV',
+        # 'password': 'UcoTWY',
+        # 'id_lid': '1215557',
         
-        # 'region': 'Калужская область',         # область или город областного значения
-        # 'city': 'Калуга',           # город
-        # 'street': 'улица Ленина',         # улица
-        # 'house': '31',          # дом
-        # 'apartment': '2',          # квартира
+        # # 'region': 'Калужская область',         # область или город областного значения
+        # # 'city': 'Калуга',           # город
+        # # 'street': 'улица Ленина',         # улица
+        # # 'house': '31',          # дом
+        # # 'apartment': '2',          # квартира
         
-        # 'region': 'Ярославская область',         # область или город областного значения
-        # 'city': 'Ярославль',           # город
-        # 'street': 'улица Звездная',         # улица
-        # 'house': '31/41',          # дом
-        # 'apartment': '61',          # квартира
+        # # 'region': 'Владимирская область',         # область или город областного значения
+        # # 'city': 'Владимир',           # город
+        # # 'street': 'ул Фейгина',         # улица
+        # # 'house': '10',          # дом
+        # # 'apartment': '2',          # квартира
+        
+        # # # 'region': 'Татарстан',         # область или город областного значения
+        # # 'city': 'Казань',           # город
+        # # 'street': 'ул Дружинная',         # улица
+        # # 'house': '7',          # дом
+        # # 'apartment': '2',          # квартира
+        
+        # # 'region': 'Ярославская область',         # область или город областного значения
+        # # 'city': 'Ярославль',           # город
+        # # 'street': 'улица Звездная',         # улица
+        # # 'house': '31/41',          # дом
+        # # 'apartment': '61',          # квартира
 
-        'region': 'Удмуртская Республика',         # область или город областного значения
-        'city': 'Воткинск',           # город
-        'street': 'Чапаева',         # улица
-        'house': '5',          # дом
-        'apartment': '10',          # квартира
+        # # 'region': 'Нижегородская область',         # область или город областного значения
+        # # 'city': 'Нижний Новгород',           # город
+        # # 'street': 'Камчатский пер',         # улица
+        # # 'house': '9',          # дом
+        # # 'apartment': '10',          # квартира
 
-        'available_connect': '',  # Возможность подключения
-        'tarifs_all': '', # список названий тарифных планов
-        'pv_address': '',
-    }
+        # # 'city': 'Реутов',           # город
+        # # 'street': 'Носовихинское шоссе',         # улица
+        # # 'house': '25',          # дом
+        # # # 'apartment': '2',          # квартира
+        
+        # # 'city': 'Смоленск',           # город
+        # # 'street': 'пр-кт Гагарина',         # улица
+        # # 'house': '14/2',          # дом
+        
+        # # 'city': 'Ярославль',           # город
+        # # 'street': 'ул Ньютона',         # улица
+        # # 'house': '40',          # дом
+        # # # 'apartment': '2',          # квартира
+        
+        # # 'region': 'Смоленская область',         # область или город областного значения
+        # # 'city': 'Вязьма',           # город
+        # # 'street': 'Кронштадтская улица',         # улица
+        # # 'house': '111',          # дом
+        # # 'apartment': '10',          # квартира
+        
+        # 'region': 'Архангельская область',         # область или город областного значения
+        # 'city': 'Северодвинск',           # город
+        # 'street': 'Лебедева',         # улица
+        # 'house': '7',          # дом
+        # 'apartment': '10',          # квартира
+        
+        
+        # 'available_connect': '',  # Возможность подключения
+        # 'tarifs_all': '', # список названий тарифных планов
+        # 'pv_address': '',
+    # }
     
     
-    e, data = get_txv(txv_dict)
-    if e: print(e)
-    print(data['tarifs_all'])
-    print(data['available_connect'])
+    # e, data = get_txv(txv_dict)
+    # if e: print(e)
+    # print('available_connect:\n', data['available_connect'])
+    # print('tarifs_all:\n', data['tarifs_all'])
+    # print('pv_address:\n', data['pv_address'])
     
     
     # set_txv_to_dj_domconnect(pv_code)
@@ -635,18 +658,15 @@ if __name__ == '__main__':
     # data = {'id': 1, 'pv_address': '55632145', 'bot_log': 'Заявка принята МТС'}
     # r = set_txv_status(0, data)
     # print(r)
-    
-    # rez, stre = search_for_an_entry(lst_street, 'Светла')
-    # rez = search_for_an_entry(lst_reg, 'ярославль')
-    # rez = search_for_an_entry(lst_reg, 'Санкт-Петербург')
-    
 
-    # Калужская область	Калуга	улица Ленина 31
-    # Санкт-Петербург Санкт-Петербург улица Маршала Казакова 78к1
-    # Ярославская область Ярославль проспект Толбухина 31
-
-
-
+    # г Нижний Новгород, Камчатский пер, д 9
+    # г Владимир, ул Фейгина, д 10
+    # г Казань, ул Дружинная, д 7
+    # Реутов, Носовихинское шоссе 25
+    # г Смоленск, пр-кт Гагарина, д 14/2
+    # г Ярославль, ул Ньютона, д 40
+    # г Рязань, ул Черновицкая, д 32
+    # г Калининград, ул Пионерская, д 1
     
 
     

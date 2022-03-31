@@ -21,25 +21,37 @@ def set_txv(request):
                 return HttpResponse('ERROR key.', status=status.HTTP_400_BAD_REQUEST)
             txv = TxV()
 
-            pv_code = request.GET.get('pv_code')
-            if pv_code:
-                try: txv.pv_code = int(pv_code)
+            pv_name = ''
+            pv = request.GET.get('pv_code')
+            dct_pv = {k : v for k, v in PV_VARS}  # Преобразуем кортеж кортежей в словарь
+            if pv:
+                try:
+                    txv.pv_code = int(pv)
+                    pv_name = dct_pv.get(txv.pv_code)
+                    if pv_name == None: raise ValueError('pv_code is undefined')
                 except: raise ValueError('pv_code is not integer')
             else: raise ValueError('pv_code is absent')
 
-            login = request.GET.get('login')
-            if login == None or len(login) == 0: raise ValueError('login is absent')
-            txv.login = login
+            # Возьмем доступы
+            obj_visit, _ = BotVisit.objects.get_or_create(name=f'Бот ТХВ {pv_name}')
+            txv.login = obj_visit.login
+            txv.password = obj_visit.password
+            txv.login_2 = obj_visit.login_2
+            txv.password_2 = obj_visit.password_2
 
-            password = request.GET.get('password')
-            if password == None or len(password) == 0: raise ValueError('password is absent')
-            txv.password = password
+            # login = request.GET.get('login')
+            # if login == None or len(login) == 0: raise ValueError('login is absent')
+            # txv.login = login
+
+            # password = request.GET.get('password')
+            # if password == None or len(password) == 0: raise ValueError('password is absent')
+            # txv.password = password
             
-            login_2 = request.GET.get('login_2')
-            if login_2: txv.login_2 = login_2
+            # login_2 = request.GET.get('login_2')
+            # if login_2: txv.login_2 = login_2
             
-            password_2 = request.GET.get('password_2')
-            if password_2: txv.password_2 = password_2
+            # password_2 = request.GET.get('password_2')
+            # if password_2: txv.password_2 = password_2
             
             id_lid = request.GET.get('id_lid')
             if id_lid: txv.id_lid = id_lid
@@ -80,24 +92,22 @@ def get_txv(request):
         if key != 'Q8kGM1HfWz':
             HttpResponse('ERROR key.', status=status.HTTP_403_FORBIDDEN)
         
+        pv_name = ''
         pv = request.GET.get('pv_code')
+        dct_pv = {k : v for k, v in PV_VARS}  # Преобразуем кортеж кортежей в словарь
         if pv:
-            try: pv = int(pv)
+            try:
+                pv = int(pv)
+                pv_name = dct_pv.get(pv)
+                if pv_name == None: raise ValueError('pv_code is undefined')
             except: raise ValueError('pv_code is not integer')
         else: raise ValueError('pv_code is absent')
 
-        pv_name = ''
-        yes_work = False
-        for cort in PV_VARS:
-            if cort[0] == pv:
-                pv_name = cort[1]
-                break
-        if pv_name:
-            # Отметимся что бот был
-            obj_visit, _ = BotVisit.objects.get_or_create(name=f'Бот ТХВ {pv_name}')
-            obj_visit.last_visit = datetime.now()
-            yes_work = obj_visit.work
-            obj_visit.save()
+        # Отметимся что бот был и определим разрешено ли работать
+        obj_visit, _ = BotVisit.objects.get_or_create(name=f'Бот ТХВ {pv_name}')
+        obj_visit.last_visit = datetime.now()
+        yes_work = obj_visit.work
+        obj_visit.save()
 
         if yes_work == True:
             tmp_txvs = TxV.objects.filter(pv_code=pv, status=0).order_by('-pub_date')[:5]
