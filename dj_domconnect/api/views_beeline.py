@@ -21,18 +21,12 @@ def set_bid_beeline(request):
                 return HttpResponse('ERROR key.', status=status.HTTP_400_BAD_REQUEST)
             bid = BidBeeline()
 
-            partner_login = request.GET.get('partner_login')
-            if partner_login == None or len(partner_login) == 0: raise ValueError('partner_login is absent')
-            bid.partner_login = partner_login
+            # Возьмем доступы
+            obj_visit, _ = BotVisit.objects.get_or_create(name='Бот автозаявки Билайн')
+            bid.partner_login = obj_visit.login
+            bid.partner_password = obj_visit.password
+            bid.partner_workercode = obj_visit.login_2
 
-            partner_workercode = request.GET.get('partner_workercode')
-            if partner_workercode == None or len(partner_workercode) == 0: raise ValueError('partner_workercode is absent')
-            bid.partner_workercode = partner_workercode
-
-            partner_password = request.GET.get('partner_password')
-            if partner_password == None or len(partner_password) == 0: raise ValueError('partner_password is absent')
-            bid.partner_password = partner_password
-            
             id_lid = request.GET.get('id_lid')
             if id_lid == None or len(id_lid) == 0: raise ValueError('id_lid is absent')
             bid.id_lid = id_lid
@@ -99,7 +93,7 @@ def get_bid_beeline(request):
         
         yes_work = False
         # Отметимся что бот был
-        obj_visit, _ = BotVisit.objects.get_or_create(name=f'Бот автозаявки Билайн')
+        obj_visit, _ = BotVisit.objects.get_or_create(name='Бот автозаявки Билайн')
         obj_visit.last_visit = datetime.now()
         yes_work = obj_visit.work
         obj_visit.save()

@@ -50,7 +50,7 @@ def get_bid_domru2(request):
         
         yes_work = False
         # Отметимся что бот был
-        obj_visit, _ = BotVisit.objects.get_or_create(name=f'Бот автозаявки ДомРу_ЮЛ')
+        obj_visit, _ = BotVisit.objects.get_or_create(name='Бот автозаявки ДомРу_ЮЛ')
         obj_visit.last_visit = datetime.now()
         yes_work = obj_visit.work
         obj_visit.save()

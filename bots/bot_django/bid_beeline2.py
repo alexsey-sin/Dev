@@ -7,115 +7,60 @@ import json
 # url_host = 'http://127.0.0.1:8000/'
 url_host = 'http://django.domconnect.ru/'
 
-def __set_bid(data):
-    # try:
-    base_url = 'https://mk.beeline.ru/PartnProg/RefLink?key=AD8AE6EF4C084ED1'
-    url_post = 'https://mk.beeline.ru/PartnProg/RefLinkSendForm'
-    user_agent_val = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36'
-    headers = {
-        'Accept': '*/*',
-        'Accept-Encoding': 'gzip, deflate, br',
-        'Accept-Language': 'ru,en;q=0.9,en-GB;q=0.8,en-US;q=0.7',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        'Host': 'mk.beeline.ru',
-        'Origin': 'https://mk.beeline.ru',
-        'Pragma': 'no-cache',
-        'Referer': 'https://mk.beeline.ru/PartnProg/RefLink?key=AD8AE6EF4C084ED1',
-        'User-Agent': user_agent_val,
-        'X-Requested-With': 'XMLHttpRequest',
-    }
-    session = requests.Session()
-    responce = session.get(base_url, headers=headers)
-    if responce.status_code != 200: raise Exception(f'Ошибка get ответа сервера билайн {responce.status_code}')
-    session.headers.update({'Referer':base_url})
-    session.headers.update({'User-Agent':user_agent_val})
-    
-    i_ph = data.get('phone')
-    if not i_ph.isdigit() or len(i_ph) != 11: raise Exception('Ошибка в номере телефона')
-    phone = f'+7 ({i_ph[1:4]}) {i_ph[4:7]}-{i_ph[7:9]}-{i_ph[9:11]}'
-    # print(phone)
-
-    form_data = {
-        'client_inn': data.get('client_inn'),
-        'contact_name': data.get('contact_name'),
-        'phone': phone,
-        'email': data.get('email'),
-        'dsc': data.get('comment'),
-        'client_name': data.get('client_name'),
-        'products': data.get('products'),
-        'parther_key': data.get('parther_key'),
-    }
-    responce = session.post(url_post, headers=headers, data=form_data)
-    # if responce.status_code == 200:
-        # data['bid_number'] = responce.text
-    # else: raise Exception(f'Ошибка post ответа сервера билайн {responce.status_code}')
-
-    # data['bid_number'] = '1111'
-    print(responce.status_code)
-    print(responce.text)
-        # with open('out.html', 'w', encoding='utf-8') as outfile:
-            # outfile.write(responce.text)
-
-    # except Exception as e:
-        # return e, data, 
-   
-    return '', data, 
-
 def set_bid(data):
-    # try:
-    base_url = 'https://mk.beeline.ru/PartnProg/RefLink?key=AD8AE6EF4C084ED1'
-    url_post = 'https://mk.beeline.ru/PartnProg/RefLinkSendForm'
-    user_agent_val = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36'
-    headers = {
-        'Accept': '*/*',
-        'Accept-Encoding': 'gzip, deflate, br',
-        'Accept-Language': 'ru,en;q=0.9,en-GB;q=0.8,en-US;q=0.7',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        'Host': 'mk.beeline.ru',
-        'Origin': 'https://mk.beeline.ru',
-        'Pragma': 'no-cache',
-        'Referer': 'https://mk.beeline.ru/PartnProg/RefLink?key=AD8AE6EF4C084ED1',
-        'User-Agent': user_agent_val,
-        'X-Requested-With': 'XMLHttpRequest',
-    }
-    session = requests.Session()
-    responce = session.get(base_url, headers=headers)
-    if responce.status_code != 200: raise Exception(f'Ошибка get ответа сервера билайн {responce.status_code}')
-    session.headers.update({'Referer':base_url})
-    session.headers.update({'User-Agent':user_agent_val})
-    
-    i_ph = data.get('phone')
-    if not i_ph.isdigit() or len(i_ph) != 11: raise Exception('Ошибка в номере телефона')
-    phone = f'+7 ({i_ph[1:4]}) {i_ph[4:7]}-{i_ph[7:9]}-{i_ph[9:11]}'
-    # print(phone)
+    try:
+        parther_key = data.get('parther_key')
+        base_url = f'https://mk.beeline.ru/PartnProg/RefLink?key={parther_key}'
+        url_post = 'https://mk.beeline.ru/PartnProg/RefLinkSendForm'
+        user_agent_val = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36'
+        headers = {
+            'Accept': '*/*',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Accept-Language': 'ru,en;q=0.9,en-GB;q=0.8,en-US;q=0.7',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive',
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            'Host': 'mk.beeline.ru',
+            'Origin': 'https://mk.beeline.ru',
+            'Pragma': 'no-cache',
+            'Referer': f'https://mk.beeline.ru/PartnProg/RefLink?key={parther_key}',
+            'User-Agent': user_agent_val,
+            'X-Requested-With': 'XMLHttpRequest',
+        }
+        session = requests.Session()
+        responce = session.get(base_url, headers=headers)
+        if responce.status_code != 200: raise Exception(f'Ошибка get ответа сервера билайн {responce.status_code}')
+        session.headers.update({'Referer':base_url})
+        session.headers.update({'User-Agent':user_agent_val})
+        
+        i_ph = data.get('phone')
+        if not i_ph.isdigit() or len(i_ph) != 11: raise Exception('Ошибка в номере телефона')
+        phone = f'+7 ({i_ph[1:4]}) {i_ph[4:7]}-{i_ph[7:9]}-{i_ph[9:11]}'
+        # print(phone)
 
-    form_data = {
-        'client_inn': data.get('client_inn'),
-        'contact_name': data.get('contact_name'),
-        'phone': phone,
-        'email': data.get('email'),
-        'dsc': data.get('comment'),
-        'client_name': data.get('client_name'),
-        'products': data.get('products'),
-        'parther_key': data.get('parther_key'),
-    }
-    responce = session.post(base_url, headers=headers, data=form_data)
-    # if responce.status_code == 200:
-        # data['bid_number'] = responce.text
-    # else: raise Exception(f'Ошибка post ответа сервера билайн {responce.status_code}')
+        form_data = {
+            'client_inn': data.get('client_inn'),
+            'contact_name': data.get('contact_name'),
+            'phone': phone,
+            'email': data.get('email'),
+            'dsc': data.get('comment'),
+            'client_name': data.get('client_name'),
+            'products': data.get('products'),
+            'parther_key': parther_key,
+        }
+        responce = session.post(base_url, headers=headers, data=form_data)
+        # if responce.status_code == 200:
+            # data['bid_number'] = responce.text
+        # else: raise Exception(f'Ошибка post ответа сервера билайн {responce.status_code}')
 
-    # data['bid_number'] = '1111'
-    print(responce.status_code)
-    print(responce.text)
-        # with open('out.html', 'w', encoding='utf-8') as outfile:
-            # outfile.write(responce.text)
+        # data['bid_number'] = '1111'
+        print(responce.status_code)
+        print(responce.text)
+            # with open('out.html', 'w', encoding='utf-8') as outfile:
+                # outfile.write(responce.text)
 
-    # except Exception as e:
-        # return e, data, 
+    except Exception as e:
+        return str(e)[:200], data, 
    
     return '', data, 
 

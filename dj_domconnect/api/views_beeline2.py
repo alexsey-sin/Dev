@@ -15,9 +15,9 @@ def set_bid_beeline2(request):
                 return HttpResponse('ERROR key.', status=status.HTTP_400_BAD_REQUEST)
             bid = BidBeeline2()
 
-            parther_key = request.GET.get('parther_key')
-            if parther_key == None or len(parther_key) == 0: raise ValueError('parther_key is absent')
-            bid.parther_key = parther_key
+            # Возьмем доступы
+            obj_visit, _ = BotVisit.objects.get_or_create(name='Бот автозаявки Билайн')
+            bid.parther_key = obj_visit.password
 
             client = request.GET.get('client_inn_name')
             if client == None or len(client) == 0: raise ValueError('client_inn_name is absent')

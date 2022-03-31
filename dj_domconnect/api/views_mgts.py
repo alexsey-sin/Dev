@@ -15,22 +15,13 @@ def set_bid_mgts(request):
                 return HttpResponse('ERROR key.', status=status.HTTP_400_BAD_REQUEST)
             bid = BidMGTS()
 
-            login = request.GET.get('login')
-            if login == None or len(login) == 0: raise ValueError('login is absent')
-            bid.login = login
+            # Возьмем доступы
+            obj_visit, _ = BotVisit.objects.get_or_create(name='Бот автозаявки МГТС')
+            bid.login = obj_visit.login
+            bid.password = obj_visit.password
+            bid.login2 = obj_visit.login_2
+            bid.password2 = obj_visit.password_2
 
-            password = request.GET.get('password')
-            if password == None or len(password) == 0: raise ValueError('password is absent')
-            bid.password = password
-            
-            login2 = request.GET.get('login2')
-            if login2 == None or len(login2) == 0: raise ValueError('login2 is absent')
-            bid.login2 = login2
-
-            password2 = request.GET.get('password2')
-            if password2 == None or len(password2) == 0: raise ValueError('password2 is absent')
-            bid.password2 = password2
-            
             id_lid = request.GET.get('id_lid')
             if id_lid == None or len(id_lid) == 0: raise ValueError('id_lid is absent')
             bid.id_lid = id_lid
@@ -112,7 +103,7 @@ def get_bid_mgts(request):
         
         yes_work = False
         # Отметимся что бот был
-        obj_visit, _ = BotVisit.objects.get_or_create(name=f'Бот автозаявки МГТС')
+        obj_visit, _ = BotVisit.objects.get_or_create(name='Бот автозаявки МГТС')
         obj_visit.last_visit = datetime.now()
         yes_work = obj_visit.work
         obj_visit.save()

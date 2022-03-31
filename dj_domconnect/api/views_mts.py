@@ -15,13 +15,10 @@ def set_bid_mts(request):
                 return HttpResponse('ERROR key.', status=status.HTTP_400_BAD_REQUEST)
             bid = BidMTS()
 
-            login = request.GET.get('login')
-            if login == None or len(login) == 0: raise ValueError('login is absent')
-            bid.login = login
-
-            password = request.GET.get('password')
-            if password == None or len(password) == 0: raise ValueError('password is absent')
-            bid.password = password
+            # Возьмем доступы
+            obj_visit, _ = BotVisit.objects.get_or_create(name='Бот автозаявки МТС')
+            bid.login = obj_visit.login
+            bid.password = obj_visit.password
             
             id_lid = request.GET.get('id_lid')
             if id_lid == None or len(id_lid) == 0: raise ValueError('id_lid is absent')
@@ -88,7 +85,7 @@ def get_bid_mts(request):
         
         yes_work = False
         # Отметимся что бот был
-        obj_visit, _ = BotVisit.objects.get_or_create(name=f'Бот автозаявки МТС')
+        obj_visit, _ = BotVisit.objects.get_or_create(name='Бот автозаявки МТС')
         obj_visit.last_visit = datetime.now()
         yes_work = obj_visit.work
         obj_visit.save()
