@@ -62,4 +62,5 @@ urlpatterns = [
 
     path('get_bots_info/<str:from_date>', views.get_bots_info),
     path('get_bots_vizit', views.get_bots_vizit),
+    path('get_lk_access', views.get_lk_access),
 ]

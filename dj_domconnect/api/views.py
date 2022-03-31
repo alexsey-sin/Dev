@@ -212,3 +212,24 @@ def get_bots_vizit(request):
             return HttpResponse(f'ERROR: {e}', status=status.HTTP_400_BAD_REQUEST)
     return HttpResponse(data, content_type='application/json; charset=utf-8', status=status.HTTP_200_OK)
 
+def get_lk_access(request):
+    if request.method == 'GET':
+        key = request.GET.get('key')
+        if key != 'Q8kGM1HfWz':
+            HttpResponse('ERROR key.', status=status.HTTP_403_FORBIDDEN)
+
+        lk_name = request.GET.get('lk_name')
+        yes_work = False
+        # Отметимся что бот был
+        obj_visit, _ = BotVisit.objects.get_or_create(name=f'Парсер ЛК {lk_name}')
+        obj_visit.last_visit = datetime.now()
+        yes_work = obj_visit.work
+        obj_visit.save()
+
+        if yes_work == True:
+            access = {'login': obj_visit.login, 'password': obj_visit.password}
+            data = json.dumps(access)
+        else: data = json.dumps({})
+
+        return HttpResponse(data, content_type='application/json; charset=utf-8')
+    return HttpResponse('Use GET request, please.', content_type='text/plain; charset=utf-8')

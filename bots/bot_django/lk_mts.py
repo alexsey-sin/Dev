@@ -10,11 +10,34 @@ emj_yellow_ball = '🟡'
 emj_green_ball = '🟢'
 emj_red_rhomb = '♦️'
 emj_yellow_rhomb = '🔸'
+operator = 'mts'
 
 
-def get_token():  # Получение токена по логину и паролю
-    login = 'YrxF9TvrPlK6fbkJNBilUqCw0vUa'
-    password = 'hFtsFhai1ZjtuYg_y58fArkaBCEa'
+def get_access_in_dj_domconnect(op_name):
+    url = url_host + 'api/get_lk_access'
+    
+    headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Connection': 'Keep-Alive',
+        'User-Agent': 'Apache-HttpClient/4.1.1 (java 1.5)',
+    }
+    params = {
+        'key': 'Q8kGM1HfWz',
+        'lk_name': op_name,
+    }
+    
+    try:
+        responce = requests.get(url, headers=headers, params=params)
+    except:
+        return 1, {}
+    if responce.status_code == 200:
+        acc_dct = json.loads(responce.text)
+        return 0, acc_dct
+    return 2, {}
+
+def get_token(access):  # Получение токена по логину и паролю
+    login = access.get('login')  # 'YrxF9TvrPlK6fbkJNBilUqCw0vUa'
+    password = access.get('password')  # 'hFtsFhai1ZjtuYg_y58fArkaBCEa'
     url = 'https://api.mts.ru/token'
 
     mess = ''
@@ -251,10 +274,20 @@ def run_lk_mts(logger, tlg_chat, tlg_token):
         '76850047000',
     ]
     
-    # Получаем токен
-    e, token = get_token()
+    # Получаем доступы
+    e, access = get_access_in_dj_domconnect(operator)
     if e:
-        mess = f'run_lk_mts ERROR: {e}'
+        mess = f'run_lk_{operator} ERROR get_access: {e}'
+        send_telegram(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN, mess)
+        logger.error(mess)
+        return
+    if access == {}: return
+    time.sleep(1)
+    
+    # Получаем токен
+    e, token = get_token(access)
+    if e:
+        mess = f'run_lk_{operator} ERROR get_token: {e}'
         send_telegram(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN, mess)
         logger.error(mess)
         return
@@ -262,10 +295,10 @@ def run_lk_mts(logger, tlg_chat, tlg_token):
 
     # Начальные данные
     out_dict = {
-        'operator': 'mts',
+        'operator': operator,
         'numbers': [],
     }
-    res_mess = 'Parsing mts:\n'
+    res_mess = f'Parsing {operator}:\n'
     cnt_avlb_min = 0
     cnt_totl_min = 0
     cnt_avlb_sms = 0
@@ -276,7 +309,7 @@ def run_lk_mts(logger, tlg_chat, tlg_token):
         # Возьмем баланс
         e, balance = get_balance(token, mob_num)
         if e:
-            mess = f'run_lk_mts ERROR: {e}'
+            mess = f'run_lk_{operator} ERROR: {e}'
             send_telegram(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN, mess)
             logger.error(mess)
             return
@@ -293,7 +326,7 @@ def run_lk_mts(logger, tlg_chat, tlg_token):
         # Возьмем тарифный план (пакет)
         e, plan = get_bill_plan_info(token, mob_num)
         if e:
-            mess = f'run_lk_mts ERROR: {e}'
+            mess = f'run_lk_{operator} ERROR: {e}'
             send_telegram(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN, mess)
             logger.error(mess)
             return
@@ -302,7 +335,7 @@ def run_lk_mts(logger, tlg_chat, tlg_token):
         # Возьмем остатки минут, смс
         e, dct_info = get_validity_info(token, mob_num, plan)
         if e:
-            mess = f'run_lk_mts ERROR: {e}'
+            mess = f'run_lk_{operator} ERROR: {e}'
             send_telegram(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN, mess)
             logger.error(mess)
             return
@@ -330,7 +363,7 @@ def run_lk_mts(logger, tlg_chat, tlg_token):
     res_mess += f'Итого: [min {cnt_avlb_min}/{cnt_totl_min}][sms {cnt_avlb_sms}/{cnt_totl_sms}]\nВсего номеров: {len(mob_numbers)}'
     e = send_api(out_dict)
     if e:
-        mess = f'run_lk_mts ERROR: send_api: {e}'
+        mess = f'run_lk_{operator} ERROR: send_api: {e}'
         send_telegram(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN, mess)
         logger.error(mess)
         return

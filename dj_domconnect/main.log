@@ -658,3 +658,6 @@ django.db.utils.OperationalError: database is locked
 2022-03-31 10:40:21,380:django.utils.autoreload:C:\Dev\dj_domconnect\api\views_txv.py changed, reloading.
 2022-03-31 10:40:30,337:django.request:Bad Request: /api/set_txv
 2022-03-31 10:41:32,667:django.utils.autoreload:C:\Dev\dj_domconnect\api\views_txv.py changed, reloading.
+2022-03-31 12:27:23,882:django.request:Not Found: /api/get_lk_access
+2022-03-31 14:43:48,265:django.request:Not Found: /api/get_lk_access
+2022-03-31 14:44:26,075:django.utils.autoreload:C:\Dev\dj_domconnect\api\urls.py changed, reloading.
