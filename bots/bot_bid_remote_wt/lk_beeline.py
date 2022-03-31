@@ -1,11 +1,12 @@
-import os
-import time
+import os, json, time, requests  # pip install requests
 from datetime import datetime
-import requests  # pip install requests
 from selenium import webdriver  # $ pip install selenium
 from selenium.webdriver.common.by import By
 
 opsos = 'beeline'
+
+# url_host = 'http://127.0.0.1:8000/'
+url_host = 'http://django.domconnect.ru/'
 
 emj_red_mark = '❗️'
 emj_red_ball = '🔴'
@@ -22,7 +23,30 @@ TELEGRAM_TOKEN = '2009560099:AAHtYot6EOHh_qr9EUoCoczQhjyRdulKHYo'
 LK_TELEGRAM_CHAT_ID = '-1001580291081'
 LK_TELEGRAM_TOKEN = '526322367:AAEaw2vaeLl_f6Njfb952NopyxqCGRQXji8'
 
-def run_lk_parsing():
+
+def get_access_in_dj_domconnect(op_name):
+    url = url_host + 'api/get_lk_access'
+    
+    headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Connection': 'Keep-Alive',
+        'User-Agent': 'Apache-HttpClient/4.1.1 (java 1.5)',
+    }
+    params = {
+        'key': 'Q8kGM1HfWz',
+        'lk_name': op_name,
+    }
+    
+    try:
+        responce = requests.get(url, headers=headers, params=params)
+    except:
+        return 1, {}
+    if responce.status_code == 200:
+        acc_dct = json.loads(responce.text)
+        return 0, acc_dct
+    return 2, {}
+
+def run_lk_parsing(access):
     # https://my.beeline.ru		S715792964	MuE8$lVGpo
     driver = None
     try:
@@ -34,14 +58,17 @@ def run_lk_parsing():
         driver.get(base_url)
         time.sleep(5)
         ###################### Login ######################
+        login = access.get('login')  # 'S715792964'
+        password = access.get('password')  # 'MuE8$lVGpo'
+        
         els = driver.find_elements(By.ID, 'loginFormB2C:loginForm:login')
         if len(els) != 1: raise Exception('Ошибка: нет поля логин')
-        els[0].send_keys('S715792964')
+        els[0].send_keys(login)
         time.sleep(1)
 
         els = driver.find_elements(By.ID, 'loginFormB2C:loginForm:passwordPwd')
         if len(els) != 1: raise Exception('Ошибка: нет поля пароль')
-        els[0].send_keys('MuE8$lVGpo')
+        els[0].send_keys(password)
         time.sleep(3)
 
         els = driver.find_elements(By.ID, 'loginFormB2C:loginForm:j_idt218')
@@ -266,8 +293,19 @@ def send_api(data):
 
 def run_lk_beeline(chat, token):
     print(f'Start parsing {opsos}')
+
+    # Получаем доступы
+    e, access = get_access_in_dj_domconnect(opsos)
+    if e:
+        mess = f'run_lk_{opsos} ERROR get_access: {e}'
+        send_telegram(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN, mess)
+        logger.error(mess)
+        return
+    if access == {}: return
+    time.sleep(1)
+
     tlg_mess = ''
-    e, data, mess = run_lk_parsing()
+    e, data, mess = run_lk_parsing(access)
     if e:
         tlg_mess = f'Parsing {opsos} - ERROR: {e}'
     else:

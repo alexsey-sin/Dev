@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from mobile.models import MobileNumber, MobileData
-from api.models import BotVisit
+from api.models import BotAccess
 from mobile.forms import MobileNumberForm
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404, redirect
@@ -73,7 +73,7 @@ def api(request):
         message = f'сохранено {cnt} записей.'
 
         # Отметимся что бот был
-        obj_visit, _ = BotVisit.objects.get_or_create(name=f'Парсер ЛК {operator}')
+        obj_visit, _ = BotAccess.objects.get_or_create(name=f'Парсер ЛК {operator}')
         obj_visit.last_visit = datetime.now()
         obj_visit.save()
         if cnt_n:
@@ -259,7 +259,7 @@ def get_mobile_residue(request):
             return HttpResponse(f'ERROR: {e}', status=status.HTTP_400_BAD_REQUEST)
 
         # Отметимся что бот был
-        obj_visit, _ = BotVisit.objects.get_or_create(name='ATS-TRUNK')
+        obj_visit, _ = BotAccess.objects.get_or_create(name='ATS-TRUNK')
         obj_visit.last_visit = datetime.now()
         obj_visit.save()
 

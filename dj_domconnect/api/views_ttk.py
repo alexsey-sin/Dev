@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from rest_framework import status
-from api.models import BidTtk, BotVisit
+from api.models import BidTtk, BotAccess
 from django.forms.models import model_to_dict
 import json
 from datetime import datetime
@@ -20,7 +20,7 @@ def set_bid_ttk(request):
             bid = BidTtk()
 
             # Возьмем доступы
-            obj_visit, _ = BotVisit.objects.get_or_create(name='Бот автозаявки ТТК')
+            obj_visit, _ = BotAccess.objects.get_or_create(name='Бот автозаявки ТТК')
             bid.login = obj_visit.login
             bid.password = obj_visit.password
 
@@ -93,7 +93,7 @@ def get_bid_ttk(request):
         
         yes_work = False
         # Отметимся что бот был
-        obj_visit, _ = BotVisit.objects.get_or_create(name='Бот автозаявки ТТК')
+        obj_visit, _ = BotAccess.objects.get_or_create(name='Бот автозаявки ТТК')
         obj_visit.last_visit = datetime.now()
         yes_work = obj_visit.work
         obj_visit.save()

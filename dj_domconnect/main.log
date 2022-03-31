@@ -661,3 +661,4 @@ django.db.utils.OperationalError: database is locked
 2022-03-31 12:27:23,882:django.request:Not Found: /api/get_lk_access
 2022-03-31 14:43:48,265:django.request:Not Found: /api/get_lk_access
 2022-03-31 14:44:26,075:django.utils.autoreload:C:\Dev\dj_domconnect\api\urls.py changed, reloading.
+2022-03-31 16:50:34,359:django.utils.autoreload:C:\Dev\dj_domconnect\api\models.py changed, reloading.

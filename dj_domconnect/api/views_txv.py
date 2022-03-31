@@ -1,7 +1,7 @@
 from django.http.request import HttpRequest
 from django.http import HttpResponse
 from rest_framework import status
-from api.models import TxV, BotVisit, PV_VARS
+from api.models import TxV, BotAccess, PV_VARS
 from django.forms.models import model_to_dict
 import json
 from datetime import datetime
@@ -33,7 +33,7 @@ def set_txv(request):
             else: raise ValueError('pv_code is absent')
 
             # Возьмем доступы
-            obj_visit, _ = BotVisit.objects.get_or_create(name=f'Бот ТХВ {pv_name}')
+            obj_visit, _ = BotAccess.objects.get_or_create(name=f'Бот ТХВ {pv_name}')
             txv.login = obj_visit.login
             txv.password = obj_visit.password
             txv.login_2 = obj_visit.login_2
@@ -104,7 +104,7 @@ def get_txv(request):
         else: raise ValueError('pv_code is absent')
 
         # Отметимся что бот был и определим разрешено ли работать
-        obj_visit, _ = BotVisit.objects.get_or_create(name=f'Бот ТХВ {pv_name}')
+        obj_visit, _ = BotAccess.objects.get_or_create(name=f'Бот ТХВ {pv_name}')
         obj_visit.last_visit = datetime.now()
         yes_work = obj_visit.work
         obj_visit.save()

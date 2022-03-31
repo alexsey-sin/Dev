@@ -48,7 +48,7 @@ if __name__ == '__main__':
     
     lst_mess = []
     for bot in lst_bots:
-        check = bot.get('check')
+        check = bot.get('work')
         if check and check == False: continue 
         name = bot.get('name')
         last_visit = bot.get('last_visit')

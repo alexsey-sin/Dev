@@ -12,7 +12,7 @@ PV_VARS = (
 )
 
 
-class BotVisit(models.Model):
+class BotAccess(models.Model):
     name = models.CharField(
         unique = True,
         max_length = 200,
@@ -27,13 +27,9 @@ class BotVisit(models.Model):
         default = 120,
         verbose_name = 'Бездействие мин',
     )
-    check = models.BooleanField(
-        default = True,
-        verbose_name = 'Проверять бездействие',
-    )
     work = models.BooleanField(
         default = True,
-        verbose_name = 'Работать разрешено',
+        verbose_name = 'В работе',
     )
     login = models.CharField(
         verbose_name = 'Логин',

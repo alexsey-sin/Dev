@@ -1,7 +1,7 @@
 from django.http.request import HttpRequest
 from django.http import HttpResponse
 from rest_framework import status
-from api.models import BidBeeline, BotVisit
+from api.models import BidBeeline, BotAccess
 from django.forms.models import model_to_dict
 import json
 from datetime import datetime
@@ -22,7 +22,7 @@ def set_bid_beeline(request):
             bid = BidBeeline()
 
             # Возьмем доступы
-            obj_visit, _ = BotVisit.objects.get_or_create(name='Бот автозаявки Билайн')
+            obj_visit, _ = BotAccess.objects.get_or_create(name='Бот автозаявки Билайн')
             bid.partner_login = obj_visit.login
             bid.partner_password = obj_visit.password
             bid.partner_workercode = obj_visit.login_2
@@ -93,7 +93,7 @@ def get_bid_beeline(request):
         
         yes_work = False
         # Отметимся что бот был
-        obj_visit, _ = BotVisit.objects.get_or_create(name='Бот автозаявки Билайн')
+        obj_visit, _ = BotAccess.objects.get_or_create(name='Бот автозаявки Билайн')
         obj_visit.last_visit = datetime.now()
         yes_work = obj_visit.work
         obj_visit.save()

@@ -4,7 +4,7 @@ from app.models import LizaGroupPhrase, LizaPhrase, Name
 from app.models import NdzGroupPhrase, NdzPhrase, PzGroupPhrase, PzPhrase
 from api.models import BidDomRu2, BidBeeline, BidMTS, BidBeeline2
 from api.models import BidRostelecom2, BidRostelecom, BidDomRu, BidTtk
-from api.models import  BidOnlime, BidMGTS, TxV, BotVisit
+from api.models import  BidOnlime, BidMGTS, TxV, BotAccess
 from django.contrib.auth import get_user_model
 from django.forms.models import model_to_dict
 import json
@@ -205,7 +205,7 @@ def get_bots_vizit(request):
             key = request.GET.get('key')
             if key != 'Q8kGM1HfWz': raise ValueError('ERROR key.')
             
-            obj_bots_vizit = BotVisit.objects.all()
+            obj_bots_vizit = BotAccess.objects.all()
             lst_bots_vizit = [model_to_dict(row) for row in obj_bots_vizit]
             data = json.dumps(lst_bots_vizit, default=str, indent=1)
         except ValueError as e:
@@ -221,7 +221,7 @@ def get_lk_access(request):
         lk_name = request.GET.get('lk_name')
         yes_work = False
         # Отметимся что бот был
-        obj_visit, _ = BotVisit.objects.get_or_create(name=f'Парсер ЛК {lk_name}')
+        obj_visit, _ = BotAccess.objects.get_or_create(name=f'Парсер ЛК {lk_name}')
         obj_visit.last_visit = datetime.now()
         yes_work = obj_visit.work
         obj_visit.save()

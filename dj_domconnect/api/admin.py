@@ -1,14 +1,14 @@
 from django.contrib import admin
 from api.models import BidDomRu2, BidBeeline, BidMTS, BidBeeline2
 from api.models import BidRostelecom2, BidRostelecom, BidDomRu, BidTtk
-from api.models import  BidOnlime, BidMGTS, TxV, BotVisit
+from api.models import  BidOnlime, BidMGTS, TxV, BotAccess
 from django.db import models
 from django.forms import NumberInput
 
 
-@admin.register(BotVisit)
-class BotVisitAdmin(admin.ModelAdmin):
-    list_display = ('name', 'work', 'check', 'last_visit', 'omission_min', 'login')
+@admin.register(BotAccess)
+class BotAccessAdmin(admin.ModelAdmin):
+    list_display = ('name', 'work', 'last_visit', 'omission_min', 'login')
     search_fields = ('name',)
     list_filter = ('last_visit', 'name')
     empty_value_display = '-пусто-'

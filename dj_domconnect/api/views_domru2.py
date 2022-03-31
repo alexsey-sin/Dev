@@ -1,7 +1,7 @@
 from django.http.request import HttpRequest
 from django.http import HttpResponse, FileResponse
 from rest_framework import status
-from api.models import BidDomRu2, BotVisit
+from api.models import BidDomRu2, BotAccess
 from django.forms.models import model_to_dict
 import json
 from datetime import datetime
@@ -50,7 +50,7 @@ def get_bid_domru2(request):
         
         yes_work = False
         # Отметимся что бот был
-        obj_visit, _ = BotVisit.objects.get_or_create(name='Бот автозаявки ДомРу_ЮЛ')
+        obj_visit, _ = BotAccess.objects.get_or_create(name='Бот автозаявки ДомРу_ЮЛ')
         obj_visit.last_visit = datetime.now()
         yes_work = obj_visit.work
         obj_visit.save()

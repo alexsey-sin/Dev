@@ -1,7 +1,7 @@
 from django.http.request import HttpRequest
 from django.http import HttpResponse
 from rest_framework import status
-from api.models import BidMGTS, BotVisit
+from api.models import BidMGTS, BotAccess
 from django.forms.models import model_to_dict
 import json
 from datetime import datetime
@@ -16,7 +16,7 @@ def set_bid_mgts(request):
             bid = BidMGTS()
 
             # Возьмем доступы
-            obj_visit, _ = BotVisit.objects.get_or_create(name='Бот автозаявки МГТС')
+            obj_visit, _ = BotAccess.objects.get_or_create(name='Бот автозаявки МГТС')
             bid.login = obj_visit.login
             bid.password = obj_visit.password
             bid.login2 = obj_visit.login_2
@@ -103,7 +103,7 @@ def get_bid_mgts(request):
         
         yes_work = False
         # Отметимся что бот был
-        obj_visit, _ = BotVisit.objects.get_or_create(name='Бот автозаявки МГТС')
+        obj_visit, _ = BotAccess.objects.get_or_create(name='Бот автозаявки МГТС')
         obj_visit.last_visit = datetime.now()
         yes_work = obj_visit.work
         obj_visit.save()
