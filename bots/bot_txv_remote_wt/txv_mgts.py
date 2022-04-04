@@ -419,13 +419,6 @@ def set_txv_status(status, data):
 def send_crm_txv(txv_dict, opsos):
     user_agent_val = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36'
 
-    url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.update'
-    
-    # Данные для СРМ
-    # 'available_connect': '',
-    # 'tarifs_all': '',
-    # 'pv_address': '',
-    
     headers = {
         'Content-Type': 'application/json',
         'Connection': 'Keep-Alive',
@@ -442,18 +435,42 @@ def send_crm_txv(txv_dict, opsos):
     available_connect = txv_dict.get('available_connect')
     if available_connect: restrictions += f'Возможность подключения: {available_connect}\n'
     
+    # Проверим статус лида
+    upgrade_status = False
+    if available_connect.find('Есть ТхВ') >= 0:
+        url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.get'
+        params = {
+            'id': txv_dict.get('id_lid'),
+        }
+        try:
+            responce = requests.post(url, headers=headers, params=params)
+            st_code = responce.status_code
+            if st_code != 200: return st_code, ''
+            lid = json.loads(responce.text)
+            result = lid.get('result')
+            status = result.get('STATUS_ID')
+            if status and status == '77': upgrade_status = True
+        except Exception as e:
+            return str(e), ''
+    
     params = {
         'id': txv_dict.get('id_lid'),
         'fields[UF_CRM_1638779781554][]': restrictions[:500],  # вся инфа
     }
+    up_status = ''
+    if upgrade_status:
+        params['fields[STATUS_ID]'] = '72'
+        up_status = 'Статус обновлен.'
 
+    url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.update'
     try:
         responce = requests.post(url, headers=headers, params=params)
         st_code = responce.status_code
-        if st_code != 200: return st_code
+        if st_code != 200: return st_code, ''
         # посмотреть результат https://crm.domconnect.ru/crm/lead/details/1215557/
     except Exception as e:
-        return str(e)
+        return str(e), ''
+    return '', up_status
     
 def send_telegram(chat: str, token: str, text: str):
     url = "https://api.telegram.org/bot" + token + "/sendMessage"
@@ -488,9 +505,9 @@ def run_txv_mgts(tlg_chat, tlg_token):
     for txv_dict in txv_list:
         rez, data = get_txv(txv_dict)
         data['bot_log'] = rez
-        crm = send_crm_txv(data, opsos)  # ответ в CRM
-        crm_mess = f'Ошибка при отправке в СРМ: {crm}\n'
-        if crm:
+        e, up_status = send_crm_txv(data, opsos)  # ответ в CRM
+        crm_mess = f'Ошибка при отправке в СРМ: {e}\n'
+        if e:
             tlg_mess += crm_mess
             data['bot_log'] += crm_mess
         address = f'{data.get("city")} {data.get("street")} д.{data.get("house")} кв.{data.get("apartment")}'
@@ -499,7 +516,7 @@ def run_txv_mgts(tlg_chat, tlg_token):
         djdc = ''
         if rez == '':  # заявка успешно создана
             djdc = set_txv_status(3, data)
-            tlg_mess += 'Успешно.\n'
+            tlg_mess += f'Успешно. {up_status}\n'
         else:  # не прошло
             djdc = set_txv_status(2, data)
             tlg_mess += f'{data.get("bot_log")}\n'

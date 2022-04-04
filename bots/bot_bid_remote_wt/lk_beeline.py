@@ -52,30 +52,36 @@ def run_lk_parsing(access):
     try:
         base_url = 'https://my.beeline.ru'
         EXE_PATH = 'driver/chromedriver.exe'
-        driver = webdriver.Chrome(executable_path=EXE_PATH)
 
-        driver.implicitly_wait(20)
-        driver.get(base_url)
-        time.sleep(5)
-        ###################### Login ######################
-        login = access.get('login')  # 'S715792964'
-        password = access.get('password')  # 'MuE8$lVGpo'
-        
-        els = driver.find_elements(By.ID, 'loginFormB2C:loginForm:login')
-        if len(els) != 1: raise Exception('Ошибка: нет поля логин')
-        els[0].send_keys(login)
-        time.sleep(1)
+        cnt = 5
+        while cnt:
+            cnt -= 1
+            try:
+                print(f'try: {5-cnt}')
+                time.sleep(1)
+                driver = webdriver.Chrome(executable_path=EXE_PATH)
+                driver.get(base_url)
+                time.sleep(3)
+                ###################### Login ######################
+                login = access.get('login')  # 'S715792964'
+                password = access.get('password')  # 'MuE8$lVGpo'
+                
+                els = driver.find_elements(By.ID, 'loginFormB2C:loginForm:login')
+                if len(els) != 1: continue
+                els[0].send_keys(login)
+                time.sleep(1)
 
-        els = driver.find_elements(By.ID, 'loginFormB2C:loginForm:passwordPwd')
-        if len(els) != 1: raise Exception('Ошибка: нет поля пароль')
-        els[0].send_keys(password)
-        time.sleep(3)
+                els = driver.find_elements(By.ID, 'loginFormB2C:loginForm:passwordPwd')
+                if len(els) != 1: continue
+                els[0].send_keys(password)
+                time.sleep(3)
 
-        els = driver.find_elements(By.ID, 'loginFormB2C:loginForm:j_idt218')
-        if len(els) != 1: raise Exception('Ошибка: нет кнопки вход')
-        els[0].click()
-        time.sleep(2)
-
+                els = driver.find_elements(By.ID, 'loginFormB2C:loginForm:j_idt218')
+                if len(els) != 1: continue
+                els[0].click()
+                time.sleep(5)
+                break
+            except: continue
         ###################### Главная страница ######################
 
         driver.get(base_url + '/b/info/abonents/catalog.xhtml')
@@ -147,7 +153,7 @@ def run_lk_parsing(access):
             if len(els_num) != 1: raise Exception(5)
             str_number = '7' + els_num[0].text.strip().replace(' ','').replace('(', '').replace(')', '').replace('-', '')
             str_number = str_number
-            number = {'number': str_number, }
+            number = {'number': str_number, 'mobile_available': 0, 'mobile_packet': 0, 'sms_available': 0, 'sms_packet': 0}
             driver.implicitly_wait(0)
 
             # находим блок с "А еще у вас есть"
@@ -162,7 +168,6 @@ def run_lk_parsing(access):
                 continue
             
             # перелистываем строчки
-            mob = 1  # Будем брать только первую строчку "Мобильная связь"
             for el_divs in els_divs:
                 class_name = el_divs.get_attribute('class')
                 if class_name.find('accum-restyle') < 0:
@@ -183,17 +188,21 @@ def run_lk_parsing(access):
 
                 if len(label) > 0 and len(value) > 0:
                     lst_val = value.split()
-                    balance = lst_val[1]
-                    total = lst_val[4]
-                    if label.find('Мобильная связь') >= 0 and mob:
-                        mob = 0
-                        number['mobile_available'] = balance
-                        number['mobile_packet'] = total
+                    bal = lst_val[1].strip()
+                    tot = lst_val[4].strip()
+                    balance = total = 0
+                    try:
+                        balance = int(bal)
+                        total = int(tot)
+                    except: continue
+                    if balance == 100 and total == 100: continue
+                    if label.find('Мобильная связь') >= 0:
+                        number['mobile_available'] += balance
+                        number['mobile_packet'] += total
                     if label.find('SMS') >= 0:
-                        number['sms_available'] = balance
-                        number['sms_packet'] = total
+                        number['sms_available'] += balance
+                        number['sms_packet'] += total
             data['numbers'].append(number)
-
         ###################### Вывод ######################
         buff = f'Parsing {data.get("operator")}:\n'
         nums = data.get('numbers')
@@ -205,36 +214,28 @@ def run_lk_parsing(access):
         
         for dct in nums:
             str_number = dct.get('number')
-            str_avlb_min = dct.get('mobile_available')
-            str_totl_min = dct.get('mobile_packet')
-            str_avlb_sms = dct.get('sms_available')
-            str_totl_sms = dct.get('sms_packet')
-            try:
-                avlb_min = totl_min = avlb_sms = totl_sms = 0
-                
-                if str_avlb_min: avlb_min = int(str_avlb_min)
-                if str_totl_min: totl_min = int(str_totl_min)
-                if str_avlb_sms: avlb_sms = int(str_avlb_sms)
-                if str_totl_sms: totl_sms = int(str_totl_sms)
-                
-                if avlb_min == 0 and totl_min == 0 and avlb_sms == 0 and totl_sms == 0: continue
-                
-                cnt_avlb_min += avlb_min
-                cnt_totl_min += totl_min
-                cnt_avlb_sms += avlb_sms
-                cnt_totl_sms += totl_sms
-                
-                emj = ''
-                if avlb_min < 500: emj = emj_yellow_rhomb
-                if avlb_min < 100: emj = emj_red_rhomb
-                sub_str = f'{emj}{str_number} [min {avlb_min}/{totl_min}]'
+            avlb_min = dct.get('mobile_available')
+            totl_min = dct.get('mobile_packet')
+            avlb_sms = dct.get('sms_available')
+            totl_sms = dct.get('sms_packet')
 
-                if avlb_sms or totl_sms:
-                    sub_str += f'[sms {avlb_sms}/{totl_sms}]'
-                
-                buff += sub_str + '\n'
-            except:
-                continue
+            if avlb_min == 0 and totl_min == 0 and avlb_sms == 0 and totl_sms == 0: continue
+            
+            cnt_avlb_min += avlb_min
+            cnt_totl_min += totl_min
+            cnt_avlb_sms += avlb_sms
+            cnt_totl_sms += totl_sms
+            
+            emj = ''
+            if avlb_min < 500: emj = emj_yellow_rhomb
+            if avlb_min < 100: emj = emj_red_rhomb
+            sub_str = f'{emj}{str_number} [min {avlb_min}/{totl_min}]'
+
+            if avlb_sms or totl_sms:
+                sub_str += f'[sms {avlb_sms}/{totl_sms}]'
+            
+            buff += sub_str + '\n'
+
         buff += f'Итого: [min {cnt_avlb_min}/{cnt_totl_min}][sms {cnt_avlb_sms}/{cnt_totl_sms}]\n'
         buff += f'Всего номеров: {cnt_nums}\n'
     except Exception as e:

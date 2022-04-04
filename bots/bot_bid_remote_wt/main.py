@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 from lk_megafon import run_lk_megafon
 from lk_beeline import run_lk_beeline
 from bid_beeline import run_bid_beeline
+from bid_beeline2 import run_bid_beeline2
 from bid_rostelecom2 import run_bid_rostelecom2
 from bid_rostelecom import run_bid_rostelecom
 from bid_mts import run_bid_mts
@@ -42,6 +43,7 @@ if __name__ == '__main__':
     dtn = dtn - timedelta(hours=5)  # Стартовать сразу
 
     start_time_bid_beeline = dtn
+    start_time_bid_beeline2 = dtn
     start_time_bid_mts = dtn
     start_time_bid_rostelecom2 = dtn
     start_time_bid_rostelecom = dtn
@@ -72,6 +74,22 @@ if __name__ == '__main__':
                 th.start()
                 print(f'Bot: {thread_name} is running.')
                 start_time_bid_beeline = cur_time
+                time.sleep(0.2)
+
+        #===============================================#
+        # Скрипт Заведение заявок beeline2
+        cur_time = datetime.now()
+        if (cur_time - start_time_bid_beeline2).seconds >= TIME_3_SECONDS:
+            thread_name = 'bid_beeline2'
+            is_run = False
+            for thread in threading.enumerate():
+                if thread.getName() == thread_name: is_run = True; break
+            if is_run == False:
+                # th = threading.Thread(target=run_bid_beeline2, name=thread_name, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
+                th = threading.Thread(target=run_bid_beeline2, name=thread_name, args=(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN))
+                th.start()
+                print(f'Bot: {thread_name} is running.')
+                start_time_bid_beeline2 = cur_time
                 time.sleep(0.2)
 
         #===============================================#

@@ -5,7 +5,7 @@ import logging
 
 from lk_mts import run_lk_mts
 from ats_trunk import run_ats
-from bid_beeline2 import run_beeline2
+# from bid_beeline2 import run_beeline2
 
 logging.basicConfig(
     level=logging.INFO,     # DEBUG, INFO, WARNING, ERROR и CRITICAL По возрастанию
@@ -37,7 +37,7 @@ PERIOD_1_HOUR = 60 * 60
 
 if __name__ == '__main__':
     stm_ats_trunk = None
-    stm_bid_beeline2 = None
+    # stm_bid_beeline2 = None
     stm_lk_mts = None
     
     while True:
@@ -57,16 +57,16 @@ if __name__ == '__main__':
             run_ats(logger)
             continue
 
-        #===============================================#
-        # Скрипт Автозаявки Билайн_ЮЛ
-        if stm_bid_beeline2:
-            passed = (cur_time - stm_bid_beeline2).seconds
-        if stm_bid_beeline2 == None or passed >= PERIOD_30_SEC:
-            stm_bid_beeline2 = cur_time
-            logger.info('Старт Автозаявки Билайн_ЮЛ')
-            run_beeline2(logger, BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
-            # run_beeline2(logger, TELEGRAM_CHAT_ID, TELEGRAM_TOKEN)
-            continue
+        # #===============================================#
+        # # Скрипт Автозаявки Билайн_ЮЛ
+        # if stm_bid_beeline2:
+            # passed = (cur_time - stm_bid_beeline2).seconds
+        # if stm_bid_beeline2 == None or passed >= PERIOD_30_SEC:
+            # stm_bid_beeline2 = cur_time
+            # logger.info('Старт Автозаявки Билайн_ЮЛ')
+            # run_beeline2(logger, BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
+            # # run_beeline2(logger, TELEGRAM_CHAT_ID, TELEGRAM_TOKEN)
+            # continue
 
         #===============================================#
         # Скрипт Сбор_инфо ЛК МТС
