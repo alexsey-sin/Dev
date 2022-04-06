@@ -342,11 +342,13 @@ class BidBeeline2(models.Model):
         max_length = 200,
     )
     client_inn = models.CharField(
-        verbose_name = 'ИНН партнера',
+        blank = True,
+        verbose_name = 'ИНН ЮЛ',
         max_length = 200,
     )
     client_name = models.CharField(
-        verbose_name = 'Название партнера',
+        blank = True,
+        verbose_name = 'Название ЮЛ',
         max_length = 200,
     )
     id_lid = models.CharField(

@@ -337,7 +337,6 @@ def download_lids():
             'order': {'DATE_MODIFY': 'ASC'},  # С сортировкой
             'filter': {
                 '>DATE_CREATE': date_create,  # '2021-10-01T00:00:00'
-                '!STATUS_ID': [17, 24],    # Дубль и ошибка в телефоне
             },
             'select': [
                 'ID', 
@@ -523,11 +522,12 @@ def calculate_0_table(ask_date):
     working_days = len([x for x in calendar.Calendar().itermonthdays2(cur_year, cur_month) if x[0] !=0 and x[1] < 5])  # Количество рабочих дней в месяце
     weekenddays = cnt_days_in_month - working_days  # выходных дней
     
+              
     out_dict = {}
     if is_current_month:  # __lte <= ;  __gte >=
-        lids_all = DcCrmLid.objects.filter(create_date__year=cur_year, create_date__month=cur_month, create_date__day__lte=ask_date.day)
+        lids_all = DcCrmLid.objects.filter(create_date__year=cur_year, create_date__month=cur_month, create_date__day__lte=ask_date.day).exclude(status_id__in=[17, 24])  # '!STATUS_ID': [17, 24],    # Дубль и ошибка в телефоне
     else:
-        lids_all = DcCrmLid.objects.filter(create_date__year=cur_year, create_date__month=cur_month)
+        lids_all = DcCrmLid.objects.filter(create_date__year=cur_year, create_date__month=cur_month).exclude(status_id__in=[17, 24])  # '!STATUS_ID': [17, 24],    # Дубль и ошибка в телефоне
     count_lids_all = lids_all.count()
     if count_lids_all == 0: return out_dict
 
@@ -762,15 +762,15 @@ def calculate_site_table(lst_res_source):
     # Соберем суммы значений по источникам
     for src in lst_res_source:
         cell_01 += src['cell_01']
-        cell_05 += src['cell_09']
+        cell_05 += src['cell_10']
         cell_06 += src['cell_02']
         cell_09 += src['cell_03']
-        cell_11 += src['cell_10']
+        cell_11 += src['cell_11']
         cell_12 += src['cell_04']
-        cell_22 += src['cell_07']
-        cell_23 += src['cell_08']
+        cell_22 += src['cell_08']
+        cell_23 += src['cell_09']
         cell_25 += src['cell_05']
-        cell_26 += src['cell_11']
+        cell_26 += src['cell_12']
 
     cell_25 = round(cell_25 / count_source)
 

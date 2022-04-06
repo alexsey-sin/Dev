@@ -16,7 +16,7 @@ def set_bid_beeline2(request):
             bid = BidBeeline2()
 
             # Возьмем доступы
-            obj_visit, _ = BotAccess.objects.get_or_create(name='Бот автозаявки Билайн')
+            obj_visit, _ = BotAccess.objects.get_or_create(name='Бот автозаявки Билайн_ЮЛ')
             bid.parther_key = obj_visit.password
 
             client = request.GET.get('client_inn_name')
@@ -27,7 +27,6 @@ def set_bid_beeline2(request):
                 bid.client_inn = client[0].strip()
                 bid.client_name = client[1].strip()
             else:  # нет разделителя /
-                bid.client_inn = '000000000'
                 bid.client_name = client[0].strip()
 
             id_lid = request.GET.get('id_lid')
@@ -70,7 +69,7 @@ def get_bid_beeline2(request):
         
         yes_work = False
         # Отметимся что бот был
-        obj_visit, _ = BotAccess.objects.get_or_create(name=f'Бот автозаявки Билайн_ЮЛ')
+        obj_visit, _ = BotAccess.objects.get_or_create(name='Бот автозаявки Билайн_ЮЛ')
         obj_visit.last_visit = datetime.now()
         yes_work = obj_visit.work
         obj_visit.save()

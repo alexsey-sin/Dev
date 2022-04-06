@@ -151,3 +151,24 @@ VALUES
 ('Бот ТХВ ОнЛайм','2022-03-31 16:02:39.090312+03',120,True,'inetme12','','RxIT9oxP',''),
 ('Бот ТХВ Ростелеком','2022-03-31 15:57:45.925558+03',120,True,'sz_v_an','','m~|HqEu~VB}|P1QDrDX%','')
 
+
+
+
+
+SELECT count(*) FROM public.api_bid_beeline
+WHERE status = 2 AND bot_log LIKE '%Message: session not created%'
+
+
+UPDATE public.api_txv
+SET status = 0, bot_log = ''
+WHERE status = 2 AND bot_log LIKE '%Message: session not created%'
+
+
+Стат SEO
+=========================================================
+SELECT count(*) as cnt FROM public.domconnect_dccrmlid
+WHERE crm_1592566018 = 'SEO' AND create_date >= '2022-03-01 00:00:00' AND create_date < '2022-04-01 00:00:00'
+
+DELETE FROM public.domconnect_dccrmlid
+DELETE FROM public.domconnect_dccrmdeal
+DELETE FROM public.domconnect_dccashseo
