@@ -102,6 +102,7 @@ def sites(request):  #
         u_name = user.username
     context = {'u_name': u_name, 'segment': 'sites'}
 
+    form = DcSiteSEOForm()
     if request.method == 'POST':
         id_edit = request.POST.get('edit', None)
         id_delete = request.POST.get('delete', None)
@@ -122,8 +123,7 @@ def sites(request):  #
                 new_form = form.save(commit=False)
                 new_form.save()
             else: context['error_mess'] = 'Ошибка запроса.'
-    else:
-        form = DcSiteSEOForm()
+
     try: context['next_num'] = DcSiteSEO.objects.aggregate(Max('num'))['num__max'] + 1
     except: context['next_num'] = 1
     
