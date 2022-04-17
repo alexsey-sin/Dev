@@ -1,0 +1,258 @@
+{% extends "app/layouts/base.html" %}
+
+{% block title %} Источники SEO {% endblock %} 
+
+{% block stylesheets %}
+<style>
+.table{
+	border: 1px solid #eee;
+	/* table-layout: fixed; */
+	width: 100%;
+	margin-bottom: 20px;
+}
+.table th {
+	font-weight: bold;
+	padding: 5px;
+	background: #efefef;
+	border: 1px solid #dddddd;
+	text-align: center;
+    vertical-align: middle;
+}
+.table td{
+	padding: 5px 10px;
+	border: 1px solid #eee;
+	text-align: center;
+    vertical-align: middle;
+}
+.table tbody tr:nth-child(odd){
+	background: #fff;
+}
+.table tbody tr:nth-child(even){
+	background: #F7F7F7;
+}
+/* .table {
+	width: 100%;
+	margin-bottom: 20px;
+	border: 1px solid #dddddd;
+	border-collapse: collapse; 
+}
+.table th {
+	font-weight: bold;
+	padding: 5px;
+	background: #efefef;
+	border: 1px solid #dddddd;
+}
+.table td {
+	border: 1px solid #dddddd;
+	padding: 5px;
+} */
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+{% if error_mess %}
+<div class="alert alert-danger" role="alert">
+    {{ error_mess }}
+</div>
+{% endif %}
+
+<div class="pcoded-content">
+    <div class="pcoded-inner-content">
+        <div class="main-body">
+            <div class="page-wrapper">
+                <!-- [ Main Content ] start -->
+                <div class="row">
+
+                    <!-- [ Hover-table ] start -->
+                    <div class="col-xl-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Источники SEO</h5>
+                            </div>
+                            <!-- <div class="card-block table-border-style"> -->
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <!-- <thead>
+                                            <tr>
+                                                <th>id<br>Номера</th>
+                                                <th>Оператор</th>
+                                                <th>Тип<br>канала</th>
+                                                <th>Тип<br>транка</th>
+                                                <th>Тип<br>тарифа</th>
+                                                <th>Название<br>тарифа</th>
+                                                <th>Описание<br>тарифа</th>
+                                                <th>Описание<br>ОАТС/ВАТС</th>
+                                                <th>Безлимит<br>внутри сети</th>
+                                                <th>Безлимит<br>внутри сети<br>не расходует<br>пакет</th>
+                                                <th>Стоимость<br>пакета</th>
+                                                <th>Стоимость<br>ВАТС/ОАТС<br>в пересчете<br>на 1 номер</th>
+                                                <th>Цена<br>минуты</th>
+                                                <th>Цена<br>мин/смс</th>
+                                                <th>Номер</th>
+                                                <th>Пакет минут</th>
+                                                <th>Пакет СМС</th>
+                                                <th>Активность</th>
+                                                <th>Действия</th>
+                                                <th>Комментарий</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for row in page %}
+                                            <tr>
+                                                <td>{{ row.id }}</td>
+                                                <td>{{ row.opsos }}</td>
+                                                <td>{{row.type_channel}}</td>
+                                                <td>{{row.type_trunk}}</td>
+                                                <td>{{row.type_tariff}}</td>
+                                                <td>{{row.name_tariff}}</td>
+                                                <td>{{row.tariff_description}}</td>
+                                                <td>{{row.oatc_batc_description}}</td>
+                                                <td>{{row.unlimited_on_net}}</td>
+                                                <td>{{row.unlimited_on_net_not_consume_package}}</td>
+                                                <td>{% if row.package_cost %}{{row.package_cost}}{% else %} --- {% endif %}</td>
+                                                <td>{% if row.oatc_batc_cost %}{{row.oatc_batc_cost}}{% else %} --- {% endif %}</td>
+                                                <td>{{row.price_min}}</td>
+                                                <td>{{row.price_min_sms}}</td>
+                                                <td>{{ row.number }}</td>
+                                                <td>{% if row.mobile_packet %}{{row.mobile_packet}}{% else %} --- {% endif %}</td>
+                                                <td>{% if row.sms_packet %}{{row.sms_packet}}{% else %} --- {% endif %}</td>
+                                                <td>{% if row.active %}Да{% else %}Нет{% endif %}</td>
+                                                <td>
+                                                    <img src="/static/assets/images/icons8-edit-16.png" alt="Редактировать" title="Редактировать" data-toggle="modal" data-target="#openModalNumber" onclick="editRowNumber(
+                                                        '{{ row.id }}',
+                                                        '{{ row.number }}',
+                                                        '{{ row.type_channel }}',
+                                                        '{{ row.type_trunk }}',
+                                                        '{{ row.type_tariff }}',
+                                                        '{{ row.name_tariff }}',
+                                                        '{{ row.tariff_description }}',
+                                                        '{{ row.oatc_batc_description }}',
+                                                        '{{ row.unlimited_on_net }}',
+                                                        '{{ row.unlimited_on_net_not_consume_package }}',
+                                                        '{{ row.package_cost }}',
+                                                        '{{ row.oatc_batc_cost }}',
+                                                        '{{ row.mobile_packet }}',
+                                                        '{{ row.sms_packet }}',
+                                                        '{{ row.active }}',
+                                                        '{{ row.comment }}'
+                                                        );"></img>
+                                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                                    <img src="/static/assets/images/icons8-delete-16.png" alt="Удалить" title="Удалить" data-toggle="modal" data-target="#openModaDeleteNumber" onclick="deleteRowNumber('{{ row.id }}','{{ row.number }}');"></img>
+                                                </td>
+                                                <td>{% if row.comment %}{{row.comment}}{% else %} --- {% endif %}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody> -->
+                                    </table>
+                                    {% include "app/paginator.html" with items=page paginator=paginator %}
+                                </div>
+                            <!-- </div> -->
+                        </div>
+                   </div>
+                    <!-- [ Hover-table ] end -->
+
+                </div>
+                <!-- [ Main Content ] end -->
+            </div>
+        </div>
+    </div>
+</div>
+<div id="openModaDeleteNumber" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="openModaDeleteNumberTitle">Удаление номера</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <h4 id="deleteNumber"></h4>
+        </div>
+        <div class="modal-footer">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" id="id_delete" name="delete">
+                <button type="submit" class="btn btn-danger">Удалить</button>
+            </form>
+        </div>
+      </div>
+    </div>
+</div>
+<div id="openModalNumber" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+				<h5 class="modal-title" id="openModalNumberTitle">Настройки номера</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+            <div class="modal-body">
+                <h4 id="editNumber"></h4>
+            </div>
+                <div class="bd-example">
+				<form id="id_form" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div class="form-group row" aria-required={% if field.field.required %}"true"{% else %}"false"{% endif %}>
+                            <label for="{{ field.id_for_label }}" class="col-md-4 col-form-label text-md-right">
+                                {{ field.label }}
+                                {% if field.field.required %}
+                                    <span class="required">*</span>
+                                {% endif %}
+                            </label>
+                            <div class="col-md-6">
+
+                                {{ field }}
+
+                                {% if field.help_text %}
+                                <small id="{{ field.id_for_label }}-help" class="form-text text-muted">{{ field.help_text|safe }}</small>
+                                {% endif %}
+                            </div>                
+                    </div>
+                    {% endfor %}
+                    <input type="hidden" id="id_edit" name="edit">
+                    <div class="modal-footer">
+                        <button id="openModalNumberButton" type="submit" class="btn btn-primary">Сохранить</button>
+                    </div>
+                </form>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock content %}
+{% block javascripts %}
+<script language="javascript">
+    if (window.history.replaceState){  // предотвращает повторную отправку формы при обновлении страницы если перед этим была отправка
+        window.history.replaceState(null, null, window.location.href);
+    }
+    function editRowNumber(i,n,tc,tt,ttr,nt,td,od,uon,uonn,pc1,obc1,m,s,a,cm){
+        $('#id_edit').val(i);
+        $('#editNumber').text(n);
+        $('#id_type_channel').val(tc);
+        $('#id_type_trunk').val(tt);
+        $('#id_type_tariff').val(ttr);
+        $('#id_name_tariff').val(nt);
+        $('#id_tariff_description').val(td);
+        $('#id_oatc_batc_description').val(od);
+        $('#id_unlimited_on_net').val(uon);
+        $('#id_unlimited_on_net_not_consume_package').val(uonn);
+        $('#id_package_cost').val(parseFloat(pc1.replace(',','.').replace(' ','')));
+        $('#id_oatc_batc_cost').val(parseFloat(obc1.replace(',','.').replace(' ','')));
+        $('#id_mobile_packet').val(m);
+        $('#id_sms_packet').val(s);
+        if (a == "True"){
+            $('#id_active').setAttr("checked");
+        }else{
+            $('#id_active').removeAttr("checked");
+        }
+        $('#id_comment').val(cm);
+    }
+    function deleteRowNumber(i,t){
+        $('#id_delete').val(i);
+        $('#deleteNumber').text(t);
+    }
+</script>
+{% endblock javascripts %}

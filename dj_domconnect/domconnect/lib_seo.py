@@ -1,4 +1,5 @@
 from domconnect.models import DcCrmGlobVar, DcCrmLid, DcCashSEO, DcSiteSEO, DcCrmDeal, DcSourceSEO
+from domconnect.models import DcCatalogProviderSEO, DcCatalogSourceSEO
 from django.db.models import Q, Avg
 from decimal import Decimal
 from datetime import datetime, timedelta
@@ -17,8 +18,8 @@ logging.basicConfig(
 # # # # logger.warning('And this, too')
 logger = logging.getLogger(__name__)  # запустили логгирование
 
-date_create = '2021-01-01T00:00:00'
-# date_create = '2021-11-01T00:00:00'
+# date_create = '2021-01-01T00:00:00'
+date_create = '2022-04-16T00:00:00'
 
 typesource = {}
 typelid = {}
@@ -121,8 +122,8 @@ class DecimalEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 def run_upgrade_seo(*args, **options):
-    # http_request = False
-    # if args and isinstance(args[0], object) and type(args[0]) == WSGIRequest: http_request = True
+    # # # # http_request = False
+    # # # # if args and isinstance(args[0], object) and type(args[0]) == WSGIRequest: http_request = True
 
     gvar_go, _ = DcCrmGlobVar.objects.get_or_create(key='go_upgrade_seo')
     if gvar_go.val_bool == True:
@@ -136,6 +137,7 @@ def run_upgrade_seo(*args, **options):
     logger.info(mess)
     print(mess)
 
+    dounload_catalog()
     download_typesource()
     download_typelid()
     download_deals()
@@ -152,6 +154,39 @@ def run_upgrade_seo(*args, **options):
     logger.info(mess)
     print(mess)
 
+def dounload_catalog():
+    '''
+        Загрузка и обновление каталога провайдеров и источников
+        провайдеры
+        https://domconnect.ru/api.get_crm_info?apikey=ace5aea03144bfea692ab289f3045bfd6a7f2440da8ba809&type=providers
+        источники
+        https://domconnect.ru/api.get_crm_info?apikey=ace5aea03144bfea692ab289f3045bfd6a7f2440da8ba809&type=source
+    '''
+    url = 'https://domconnect.ru/api.get_crm_info?apikey=ace5aea03144bfea692ab289f3045bfd6a7f2440da8ba809&type=providers'
+    try:
+        responce = requests.post(url)
+        if responce.status_code == 200:
+            answer = json.loads(responce.text)
+            response = answer.get('response')
+            for res in response:
+                name = res.get('NAME')
+                prov_id = res.get('STATUS_ID')
+                _, _ = DcCatalogProviderSEO.objects.get_or_create(name=name, prov_id=prov_id)
+        else: return logger.info(f'Ошибка dounload_catalog: responce.status_code: {responce.status_code}\n{responce.text}')
+    except Exception as e: logger.info(f'Ошибка dounload_catalog: try: requests.post {e}')
+
+    url = 'https://domconnect.ru/api.get_crm_info?apikey=ace5aea03144bfea692ab289f3045bfd6a7f2440da8ba809&type=source'
+    try:
+        responce = requests.post(url)
+        if responce.status_code == 200:
+            answer = json.loads(responce.text)
+            response = answer.get('response')
+            for res in response:
+                name = res.get('NAME')
+                source_id = res.get('STATUS_ID')
+                _, _ = DcCatalogSourceSEO.objects.get_or_create(name=name, source_id=source_id)
+        else: return logger.info(f'Ошибка dounload_catalog: responce.status_code: {responce.status_code}\n{responce.text}')
+    except Exception as e: logger.info(f'Ошибка dounload_catalog: try: requests.post {e}')
 
 def get_key_crm():
     gvar_key, create = DcCrmGlobVar.objects.get_or_create(key='key_crm')
@@ -475,7 +510,8 @@ def calculateSEO():
         objs_site = DcSiteSEO.objects.all().order_by('num')
         for obj_site in objs_site:
             site_num = obj_site.num
-            site_provider = obj_site.provider
+            try: site_provider = DcCatalogProviderSEO.objects.get(name=obj_site.provider).prov_id
+            except: site_provider = obj_site.provider
             lst_res_source = []  # Результирующий список результатов вычислений источников
             # По каждому сайту берем список источников
             sources = obj_site.sources.order_by('num')
@@ -706,9 +742,10 @@ def calculate_source_table(ask_date, ask_source, ask_provider):
     # ('Билайн', 'МТС [кроме МСК и МО]', 'Ростелеком [кроме МСК]', 'МГТС [МСК и МО]')
     cell_11 = cell_conv_sum.filter(crm_1493413514__in=['OTHER', '2', '3', '11']).count()   # Провайдер (INDUSTRY)
     # (12) Сделки >50
-    # провайдер из переменной ask_provider(список). Для мультибрендовых источников - несколько значений
-    lst = ask_provider.split(';')
-    cell_12 = cell_conv_sum.filter(crm_1493413514__in=lst).count()  # Провайдер (INDUSTRY)
+    # # # # # провайдер из переменной ask_provider(список). Для мультибрендовых источников - несколько значений
+    # # # # # lst = ask_provider.split(';')
+    # # # # # cell_12 = cell_conv_sum.filter(crm_1493413514__in=lst).count()  # Провайдер (INDUSTRY)
+    cell_12 = cell_conv_sum.filter(crm_1493413514=ask_provider).count()  # Провайдер (INDUSTRY)
 
     out_dict['cell_01'] = cell_01
     out_dict['cell_02'] = cell_02
@@ -975,7 +1012,7 @@ def make_seo_page():
             source_tables = []
             sources = DcSourceSEO.objects.filter(site=obj_site).order_by('num')
             for source in sources:
-                item_source = {'name_source': source.source}
+                item_source = {'name_source': str(source.source)}
                 it_src_month = []
                 src_date = copy.deepcopy(calc_date)
                 for _ in range(num_months):

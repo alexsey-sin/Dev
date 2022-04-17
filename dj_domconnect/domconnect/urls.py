@@ -7,6 +7,8 @@ app_name = 'domconnect'
 
 urlpatterns = [
     path('', views.index, name='home'),
+    path('sites', views.sites, name='sites'),
+    path('sources', views.sources, name='sources'),
     path('datacrm', views.dataCrm, name='datacrm'),
     path('dataajax', views.dataAjax, name='dataajax'),
 

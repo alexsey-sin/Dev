@@ -246,10 +246,40 @@ class DcCashSEO(models.Model):  # Кэш SEO
         return self.val_date.strftime('%m.%Y')
 
 
-class DcSiteSEO(models.Model):  # Сайты для перечня тавлиц SEO
+class DcCatalogProviderSEO(models.Model):  # Каталог сайтов из СРМ
+    name = models.CharField(  # Название сайта
+        max_length = 255,
+        verbose_name='Сайт',
+    )
+    prov_id = models.CharField(  # Код сайта
+        max_length = 255,
+        verbose_name='Код',
+    )
+
+    def __str__(self):
+        return self.name
+
+
+class DcCatalogSourceSEO(models.Model):  # Каталог источников из СРМ
+    name = models.CharField(  # Название источника
+        max_length = 255,
+        verbose_name='Источник',
+    )
+    source_id = models.CharField(  # Код источника
+        max_length = 255,
+        verbose_name='Код',
+    )
+
+    def __str__(self):
+        return self.name
+
+
+class DcSiteSEO(models.Model):  # Сайты для перечня таблиц SEO
+    num = models.PositiveSmallIntegerField(
+        verbose_name='Номер п/п',
+    )
     site = models.CharField(  # сайт
         max_length = 255,
-        unique = True,
         verbose_name='Сайт',
     )
     name = models.CharField(  # Название сайта
@@ -257,26 +287,33 @@ class DcSiteSEO(models.Model):  # Сайты для перечня тавлиц 
         blank = True,
         verbose_name='Название',
     )
-    provider = models.CharField( # КОДЫ!!! 
-    # Для мультибрендовых сайтов названия провайдеров через ;
-    # ('Билайн', 'МТС [кроме МСК и МО]', 'Ростелеком [кроме МСК]', 'МГТС [МСК и МО]') = 'OTHER;2;3;11'
-        max_length = 255,
+    provider = models.ForeignKey(
+        DcCatalogProviderSEO,
+        on_delete=models.CASCADE,
         verbose_name='Провайдер',
     )
-    num = models.PositiveSmallIntegerField(
-        verbose_name='Номер п/п',
-    )
+    # provider = models.CharField( # КОДЫ!!! 
+    # # Для мультибрендовых сайтов названия провайдеров через ;
+    # # ('Билайн', 'МТС [кроме МСК и МО]', 'Ростелеком [кроме МСК]', 'МГТС [МСК и МО]') = 'OTHER;2;3;11'
+    #     max_length = 255,
+    #     verbose_name='Провайдер',
+    # )
 
     def __str__(self):
         return self.site
 
 
-class DcSourceSEO(models.Model):  # Источники для перечня тавлиц SEO
-    source = models.CharField(  # Название источника
-        max_length = 255,
-        unique = True,
+class DcSourceSEO(models.Model):  # Источники для перечня таблиц SEO
+    source = models.ForeignKey(
+        DcCatalogSourceSEO,
+        on_delete=models.CASCADE,
         verbose_name='Источник',
     )
+    # source = models.CharField(  # Название источника
+    #     max_length = 255,
+    #     unique = True,
+    #     verbose_name='Источник',
+    # )
     site = models.ForeignKey(
         DcSiteSEO,
         on_delete=models.CASCADE,
@@ -288,4 +325,6 @@ class DcSourceSEO(models.Model):  # Источники для перечня т�
     )
 
     def __str__(self):
-        return self.source
+        return str(self.source)
+
+

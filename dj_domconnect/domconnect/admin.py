@@ -1,5 +1,6 @@
 from django.contrib import admin
 from domconnect.models import DcCrmGlobVar, DcCrmLid, DcCashSEO, DcSiteSEO, DcSourceSEO, DcCrmDeal
+from domconnect.models import DcCatalogProviderSEO, DcCatalogSourceSEO
 from django.db import models
 from django.forms import NumberInput
 
@@ -60,14 +61,12 @@ class DcCashSEOAdmin(admin.ModelAdmin):
 class DcSiteSEOAdmin(admin.ModelAdmin):
     list_display = ('site', 'name', 'provider', 'num')
     search_fields = ('site', 'provider',)
-    list_filter = ('site', 'provider')
 
 
 @admin.register(DcSourceSEO)
 class DcSourceSEOAdmin(admin.ModelAdmin):
     list_display = ('source', 'site', 'num')
     search_fields = ('source',)
-    list_filter = ('source', 'site')
 
 
 @admin.register(DcCrmDeal)
@@ -83,3 +82,17 @@ class DcCrmDealAdmin(admin.ModelAdmin):
     empty_value_display = '-пусто-'
     date_hierarchy = 'create_date'
     list_per_page = 20
+
+
+@admin.register(DcCatalogProviderSEO)
+class DcCatalogProviderSEOAdmin(admin.ModelAdmin):
+    list_display = ('name', 'prov_id')
+    search_fields = ('name',)
+
+
+@admin.register(DcCatalogSourceSEO)
+class DcCatalogSourceSEOAdmin(admin.ModelAdmin):
+    list_display = ('name', 'source_id')
+    search_fields = ('name',)
+
+

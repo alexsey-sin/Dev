@@ -3,16 +3,19 @@ from django.http import HttpResponse, FileResponse
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
-from django.db.models import Q
+from django.db.models import Q, Max
 # from django.core.paginator import Paginator
 # from app.forms import NameForm, LizaPhraseForm, GermanPhraseForm, NdzPhraseForm, PzPhraseForm
 from domconnect.models import DcCrmGlobVar, DcCrmLid, DcCashSEO, DcSiteSEO, DcSourceSEO, DcCrmDeal
+from domconnect.models import DcCatalogProviderSEO, DcCatalogSourceSEO
 from datetime import datetime, timedelta
 from django.http import JsonResponse
-from domconnect.lib_seo import run_upgrade_seo, make_seo_page, make_csv_text
+from domconnect.lib_seo import get_key_crm, run_upgrade_seo, make_csv_text, dounload_catalog
+from domconnect.forms import DcSiteSEOForm
 from threading import Thread
-import os, logging, json, threading, calendar
+import os, logging, json, threading, requests
 from pathlib import Path
+from django import forms
 
 
 logging.basicConfig(
@@ -47,21 +50,21 @@ def index(request):  # Статистика SEO
 
     # Берем последний сохраненный архив
     page_context = {}
-    try:
-        # Возьмем список всех файлов в папке
-        list_archives = os.listdir(seo_archive_folder_path)
-        if list_archives:
-            # Отсортируем по дате создания
-            list_archives_sort = sorted(list_archives, key=lambda x: os.path.getctime(os.path.join(seo_archive_folder_path, x)), reverse=True)
-            # Соберем без расширения
-            list_namefiles = [s.split('.js')[0] for s in list_archives_sort]
-            context['list_archives'] = list_namefiles
+    # try:
+    #     # Возьмем список всех файлов в папке
+    list_archives = os.listdir(seo_archive_folder_path)
+    if list_archives:
+        # Отсортируем по дате создания
+        list_archives_sort = sorted(list_archives, key=lambda x: os.path.getctime(os.path.join(seo_archive_folder_path, x)), reverse=True)
+        # Соберем без расширения
+        list_namefiles = [s.split('.js')[0] for s in list_archives_sort]
+        context['list_archives'] = list_namefiles
 
-            with open(f'{seo_archive_folder_path}/{list_archives_sort[0]}', 'r', encoding='utf-8') as file:
-                page_context = json.load(file)
-    except Exception as e:
-        context['label_seo'] = 'Ошибка загрузки данных из кэш.'
-        logger.error(str(e))
+        with open(f'{seo_archive_folder_path}/{list_archives_sort[0]}', 'r', encoding='utf-8') as file:
+            page_context = json.load(file)
+    # except Exception as e:
+    #     context['label_seo'] = 'Ошибка загрузки данных из кэш.'
+    #     logger.error(str(e))
     
     # Переносим полученные данные
     if page_context:
@@ -89,6 +92,65 @@ def index(request):  # Статистика SEO
                 logger.error(str(e))
     
     return render(request, 'domconnect/statseo.html', context)
+
+
+@login_required(login_url='/login/')
+def sites(request):  #
+    user = request.user
+    u_name = user.get_full_name()
+    if u_name.strip() == '':
+        u_name = user.username
+    context = {'u_name': u_name, 'segment': 'sites'}
+
+    if request.method == 'POST':
+        id_edit = request.POST.get('edit', None)
+        id_delete = request.POST.get('delete', None)
+
+        if id_edit:  # редактирование
+            new_form = get_object_or_404(DcSiteSEO, id=id_edit)
+            new_form.site = request.POST.get("site")
+            new_form.name = request.POST.get("name")
+            new_form.provider = request.POST.get("provider")
+            new_form.num = request.POST.get("num")
+            new_form.save()
+        elif id_delete:
+            rec = get_object_or_404(DcSiteSEO, id=id_delete)
+            rec.delete()
+        else:
+            form = DcSiteSEOForm(request.POST)
+            if form.is_valid():
+                new_form = form.save(commit=False)
+                new_form.save()
+            else: context['error_mess'] = 'Ошибка запроса.'
+    else:
+        form = DcSiteSEOForm()
+    try: context['next_num'] = DcSiteSEO.objects.aggregate(Max('num'))['num__max'] + 1
+    except: context['next_num'] = 1
+    
+    tmp_data = DcSiteSEO.objects.order_by('num').values()
+    data = [row for row in tmp_data]
+    for row in data:
+        row['provider'] = DcCatalogProviderSEO.objects.get(id=row['provider_id'])
+
+    context['data'] = data
+    context['form'] = form
+
+    return render(request, 'domconnect/sites.html', context)
+
+
+@login_required(login_url='/login/')
+def sources(request):  #
+    user = request.user
+    u_name = user.get_full_name()
+    if u_name.strip() == '':
+        u_name = user.username
+    context = {'u_name': u_name, 'segment': 'sources'}
+
+    tmp_data = DcSourceSEO.objects.order_by('num').values()
+    data = [row for row in tmp_data]
+
+    context['data'] = data
+    return render(request, 'domconnect/sources.html', context)
 
 
 @login_required(login_url='/login/')
@@ -203,6 +265,8 @@ def deleteCash(request):  # Удаление данных из таблицы к
 def upgradeSiteSource(request):  # Удаление и загрузка данных таблиц Site и Source из файла
     err = ''
     try:
+        # Обновим каталог 
+        dounload_catalog()
         with open('SiteSource.json', 'r', encoding='utf-8') as file:
             js_data = json.load(file)
         if not js_data or len(js_data) == 0: raise Exception('Нет данных для обновления.')
@@ -211,20 +275,30 @@ def upgradeSiteSource(request):  # Удаление и загрузка данн
         # Перебираем сайты с вложенными источниками и заносим в базу
         for dct_site in js_data:
             num =  dct_site.get('num')
+            name_site = dct_site.get('name')
             site = dct_site.get('site')
-            provider = dct_site.get('provider')
+            cod_provider = dct_site.get('provider')
             sources = dct_site.get('sources')
-            if not num or not site or not provider or not sources:
+            if not num or not site or not cod_provider or not sources:
                 raise Exception('Ошибка данных сайта для обновления.')
-            obj_site, _ = DcSiteSEO.objects.get_or_create(num=num, site=site, provider=provider)
+            obj_provider = DcCatalogProviderSEO.objects.get(prov_id=cod_provider)
+            obj_site, _ = DcSiteSEO.objects.get_or_create(num=num, site=site, name=name_site, provider=obj_provider)
             if not obj_site: raise Exception('Ошибка сохранения сайта.')
+
+            # Сохраняем источники
             for rec in sources:
-                num = rec.get('num')
-                source = rec.get('source')
-                if not num or not source: raise Exception('Ошибка данных источника для обновления.')
-                obj_source, _ = DcSourceSEO.objects.get_or_create(num=num, source=source, site=obj_site)
+                num_source = rec.get('num')
+                name_source = rec.get('source')
+                if not num_source or not name_source: raise Exception('Ошибка данных источника для обновления.')
+                try:
+                    obj_cat_source = DcCatalogSourceSEO.objects.get(name=name_source)
+                except:
+                    logger.error(f'Ошибка Икточник: {name_source} отсутствует в каталоге.')
+                    continue
+
+                obj_source, _ = DcSourceSEO.objects.get_or_create(num=num, source=obj_cat_source, site=obj_site)
                 if not obj_source: raise Exception('Ошибка сохранения источника.')
-        
+            
     except Exception as e:
         err = f'Ошибка upgradeSiteSource: try: {e}'
 

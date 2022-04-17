@@ -4,7 +4,7 @@ from rest_framework import status
 from api.models import TxV, BotAccess, PV_VARS
 from django.forms.models import model_to_dict
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.views.decorators.csrf import csrf_exempt
 # import logging
 
@@ -19,8 +19,8 @@ def set_txv(request):
             key = request.GET.get('key')
             if key != 'Q8kGM1HfWz':
                 return HttpResponse('ERROR key.', status=status.HTTP_400_BAD_REQUEST)
-            txv = TxV()
 
+            txv = TxV()
             pv_name = ''
             pv = request.GET.get('pv_code')
             dct_pv = {k : v for k, v in PV_VARS}  # Преобразуем кортеж кортежей в словарь
@@ -39,27 +39,13 @@ def set_txv(request):
             txv.login_2 = obj_visit.login_2
             txv.password_2 = obj_visit.password_2
 
-            # login = request.GET.get('login')
-            # if login == None or len(login) == 0: raise ValueError('login is absent')
-            # txv.login = login
-
-            # password = request.GET.get('password')
-            # if password == None or len(password) == 0: raise ValueError('password is absent')
-            # txv.password = password
-            
-            # login_2 = request.GET.get('login_2')
-            # if login_2: txv.login_2 = login_2
-            
-            # password_2 = request.GET.get('password_2')
-            # if password_2: txv.password_2 = password_2
-            
             id_lid = request.GET.get('id_lid')
             if id_lid: txv.id_lid = id_lid
 
             provider_dc = request.GET.get('provider_dc')
             if provider_dc: txv.provider_dc = provider_dc
 
-            region = request.GET.get('region')
+            region = request.GET.get('region', '')
             if region: txv.region = region
 
             city = request.GET.get('city')
@@ -74,9 +60,16 @@ def set_txv(request):
             if house == None or len(house) == 0: raise ValueError('house is absent')
             txv.house = house
 
-            apartment = request.GET.get('apartment')
-            if apartment == None or len(apartment) == 0: raise ValueError('apartment is absent')
-            txv.apartment = apartment
+            apartment = request.GET.get('apartment', '')
+            if apartment: txv.apartment = apartment
+
+            # Проверим нет ли уже такого адреса этого провайдера в базе
+            old_date = datetime.today() - timedelta(days=3)  # __lte <= ;  __gte >=
+            old_txv = TxV.objects.filter(pv_code=txv.pv_code, region=region, city=city, street=street, house=house, apartment=apartment, pub_date__gte=old_date)
+            if len(old_txv) > 0:
+                ans_mes = old_txv[0].available_connect
+                if len(ans_mes) == 0: ans_mes = old_txv[0].bot_log
+                return HttpResponse(f'txv already exists: \n{ans_mes}.', status=status.HTTP_200_OK)
 
             txv.status = 0
             txv.save()

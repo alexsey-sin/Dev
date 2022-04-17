@@ -2,6 +2,7 @@
     {
         "num": "1",
         "site": "https://mirbeeline.ru/",
+        "name": "Мир Билайн",
         "provider": "OTHER",
         "sources": [
             {
@@ -37,6 +38,7 @@
     {
         "num": "2",
         "site": "https://beelineru.ru/",
+        "name": "Билайн РУ",
         "provider": "OTHER",
         "sources": [
             {
@@ -46,16 +48,13 @@
             {
                 "num": "2",
                 "source": "BEELINE-ru-S-88006001150"
-            },
-            {
-                "num": "3",
-                "source": "BEELINE-ru-S-74993806540"
             }
         ]
     },
     {
         "num": "3",
         "site": "https://beellne.ru",
+        "name": "Билайн",
         "provider": "OTHER",
         "sources": [
             {
@@ -71,6 +70,7 @@
     {
         "num": "4",
         "site": "https://mtsru.ru/",
+        "name": "МТС РУ",
         "provider": "2",
         "sources": [
             {
@@ -98,6 +98,7 @@
     {
         "num": "5",
         "site": "https://rt-internet.ru/",
+        "name": "РТ-Интернет",
         "provider": "3",
         "sources": [
             {
@@ -121,6 +122,7 @@
     {
         "num": "6",
         "site": "https://msk-online.ru/",
+        "name": "Онлайм",
         "provider": "25",
         "sources": [
             {
@@ -136,6 +138,7 @@
     {
         "num": "7",
         "site": "https://spb-rt.ru/",
+        "name": "СПб РТ",
         "provider": "3",
         "sources": [
             {
@@ -147,6 +150,7 @@
     {
         "num": "8",
         "site": "https://sever-ttk.ru/",
+        "name": "Север ТТК",
         "provider": "4",
         "sources": [
             {
@@ -160,16 +164,13 @@
             {
                 "num": "3",
                 "source": "TTK-mob-9023331110"
-            },
-            {
-                "num": "4",
-                "source": "TTK-sev-G-88007753740"
             }
         ]
     },
     {
         "num": "9",
         "site": "https://wwwttk.ru/",
+        "name": "ТТК",
         "provider": "4",
         "sources": [
             {
@@ -185,6 +186,7 @@
     {
         "num": "10",
         "site": "https://internet-tv-dom.ru/",
+        "name": "Интернет-ТВ ДомРу",
         "provider": "1",
         "sources": [
             {
@@ -200,6 +202,7 @@
     {
         "num": "11",
         "site": "https://internetv-dom.ru/",
+        "name": "Интернет ТВ ДомРу",
         "provider": "1",
         "sources": [
             {
@@ -211,6 +214,7 @@
     {
         "num": "12",
         "site": "https://beeline-ural.ru/",
+        "name": "Билайн Урал",
         "provider": "OTHER",
         "sources": [
             {
@@ -222,6 +226,7 @@
     {
         "num": "13",
         "site": "mt-home.ru_МТС Москва",
+        "name": "МТС Москва",
         "provider": "11",
         "sources": [
             {
@@ -233,6 +238,7 @@
     {
         "num": "14",
         "site": "mts-ural.ru_МТС Урал",
+        "name": "МТС Урал",
         "provider": "2",
         "sources": [
             {
@@ -244,11 +250,36 @@
     {
         "num": "15",
         "site": "nbn-24.ru_НетБайНет",
+        "name": "НетБайНет",
         "provider": "12",
         "sources": [
             {
                 "num": "1",
                 "source": "nbn-24.ru_НетБайНет"
+            }
+        ]
+    },
+    {
+        "num": "16",
+        "site": "inet-yar.ru",
+        "name": "inet-yar",
+        "provider": "7",
+        "sources": [
+            {
+                "num": "1",
+                "source": "inet-yar.ru_IVD"
+            }
+        ]
+    },
+    {
+        "num": "17",
+        "site": "wwwmyttk.ru",
+        "name": "MyTTK",
+        "provider": "4",
+        "sources": [
+            {
+                "num": "1",
+                "source": "wwwmyttk.ru_ТТК"
             }
         ]
     }
