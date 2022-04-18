@@ -183,6 +183,7 @@ def checking_priorities(route_trunks, trunks_residue):
     out_mess = ''
 
     change_list = []
+    old_lst_trunks = []
     for route_trunk in route_trunks:  # Проход по каждой группе транков
         route_id = route_trunk['id']
         trunks = route_trunk.get('trunks')
@@ -195,6 +196,10 @@ def checking_priorities(route_trunks, trunks_residue):
             for tr_resd in trunks_residue:
                 if tr_resd['id'] == trunk_id:
                     trunk['residue'] = tr_resd['residue']
+                    trunk['cid'] = tr_resd['cid']
+                    
+                    
+        old_lst_trunks.append(route_trunk)
         
         # создадим глубокую копию списка
         new_trunks = copy.deepcopy(trunks)
@@ -217,11 +222,8 @@ def checking_priorities(route_trunks, trunks_residue):
                         new_seq['trunk_id'] = trunk['trunk_id']
                         new_seq['seq'] = new_trunk['seq']
                         change_list.append(new_seq)
-        
-    if change_list:
-        # print(change_list)
-        out_rez, out_mess = change_seq(change_list)
-    return out_rez, out_mess
+    
+    return change_list, old_lst_trunks
 
 def change_seq(change_list):
     url = url_ats + 'cli/api_route_sequence.php'
@@ -284,8 +286,15 @@ def run_ats(logging):
         logging.error(f'ATS-TRUNK: get_route_trunks(): {rez_str}')
         return
 
+    # Проверим приоритеты транков
+    change_list, old_trunks = checking_priorities(route_trunks, trunks)
+    
     # Меняем приоритеты транков
-    rez, rez_str = checking_priorities(route_trunks, trunks)
+    rez = ''
+    rez_str = ''
+    if change_list:
+        rez, rez_str = change_seq(change_list)
+
     if rez:  # Если  что-то не так
         logging.error(f'ATS-TRUNK: checking_priorities(): {rez_str}')
         return

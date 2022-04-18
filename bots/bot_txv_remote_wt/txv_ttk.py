@@ -1,15 +1,13 @@
-import os
-import time
+import os, time, json, requests  # pip install requests
 from datetime import datetime
-import requests  # pip install requests
-import json
 from selenium import webdriver  # $ pip install selenium
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
 
-# url_host = 'http://127.0.0.1:8000/'
-url_host = 'http://django.domconnect.ru/'
+url_host = 'http://127.0.0.1:8000/'
+# url_host = 'http://django.domconnect.ru/'
 opsos = 'ТТК'
 pv_code = 5
 
@@ -97,6 +95,45 @@ def find_short(f_lst):
             i_min = i
     return i_min
     
+def find_short_tup(f_lst):
+    '''
+        На входе список кортежей.
+        в кортеже индекс фразы на странице и фраза
+        Поиск самой короткой фразы в списке и выдача её индекса на странице
+    '''
+    l_min = 10000
+    i_min = 0
+    for i in range(len(f_lst)):
+        l_phr = len(f_lst[i][1])
+        if l_phr < l_min:
+            l_min = l_phr
+            i_min = i
+    i_out = f_lst[i_min][0]
+    return i_out
+
+def ordering_city(in_city: str):  # Преобразование строки город
+    '''
+        Проверяем на
+        изветсный тип населенного пункта
+        выдаем название без типа населенного пункта
+        если известный тип не найден - возвращаем входную строку
+    '''
+    lst_type_city = [
+        'рабочий поселок',
+        'поселок городского типа',
+        'поселок',
+        'село',
+        'деревня',
+    ]
+
+    for tp in lst_type_city:
+        i = in_city.find(tp)
+        if i >= 0:
+            out_city = in_city[i+len(tp):].strip()
+            return out_city
+
+    return in_city
+
 def ordering_street_by_type(in_street: str):  # Преобразование строки улица
     '''
         разбиваем строку по запятым, и каждый фрагмент проверяем на
@@ -193,6 +230,21 @@ def ordering_house(in_house: str):  # Преобразование строки 
 def is_russian(s: str) -> bool:  # Проверка строки: Можно использовать буквы кириллического алфавита и символы “-” и пробел
     return bool(re.fullmatch(r'(?i)[а-яё -]+', s))
 
+def wait_spinner(driver):  # Ожидаем крутящийся спинер
+    driver.implicitly_wait(1)
+    while True:
+        time.sleep(1)
+        els = driver.find_elements(By.XPATH, '//span[@class="loader"]')
+        if len(els):
+            attr_disp = els[0].get_attribute('style')
+            if attr_disp == '':
+                # print('spinner')
+                continue
+            else: break
+        else: break
+    driver.implicitly_wait(10)
+    time.sleep(2)
+
 # =========================================================
 def get_txv(data):
     driver = None
@@ -200,9 +252,9 @@ def get_txv(data):
         base_url = 'https://onyma-crm.ttk.ru:4443/onyma/'
         
         EXE_PATH = 'driver/chromedriver.exe'
-        driver = webdriver.Chrome(executable_path=EXE_PATH)
-        # s = Service(ChromeDriverManager().install())
-        # driver = webdriver.Chrome(service=s)
+        # driver = webdriver.Chrome(executable_path=EXE_PATH)
+        service = Service(EXE_PATH)
+        driver = webdriver.Chrome(service=service)
 
         driver.implicitly_wait(10)
         driver.get(base_url)
@@ -259,8 +311,11 @@ def get_txv(data):
         if len(els_div_city) != 1: raise Exception('Ошибка Нет блока Город')
         els_inp = els_div_city[0].find_elements(By.XPATH, './/input[@class="editbox w-text value-empty"]')
         if len(els_inp) != 1: raise Exception('Ошибка Нет поля ввода Город')
-        city = data.get('city')
-        if city == None: raise Exception('Ошибка Не задано значение Город')
+        city = data.get('city', '')
+        if city:
+            city = city.replace('ё', 'е')
+            city = ordering_city(city)
+        else: raise Exception('Ошибка город не задан.')
         try:
             els_inp[0].click()
             time.sleep(0.2)
@@ -268,12 +323,12 @@ def get_txv(data):
             time.sleep(0.2)
             els_inp[0].send_keys(Keys.ENTER)
         except: raise Exception('Ошибка ввода город')
-        time.sleep(3)
+        time.sleep(5)
         # Смотрим варианты
         els_div_opt = els_div_city[0].find_elements(By.XPATH, './/div[@class="options"]')
         if len(els_div_opt) != 1: raise Exception('Ошибка Нет блока подсказок Город')
         els_opt = els_div_opt[0].find_elements(By.TAG_NAME, 'span')
-        if len(els_opt) == 0: raise Exception(f'Ошибка Город \"{city}\" не найден (нет списка вариантов)')
+        if len(els_opt) == 0: raise Exception(f'Ошибка нас.пункт {city} не найден.')
         lst_city = []
         try:
             els_inp[0].send_keys(Keys.ARROW_DOWN)
@@ -282,7 +337,7 @@ def get_txv(data):
                 if el_opt.text == '': continue
                 lst_city.append(el_opt.text)
             i_fnd = find_short(lst_city)
-            if i_fnd < 0: raise Exception(f'Ошибка Город \"{city}\" не найден2 (нет списка вариантов)')
+            if i_fnd < 0: raise Exception(f'Ошибка нас.пункт {city} не найден2.')
             # Пробежим по списку подсказки
             for _ in range(i_fnd):
                 els_inp[0].send_keys(Keys.ARROW_DOWN)
@@ -300,49 +355,35 @@ def get_txv(data):
         if street == None: raise Exception('Ошибка Не задано значение Улица')
         name_street = ordering_street_by_type(street)
         if name_street == '': name_street = street
-        try: els_inp[0].send_keys(name_street)
-        except: raise Exception('Ошибка ввода значение Улица')
-        time.sleep(5)
-        # Смотрим варианты
-        els_div_opt = els_div_addr[0].find_elements(By.XPATH, './/div[@class="option"]')  # здесь их много
-        if len(els_div_opt) == 0: raise Exception(f'Ошибка Улица \"{name_street}\" не найдена (нет списка вариантов)')
-        lst_addr = []
-        f_ok = False
-        for el_opt in els_div_opt:
-            if el_opt.text == name_street:
-                f_ok = True
-                try: el_opt.click()
-                except: raise Exception('Ошибка клика значение Улица')
-                time.sleep(2)
-                break
-        if f_ok == False: raise Exception(f'Ошибка Улица \"{name_street}\" не найдена')
+        
         # Добавляем дом
         house = data.get('house')
         if house == None: raise Exception('Ошибка Не задано значение Дом')
         c_house = ordering_house(house)
-        if c_house[0] == '': raise Exception(f'Ошибка Дом \"{house}\" {c_house[1]}')
-        str_hs = f', д {c_house[0]}'
+        if c_house[0] == '': raise Exception(f'Ошибка Дом {house} {c_house[1]}')
+        # print(c_house)
+        str_hs = f'{name_street}, д {c_house[0]}'
         try: els_inp[0].send_keys(str_hs)
-        except: raise Exception('Ошибка ввода значение Дом')
-        time.sleep(5)
+        except: raise Exception('Ошибка ввода значение улица/дом')
+        wait_spinner(driver)  # Подождем если есть спинер
+        time.sleep(1)
         # Смотрим варианты
-        addr = els_inp[0].get_attribute('value')
-        # print('Address:', addr)
         els_div_opt = els_div_addr[0].find_elements(By.XPATH, './/div[@class="option"]')  # здесь их много
-        if len(els_div_opt) == 0: raise Exception(f'Ошибка Дом \"{addr}\" не определен (нет списка вариантов)')
-        lst_addr = []
-        for el_opt in els_div_opt:
-            lst_addr.append(el_opt.text)
-        # Проходим по списку, проверяем вхождение полного номера дома и бракуем если есть квартира
-        for i in range(len(lst_addr)):
-            if lst_addr[i].find(' кв ') >= 0 or lst_addr[i].find(c_house[1]) < 0: lst_addr[i] = ''
-        # выберем саму короткую
-        i_fnd = find_short(lst_addr)
-        if i_fnd < 0: raise Exception(f'Ошибка Дом \"{addr}\" не определен2 (нет списка вариантов)')
-        try: els_div_opt[i_fnd].click()
-        except: raise Exception('Ошибка клика значение Дом')
-        time.sleep(2)
-        
+        if len(els_div_opt) == 0: raise Exception(f'Ошибка Улица {name_street} не найдена.')
+        lst_street = []
+        for i in range(len(els_div_opt)):
+            txt = els_div_opt[i].text
+            i_s = txt.find(name_street)
+            i_h = txt.find(f'д {c_house[1]}')
+            if i_s >= 0 and i_h >= 0: lst_street.append((i, txt[i_s:]))
+
+        if len(lst_street) > 0:
+            f_ind = find_short_tup(lst_street)
+            try: els_div_opt[f_ind].click()
+            except: raise Exception('Ошибка клика значение Улица2')
+            time.sleep(3)
+        else: raise Exception(f'Ошибка Улица {name_street} д. {c_house[0]} не найдена.')
+                
         # Добавляем квартиру
         els_add = els_div_addr[0].find_elements(By.XPATH, './/span[@class="do-add cursor-pointer mdi onm-icon-plus mdi-15"]')
         if len(els_add) != 1: raise Exception('Ошибка Нет кнопки добавить квартиру')
@@ -406,81 +447,6 @@ def get_txv(data):
             raise Exception('')
         if s_inet == False and s_tv == False: raise Exception('')
         
-        # Раздел услуги
-        els = driver.find_elements(By.XPATH, '//div[@data-ctrl="s$obj_serv"]')
-        if len(els) != 1: raise Exception('Ошибка Нет блока кнопки поля услуги')
-        els_spn = els[0].find_elements(By.XPATH, './/span[@add_action_id="7100110000000000000911"]')
-        if len(els_spn) != 1: raise Exception('Ошибка Нет кнопки поля услуги')
-        driver.execute_script("arguments[0].scrollIntoView();", els_spn[0])
-        time.sleep(1)
-        try: els_spn[0].click()
-        except: raise Exception('Ошибка клика кнопки поля услуги')
-        time.sleep(3)
-        
-        lst_tarif = []
-        # Смотрим тарифные планы общий пакет
-        if s_inet and s_tv:
-            els = driver.find_elements(By.XPATH, '//div[@data-ctrl="pack_new"]')
-            if len(els) != 1: raise Exception('Ошибка Нет блока услуги общий пакет')
-            driver.execute_script("arguments[0].scrollIntoView();", els[0])
-            time.sleep(1)
-            els_spn = els[0].find_elements(By.XPATH, './/span[@class="trigger mdi mdi-20 mdi-chevron-down"]')
-            if len(els_spn) != 1: raise Exception('Ошибка Нет кнопки поля услуги общий пакет')
-            try: els_spn[0].click()
-            except: raise Exception('Ошибка клика услуги общий пакет')
-            time.sleep(3)
-            els_div = els[0].find_elements(By.XPATH, './/div[@class="listbox-item"]')
-            if len(els_div) == 0: raise Exception('Ошибка Нет списка услуг общий пакет')
-            if len(els_div) > 0: lst_tarif.append('#Пакетные тарифы:')
-            for el_div in els_div:
-                lst_tarif.append(el_div.text)
-            try: els_spn[0].click()
-            except: raise Exception('Ошибка клика закрыть услуги общий пакет')
-            time.sleep(3)
-            
-        # Смотрим тарифные планы интернет
-        if s_inet:
-            els = driver.find_elements(By.XPATH, '//div[@data-ctrl="serv_inet_poffer"]')
-            if len(els) != 1: raise Exception('Ошибка Нет блока услуги интернет')
-            driver.execute_script("arguments[0].scrollIntoView();", els[0])
-            time.sleep(1)
-            els_spn = els[0].find_elements(By.XPATH, './/span[@class="trigger mdi mdi-20 mdi-chevron-down"]')
-            if len(els_spn) != 1: raise Exception('Ошибка Нет кнопки поля услуги интернет')
-            try: els_spn[0].click()
-            except: raise Exception('Ошибка клика услуги интернет')
-            time.sleep(3)
-            els_div = els[0].find_elements(By.XPATH, './/div[@class="listbox-item"]')
-            if len(els_div) == 0: raise Exception('Ошибка Нет списка услуг интернет')
-            if len(els_div) > 0: lst_tarif.append('#Тарифы интернет:')
-            for el_div in els_div:
-                lst_tarif.append(el_div.text)
-            try: els_spn[0].click()
-            except: raise Exception('Ошибка клика закрыть услуги интернет')
-            time.sleep(3)
-        
-        # Смотрим тарифные планы ТВ
-        if s_tv:
-            els = driver.find_elements(By.XPATH, '//div[@data-ctrl="a$7100420000000000000379"]')
-            if len(els) != 1: raise Exception('Ошибка Нет блока услуги ТВ')
-            driver.execute_script("arguments[0].scrollIntoView();", els[0])
-            time.sleep(1)
-            els_spn = els[0].find_elements(By.XPATH, './/span[@data-column-name="a$7100420000000000000380_0"]')
-            if len(els_spn) != 1: raise Exception('Ошибка Нет поля услуги ТВ')
-            els_spn1 = els_spn[0].find_elements(By.XPATH, './/span[@class="trigger mdi mdi-20 mdi-chevron-down"]')
-            if len(els_spn1) != 1: raise Exception('Ошибка Нет кнопки поля услуги ТВ')
-            try: els_spn1[0].click()
-            except: raise Exception('Ошибка клика услуги ТВ')
-            time.sleep(3)
-            els_div = els[0].find_elements(By.XPATH, './/div[@class="listbox-item"]')
-            if len(els_div) == 0: raise Exception('Ошибка Нет списка услуг ТВ')
-            if len(els_div) > 0: lst_tarif.append('#Тарифы ТВ:')
-            for el_div in els_div:
-                lst_tarif.append(el_div.text)
-            try: els_spn1[0].click()
-            except: raise Exception('Ошибка клика закрыть услуги ТВ')
-            time.sleep(1)
-        if len(lst_tarif) > 0: data['tarifs_all'] = '\n'.join(lst_tarif)
-
         time.sleep(1)
 
         # #===========
@@ -693,26 +659,54 @@ if __name__ == '__main__':
     
     # https://onyma-crm.ttk.ru:4443/onyma/
     # login: wd_dc_sg
-    # password: QgdjJGNm
+    # password: 9zWxQjOh
 
     
     # txv_dict = {
         # 'pv_code': pv_code,
         # 'login': 'wd_dc_sg',
-        # 'password': 'QgdjJGNm',
+        # 'password': '9zWxQjOh',
         # 'id_lid': '1215557',
         
+        # # 'city': 'Абакан',           # город
+        # # 'street': 'Кати Перекрещенко',         # улица
+        # # 'house': '2',          # дом
+        # # 'apartment': '95',          # квартира
+
         # # 'region': 'Калужская область',         # область или город областного значения
         # # 'city': 'Калуга',           # город
         # # 'street': 'улица Ленина',         # улица
         # # 'house': '31',          # дом
         # # 'apartment': '2',          # квартира
 
-        # # # 'region': 'Ярославская область',         # область или город областного значения
-        # 'city': 'Ярославль',           # город
-        # 'street': 'улица Звездная',         # улица
-        # 'house': '31/41',          # дом
-        # 'apartment': '61',          # квартира
+        # # # # 'region': 'Ярославская область',         # область или город областного значения
+        # # 'city': 'Ярославль',           # город
+        # # 'street': 'улица Звездная',         # улица улица Звездная 31
+        # # 'house': '31/41',          # дом
+        # # 'apartment': '61',          # квартира
+
+        # # # 'region': 'Нижегородская область',         # область или город областного значения
+        # # 'city': 'Заволжье',           # город     проспект Дзержинского 54
+        # # 'street': 'проспект Дзержинского',         # улица
+        # # 'house': '54',          # дом
+        # # 'apartment': '64',          # квартира
+
+        # # # 'region': 'Нижегородская область',         # область или город областного значения
+        # # 'city': 'Калининград',           # город
+        # # 'street': 'Беломорская улица',         # улица
+        # # 'house': '2',          # дом
+        # # 'apartment': '10',          # квартира
+
+        # # 'region': 'Владимирская область',         # область или город областного значения
+        # # 'city': 'Муром',           # город
+        # # 'street': '30 лет Победы',         # улица      30 лет Победы 9
+        # # 'house': '9',          # дом
+        # # 'apartment': '4',          # квартира
+
+        # # 'city': 'посёлок Новогорный',           # город
+        # # 'street': '8 Марта',         # улица
+        # # 'house': '7',          # дом
+        # # 'apartment': '30',          # квартира
 
         # # # 'region': 'Ярославская область',         # область или город областного значения
         # # 'city': 'Ярославль',           # город
@@ -721,10 +715,10 @@ if __name__ == '__main__':
         # # 'apartment': '63',          # квартира
 
         # # # 'region': 'Ярославская область',         # область или город областного значения
-        # # 'city': 'Ярославль',           # город
-        # # 'street': 'улица Солёная',         # улица
-        # # 'house': '31/41',          # дом
-        # # 'apartment': '61',          # квартира
+        # 'city': 'Тульская область посёлок Грицовский',           # город
+        # 'street': 'Первомайская улица',         # улица
+        # 'house': '9',          # дом
+        # 'apartment': '10',          # квартира
 
         # 'available_connect': '',  # Возможность подключения
         # 'tarifs_all': '', # список названий тарифных планов
@@ -739,7 +733,7 @@ if __name__ == '__main__':
     # print(data['pv_address'])
     
     
-    # set_txv_to_dj_domconnect(pv_code)
+    set_txv_to_dj_domconnect(pv_code)
     # rez, txv_list = get_txv_in_dj_domconnect(pv_code)
     # print(rez)
     # for txv_dict in txv_list:

@@ -24,3 +24,25 @@
 2022-04-17 17:29:25,058:domconnect.lib_seo:Загрузка завершена. Обработано сделок: 0. Ошибок: 0
 2022-04-17 17:29:27,373:domconnect.lib_seo:Загрузка завершена. Обработано лидов: 51. Ошибок: 0
 2022-04-17 17:35:32,673:domconnect.lib_seo:Расчет и сохранение данных SEO в кэш закончено.
+2022-04-17 20:24:10,018:django.request:Internal Server Error: /domconnect/sites
+Traceback (most recent call last):
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\core\handlers\exception.py", line 34, in inner
+    response = get_response(request)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\core\handlers\base.py", line 115, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\core\handlers\base.py", line 113, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\contrib\auth\decorators.py", line 21, in _wrapped_view
+    return view_func(request, *args, **kwargs)
+  File "c:\Dev\dj_domconnect\domconnect\views.py", line 114, in sites
+    new_form.provider = request.POST.get("provider")
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\db\models\fields\related_descriptors.py", line 214, in __set__
+    raise ValueError(
+ValueError: Cannot assign "'14'": "DcSiteSEO.provider" must be a "DcCatalogProviderSEO" instance.
+2022-04-17 20:26:19,902:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-04-17 20:30:00,124:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-04-17 20:30:26,461:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-04-17 22:03:21,869:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-04-17 22:05:57,974:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-04-17 22:07:50,283:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
+2022-04-17 22:08:21,120:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.

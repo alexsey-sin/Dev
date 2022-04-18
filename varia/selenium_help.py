@@ -52,6 +52,8 @@ els = els_parent.find_elements(By.XPATH, './/button[contains(@onclick, "saveManu
 
 # Взять значение атрибута у элемента
 attr = els[0].get_attribute('value')
+# Взять значение внутри тэга у элемента
+attr = els[0].get_attribute('innerHTML')
 
 
 # Кликнуть мышкой

@@ -108,11 +108,13 @@ def sites(request):  #
         id_delete = request.POST.get('delete', None)
 
         if id_edit:  # редактирование
+            try: provider = DcCatalogProviderSEO.objects.get(id=request.POST.get('provider'))
+            except: context['error_mess'] = 'Ошибка провайдера.'
             new_form = get_object_or_404(DcSiteSEO, id=id_edit)
-            new_form.site = request.POST.get("site")
-            new_form.name = request.POST.get("name")
-            new_form.provider = request.POST.get("provider")
-            new_form.num = request.POST.get("num")
+            new_form.site = request.POST.get('site')
+            new_form.name = request.POST.get('name')
+            new_form.provider = provider
+            new_form.num = request.POST.get('num')
             new_form.save()
         elif id_delete:
             rec = get_object_or_404(DcSiteSEO, id=id_delete)
@@ -148,6 +150,10 @@ def sources(request):  #
 
     tmp_data = DcSourceSEO.objects.order_by('num').values()
     data = [row for row in tmp_data]
+    for dt in data:
+        dt['source'] = DcCatalogSourceSEO.objects.get(id=dt['source_id']).name
+        dt['site'] = DcSiteSEO.objects.get(id=dt['site_id']).site
+        print(dt)
 
     context['data'] = data
     return render(request, 'domconnect/sources.html', context)

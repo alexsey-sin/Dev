@@ -41,14 +41,46 @@ def get_token(login: str, password: str):
     except:
         return 'Ошибка get_token: try: requests.post', ''
 
+def get_url(login: str, password: str):
+    url = 'https://urmdf.ssl.mts.ru'
+    
+    headers = {
+        'Content-Type': 'application/json',
+        'Connection': 'Keep-Alive',
+        'User-Agent': 'Apache-HttpClient/4.1.1 (java 1.5)',
+    }
+    # data = {
+        # 'login': login,
+        # 'password': password,
+    # }
+    try:
+        # responce = requests.post(url, headers=headers, json=data)
+        responce = requests.get(url, headers=headers)
+        print(responce.status_code)
+        print(responce.text)
+        # if responce.status_code == 200:
+            # # answer = json.loads(responce.text)
+            # # resp_code = answer.get('resp_code')
+            # # if resp_code != 0: return 'Error', f'get_url: resp_code={resp_code}'
+            # # access_token = answer.get('access_token', 'None')
+            # # expires_in = answer.get('expires_in')
+            # return ''
+        # else:
+            # return f'Ошибка get_url: responce.status_code: {responce.status_code}\n{responce.text}'
+
+        # {"resp_code":0,"access_token":"y9Hhze7_eiigdE1xa91-VCjHVgpvFkg8","expires_in":28800}
+    except:
+        return 'Ошибка get_url: try: requests.post'
+
 def get_catalog():
     # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.catalog.get'
     # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.catalog.list'
+    url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.status.list'
     # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.productsection.fields'
     # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.fields'  # типы и структура полей
     # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.userfield.get'
     # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.userfield.list'
-    url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.status.entity.items' # Типы источника лида
+    # url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.status.entity.items' # Типы источника лида
     
     # dt_start = datetime.strptime(from_data, '%d.%m.%Y')
     # str_dt_start = dt_start.strftime('%Y-%m-%dT%H:%M:%S')
@@ -110,17 +142,17 @@ def get_catalog():
     # }
     data = {'entityId': 'SOURCE'}
     try:
-        responce = requests.post(url, json=data)
-        # responce = requests.post(url)
+        # responce = requests.post(url, json=data)
+        responce = requests.post(url)
         # responce = requests.post(url, headers=headers)
         if responce.status_code == 200:
             answer = json.loads(responce.text)
             result = answer.get('result')
-            for dct in result:
-                name = dct.get('NAME')
-                id = dct.get('STATUS_ID')
-                print('ID', id, 'name:', name)
-            print('Всего: ', len(result))
+            # for dct in result:
+                # name = dct.get('NAME')
+                # id = dct.get('STATUS_ID')
+                # print('ID', id, 'name:', name)
+            # print('Всего: ', len(result))
                 # if name == 'Подключаем': print(name, 'ID', dct.get('ID'))  #  8
             # if not result: print('update_typelid no result in answer')
             # dct_list = result.get('LIST')
@@ -137,6 +169,12 @@ def get_catalog():
             # print(dct_list)
             # print(answer)
             # print(result)
+            with open('source.txt', 'w', encoding='utf-8') as out_file:
+                for res in result:
+                    if res.get('ENTITY_ID') == 'SOURCE':
+                        row = f'{res.get("STATUS_ID")}  {res.get("NAME")}\n'
+                        out_file.write(row)
+                        # json.dump(res, out_file, ensure_ascii=False, indent=4)
             # print(go_next, go_total)
         else: return f'Ошибка get_catalog: responce.status_code: {responce.status_code}\n{responce.text}'
     except: return 'Ошибка get_catalog: try: requests.post'
@@ -228,8 +266,8 @@ def get_source():
             # print(result)
 
             with open('source_id.txt', 'w', encoding='utf-8') as outfile:
-                outfile.write('\n'.join(out_dct))
-                # json.dump(out_dct, outfile, ensure_ascii=False, indent=4)
+                # outfile.write('\n'.join(out_dct))
+                json.dump(out_dct, outfile, ensure_ascii=False, indent=4)
 
 
         else: return f'Ошибка get_source: responce.status_code: {responce.status_code}\n{responce.text}'
@@ -330,7 +368,7 @@ def get_lids22():
         'filter': {
             '>=DATE_CREATE': '2022-03-01T00:00:00',
             '<DATE_CREATE': '2022-04-01T00:00:00',
-            # '!STATUS_ID': [17, 24],    # Дубль и ошибка в телефоне
+            '!STATUS_ID': [17, 24],    # Дубль и ошибка в телефоне
             'UF_CRM_1592566018': '3116',  # SEO
         },
         # 'select': [
@@ -677,16 +715,35 @@ if __name__ == '__main__':
 
     
 
-
-    get_lids22()
+    # get_source()
+    # get_lids22()
     # r = get_type_lids()
     # print(r)
+    # get_url('','')
+    
+    
+    # PROVIDERS = []
+    # # Загрузим коды типов сайтов
+    # url_providers = 'https://domconnect.ru/api.get_crm_info?apikey=ace5aea03144bfea692ab289f3045bfd6a7f2440da8ba809&type=providers'
+    # try:
+    #     responce = requests.post(url_providers)
+    #     if responce.status_code == 200:
+    #         answer = json.loads(responce.text)
+    #         result = answer.get('response')
+    #         for res_item in result:
+    #             status_id = res_item.get('STATUS_ID')
+    #             name_provider = res_item.get('NAME')
+    #             PROVIDERS.append((status_id, name_provider))
+    #     else: return logger.info(f'Ошибка download_providers: responce.status_code: {responce.status_code}\n{responce.text}')
+    # except Exception as e: logger.info(f'Ошибка download_providers: try: requests.post {e}')
+    # form.fields['provider'] = forms.ChoiceField(choices=PROVIDERS, label='Провайдер', initial='', widget=forms.Select(), required=True)
+
 
 
 
 
     # from_date = '2022-02-08T00:00:00'
-    # # e = get_catalog()
+    e = get_catalog()
     # # e = get_source()
     # e, lst_deal = get_deals(from_date)
     # if e: print(e)

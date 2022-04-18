@@ -309,11 +309,6 @@ class DcSourceSEO(models.Model):  # Источники для перечня т�
         on_delete=models.CASCADE,
         verbose_name='Источник',
     )
-    # source = models.CharField(  # Название источника
-    #     max_length = 255,
-    #     unique = True,
-    #     verbose_name='Источник',
-    # )
     site = models.ForeignKey(
         DcSiteSEO,
         on_delete=models.CASCADE,

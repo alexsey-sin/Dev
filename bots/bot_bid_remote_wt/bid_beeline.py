@@ -157,7 +157,14 @@ def ordering_street(in_street: str):  # Преобразование строк�
         изветсный тип улицы
         выдаем список [тип_улицы, название]
         если известный тип не найден - возвращаем пустой список
+        
+        Список типов улицы имеет очередность в приоритете определения по убыванию
     '''
+    lst_type_raion = [
+        'микрорайон',
+        'район',
+        'станица',
+    ]
     lst_type_street = [
         'улица',
         'проспект',
@@ -170,18 +177,75 @@ def ordering_street(in_street: str):  # Преобразование строк�
         'набережная',
         'площадь',
     ]
-    out_cort = []
-    lst = in_street.split(',')
-    for sub in lst:
-        rez = False
+    lst_street = in_street.split(',')
+    if len(lst_street) == 0: return []
+
+                    # разобьем на известные типы районов, типы улиц, и просто выражения
+    lst_tr = []
+    lst_ts = []
+    lst_em = []
+    lst_tmp = []
+    # Отделим известные типы районов
+    for sub in lst_street:
+        not_rez = True
+        for ts in lst_type_raion:
+            if sub.find(ts) >= 0:
+                not_rez = False
+                lst_tr.append((ts, sub.replace(ts, '').strip()))
+                break
+        if not_rez: lst_tmp.append(sub.strip())
+
+    if len(lst_tmp) == 0:
+        if len(lst_tr) == 1: return lst_tr[0][0], lst_tr[0][1]
+        else: return []
+    
+    # Отделим известные типы улиц
+    lst_tmp2 = []
+    for sub in lst_tmp:
+        not_rez = True
         for ts in lst_type_street:
             if sub.find(ts) >= 0:
-                rez = True
-                out_cort.append(ts)
-                out_cort.append(sub.replace(ts, '').strip())
+                not_rez = False
+                lst_ts.append((ts, sub.replace(ts, '').strip()))
                 break
-        if rez: break
-    return out_cort
+        if not_rez: lst_tmp2.append(sub.strip())
+
+    if len(lst_tmp2) == 0:
+        if len(lst_ts) == 1: return lst_ts[0][0], lst_ts[0][1]
+        else: return []
+    else: return '', ' '.join(lst_tmp2)
+    # print('lst_tr:', lst_tr)
+    # print('lst_ts:', lst_ts)
+    # print('lst_em:', lst_em)
+    # print('lst_tmp:', lst_tmp)
+    # for sub in lst_tmp:
+        # rez = False
+        # for ts in lst_type_street:
+            # if sub.find(ts) >= 0: rez = True
+        # if rez: lst_ts.append((ts, sub.replace(ts, '').strip()))
+        # else: lst_tmp2.append(sub)
+
+    # if len(lst_tmp2) == 0:
+        # if len(lst_ts) == 1: return lst_ts[0][0], lst_ts[0][1]
+        # else: return 'many', ' '.join(lst_ts)
+    # else: return 'empty', ' '.join(lst_tmp2)
+    
+    # for sub in lst_street:
+        # for tr in lst_type_raion:
+            # if sub.find(tr) >= 0: lst_tr.append(sub)
+    
+    
+    # out_cort = []
+    # for ts in lst_type_street:
+        # rez = False
+        # for sub in lst_street:
+            # if sub.find(ts) >= 0:
+                # rez = True
+                # out_cort.append(ts)
+                # out_cort.append(sub.replace(ts, '').strip())
+                # break
+        # if rez: break
+    # return out_cort
 
 def ordering_house(in_house: str):  # Преобразование строки дом
     '''
@@ -272,61 +336,58 @@ def set_bid(data):
 
         driver.implicitly_wait(20)
         driver.get(base_url)
-        time.sleep(2)
+        time.sleep(3)
         
         ###################### Login ######################
         els = driver.find_elements(By.ID, 'id_login')
-        if els[0]:
-            try: els[0].send_keys(data['partner_login'])
-            except: raise Exception('Ошибка ввода 1')
-        else: raise Exception('Ошибка авторизация')
+        if len(els) != 1: raise Exception('Ошибка нет поля логин')
+        login = data.get('login')
+        try: 
+            if login: els[0].send_keys(login)
+            else: raise Exception('Ошибка не задан логин')
+        except: raise Exception('Ошибка действий 01')
         time.sleep(1)
-
+        
+        workercode = data.get('login_2')
+        if not workercode: raise Exception('Ошибка не задан PartnerWeb (login2)')
         els = driver.find_elements(By.ID, 'id_workercode')
-        if els[0]:
-            try: els[0].send_keys(data['partner_workercode'])
-            except: raise Exception('Ошибка ввода 2')
-        else: raise Exception('Ошибка авторизации')
+        if len(els) != 1: raise Exception('Ошибка нет поля workercode')
+        try: els[0].send_keys(workercode)
+        except: raise Exception('Ошибка действий 02')
         time.sleep(1)
 
         els = driver.find_elements(By.ID, 'id_password')
-        if els[0]:
-            try: els[0].send_keys(data['partner_password'])
-            except: raise Exception('Ошибка ввода 3')
-        else: raise Exception('Ошибка авторизация')
+        if len(els) != 1: raise Exception('Ошибка нет поля пароль')
+        password = data.get('password')
+        try:
+            if password: els[0].send_keys(password)
+            else: raise Exception('Ошибка не задан пароль')
+        except: raise Exception('Ошибка действий 03')
         time.sleep(1)
-        
+
         els = driver.find_elements(By.TAG_NAME, 'button')
-        if els[0]:
-            try: els[0].click()
-            except: raise Exception('Ошибка клика 1')
-        else: raise Exception('Ошибка авторизация')
-        time.sleep(3)
+        if len(els) != 1: raise Exception('Ошибка нет кнопки войти')
+        try: els[0].click()
+        except: raise Exception('Ошибка действий 04')
+        time.sleep(5)
         ###################### Главная страница ######################
-        
-        els_a = driver.find_elements(By.TAG_NAME, 'a')
-        el = None
-        for el_a in els_a:
-            link = el_a.get_attribute('href')
-            if link and link.find('/ngapp#!/checkaddress/search') >= 0:
-                el = el_a
-                break
-        if el:
-            try: el.click()
-            except: raise Exception('Ошибка клика 2')
-        else: raise Exception('Ошибка переход к списку городов')
-        time.sleep(3)
+        els_a = driver.find_elements(By.XPATH, '//a[@href="/ngapp#!/checkaddress/search"]')
+        if len(els_a) != 1: raise Exception('Ошибка авторизации')
+        try: els_a[0].click()
+        except: raise Exception('Ошибка действий 05')
+        time.sleep(5)
         ###################### Страница поиска адреса ######################
         # Вводим название населенного пункта
         els = driver.find_elements(By.ID, 'btn-append-to-body')
-        if len(els) != 1: raise Exception('Ошибка нет поля ввод города')
+        if len(els) != 1: raise Exception('Ошибка нет поля ввода города')
         city = data.get('city')
-        if city:
+        try:
             city = city.replace('ё', 'е')
-            try: els[0].send_keys(city)
-            except: raise Exception('Ошибка ввода 4')
-        else: raise Exception('Ошибка не задан город')
+            if city: els[0].send_keys(city)
+            else: raise Exception('Ошибка не задан город')
+        except: raise Exception('Ошибка действий 06')
         time.sleep(3)
+        
         # Ищем всплывающее контекстное меню с подсказкой города
         driver.implicitly_wait(1)
 
@@ -336,21 +397,25 @@ def set_bid(data):
         if len(els_a) == 0: raise Exception(f'Ошибка Населенный пункт {city} не найден')
         elif len(els_a) == 1:
             try: els_a[0].click()
-            except: raise Exception('Ошибка клика 3')
+            except: raise Exception('Ошибка действий 07')
         else:
             # Здесь можно для каждого нас. пункта прописать отдельные правила
             # по выбору пункта всплывающего меню
             if city == 'Ярославль':
                 try: els_a[0].click()
-                except: raise Exception('Ошибка клика 4')
+                except: raise Exception('Ошибка действий 08')
             elif city == 'Кострома':
                 try: els_a[0].click()
-                except: raise Exception('Ошибка клика 5')
+                except: raise Exception('Ошибка действий 09')
             else:
                 # Множественный выбор
                 lst_nas_punkt = []
                 for el in els_a:
                     lst_nas_punkt.append(el.text)
+                
+                print('city:', city)
+                print('lst_nas_punkt:', lst_nas_punkt)
+                
                 lst_cheq = check_equality_citys(lst_nas_punkt, city)
                 if len(lst_cheq) == 0: raise Exception(f'Ошибка Населенный пункт: {city} не найден2')
                 elif len(lst_cheq) > 1:
@@ -359,21 +424,23 @@ def set_bid(data):
                         lst_tup.append((ci, lst_nas_punkt[ci]))
                     i_tup = find_short_tup(lst_tup)
                     try: els_a[i_tup].click()
-                    except: raise Exception('Ошибка клика 6')
+                    except: raise Exception('Ошибка действий 10')
         
         time.sleep(3)
-        
+
         # Вводим название улицы
         els_street = driver.find_elements(By.XPATH, '//input[@placeholder="Улица"]')
         if len(els_street) != 1: raise Exception('Ошибка не найдено поле ввода названия улицы')
         el_street = els_street[0]
         # Удалим если что-то уже введено
-        try: el_street.send_keys(Keys.CONTROL + 'a')
+        try:
+            el_street.click()
+            time.sleep(0.2)
+            el_street.send_keys(Keys.CONTROL + 'a')
+            time.sleep(0.2)
+            el_street.send_keys(Keys.DELETE)
+            time.sleep(0.2)
         except: raise Exception('Ошибка ввода 5')
-        time.sleep(0.2)
-        try: el_street.send_keys(Keys.DELETE)
-        except: raise Exception('Ошибка ввода 6')
-        time.sleep(0.2)
 
         # Преобразуем в нормальный вид [тип, название]
         street = data.get('street')
@@ -386,76 +453,101 @@ def set_bid(data):
         else:  # если нет - вводим как есть
             try: el_street.send_keys(street)
             except: raise Exception('Ошибка ввода 8')
-            lst_street = ('улица', street)
+            lst_street = ('', street)
         
         # Нажимаем кнопку найти
         els_button = driver.find_elements(By.XPATH, '//button[@ng-click="checkaddressAbstractController.searchPattern()"]')
         if len(els_button) != 1: raise Exception('Ошибка не найдена кнопка поиск улицы')
         try: els_button[0].click()
-        except: raise Exception('Ошибка клика 7')
+        except: raise Exception('Ошибка действий 13')
         time.sleep(5)
         
-        driver.implicitly_wait(1)
         # Определим - найдена ли улица однозначно
         els_div = driver.find_elements(By.XPATH, '//div[@ng-hide="checkaddressAbstractController.loading"]')
         if len(els_div) > 0:  # Проблемма - улица не найдена или множественный выбор
             streets = []
             for el_div in els_div:
                 if el_div.text == 'Улицы не найдены':
-                    raise Exception(f'Ошибка улица {street} не найдена.')
+                    raise Exception(f'Ошибка Улица: {street} не найдена.')
             
-            # Ищем всплывающее контекстное меню с подсказкой города
+            # Ищем всплывающее контекстное меню с подсказкой улиц
             els_div = driver.find_elements(By.ID, 'listStart')
-            if len(els_div) != 1: raise Exception('Ошибка нет всплывающее контекстное меню с подсказкой улицы')
-            els_a = els_div[0].find_elements(By.XPATH, './*//a[@class="link ng-binding"]')
-            if len(els_a) == 0: raise Exception(f'Ошибка улица {street} не найдена2.')
+            if len(els_div) != 1: raise Exception('Ошибка - нет всплывающее контекстное меню с подсказкой улицы')
+            els_a = els_div[0].find_elements(By.XPATH, './/a[@class="link ng-binding"]')
+            if len(els_a) == 0: raise Exception(f'Ошибка Улица: {street} не найдена2.')
             f_lst = []
             for i in range(len(els_a)):
-                name_street = els_a[i].text
-                if name_street.find(lst_street[1]) >= 0 and name_street.find(lst_street[0]) >= 0: f_lst.append((i, name_street))
-            
-            f_ind = find_short_tup(f_lst)
-            try: els_a[f_ind].click()
-            except: raise Exception('Ошибка клика 8')
-            time.sleep(5)
-        
+                txt = els_a[i].text
+                if lst_street[0] == '':
+                    if txt.find(lst_street[1]) >= 0: f_lst.append((i, txt))
+                else:
+                    if txt.find(lst_street[0]) >= 0 and txt.find(lst_street[1]) >= 0: f_lst.append((i, txt))
+            if len(f_lst) == 0: raise Exception(f'Ошибка Улица: {street} не найдена3.')
+            elif len(f_lst) == 1:
+                try: els_a[f_lst[0][0]].click()
+                except: raise Exception('Ошибка действий 14')
+            else:
+                i_fnd = find_short_tup(f_lst)
+                try: els_a[i_fnd].click()
+                except: raise Exception('Ошибка действий 15')
+            time.sleep(3)
+
         driver.implicitly_wait(10)
-        time.sleep(5)
+        time.sleep(3)
+        
+        # Возьмем определившуюся улицу
+        defined_street = ''
+        els = driver.find_elements(By.XPATH, '//span[@ng-if="!item.url"]')
+        if len(els) != 1: print('!item.url:', len(els))
+        else: defined_street = els[0].text
+        
+        # # Кликнем: Показать все дома
+        # els = driver.find_elements(By.XPATH, '//div[@ng-click="checkaddressAbstractController.toggleConnectedHousesFilter()"]')
+        # if len(els) == 1:
+            # try: els[0].click()
+            # except: raise Exception('Ошибка действий 16')
+            # time.sleep(1)
+
         # Ищем таблицу с номерами домов
         els_table = driver.find_elements(By.TAG_NAME, 'table')
-        if len(els_table) != 1: raise Exception('Ошибка нет таблицы домов')
+        if len(els_table) != 1: raise Exception('Ошибка - нет таблицы домов')
         el_table = els_table[0]
         
         els_a = el_table.find_elements(By.TAG_NAME, 'a')
-        if len(els_a) == 0: raise Exception('Ошибка В таблице домов нет элементов')
+        if len(els_a) == 0: raise Exception(f'Ошибка {defined_street} нет подключенных домов')
         
         house = data.get('house')
-        if house == None: raise Exception('Ошибка не задан номер дома')
-        c_house = ordering_house(house)
-        if c_house[0] == '': raise Exception(f'Ошибка не распознан номер дома \"{house}\"')
+        if house: c_house = ordering_house(house)
+        else: raise Exception('Ошибка не задан номер дома')
+        
+        if c_house[0] == '': raise Exception(f'Ошибка не распознан номер дома: \"{house}\"')
         el = None
         for el_a in els_a:
             if el_a.text == c_house[1]:
                 el = el_a
                 break
-        
         if el:
             try: el.click()
-            except: raise Exception('Ошибка клика 9')
-        else: raise Exception(f'Ошибка Дом {house} не найден')
-        time.sleep(5)
+            except: raise Exception('Ошибка действий 17')
+        else: raise Exception(f'Ошибка Дом: {house} не найден')
+        time.sleep(3)
         
-        els_b = driver.find_elements(By.TAG_NAME, 'button')
-        el = None
-        for el_b in els_b:
-            link = el_b.get_attribute('ng-click')
-            if link and link.find('ok()') >= 0:
-                el = el_b
-                break
-        if el:
-            try: el.click()
-            except: raise Exception('Ошибка клика 10')
-        else: raise Exception('Ошибка нет кнопки продолжить после прочтения ограничений')
+        # Берем информацию об ограничениях по адресу
+        info_restrictions = 'Есть ТхВ\n'
+        els = driver.find_elements(By.XPATH, '//div[@class="modal-content"]')
+        if len(els) != 1: raise Exception('Ошибка нет всплывающего окна с информацией об ограничениях')
+        els_b = els[0].find_elements(By.TAG_NAME, 'b')
+        for el_b in els_b: info_restrictions += f'{el_b.text}\n'
+        els_p = els[0].find_elements(By.TAG_NAME, 'p')
+        for el_p in els_p: info_restrictions += f'{el_p.text}\n'
+        
+        data['available_connect'] = info_restrictions
+        
+        # Жмем продолжить
+        els_btn = driver.find_elements(By.XPATH, '//button[@ng-click="ok()"]')
+        if len(els_btn) != 1: raise Exception('Ошибка нет кнопки продолжить после прочтения ограничений')
+        try: els_btn[0].click()
+        except: raise Exception('Ошибка действий 18')
         time.sleep(3)
         ###################### Страница ввода заявки ######################
         # Ищем квартиру

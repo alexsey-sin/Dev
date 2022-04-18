@@ -84,70 +84,36 @@ def find_string_to_substrs(lst: list, substr: str):  # Поиск вхожден
 
 def check_equality_citys(lst: list, in_str: str):  # Поиск вхождения фразы в списке фраз
     '''
-        Поиск вхождения фразы в списке фраз
-        Поиск ведется последовательно начиная с первой буквы in_str
-        - назовем её подстрока. Если таких вхождений в списке много,
-        2 и более добавляем следующую букву к подстроке.
-        Поиск завершен если вхождений только одно.
-        Возвращаем индекс фразы в списке и саму фразу.
-        Если нет вхождений - возвращаем "-1"
+        Поиск вхождения фразы в списке фраз как самостоятельного слова
+        Если нет вхождений - возвращаем []
     '''
     # Преобразуем входные данные к нижнему регистру
     in_str = in_str.lower().replace('ё', 'е')
     in_lst = [s.lower().replace('ё', 'е') for s in lst]
     
-    ret_ind = -1
-    ret_phrase = ''
-    # поиск с циклом по набиранию подстроки
-    for i_s in range(len(in_str)):
-        sub_str = in_str[0:i_s+1]
-        cnt_phr = 0
-        # просмотрим список на вхождение
-        for i_lst in range(len(in_lst)):
-            if in_lst[i_lst].find(sub_str) >= 0:
-                cnt_phr += 1
-                ret_ind = i_lst
-        if cnt_phr > 1:
-            ret_ind = -1
-        else:
-            break
-    if ret_ind >= 0: return [ret_ind,]  # похожая фраза найдена и она в единственной строке
-    
-    # просмотрим список на полное совпадение
-    ret_ind = -1
-    cnt_phr = 0
-    for i_lst in range(len(in_lst)):
-        if in_lst[i_lst] == in_str:
-            cnt_phr += 1
-            ret_ind = i_lst
-    if cnt_phr == 1: return [ret_ind,]
-
-    # просмотрим список на полное совпадение как самостоятельного слова
-    # ret_ind = -1
-    # cnt_phr = 0
-    ln_sb = len(in_str)
+    # просмотрим список на вхождение как самостоятельного слова
+    ln_sb = len(in_str)  # длина иск фразы
     rez_lst = []
     for i_lst in range(len(in_lst)):
-        ln_str = len(in_lst[i_lst])
-        i = in_lst[i_lst].find(in_str)
-        if i >= 0:
-            if in_str == 'омск':
-                rez_lst.append(i_lst)
-                break
-            # фраза найдена
-            # проверим букву перед фразой
-            if i > 0:
-                if in_lst[i_lst][i - 1].isalpha():  #не повезло - буква
-                    continue
-            # проверим букву после фразы
-            if i + ln_sb < ln_str:
-                if in_lst[i_lst][i + ln_sb].isalpha():  #не повезло - буква
-                    continue
-            if i + ln_sb == ln_str and in_str == 'кострома':
-                rez_lst.append(i_lst)
-                break
+        ln_str = len(in_lst[i_lst])  # длина фразы из списка
+        # Соберем индексы всех вхождений
+        lst_i = []
+        i = -1
+        while True:
+            i = in_lst[i_lst].find(in_str, i+1)  # индекс начала иск фразы
+            if i >= 0: lst_i.append(i) # иск фраза входит
+            else: break
+        if len(lst_i) == 0: continue # нет вхождений
+        
+        # Проверим каждое вхождение
+        for li in lst_i:
+            if li > 0:  # иск фраза не в начале
+                if in_lst[i_lst][li - 1].isalpha(): continue  #не повезло - буква
+            if li + ln_sb < ln_str:
+                if in_lst[i_lst][li + ln_sb].isalpha(): continue #не повезло - буква
+            # Слово самостоятельное, добавляем индекс в рез список
             rez_lst.append(i_lst)
-            
+            break
         
     return rez_lst
 
@@ -157,7 +123,16 @@ def ordering_street(in_street: str):  # Преобразование строк�
         изветсный тип улицы
         выдаем список [тип_улицы, название]
         если известный тип не найден - возвращаем пустой список
+        
+        Список типов улицы имеет очередность в приоритете определения по убыванию
     '''
+    lst_type_raion = [
+        'микрорайон',
+        'район',
+        'станица',
+        'поселок',
+        'округ',
+    ]
     lst_type_street = [
         'улица',
         'проспект',
@@ -169,20 +144,44 @@ def ordering_street(in_street: str):  # Преобразование строк�
         'проезд',
         'набережная',
         'площадь',
-        'микрорайон',
     ]
-    out_cort = []
-    lst = in_street.split(',')
-    for sub in lst:
-        rez = False
+    lst_street = in_street.split(',')
+    if len(lst_street) == 0: return []
+
+    # разобьем на известные типы районов, типы улиц, и просто выражения
+    lst_tr = []
+    lst_ts = []
+    lst_em = []
+    lst_tmp = []
+    # Отделим известные типы районов
+    for sub in lst_street:
+        not_rez = True
+        for ts in lst_type_raion:
+            if sub.find(ts) >= 0:
+                not_rez = False
+                lst_tr.append((ts, sub.replace(ts, '').strip()))
+                break
+        if not_rez: lst_tmp.append(sub.strip())
+
+    if len(lst_tmp) == 0:
+        if len(lst_tr) == 1: return lst_tr[0][0], lst_tr[0][1]
+        else: return []
+    
+    # Отделим известные типы улиц
+    lst_tmp2 = []
+    for sub in lst_tmp:
+        not_rez = True
         for ts in lst_type_street:
             if sub.find(ts) >= 0:
-                rez = True
-                out_cort.append(ts)
-                out_cort.append(sub.replace(ts, '').strip())
+                not_rez = False
+                lst_ts.append((ts, sub.replace(ts, '').strip()))
                 break
-        if rez: break
-    return out_cort
+        if not_rez: lst_tmp2.append(sub.strip())
+
+    if len(lst_tmp2) == 0:
+        if len(lst_ts) == 1: return lst_ts[0][0], lst_ts[0][1]
+        else: return []
+    else: return '', ' '.join(lst_tmp2)
 
 def ordering_house(in_house: str):  # Преобразование строки дом
     '''
@@ -264,6 +263,7 @@ def find_short_tup(f_lst):
     
 def get_txv(data):
     driver = None
+    rez_set_bid = ''
     try:
         base_url = 'https://partnerweb.beeline.ru/'
         
@@ -338,28 +338,20 @@ def get_txv(data):
             try: els_a[0].click()
             except: raise Exception('Ошибка действий 07')
         else:
-            # Здесь можно для каждого нас. пункта прописать отдельные правила
-            # по выбору пункта всплывающего меню
-            if city == 'Ярославль':
-                try: els_a[0].click()
-                except: raise Exception('Ошибка действий 08')
-            elif city == 'Кострома':
-                try: els_a[0].click()
-                except: raise Exception('Ошибка действий 09')
-            else:
-                # Множественный выбор
-                lst_nas_punkt = []
-                for el in els_a:
-                    lst_nas_punkt.append(el.text)
-                lst_cheq = check_equality_citys(lst_nas_punkt, city)
-                if len(lst_cheq) == 0: raise Exception(f'Ошибка Населенный пункт: {city} не найден2')
-                elif len(lst_cheq) > 1:
-                    lst_tup = []
-                    for ci in lst_cheq:
-                        lst_tup.append((ci, lst_nas_punkt[ci]))
-                    i_tup = find_short_tup(lst_tup)
-                    try: els_a[i_tup].click()
-                    except: raise Exception('Ошибка действий 10')
+            # Множественный выбор
+            lst_nas_punkt = []
+            for el in els_a:
+                lst_nas_punkt.append(el.text)
+            
+            lst_cheq = check_equality_citys(lst_nas_punkt, city)
+            if len(lst_cheq) == 0: raise Exception(f'Ошибка Населенный пункт: {city} не найден2')
+            elif len(lst_cheq) > 1:
+                lst_tup = []
+                for ci in lst_cheq:
+                    lst_tup.append((ci, lst_nas_punkt[ci]))
+                i_tup = find_short_tup(lst_tup)
+                try: els_a[i_tup].click()
+                except: raise Exception('Ошибка действий 10')
         
         time.sleep(3)
 
@@ -382,13 +374,14 @@ def get_txv(data):
         if not street: raise Exception('Ошибка не задано поле улица')
         street = street.replace('ё', 'е')
         lst_street = ordering_street(street)
+        # print(lst_street)
         if lst_street:  # если распознали по типу
             try: el_street.send_keys(lst_street[1])
             except: raise Exception('Ошибка ввода 7')
         else:  # если нет - вводим как есть
             try: el_street.send_keys(street)
             except: raise Exception('Ошибка ввода 8')
-            lst_street = ('улица', street)
+            lst_street = ('', street)
         
         # Нажимаем кнопку найти
         els_button = driver.find_elements(By.XPATH, '//button[@ng-click="checkaddressAbstractController.searchPattern()"]')
@@ -413,8 +406,10 @@ def get_txv(data):
             f_lst = []
             for i in range(len(els_a)):
                 txt = els_a[i].text
-                print(txt)
-                if txt.find(lst_street[0]) >= 0 and txt.find(lst_street[1]) >= 0: f_lst.append((i, txt))
+                if lst_street[0] == '':
+                    if txt.find(lst_street[1]) >= 0: f_lst.append((i, txt))
+                else:
+                    if txt.find(lst_street[0]) >= 0 and txt.find(lst_street[1]) >= 0: f_lst.append((i, txt))
             if len(f_lst) == 0: raise Exception(f'Ошибка Улица: {street} не найдена3.')
             elif len(f_lst) == 1:
                 try: els_a[f_lst[0][0]].click()
@@ -423,35 +418,58 @@ def get_txv(data):
                 i_fnd = find_short_tup(f_lst)
                 try: els_a[i_fnd].click()
                 except: raise Exception('Ошибка действий 15')
-            time.sleep(3)
+            time.sleep(1)
 
         driver.implicitly_wait(10)
         time.sleep(3)
         
-        # Ищем таблицу с номерами домов
-        els_table = driver.find_elements(By.TAG_NAME, 'table')
-        if len(els_table) != 1: raise Exception('Ошибка - нет таблицы домов')
-        el_table = els_table[0]
         
-        els_a = el_table.find_elements(By.TAG_NAME, 'a')
-        if len(els_a) == 0: raise Exception('Ошибка В таблице домов нет элементов')
-        
+        # Обработаем номер дома
         house = data.get('house')
         if house: c_house = ordering_house(house)
         else: raise Exception('Ошибка не задан номер дома')
-        
         if c_house[0] == '': raise Exception(f'Ошибка не распознан номер дома: \"{house}\"')
-        el = None
-        for el_a in els_a:
-            if el_a.text == c_house[1]:
-                el = el_a
-                break
-        if el:
-            try: el.click()
-            except: raise Exception('Ошибка действий 15')
-        else: raise Exception(f'Ошибка Дом: {house} не найден')
-        time.sleep(3)
         
+        #=====================================
+        table_all_house = False
+        find_house = False
+        link_house = None
+        while True:
+            # Ищем таблицу с номерами домов
+            els_table = driver.find_elements(By.TAG_NAME, 'table')
+            if len(els_table) != 1: raise Exception('Ошибка - нет таблицы домов')
+            el_table = els_table[0]
+            
+            els_a = el_table.find_elements(By.TAG_NAME, 'a')
+            if len(els_a) > 0:
+                for el_a in els_a:
+                    if el_a.text == c_house[1]:
+                        link_house = el_a
+                        find_house = True
+                        break
+                if find_house: break
+            if table_all_house == False:
+                # Кликнем: Показать все дома
+                els = driver.find_elements(By.XPATH, '//div[@ng-click="checkaddressAbstractController.toggleConnectedHousesFilter()"]')
+                if len(els) == 1:
+                    try: els[0].click()
+                    except: raise Exception('Ошибка действий 16')
+                    time.sleep(2)
+                table_all_house = True
+            else: break
+                
+        
+        time.sleep(2)
+        if find_house:
+            if table_all_house == False:
+                try: link_house.click()
+                except: raise Exception('Ошибка действий 17')
+                time.sleep(3)
+            else:
+                data['available_connect'] = 'Нет ТхВ - Дом не подключен'
+                raise Exception('')  # Просто выход
+        else: raise Exception(f'Ошибка Дом: {house} не найден')
+            
         # Берем информацию об ограничениях по адресу
         info_restrictions = 'Есть ТхВ\n'
         els = driver.find_elements(By.XPATH, '//div[@class="modal-content"]')
@@ -467,7 +485,7 @@ def get_txv(data):
         els_btn = driver.find_elements(By.XPATH, '//button[@ng-click="ok()"]')
         if len(els_btn) != 1: raise Exception('Ошибка нет кнопки продолжить после прочтения ограничений')
         try: els_btn[0].click()
-        except: raise Exception('Ошибка действий 16')
+        except: raise Exception('Ошибка действий 18')
         time.sleep(3)
         ###################### Страница ввода заявки ######################
         # Ищем квартиру
@@ -479,7 +497,7 @@ def get_txv(data):
             els_ih = driver.find_elements(By.XPATH, '//input[@name="flat"]')
             if len(els_ih) < 2: raise Exception('Ошибка нет поля ввода квартиры')
             try: els_ih[1].send_keys(apartment)
-            except: raise Exception('Ошибка действий 17')
+            except: raise Exception('Ошибка действий 19')
             time.sleep(1)
             driver.set_window_size(1000,1000)
             time.sleep(1)
@@ -494,124 +512,20 @@ def get_txv(data):
         els_btn = driver.find_elements(By.XPATH, '//button[@ng-click="$abonCtrl.checkAddress()"]')
         if len(els_btn) < 2: raise Exception('Ошибка нет кнопки проверить квартиру')
         try: els_btn[0].click()
-        except: raise Exception('Ошибка действий 18')
+        except: raise Exception('Ошибка действий 20')
         time.sleep(3)
 
         driver.implicitly_wait(1)
         # Проверяем блок если есть активный договор
         els_er = driver.find_elements(By.XPATH, '//div[@ng-if="$abonCtrl.addressErrorMessage"]')
         if els_er: data['available_connect'] = els_er[0].text
+        time.sleep(2)
+        raise Exception('')  # Просто выход
             # err_txt = els_er[0].text
             # if err_txt.find('На адресе есть активный договор') >= 0:
                 # data['available_connect'] = 'На адресе уже есть активный договор\n'
             # else: data['available_connect'] = err_txt
         # time.sleep(3)
-
-        # # Смотрим тарифные планы
-        # # По умолчанию открыта вкладка "Все в одном"
-        # tarifs_all = '#Все в одном\n'
-        # # Ищем тарифные предложения
-        # els_tarifs = driver.find_elements(By.XPATH, '//label[@class="title cur-pointer ng-binding title--normal title--dotted"]')
-        # lst_tarif = []
-        # for el_tarif in els_tarifs:
-            # tarif = el_tarif.text.strip()
-            # if tarif: lst_tarif.append(tarif)
-        # tarifs_all += '\n'.join(lst_tarif)
-        # # Кликаем на  "Пакетные предложения"
-        # els_pack = driver.find_elements(By.XPATH, '//div[@ng-click="$servCtrl.stype.tab = 3; $servCtrl.stype.presetsClicked = true;"]')
-        # if len(els_pack) != 1: raise Exception('Ошибка - нет вкладки пакетные предложения')
-        # try: els_pack[0].click()
-        # except: raise Exception('Ошибка действий 19')
-        # time.sleep(5)
-        # tarifs_all += '\n#Пакетные предложения\n'
-        # # Ищем тарифные предложения
-        # els_tarifs = driver.find_elements(By.XPATH, '//label[@class="title cur-pointer ng-binding title--normal title--dotted"]')
-        # lst_tarif = []
-        # for el_tarif in els_tarifs:
-            # tarif = el_tarif.text.strip()
-            # if tarif: lst_tarif.append(tarif)
-        # tarifs_all += '\n'.join(lst_tarif)
-        # data['tarifs_all'] = tarifs_all
-        
-        # # Жмем Просмотр графика подключений
-        # els_sp = driver.find_elements(By.XPATH, '//span[@ng-click="$abonCtrl.openScheduleHandler()"]')
-        # if len(els_sp) < 2: raise Exception('Ошибка нет ссылки Просмотр графика подключений')
-        # try: els_sp[0].click()
-        # except: raise Exception('Ошибка действий 20')
-        # time.sleep(3)
-        
-        # driver.implicitly_wait(10)
-        # # Кликаем календарь
-        # els_inp = driver.find_elements(By.XPATH, '//input[@ng-model="$abonCtrl.schedule.date"]')
-        # if len(els_inp) != 1: raise Exception('Ошибка поля календарь')
-        # try: els_inp[0].click()
-        # except: raise Exception('Ошибка действий 21')
-        # time.sleep(1)
-        
-        # els_btn_cld = driver.find_elements(By.XPATH, '//button[@ng-click="$abonCtrl.showCalendar()"]')
-        # if len(els_btn_cld) != 1: raise Exception('Ошибка нет кнопки календарь')
-        # try: els_btn_cld[0].click()
-        # except: raise Exception('Ошибка действий 22')
-        # time.sleep(3)
-        
-        # els_cld = driver.find_elements(By.TAG_NAME, 'schedules-calendar')
-        # if len(els_cld) != 1: raise Exception('Ошибка нет блока календарь')
-        
-        # # Определяем дату
-        # time.sleep(5)
-        # txt_months = ['', 'январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь']
-        # els_month = els_cld[0].find_elements(By.XPATH, './/div[@class="schedules-calendar"]')
-        # if len(els_month) == 0: raise Exception('Календарь не содержит блоки месяцев.')
-        # free_first_day = ''
-        # el_ff_day = None
-        # for el_month in els_month:
-            # f_month = False
-            # f_day = False
-            # els_tit_month = el_month.find_elements(By.XPATH, './/div[@class="schedules-calendar__caption title title--s title--normal ng-binding"]')
-            # if len(els_tit_month) != 1: raise Exception('Ошибка структуры календаря.Титул.')
-            # els_days_yellow = el_month.find_elements(By.XPATH, './/div[@class="schedules-calendar__day schedules-calendar__day--hover-border ng-binding ng-scope schedules-calendar__day--color-yellow"]')
-            # els_days_green = el_month.find_elements(By.XPATH, './/div[@class="schedules-calendar__day schedules-calendar__day--hover-border ng-binding ng-scope schedules-calendar__day--color-green"]')
-            # els_days = els_days_yellow + els_days_green
-            # try:
-                # els_days.sort(key=lambda x: int(x.text))
-            # except:
-                # pass
-            # for el_days in els_days:
-                # if free_first_day == '':
-                    # el_ff_day = el_days
-                    # free_first_day = f'{el_days.text} {els_tit_month[0].text}'
-                    # break
-
-        # if free_first_day:
-            # try: el_ff_day.click()
-            # except: raise Exception('Ошибка действий 23')
-            # time.sleep(5)
-        
-            # # Смотрим время
-            # els_time = driver.find_elements(By.XPATH, '//span[@class="ui-select-toggle"]')
-            # if len(els_time) != 1: raise Exception('Ошибка: Нет поля выбора время.')
-            # try: els_time[0].click()
-            # except: raise Exception('Ошибка действий 24')
-            # time.sleep(2)
-            
-            # els_li_times = driver.find_elements(By.XPATH, '//li[@id="ui-select-choices-0"]')
-            # if len(els_li_times) != 1: raise Exception('Ошибка: Нет блока время.')
-            # els_times = els_li_times[0].find_elements(By.XPATH, './/span[@class="ng-binding ng-scope"]')
-            # if len(els_times) == 0: raise Exception('Ошибка: Нет вариантов выбора время.')
-
-            # lst_tmp = []
-            # available_timeslot = ''
-            # try:
-                # for el_times in els_times:
-                    # l_time = el_times.text.strip()
-                    # ll_time = l_time.split(' — ')
-                    # t1_t = ll_time[0].split(':')
-                    # t2_t = ll_time[1].split(':')
-                    # lst_tmp.append(f'{t1_t[0]}-{t2_t[0]}')
-            # except: raise Exception('Ошибка сбора списка времени.')
-            # if lst_tmp: available_timeslot = ';'.join(lst_tmp)
-            # data['available_connect'] += f'Возможно подключение {free_first_day}\n в {available_timeslot}\n'
-        # data['available_connect'] += info_restrictions
 
         # #===========
         # time.sleep(10)
@@ -621,11 +535,11 @@ def get_txv(data):
         # #===========
         
     except Exception as e:
-        return str(e)[:100], data
+        rez_set_bid = str(e)[:100]
     finally:
         if driver: driver.quit()
    
-    return '', data
+    return rez_set_bid, data
 
 def set_txv_to_dj_domconnect(pv_code):
     url = url_host + 'api/set_txv'
@@ -823,7 +737,7 @@ if __name__ == '__main__':
     TELEGRAM_CHAT_ID = '1740645090'
     TELEGRAM_TOKEN = '2009560099:AAHtYot6EOHh_qr9EUoCoczQhjyRdulKHYo'
     
-    run_txv_beeline(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN)
+    # run_txv_beeline(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN)
     # rez, txv_list = get_txv_in_dj_domconnect(pv_code)
     # for val in txv_list:
         # print(val)
@@ -835,15 +749,46 @@ if __name__ == '__main__':
         'password': '8GFysus@kffs7',
         'pv_code': pv_code,
 
-        # 'city': 'Энгельс',
+        # 'city': 'Энгельс',8GFysus@kffs7 Липецк, ул Катукова д 24
         # 'street': 'проспект Химиков',
         # 'house': '3/1',
         # 'apartment': '10',
         
-        'city': 'Ярославль',
-        'street': 'улица Звёздная',
-        'house': '31/41',
+        # 'region': 'Московская область',
+        # 'city': 'Химки',
+        # 'street': 'микрорайон Левобережный, Совхозная улица',
+        # 'house': '18',
+        # 'apartment': '10',
+        
+        'region': 'Ленинградская область',
+        'city': 'Липецк',
+        'street': 'Катукова',  #
+        'house': '24',
         'apartment': '10',
+        
+        # 'region': 'Тверская область',
+        # 'city': 'Тверь',
+        # 'street': 'Волоколамский проспект',
+        # 'house': '14',     # Есть договор
+        # 'apartment': '10',
+        
+        # 'region': 'Ярославская область',
+        # 'city': 'Ярославль',
+        # 'street': 'посёлок Текстилей, Большая Донская улица',
+        # 'house': '15',     # 
+        # 'apartment': '10',
+        
+        # 'region': 'Мурманская область',
+        # 'city': 'Мурманск',
+        # 'street': 'Баумана',
+        # 'house': '36',     # 
+        # 'apartment': '10',
+        
+        # 'region': 'Краснодарский край',
+        # 'city': 'Красноярск',
+        # 'street': 'проспект 60 лет Образования СССР',
+        # 'house': '14',     # Дом подключен
+        # 'apartment': '10',
         
         'available_connect': '',  # Возможность подключения
         'tarifs_all': '', # список названий тарифных планов
@@ -854,16 +799,36 @@ if __name__ == '__main__':
 
     print('available_connect:', data['available_connect'])
     print('pv_address:', data['pv_address'])
-    # print('tarifs_all:')
-    # print(data['tarifs_all'])
     
     # end_time = datetime.now()
     # time_str = '\nDuration: {}'.format(end_time - start_time)
     # print(time_str)
     # limit_request_line
 
-    
-    
+    # ls = [
+        # 'район Режный, микрорайон Левобережный, Совхозная улица',
+        # 'район Режный, микрорайон Левобережный',
+        # 'микрорайон Левобережный',
+        # 'микрорайон Левобережный, Совхозная',
+        # 'Совхозная',
+    # ]
+    # for s in ls:
+        # print(s)
+        # rez = ordering_street(s)
+        # print(rez)
+        # print()
+    # lc = [
+        # 'Мурманская о., г. Мурманск',
+        # 'Мурманская обл., ЗАТО Североморск, пгт. Т омскw',
+        # # 'Мурманская обл., г. Оленегорск',
+        # # 'Мурманская обл., г. Полярный',
+        # # 'Мурманская обл., г. Североморск',
+        # # 'Мурманская обл., нп. Видяево',
+        # # 'Мурманская о., г. Мурманск',
+        # ' омск2 '
+    # ]
+    # lst_cheq = check_equality_citys(lc, 'омск')
+    # print(lst_cheq)
     pass
     '''
         1 аккаунт

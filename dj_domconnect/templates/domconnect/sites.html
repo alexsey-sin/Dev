@@ -30,6 +30,9 @@
 .table tbody tr:nth-child(even){
 	background: #F7F7F7;
 }
+select {
+    width: 300px;
+}
 /* .table {
 	width: 100%;
 	margin-bottom: 20px;
@@ -206,7 +209,18 @@
         $('#id_num').val(n);
         $('#id_site').val(s);
         $('#id_name').val(nm);
-        $('#id_provider').val(pv);
+        $('#id_provider option:contains(' + pv + ')').prop('selected', true);
+        // var select = document.querySelector('#id_provider');
+        // document.querySelector('#id_provider').addEventListener('click', function() {
+        //     // по значению
+        //     select.value = pv;
+        // });
+        // document.querySelector('#btn').addEventListener('click', function() {
+        //     // по индексу (помним что нумерация с 0-ля)
+        //     select.selectedIndex = 4;
+        // });
+                // $('#id_provider').val(pv);
+        // alert(pv);
     }
     function deleteSite(i,t){
         $('#id_delete').val(i);

@@ -1,12 +1,9 @@
-import os
-import time
+import os, time, json, requests  # pip install requests
 from datetime import datetime
-import requests  # pip install requests
-import json
 from selenium import webdriver  # $ pip install selenium
 from selenium.webdriver.common.by import By
-# from selenium.webdriver.support.ui import WebDriverWait
-# from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.firefox.service import Service
+from selenium.webdriver.firefox.options import Options
 
 # url_host = 'http://127.0.0.1:8000/'
 url_host = 'http://django.domconnect.ru/'
@@ -260,15 +257,19 @@ def get_txv(data):
     try:
         base_url = 'https://urmdf.ssl.mts.ru'
         
-        EXE_PATH = 'driver/chromedriver.exe'
-        driver = webdriver.Chrome(executable_path=EXE_PATH)
+        # EXE_PATH_Ch = 'driver/chromedriver.exe'
+        EXE_PATH_Fx = 'driver/geckodriver.exe'
 
-        # EXE_PATH = r'c:/Dev/bot_opsos/driver/firefoxdriver.exe'
-        # driver = webdriver.Firefox(executable_path=EXE_PATH)
+        # driver = webdriver.Chrome(executable_path=EXE_PATH_Ch)
+
+        options = Options()
+        # options.binary_location = r'C:\Users\asinicin2\AppData\Local\Mozilla Firefox\firefox.exe'
+        options.binary_location = r'C:\Program Files\Mozilla Firefox\firefox.exe'
+        driver = webdriver.Firefox(service=Service(EXE_PATH_Fx), options=options)
 
         driver.implicitly_wait(20)
         driver.get(base_url)
-        time.sleep(3)
+        time.sleep(10)
         
         ###################### Login ######################
         els = driver.find_elements(By.ID, 'phone')
@@ -591,80 +592,80 @@ if __name__ == '__main__':
 
     # run_bid_mts()
     
-    # txv_dict = {
-        # 'pv_code': pv_code,
-        # 'login': 'GRYURYEV',
-        # 'password': 'UcoTWY',
-        # 'id_lid': '1215557',
+    txv_dict = {
+        'pv_code': pv_code,
+        'login': 'GRYURYEV',
+        'password': 'UcoTWY',
+        'id_lid': '1215557',
         
-        # # 'region': 'Калужская область',         # область или город областного значения
-        # # 'city': 'Калуга',           # город
-        # # 'street': 'улица Ленина',         # улица
-        # # 'house': '31',          # дом
-        # # 'apartment': '2',          # квартира
+        # 'region': 'Калужская область',         # область или город областного значения
+        # 'city': 'Калуга',           # город
+        # 'street': 'улица Ленина',         # улица
+        # 'house': '31',          # дом
+        # 'apartment': '2',          # квартира
         
-        # # 'region': 'Владимирская область',         # область или город областного значения
-        # # 'city': 'Владимир',           # город
-        # # 'street': 'ул Фейгина',         # улица
-        # # 'house': '10',          # дом
-        # # 'apartment': '2',          # квартира
+        # 'region': 'Владимирская область',         # область или город областного значения
+        # 'city': 'Владимир',           # город
+        # 'street': 'ул Фейгина',         # улица
+        # 'house': '10',          # дом
+        # 'apartment': '2',          # квартира
         
-        # # # 'region': 'Татарстан',         # область или город областного значения
-        # # 'city': 'Казань',           # город
-        # # 'street': 'ул Дружинная',         # улица
-        # # 'house': '7',          # дом
-        # # 'apartment': '2',          # квартира
-        
-        # # 'region': 'Ярославская область',         # область или город областного значения
-        # # 'city': 'Ярославль',           # город
-        # # 'street': 'улица Звездная',         # улица
-        # # 'house': '31/41',          # дом
-        # # 'apartment': '61',          # квартира
-
-        # # 'region': 'Нижегородская область',         # область или город областного значения
-        # # 'city': 'Нижний Новгород',           # город
-        # # 'street': 'Камчатский пер',         # улица
-        # # 'house': '9',          # дом
-        # # 'apartment': '10',          # квартира
-
-        # # 'city': 'Реутов',           # город
-        # # 'street': 'Носовихинское шоссе',         # улица
-        # # 'house': '25',          # дом
-        # # # 'apartment': '2',          # квартира
-        
-        # # 'city': 'Смоленск',           # город
-        # # 'street': 'пр-кт Гагарина',         # улица
-        # # 'house': '14/2',          # дом
-        
-        # # 'city': 'Ярославль',           # город
-        # # 'street': 'ул Ньютона',         # улица
-        # # 'house': '40',          # дом
-        # # # 'apartment': '2',          # квартира
-        
-        # # 'region': 'Смоленская область',         # область или город областного значения
-        # # 'city': 'Вязьма',           # город
-        # # 'street': 'Кронштадтская улица',         # улица
-        # # 'house': '111',          # дом
-        # # 'apartment': '10',          # квартира
-        
-        # 'region': 'Архангельская область',         # область или город областного значения
-        # 'city': 'Северодвинск',           # город
-        # 'street': 'Лебедева',         # улица
+        # # 'region': 'Татарстан',         # область или город областного значения
+        # 'city': 'Казань',           # город
+        # 'street': 'ул Дружинная',         # улица
         # 'house': '7',          # дом
+        # 'apartment': '2',          # квартира
+        
+        # 'region': 'Ярославская область',         # область или город областного значения
+        # 'city': 'Ярославль',           # город
+        # 'street': 'улица Звездная',         # улица
+        # 'house': '31/41',          # дом
+        # 'apartment': '61',          # квартира
+
+        # 'region': 'Нижегородская область',         # область или город областного значения
+        # 'city': 'Нижний Новгород',           # город
+        # 'street': 'Камчатский пер',         # улица
+        # 'house': '9',          # дом
+        # 'apartment': '10',          # квартира
+
+        # 'city': 'Реутов',           # город
+        # 'street': 'Носовихинское шоссе',         # улица
+        # 'house': '25',          # дом
+        # # 'apartment': '2',          # квартира
+        
+        # 'city': 'Смоленск',           # город
+        # 'street': 'пр-кт Гагарина',         # улица
+        # 'house': '14/2',          # дом
+        
+        # 'city': 'Ярославль',           # город
+        # 'street': 'ул Ньютона',         # улица
+        # 'house': '40',          # дом
+        # # 'apartment': '2',          # квартира
+        
+        # 'region': 'Смоленская область',         # область или город областного значения
+        # 'city': 'Вязьма',           # город
+        # 'street': 'Кронштадтская улица',         # улица
+        # 'house': '111',          # дом
         # 'apartment': '10',          # квартира
         
+        'region': 'Республика Бурятия',         # область или город областного значения
+        'city': 'Улан-Удэ',           # город
+        'street': 'Цивилева',         # улица
+        'house': '42',          # дом
+        'apartment': '10',          # квартира
         
-        # 'available_connect': '',  # Возможность подключения
-        # 'tarifs_all': '', # список названий тарифных планов
-        # 'pv_address': '',
-    # }
+        
+        'available_connect': '',  # Возможность подключения
+        'tarifs_all': '', # список названий тарифных планов
+        'pv_address': '',
+    }
     
     
-    # e, data = get_txv(txv_dict)
-    # if e: print(e)
-    # print('available_connect:\n', data['available_connect'])
-    # print('tarifs_all:\n', data['tarifs_all'])
-    # print('pv_address:\n', data['pv_address'])
+    e, data = get_txv(txv_dict)
+    if e: print(e)
+    print('available_connect:\n', data['available_connect'])
+    print('tarifs_all:\n', data['tarifs_all'])
+    print('pv_address:\n', data['pv_address'])
     
     
     # set_txv_to_dj_domconnect(pv_code)

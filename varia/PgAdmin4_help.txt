@@ -61,9 +61,8 @@ LIMIT 100
 Скачать ошибки ТхВ Билайн
 =========================================================
 SELECT region, city, street, house, apartment, bot_log FROM public.api_txv
-WHERE "pv_code" = 1 AND "status" = 2
+WHERE pv_code = 1 AND status = 2
 ORDER BY pub_date DESC
-
 
 
 Удаляем заявки ТхВ старые ДомРу
@@ -79,37 +78,38 @@ DELETE FROM public.api_txv
 WHERE "pv_code" = 4 AND "pub_date" < '2022-03-22 15:00:00' AND "status" = 1
 
 
-Исправляем пароль в ТхВ Ростелеком и обновляем статус
+Удаляем все миграции
 =========================================================
-UPDATE public.api_txv
-SET password = 'gBLnFexH6d1~vCZHRVEt3E', status = 0
-WHERE "pv_code" = 4 AND "pub_date" > '2022-03-24 15:00:00' AND "status" = 2
+DELETE FROM public.django_migrations
+WHERE app = 'domconnect'
 
+manage.py migrate --fake contenttypes
 
-UPDATE public.api_txv
-SET password = 'gBLnFexH6d1~vCZHRVEt3E', status = 0
-WHERE "pv_code" = 4 AND "pub_date" > '2022-03-24 15:00:00' AND password != 'gBLnFexH6d1~vCZHRVEt3E'
+ALTER TABLE django_content_type ADD COLUMN name character varying(50) NOT NULL DEFAULT 'someName'
 
-
-Исправляем пароли и логины в ТхВ МГТС и обновляем статус
+INSERT INTO public.django_migrations (app, name, applied) 
+VALUES ('mobile', '0001_initial', '2022-04-17 18:21:41.472674+03')
 =========================================================
-UPDATE public.api_txv
-SET login = 'ESubbotin', password = 'sr@8Cjmu', login_2 = 'MChumakova', password_2 = 'Qhvv@!4817', status = 0
-WHERE pv_code = 7 AND status = 2 AND pub_date > '2022-03-30 00:00:00'
 
 
 SELECT count(*) FROM public.api_txv
 WHERE pv_code = 4 AND status = 2 AND bot_log LIKE '%Нет ссылки Создать заявку ФЛ%'
 
 UPDATE public.api_txv
-SET status = 0, bot_log = '', password = 'm~|HqEu~VB}|P1QDrDX%'
+SET status = 0, bot_log = ''
 WHERE pv_code = 4 AND status = 2 AND bot_log LIKE '%Нет ссылки Создать заявку ФЛ%'
 
 Исправляем статус в ТхВ МТС
 =========================================================
 UPDATE public.api_txv
-SET status = 0
+SET status = 0, bot_log = ''
 WHERE pv_code = 3 AND status = 2
+
+Исправляем статус в ТхВ Билайн
+=========================================================
+UPDATE public.api_txv
+SET status = 0, bot_log = ''
+WHERE pv_code = 1 AND status = 2
 
 UPDATE public.api_txv
 SET status = 0, bot_log = '', password = 'm~|HqEu~VB}|P1QDrDX%'
@@ -172,3 +172,50 @@ WHERE crm_1592566018 = 'SEO' AND create_date >= '2022-03-01 00:00:00' AND create
 DELETE FROM public.domconnect_dccrmlid
 DELETE FROM public.domconnect_dccrmdeal
 DELETE FROM public.domconnect_dccashseo
+
+
+
+Исправляем заявки ТхВ МТС
+=========================================================
+SELECT count(*) FROM public.api_txv
+WHERE pv_code = 3 AND status = 2 AND bot_log LIKE '%Ошибка нет поля логин%'
+
+UPDATE public.api_txv
+SET status = 0, bot_log = ''
+WHERE pv_code = 3 AND status = 2 AND bot_log LIKE '%Ошибка нет поля логин%'
+
+Исправляем заявки ТхВ ТТК
+=========================================================
+SELECT count(*) FROM public.api_txv
+WHERE pv_code = 5 AND status = 2 AND bot_log LIKE '%Нет ссылки Сводные панели%'
+
+UPDATE public.api_txv
+SET status = 0, bot_log = '', password = '9zWxQjOh'
+WHERE pv_code = 5 AND status = 2 AND bot_log LIKE '%Нет ссылки Сводные панели%'
+
+
+Повторяющиеся записи УДАЛЕНИЕ!!!!
+=========================================================
+Просмотр
+SELECT COUNT(*) cnt FROM public.api_txv
+GROUP BY region, city, street, house, apartment, pv_code
+HAVING COUNT(*) > 1
+=================
+
+DELETE FROM public.api_txv a USING (SELECT
+        MAX(b.id) mid, b.region, b.city, b.street, b.house, b.apartment, b.pv_code
+        FROM public.api_txv b
+        GROUP BY b.region, b.city, b.street, b.house, b.apartment, b.pv_code
+    ) c
+WHERE
+    a.region = c.region
+    AND a.city = c.city
+    AND a.street = c.street
+    AND a.house = c.house
+    AND a.apartment = c.apartment
+    AND a.pv_code = c.pv_code
+    AND a.id < c.mid
+=========================================================
+
+
+

@@ -863,7 +863,7 @@ def send_crm_txv(txv_dict, opsos):
             lid = json.loads(responce.text)
             result = lid.get('result')
             status = result.get('STATUS_ID')
-            if status and status == '77': upgrade_status = True
+            if status and (status == '77' or status == '72'): upgrade_status = True
         except Exception as e:
             return str(e), ''
     
@@ -884,7 +884,7 @@ def send_crm_txv(txv_dict, opsos):
     }
     up_status = ''
     if upgrade_status:
-        params['fields[STATUS_ID]'] = '72'
+        params['fields[STATUS_ID]'] = '86'
         up_status = 'Статус обновлен.'
     try:
         responce = requests.post(url, headers=headers, params=params)

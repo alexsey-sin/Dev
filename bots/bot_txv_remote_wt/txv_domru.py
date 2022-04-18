@@ -1,9 +1,7 @@
-import os
-import time
+import os, time, json, requests  # pip install requests
 from datetime import datetime
-import requests  # pip install requests
-import json
 from selenium import webdriver  # $ pip install selenium
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
@@ -108,37 +106,144 @@ def find_short_in_cort(f_lst):
             l_min = l_phr
             i_min = f_lst[i][0]
     return i_min
+
+def find_short_tup(f_lst):
+    '''
+        На входе список кортежей.
+        в кортеже индекс фразы на странице и фраза
+        Поиск самой короткой фразы в списке и выдача её индекса на странице
+    '''
+    l_min = 10000
+    i_min = 0
+    for i in range(len(f_lst)):
+        l_phr = len(f_lst[i][1])
+        if l_phr < l_min:
+            l_min = l_phr
+            i_min = i
+    i_out = f_lst[i_min][0]
+    return i_out
+
+lst_off_city =[
+    'Донецк',
+    'Луганск',
+    'Улан-Удэ',
+]
+
+def normalize_region(reg):
+    dct_reg = {
+        'Новгородская область': 'Нижний Новгород',
+        'Ярославская область': 'Ярославль',
+        'Томская область': 'Томск',
+        'Омская область': 'Омск',
+        'Ростовская область': 'Ростов-на-Дону',
+        'Ленинградская область': 'Санкт-Петербург',
+        'Курганская область': 'Курган',
+        'Курская область': 'Курск',
+        'Самарская область': 'Самара',
+        'Саратовская область': 'Саратов',
+        'Тульская область': 'Тула',
+        'Тверская область': 'Тверь',
+        'Пермский край': 'Пермь',
+        'Пензенская область': 'Пенза',
+        'Брянская область': 'Брянск',
+        'Иркутская область': 'Иркутск',
+        'Краснодарский край': 'Краснодар',
+        'Челябинская область': 'Челябинск',
+        'Волгоградская область': 'Волгоград',
+        'Воронежская область': 'Воронеж',
+    }
     
+    if reg in dct_reg: return dct_reg[reg]
+    else: return reg
+    
+def ordering_city(in_city: str):  # Преобразование строки город
+    '''
+        Проверяем на
+        изветсный тип населенного пункта
+        выдаем название без типа населенного пункта
+        если известный тип не найден - возвращаем входную строку
+    '''
+    lst_type_city = [
+        'рабочий поселок',
+        'поселок городского типа',
+        'поселок',
+        'село',
+        'деревня',
+    ]
+
+    for tp in lst_type_city:
+        i = in_city.find(tp)
+        if i >= 0:
+            out_city = in_city[i+len(tp):].strip()
+            return out_city
+
+    return in_city
+
 def ordering_street(in_street: str):  # Преобразование строки улица
     '''
         разбиваем строку по запятым, и каждый фрагмент проверяем на
         изветсный тип улицы
-        выдаем название без типа улицы
-        если известный тип не найден - возвращаем пустую строку
+        выдаем список [тип_улицы, название]
+        если известный тип не найден - возвращаем пустой список
+        
+        Список типов улицы имеет очередность в приоритете определения по убыванию
     '''
-    lst_type_street = [
-        'улица',
-        'проспект',
-        'переулок',
-        'бульвар',
-        'шоссе',
-        'аллея',
-        'тупик',
-        'проезд',
-        'набережная',
-        'площадь',
+    lst_type_raion = [
+        'микрорайон',
+        'район',
+        'станица',
+        'поселок',
+        'округ',
     ]
-    out_street = ''
-    lst = in_street.split(',')
-    for sub in lst:
-        rez = False
-        for ts in lst_type_street:
+    dkt_type_street = {
+        'улица': 'ул',
+        'проспект': 'пр-кт',
+        'переулок': 'пер',
+        'бульвар': 'б-р',
+        'шоссе': 'ш',
+        'аллея': 'ал',
+        'тупик': 'туп',
+        'проезд': 'пр-д',
+        'набережная': 'наб',
+        'площадь': 'пл',
+    }
+    lst_street = in_street.split(',')
+    if len(lst_street) == 0: return []
+
+    # разобьем на известные типы районов, типы улиц, и просто выражения
+    lst_tr = []
+    lst_ts = []
+    lst_em = []
+    lst_tmp = []
+    # Отделим известные типы районов
+    for sub in lst_street:
+        not_rez = True
+        for ts in lst_type_raion:
             if sub.find(ts) >= 0:
-                rez = True
-                out_street = sub.replace(ts, '').strip()
+                not_rez = False
+                lst_tr.append((ts, sub.replace(ts, '').strip()))
                 break
-        if rez: break
-    return out_street
+        if not_rez: lst_tmp.append(sub.strip())
+
+    if len(lst_tmp) == 0:
+        if len(lst_tr) == 1: return lst_tr[0][0], lst_tr[0][1]
+        else: return []
+    
+    # Отделим известные типы улиц
+    lst_tmp2 = []
+    for sub in lst_tmp:
+        not_rez = True
+        for ts, sts in dkt_type_street.items():
+            if sub.find(ts) >= 0:
+                not_rez = False
+                lst_ts.append((sts, sub.replace(ts, '').strip()))
+                break
+        if not_rez: lst_tmp2.append(sub.strip())
+
+    if len(lst_tmp2) == 0:
+        if len(lst_ts) == 1: return lst_ts[0][0], lst_ts[0][1]
+        else: return []
+    else: return '', ' '.join(lst_tmp2)
 
 def ordering_house(in_house: str):  # Преобразование строки дом
     '''
@@ -188,7 +293,7 @@ def ordering_house(in_house: str):  # Преобразование строки 
     if len(lst_house) > 3: return ('', 'В номере много позиций')
     if len(lst_house) == 2:  # значит буква - склеиваем как 30А
         lst_house[1] = lst_house[1].lower()
-        return (lst_house[0], ''.join(lst_house))
+        return (lst_house[0], '/'.join(lst_house))
     # анализируем  корп, литер
     if lst_house[1].find('к') >= 0:
         lst_house[1] = '/'
@@ -205,7 +310,8 @@ def get_txv(data):
         base_url = 'https://internet-tv-dom.ru/operator'
         
         EXE_PATH = 'driver/chromedriver.exe'
-        driver = webdriver.Chrome(executable_path=EXE_PATH)
+        service = Service(EXE_PATH)
+        driver = webdriver.Chrome(service=service)
 
         # EXE_PATH = r'c:/Dev/bot_opsos/driver/firefoxdriver.exe'
         # driver = webdriver.Firefox(executable_path=EXE_PATH)
@@ -215,11 +321,25 @@ def get_txv(data):
         time.sleep(3)
         
         ###################### Страница ссылок городов ######################
-        region = data.get('region')
-        if region: region = region.replace('ё', 'е')
-        city = data.get('city')
-        if city: city = city.replace('ё', 'е')
+        region = data.get('region', '')
+        if region:
+            region = region.replace('ё', 'е')
+            region = normalize_region(region)
+        city = data.get('city', '')
+        if city:
+            city = city.replace('ё', 'е')
+            city = ordering_city(city)
         else: raise Exception('Ошибка город не задан.')
+        
+        # Проверим на города/регионы в отсутствующих для подключения
+        off_ok = False
+        for off_reg in lst_off_city:
+            if city.find(off_reg) >= 0 or region.find(off_reg) >= 0: off_ok = True
+        
+        if off_ok:
+            data['available_connect'] = 'В регионе нет ТхВ.'
+            raise Exception('')
+        
         els = driver.find_elements(By.XPATH, '//div[@id="b12356"]')
         if len(els) != 1: raise Exception('Ошибка нет блока городов')
         els_a = els[0].find_elements(By.TAG_NAME, 'a')
@@ -228,9 +348,10 @@ def get_txv(data):
         for el_a in els_a:
             if el_a.text == city or el_a.text == region:
                 url_city = el_a.get_attribute('href')
-        if url_city: driver.get(url_city)
-        else: raise Exception(f'Ошибка город \"{city}\" в списке городов не найден')
-
+                a_city = el_a
+        if url_city:
+            driver.get(url_city)
+        else: raise Exception(f'Ошибка город {city} в списке городов не найден')
         time.sleep(5)
 
         ###################### Страница Логин/Пароль ######################
@@ -332,32 +453,50 @@ def get_txv(data):
         els_street = el_addr.find_elements(By.XPATH, './/input[@id="street_name"]')
         if len(els_street) != 1: raise Exception('Ошибка Нет поля ввода Улица')
         street = data.get('street')
-        if street == None: raise Exception('Ошибка Не задано значение Улица')
-        ord_street = ordering_street(street)
-        if ord_street == '': ord_street = street
-        try: els_street[0].send_keys(ord_street)
-        except: raise Exception('Ошибка ввода улицы')
+        if street: street = street.replace('ё', 'е')
+        else: raise Exception('Ошибка Не задано значение Улица')
+        lst_street = ordering_street(street)
+        # print(lst_street)
+        if lst_street:  # если распознали по типу
+            try: els_street[0].send_keys(lst_street[1])
+            except: raise Exception('Ошибка ввода 7')
+        else:  # если нет - вводим как есть
+            try: els_street[0].send_keys(street)
+            except: raise Exception('Ошибка ввода 8')
+            lst_street = ('', street)
+
         time.sleep(5)
+        
         # отлавливаем подсказку
-        f_ok = False
-        f_str = []
+        f_ok == False
         els_ul = driver.find_elements(By.TAG_NAME, 'ul')
         for el_ul in els_ul:
-            str_class = el_ul.get_attribute('class')
-            if str_class.find('display: none') >= 0: continue
+            str_style = el_ul.get_attribute('style')
+            if str_style.find('display: none') >= 0: continue
             els_li = el_ul.find_elements(By.TAG_NAME, 'li')
-            if len(els_li) > 0:
-                for i in range(len(els_li)):
-                    a_s = els_li[i].find_elements(By.TAG_NAME, 'a')
-                    if len(a_s[0].text) > 0: f_str.append(a_s[0].text)
-                if len(f_str) > 0:
-                    f_ok = True
-                    i_sh = find_short(f_str)
-                    try: els_li[i_sh].click()
-                    except: raise Exception('Ошибка клика выбора улицы')
-                    time.sleep(5)
-                
-            if f_ok == True: break
+            if len(els_li) == 0: continue
+            f_str = []
+            for i in range(len(els_li)):
+                a_s = els_li[i].find_elements(By.TAG_NAME, 'a')
+                if len(a_s) > 0:
+                    txt = a_s[0].text
+                    if lst_street[0] == '':
+                        if txt.find(lst_street[1]) >= 0: f_str.append((i, txt))
+                    else:
+                        if txt.find(lst_street[0]) >= 0 and txt.find(lst_street[1].lower()) >= 0: f_str.append((i, txt))
+                    
+            if len(f_str) == 0: raise Exception(f'Ошибка Улица: {street} не найдена.')
+            elif len(f_str) == 1:
+                try: els_li[f_str[0][0]].click()
+                except: raise Exception('Ошибка действий 14')
+                f_ok = True
+            else:
+                i_fnd = find_short_tup(f_str)
+                try: els_li[i_fnd].click()
+                except: raise Exception('Ошибка действий 15')
+                f_ok = True
+            time.sleep(1)
+
         if f_ok == False: raise Exception(f'Ошибка Улица: {street} не найдена')
         
         # Вводим дом
@@ -480,8 +619,8 @@ def set_txv_to_dj_domconnect(pv_code):
         'password': 'BVNocturne20',
         'id_lid': '1215557',
         
-        'city': 'Ярославль',           # город
-        # 'street': 'улица Пирогова',         # улица
+        'region': 'Вор область',
+        'city': 'Воронеж',           # город
         'street': 'улица Индустриальн',         # улица
         'house': '21',          # дом
         'apartment': '2',          # квартира
@@ -659,7 +798,7 @@ def run_txv_domru(tlg_chat, tlg_token):
 
 
 if __name__ == '__main__':
-    start_time = datetime.now()
+    # start_time = datetime.now()
     
     # https://internet-tv-dom.ru/operator
     # login: sinitsin
@@ -671,34 +810,30 @@ if __name__ == '__main__':
         # 'password': 'BVNocturne20',
         # 'id_lid': '1215557',
         
+
+        # # 'region': 'Республика Бурятия',           # город
+        # # 'city': 'Улан-Удэ',           # город
+        # # 'street': 'Смолина',         # улица
+        # # 'house': '61',          # дом
+        # # 'apartment': '197',          # квартира
+
+        # # 'region': 'Республика Бурятия',           # город
+        # 'city': 'Донецк',           # город
+        # 'street': 'Смолина',         # улица
+        # 'house': '61',          # дом
+        # 'apartment': '197',          # квартира
+
+        # # 'region': 'Омская область',           # город
+        # # 'city': 'Омск',           # город
+        # # 'street': 'микрорайон Городок Нефтяников, Энтузиастов',         # улица
+        # # 'house': '31',          # дом
+        # # 'apartment': '10',          # квартира
+
+        # # 'region': 'Ярославская область',           # город
         # # 'city': 'Ярославль',           # город
-        # # # 'street': 'улица Пирогова',         # улица
-        # # 'street': 'улица Индустриальн',         # улица
-        # # 'house': '21',          # дом
-        # # 'apartment': '2',          # квартира
-        
-        # # 'city': 'Сосновоборск',           # город
-        # # 'street': 'Юности',         # улица
-        # # 'house': '21',          # дом
-        # # 'apartment': '10',          # квартира
-
-        # # 'region': 'Санкт-Петербург',           # город
-        # # 'city': 'Санкт-Петербург',           # город
-        # # 'street': 'Богатырский проспект',         # улица
-        # # 'house': '11',          # дом
-        # # 'apartment': '10',          # квартира
-
-        # # 'region': 'Тверская область',           # город
-        # # 'city': 'Тверь',           # город
-        # # 'street': 'Хрустальная улица',         # улица
-        # # 'house': '41к3',          # дом
-        # # 'apartment': '10',          # квартира
-
-        # 'region': 'Нижегородская область',           # город
-        # 'city': 'Нижний Новгород',           # город
-        # 'street': 'проспект Ленина',         # улица
-        # 'house': '24Б',          # дом
-        # 'apartment': '10',          # квартира
+        # # 'street': 'проспект Толбухина',         # улица
+        # # 'house': '43',          # дом
+        # # 'apartment': '5',          # квартира
 
         # 'available_connect': '',
         # 'pv_address': '',
@@ -710,7 +845,6 @@ if __name__ == '__main__':
     # if e: print(e)
     # print('available_connect:\n', data['available_connect'])
     # print('pv_address:\n', data['pv_address'])
-
     
     
     # set_txv_to_dj_domconnect(pv_code)
@@ -732,15 +866,12 @@ if __name__ == '__main__':
     # Ярославская область Ярославль проспект Толбухина 31
 
 
-
-    
-
     
     
     pass
     
-    end_time = datetime.now()
-    time_str = '\nDuration: {}'.format(end_time - start_time)
-    print(time_str)
-    # limit_request_line
+    # end_time = datetime.now()
+    # time_str = '\nDuration: {}'.format(end_time - start_time)
+    # print(time_str)
+    # # limit_request_line
 
