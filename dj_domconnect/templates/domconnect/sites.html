@@ -77,7 +77,7 @@ select {
                                     <table class="table table-hover">
                                         <thead>
                                             <tr>
-                                                <th style="width: 10%;">Номер п/п</th>
+                                                <!-- <th style="width: 10%;">Номер п/п</th> -->
                                                 <th style="width: 30%;">URL</th>
                                                 <th style="width: 30%;">Название</th>
                                                 <th style="width: 20%;">Провайдер</th>
@@ -87,19 +87,16 @@ select {
                                         <tbody>
                                             {% for row in data %}
                                             <tr>
-                                                <td>{{ row.num }}</td>
+                                                <!-- <td>{{ row.num }}</td> -->
                                                 <td>{{ row.site }}</td>
                                                 <td>{{ row.name }}</td>
                                                 <td>{{ row.provider }}</td>
                                                 <td>
-                                                    <img src="/static/assets/images/icons8-edit-16.png" alt="Редактировать" title="Редактировать" data-toggle="modal" data-target="#openModalSite" onclick="editSite(
-                                                        '{{ row.id }}',
-                                                        '{{ row.num }}',
-                                                        '{{ row.site }}',
-                                                        '{{ row.name }}',
-                                                        '{{ row.provider }}'
-                                                        );"></img>
-                                                    &nbsp;&nbsp;&nbsp;&nbsp;
+                                                    <img src="/static/assets/images/icons8-upload-16.png" alt="Вверх" title="Вверх" onclick="change_position('change_up', '{{ row.id }}');"></img>
+                                                    <img src="/static/assets/images/icons8-download-16.png" alt="Вниз" title="Вниз" onclick="change_position('change_down', '{{ row.id }}');"></img>
+                                                    &nbsp;&nbsp;&nbsp;
+                                                    <a href="{% url 'domconnect:site_edit' row.id %}"><img src="/static/assets/images/icons8-edit-16.png" alt="Редактировать" title="Редактировать"></img></a>
+                                                    &nbsp;&nbsp;&nbsp;
                                                     <img src="/static/assets/images/icons8-delete-16.png" alt="Удалить" title="Удалить" data-toggle="modal" data-target="#openModaDeleteSite" onclick="deleteSite('{{ row.id }}','{{ row.site }}');"></img>
                                                 </td>
                                             </tr>
@@ -111,7 +108,7 @@ select {
                         </div>
                         <!-- <div class="card"> -->
 							<div width="200px" align="center">
-								<button type="button" class="btn btn-secondary" title="Добавить новый сайт" data-toggle="modal" data-target="#openModalSite" onclick="newSite();">Добавить</button>
+								<a type="button" class="btn btn-secondary" title="Добавить новый сайт" href="{% url 'domconnect:site_edit' 0 %}">Добавить</a>
 							</div>
                         <!-- </div> -->
                    </div>
@@ -145,47 +142,15 @@ select {
       </div>
     </div>
 </div>
-<div id="openModalSite" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-				<h5 class="modal-title" id="openModalNumberTitle">Настройки сайта</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
-            <div class="modal-body">
-                <h4 id="editSite"></h4>
-            </div>
-                <div class="bd-example">
-				<form id="id_form" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {% for field in form %}
-                    <div class="form-group row" aria-required={% if field.field.required %}"true"{% else %}"false"{% endif %}>
-                            <label for="{{ field.id_for_label }}" class="col-md-4 col-form-label text-md-right">
-                                {{ field.label }}
-                                {% if field.field.required %}
-                                    <span class="required">*</span>
-                                {% endif %}
-                            </label>
-                            <div class="col-md-6">
-
-                                {{ field }}
-
-                                {% if field.help_text %}
-                                <small id="{{ field.id_for_label }}-help" class="form-text text-muted">{{ field.help_text|safe }}</small>
-                                {% endif %}
-                            </div>                
-                    </div>
-                    {% endfor %}
-                    <input type="hidden" id="id_edit" name="edit">
-                    <div class="modal-footer">
-                        <button id="openModalSiteButton" type="submit" class="btn btn-primary">Сохранить</button>
-                    </div>
-                </form>
-			</div>
-		</div>
-	</div>
+<div id="openModalChange" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <form id="id_form_change" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" id="id_direct" name="direct">
+        <input type="hidden" id="id_change" name="id_change">
+        <div class="modal-footer">
+            <button id="id_btn_change" type="submit" class="btn btn-primary"></button>
+        </div>
+    </form>
 </div>
 
 {% endblock content %}
@@ -193,38 +158,18 @@ select {
 <script language="javascript">
     setTimeout(function(){
         document.getElementById('mess_fadeout').style.display = 'none';
-    }, 2000);
+    }, 5000);
     if (window.history.replaceState){  // предотвращает повторную отправку формы при обновлении страницы если перед этим была отправка
         window.history.replaceState(null, null, window.location.href);
-    }
-    function newSite(){
-        $('#openModalNumberTitle').html('Новый сайт');
-        $('#id_num').val('{{next_num}}');
-        $('#id_site').val('');
-        $('#id_name').val('');
-        $('#id_provider').val('');
-    }
-    function editSite(i,n,s,nm,pv){
-        $('#id_edit').val(i);
-        $('#id_num').val(n);
-        $('#id_site').val(s);
-        $('#id_name').val(nm);
-        $('#id_provider option:contains(' + pv + ')').prop('selected', true);
-        // var select = document.querySelector('#id_provider');
-        // document.querySelector('#id_provider').addEventListener('click', function() {
-        //     // по значению
-        //     select.value = pv;
-        // });
-        // document.querySelector('#btn').addEventListener('click', function() {
-        //     // по индексу (помним что нумерация с 0-ля)
-        //     select.selectedIndex = 4;
-        // });
-                // $('#id_provider').val(pv);
-        // alert(pv);
     }
     function deleteSite(i,t){
         $('#id_delete').val(i);
         $('#deleteSite').text(t);
+    }
+    function change_position(direct, id){
+        $('#id_direct').val(direct);
+        $('#id_change').val(id);
+        $('#id_btn_change').trigger('click');
     }
 </script>
 {% endblock javascripts %}

@@ -102,42 +102,148 @@ def sites(request):  #
         u_name = user.username
     context = {'u_name': u_name, 'segment': 'sites'}
 
-    form = DcSiteSEOForm()
     if request.method == 'POST':
-        id_edit = request.POST.get('edit', None)
         id_delete = request.POST.get('delete', None)
+        id_change = request.POST.get('id_change', None)
+        direct = request.POST.get('direct', None)
 
-        if id_edit:  # редактирование
-            try: provider = DcCatalogProviderSEO.objects.get(id=request.POST.get('provider'))
-            except: context['error_mess'] = 'Ошибка провайдера.'
-            new_form = get_object_or_404(DcSiteSEO, id=id_edit)
-            new_form.site = request.POST.get('site')
-            new_form.name = request.POST.get('name')
-            new_form.provider = provider
-            new_form.num = request.POST.get('num')
-            new_form.save()
-        elif id_delete:
-            rec = get_object_or_404(DcSiteSEO, id=id_delete)
-            rec.delete()
-        else:
-            form = DcSiteSEOForm(request.POST)
-            if form.is_valid():
-                new_form = form.save(commit=False)
-                new_form.save()
-            else: context['error_mess'] = 'Ошибка запроса.'
+        if id_delete:
+            try:
+                _ = DcSiteSEO.objects.get(id=id_delete).delete()
+                objs_site = DcSiteSEO.objects.order_by('num')
+                for i in range(len(objs_site)):
+                    objs_site[i].num = i
+                    objs_site[i].save()
+            except Exception as e: context['error_mess'] = f'Ошибка удаления сайта: {e}.'
+        if id_change and direct:
+            try:
+                old_pos = DcSiteSEO.objects.get(id=id_change).num
+                max_pos = DcSiteSEO.objects.aggregate(Max('num'))['num__max']
+                rec = True
+                if (direct == 'change_down' and old_pos == max_pos) or (direct == 'change_up' and old_pos == 0): rec = False
+                if rec:
+                    objs_site = DcSiteSEO.objects.order_by('num')
+                    for i in range(len(objs_site)):
+                        if direct == 'change_up':
+                            if i == old_pos-1: objs_site[i].num = i+1
+                            if i == old_pos: objs_site[i].num = i-1
+                        if direct == 'change_down':
+                            if i == old_pos+1: objs_site[i].num = i-1
+                            if i == old_pos: objs_site[i].num = i+1
+                        objs_site[i].save()
+            except Exception as e: context['error_mess'] = f'Ошибка перемещения сайта: {e}.'
 
-    try: context['next_num'] = DcSiteSEO.objects.aggregate(Max('num'))['num__max'] + 1
-    except: context['next_num'] = 1
-    
     tmp_data = DcSiteSEO.objects.order_by('num').values()
     data = [row for row in tmp_data]
     for row in data:
         row['provider'] = DcCatalogProviderSEO.objects.get(id=row['provider_id'])
 
     context['data'] = data
-    context['form'] = form
 
     return render(request, 'domconnect/sites.html', context)
+
+
+@login_required(login_url='/login/')
+def site_edit(request, id_site):
+    user = request.user
+    u_name = user.get_full_name()
+    if u_name.strip() == '':
+        u_name = user.username
+    context = {'u_name': u_name, 'segment': 'site_edit'}
+
+    if request.method == 'POST':
+        id_edit_site = request.POST.get('edit_site', None)
+        new_source = request.POST.get('new_source', None)
+        delete_source = request.POST.get('delete_source', None)
+        id_change = request.POST.get('id_change', None)
+        direct = request.POST.get('direct', None)
+
+        if id_edit_site:
+            try:
+                if int(id_edit_site) > 0:
+                    objs_site = DcSiteSEO.objects.filter(id=id_edit_site)
+                    if len(objs_site) != 1: raise Exception('Нет сайта')
+                    obj_site = objs_site[0]
+                else:
+                    obj_site = DcSiteSEO()
+                
+                obj_site.num = request.POST.get('num')
+                obj_site.site = request.POST.get('site')
+                obj_site.name = request.POST.get('name')
+                obj_site.provider = DcCatalogProviderSEO.objects.get(name=request.POST.get('provider'))
+                obj_site.save()
+                return redirect('domconnect:sites')
+            except Exception as e: context['error_mess'] = f'Ошибка сохранения сайта {e}.'
+        if new_source:
+            try:
+                if int(id_site) == 0: raise Exception('Сначала надо сохранить сайт.')
+                objs_site = DcSiteSEO.objects.filter(id=id_site)
+                if len(objs_site) != 1: raise Exception(f'Сайт {id_site} не найден.')
+                obj_site = objs_site[0]
+                objs_source = DcCatalogSourceSEO.objects.filter(name=new_source)
+                if len(objs_source) != 1: raise Exception(f'Источник {new_source} не найден.')
+                obj_source = objs_source[0]
+                try: next_num = DcSourceSEO.objects.filter(site=id_site).aggregate(Max('num'))['num__max'] + 1
+                except: next_num = 1
+                _, create = DcSourceSEO.objects.get_or_create(site=obj_site, source=obj_source, num=next_num)
+                if create != True: raise Exception(f'Источник {new_source} не сохранен.')
+            except Exception as e: context['error_mess'] = f'Ошибка сохранения источника: {e}.'
+        if delete_source:
+            try:
+                _ = DcSourceSEO.objects.get(id=delete_source).delete()
+                objs_source = DcSourceSEO.objects.filter(site=id_site).order_by('num')
+                for i in range(len(objs_source)):
+                    objs_source[i].num = i
+                    objs_source[i].save()
+            except Exception as e: context['error_mess'] = f'Ошибка удаления источника: {e}.'
+        if id_change and direct:
+            try:
+                old_pos = DcSourceSEO.objects.get(id=id_change).num
+                max_pos = DcSourceSEO.objects.filter(site=id_site).aggregate(Max('num'))['num__max']
+                rec = True
+                if (direct == 'change_down' and old_pos == max_pos) or (direct == 'change_up' and old_pos == 0): rec = False
+                if rec:
+                    objs_source = DcSourceSEO.objects.filter(site=id_site).order_by('num')
+                    for i in range(len(objs_source)):
+                        if direct == 'change_up':
+                            if i == old_pos-1: objs_source[i].num = i+1
+                            if i == old_pos: objs_source[i].num = i-1
+                        if direct == 'change_down':
+                            if i == old_pos+1: objs_source[i].num = i-1
+                            if i == old_pos: objs_source[i].num = i+1
+                        objs_source[i].save()
+            except Exception as e: context['error_mess'] = f'Ошибка перемещения сайта: {e}.'
+            
+
+    objs_provider = DcCatalogProviderSEO.objects.all().values()
+    provider_list = [row for row in objs_provider]
+    context['provider_list'] = provider_list
+
+    objs_source = DcCatalogSourceSEO.objects.all().values()
+    source_list = [row for row in objs_source]
+    context['source_list'] = source_list
+
+    context['id_site'] = 0
+    try: context['num'] = DcSiteSEO.objects.aggregate(Max('num'))['num__max'] + 1
+    except: context['num'] = 1
+    context['site'] = ''
+    context['name'] = ''
+    context['provider'] = ''
+    if id_site > 0:
+        objs_provider = DcSiteSEO.objects.filter(id=id_site)
+        if len(objs_provider) == 1:
+            context['id_site'] = id_site
+            context['num'] = objs_provider[0].num
+            context['site'] = objs_provider[0].site
+            context['name'] = objs_provider[0].name
+            context['provider'] = objs_provider[0].provider
+
+        objs_source = DcSourceSEO.objects.filter(site=id_site).order_by('num')
+        if len(objs_source) > 0:
+            sources = [row for row in objs_source]
+            context['sources'] = sources
+
+    return render(request, 'domconnect/site_edit.html', context)
 
 
 @login_required(login_url='/login/')
@@ -302,7 +408,7 @@ def upgradeSiteSource(request):  # Удаление и загрузка данн
                     logger.error(f'Ошибка Икточник: {name_source} отсутствует в каталоге.')
                     continue
 
-                obj_source, _ = DcSourceSEO.objects.get_or_create(num=num, source=obj_cat_source, site=obj_site)
+                obj_source, _ = DcSourceSEO.objects.get_or_create(num=num_source, source=obj_cat_source, site=obj_site)
                 if not obj_source: raise Exception('Ошибка сохранения источника.')
             
     except Exception as e:
