@@ -41,8 +41,13 @@ input {
 
 {% block content %}
 {% if error_mess %}
-<div id="mess_fadeout" class="alert alert-danger" role="alert">
+<div id="err_mess_fadeout" class="alert alert-danger" role="alert">
     {{ error_mess }}
+</div>
+{% endif %}
+{% if success_mess %}
+<div id="suc_mess_fadeout" class="alert alert-info" role="alert">
+    {{ success_mess }}
 </div>
 {% endif %}
 
@@ -112,7 +117,7 @@ input {
                                             <tr>
                                                 <!-- <th style="width: 10%;">Номер п/п</th> -->
                                                 <th style="width: 30%;">Источник</th>
-                                                <th style="width: 10%;">Действия</th>
+                                                <!-- <th style="width: 10%;">Действия</th> -->
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -120,12 +125,12 @@ input {
                                             <tr>
                                                 <!-- <td>{{ src.num }}</td> -->
                                                 <td>{{ src.source }}</td>
-                                                <td>
-                                                    <img src="/static/assets/images/icons8-upload-16.png" alt="Вверх" title="Вверх" onclick="change_position('change_up', '{{ src.id }}');"></img>
-                                                    <img src="/static/assets/images/icons8-download-16.png" alt="Вниз" title="Вниз" onclick="change_position('change_down', '{{ src.id }}');"></img>
-                                                    &nbsp;&nbsp;&nbsp;
-                                                    <img src="/static/assets/images/icons8-delete-16.png" alt="Удалить" title="Удалить" data-toggle="modal" data-target="#openModaDeleteSource" onclick="deleteSource('{{ src.id }}','{{ src.source }}');"></img>
-                                                </td>
+                                                <!-- <td> -->
+                                                    <!-- <img src="/static/assets/images/icons8-upload-16.png" alt="Вверх" title="Вверх" onclick="change_position('change_up', '{{ src.id }}');"></img> -->
+                                                    <!-- <img src="/static/assets/images/icons8-download-16.png" alt="Вниз" title="Вниз" onclick="change_position('change_down', '{{ src.id }}');"></img> -->
+                                                    <!-- &nbsp;&nbsp;&nbsp; -->
+                                                    <!-- <img src="/static/assets/images/icons8-delete-16.png" alt="Удалить" title="Удалить" data-toggle="modal" data-target="#openModaDeleteSource" onclick="deleteSource('{{ src.id }}','{{ src.source }}');"></img> -->
+                                                <!-- </td> -->
                                             </tr>
                                             {% endfor %}
                                         </tbody>
@@ -159,7 +164,7 @@ input {
         </div>
     </div>
 </div>
-<div id="openModaDeleteSource" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+<!-- <div id="openModaDeleteSource" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -190,25 +195,28 @@ input {
             <button id="id_btn_change" type="submit" class="btn btn-primary"></button>
         </div>
     </form>
-</div>
+</div> -->
 
 {% endblock content %}
 {% block javascripts %}
 <script language="javascript">
     setTimeout(function(){
-        document.getElementById('mess_fadeout').style.display = 'none';
+        document.getElementById('err_mess_fadeout').style.display = 'none';
     }, 5000);
+    setTimeout(function(){
+        document.getElementById('suc_mess_fadeout').style.display = 'none';
+    }, 2000);
     if (window.history.replaceState){  // предотвращает повторную отправку формы при обновлении страницы если перед этим была отправка
         window.history.replaceState(null, null, window.location.href);
     }
-    function deleteSource(i,t){
-        $('#id_delete_source').val(i);
-        $('#deleteSource').text(t);
-    }
-    function change_position(direct, id){
-        $('#id_direct').val(direct);
-        $('#id_change').val(id);
-        $('#id_btn_change').trigger('click');
-    }
+    // function deleteSource(i,t){
+    //     $('#id_delete_source').val(i);
+    //     $('#deleteSource').text(t);
+    // }
+    // function change_position(direct, id){
+    //     $('#id_direct').val(direct);
+    //     $('#id_change').val(id);
+    //     $('#id_btn_change').trigger('click');
+    // }
 </script>
 {% endblock javascripts %}

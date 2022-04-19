@@ -102,36 +102,37 @@ def sites(request):  #
         u_name = user.username
     context = {'u_name': u_name, 'segment': 'sites'}
 
-    if request.method == 'POST':
-        id_delete = request.POST.get('delete', None)
-        id_change = request.POST.get('id_change', None)
-        direct = request.POST.get('direct', None)
+    # if request.method == 'POST':
+    #     id_delete = request.POST.get('delete', None)
+    #     id_change = request.POST.get('id_change', None)
+    #     direct = request.POST.get('direct', None)
 
-        if id_delete:
-            try:
-                _ = DcSiteSEO.objects.get(id=id_delete).delete()
-                objs_site = DcSiteSEO.objects.order_by('num')
-                for i in range(len(objs_site)):
-                    objs_site[i].num = i
-                    objs_site[i].save()
-            except Exception as e: context['error_mess'] = f'Ошибка удаления сайта: {e}.'
-        if id_change and direct:
-            try:
-                old_pos = DcSiteSEO.objects.get(id=id_change).num
-                max_pos = DcSiteSEO.objects.aggregate(Max('num'))['num__max']
-                rec = True
-                if (direct == 'change_down' and old_pos == max_pos) or (direct == 'change_up' and old_pos == 0): rec = False
-                if rec:
-                    objs_site = DcSiteSEO.objects.order_by('num')
-                    for i in range(len(objs_site)):
-                        if direct == 'change_up':
-                            if i == old_pos-1: objs_site[i].num = i+1
-                            if i == old_pos: objs_site[i].num = i-1
-                        if direct == 'change_down':
-                            if i == old_pos+1: objs_site[i].num = i-1
-                            if i == old_pos: objs_site[i].num = i+1
-                        objs_site[i].save()
-            except Exception as e: context['error_mess'] = f'Ошибка перемещения сайта: {e}.'
+    #     if id_delete:
+    #         try:
+    #             _ = DcSiteSEO.objects.get(id=id_delete).delete()
+    #             objs_site = DcSiteSEO.objects.order_by('num')
+    #             for i in range(len(objs_site)):
+    #                 objs_site[i].num = i
+    #                 objs_site[i].save()
+    #             # context['success_mess'] = 'Сайт удален.'
+    #         except Exception as e: context['error_mess'] = f'Ошибка удаления сайта: {e}.'
+    #     if id_change and direct:
+    #         try:
+    #             old_pos = DcSiteSEO.objects.get(id=id_change).num
+    #             max_pos = DcSiteSEO.objects.aggregate(Max('num'))['num__max']
+    #             rec = True
+    #             if (direct == 'change_down' and old_pos == max_pos) or (direct == 'change_up' and old_pos == 0): rec = False
+    #             if rec:
+    #                 objs_site = DcSiteSEO.objects.order_by('num')
+    #                 for i in range(len(objs_site)):
+    #                     if direct == 'change_up':
+    #                         if i == old_pos-1: objs_site[i].num = i+1
+    #                         if i == old_pos: objs_site[i].num = i-1
+    #                     if direct == 'change_down':
+    #                         if i == old_pos+1: objs_site[i].num = i-1
+    #                         if i == old_pos: objs_site[i].num = i+1
+    #                     objs_site[i].save()
+    #         except Exception as e: context['error_mess'] = f'Ошибка перемещения сайта: {e}.'
 
     tmp_data = DcSiteSEO.objects.order_by('num').values()
     data = [row for row in tmp_data]
@@ -154,9 +155,9 @@ def site_edit(request, id_site):
     if request.method == 'POST':
         id_edit_site = request.POST.get('edit_site', None)
         new_source = request.POST.get('new_source', None)
-        delete_source = request.POST.get('delete_source', None)
-        id_change = request.POST.get('id_change', None)
-        direct = request.POST.get('direct', None)
+        # delete_source = request.POST.get('delete_source', None)
+        # id_change = request.POST.get('id_change', None)
+        # direct = request.POST.get('direct', None)
 
         if id_edit_site:
             try:
@@ -172,6 +173,7 @@ def site_edit(request, id_site):
                 obj_site.name = request.POST.get('name')
                 obj_site.provider = DcCatalogProviderSEO.objects.get(name=request.POST.get('provider'))
                 obj_site.save()
+                context['success_mess'] = 'Сайт сохранен.'
                 return redirect('domconnect:sites')
             except Exception as e: context['error_mess'] = f'Ошибка сохранения сайта {e}.'
         if new_source:
@@ -188,31 +190,31 @@ def site_edit(request, id_site):
                 _, create = DcSourceSEO.objects.get_or_create(site=obj_site, source=obj_source, num=next_num)
                 if create != True: raise Exception(f'Источник {new_source} не сохранен.')
             except Exception as e: context['error_mess'] = f'Ошибка сохранения источника: {e}.'
-        if delete_source:
-            try:
-                _ = DcSourceSEO.objects.get(id=delete_source).delete()
-                objs_source = DcSourceSEO.objects.filter(site=id_site).order_by('num')
-                for i in range(len(objs_source)):
-                    objs_source[i].num = i
-                    objs_source[i].save()
-            except Exception as e: context['error_mess'] = f'Ошибка удаления источника: {e}.'
-        if id_change and direct:
-            try:
-                old_pos = DcSourceSEO.objects.get(id=id_change).num
-                max_pos = DcSourceSEO.objects.filter(site=id_site).aggregate(Max('num'))['num__max']
-                rec = True
-                if (direct == 'change_down' and old_pos == max_pos) or (direct == 'change_up' and old_pos == 0): rec = False
-                if rec:
-                    objs_source = DcSourceSEO.objects.filter(site=id_site).order_by('num')
-                    for i in range(len(objs_source)):
-                        if direct == 'change_up':
-                            if i == old_pos-1: objs_source[i].num = i+1
-                            if i == old_pos: objs_source[i].num = i-1
-                        if direct == 'change_down':
-                            if i == old_pos+1: objs_source[i].num = i-1
-                            if i == old_pos: objs_source[i].num = i+1
-                        objs_source[i].save()
-            except Exception as e: context['error_mess'] = f'Ошибка перемещения сайта: {e}.'
+        # if delete_source:
+        #     try:
+        #         _ = DcSourceSEO.objects.get(id=delete_source).delete()
+        #         objs_source = DcSourceSEO.objects.filter(site=id_site).order_by('num')
+        #         for i in range(len(objs_source)):
+        #             objs_source[i].num = i
+        #             objs_source[i].save()
+        #     except Exception as e: context['error_mess'] = f'Ошибка удаления источника: {e}.'
+        # if id_change and direct:
+        #     try:
+        #         old_pos = DcSourceSEO.objects.get(id=id_change).num
+        #         max_pos = DcSourceSEO.objects.filter(site=id_site).aggregate(Max('num'))['num__max']
+        #         rec = True
+        #         if (direct == 'change_down' and old_pos == max_pos) or (direct == 'change_up' and old_pos == 0): rec = False
+        #         if rec:
+        #             objs_source = DcSourceSEO.objects.filter(site=id_site).order_by('num')
+        #             for i in range(len(objs_source)):
+        #                 if direct == 'change_up':
+        #                     if i == old_pos-1: objs_source[i].num = i+1
+        #                     if i == old_pos: objs_source[i].num = i-1
+        #                 if direct == 'change_down':
+        #                     if i == old_pos+1: objs_source[i].num = i-1
+        #                     if i == old_pos: objs_source[i].num = i+1
+        #                 objs_source[i].save()
+        #     except Exception as e: context['error_mess'] = f'Ошибка перемещения сайта: {e}.'
             
 
     objs_provider = DcCatalogProviderSEO.objects.all().values()
@@ -237,7 +239,7 @@ def site_edit(request, id_site):
             context['site'] = objs_provider[0].site
             context['name'] = objs_provider[0].name
             context['provider'] = objs_provider[0].provider
-
+        
         objs_source = DcSourceSEO.objects.filter(site=id_site).order_by('num')
         if len(objs_source) > 0:
             sources = [row for row in objs_source]
