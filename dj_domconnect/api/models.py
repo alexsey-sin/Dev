@@ -9,8 +9,11 @@ PV_VARS = (
     (5, 'ТТК'),
     (6, 'ОнЛайм'),
     (7, 'МГТС'),
+    (10, 'Мульти_регион'),
+    (11, 'Мульти_МСК'),
 )
-
+PV_CODES_REGION = [1, 2, 3, 4, 5]
+PV_CODES_MSK = [6, 7]
 
 class BotAccess(models.Model):
     name = models.CharField(

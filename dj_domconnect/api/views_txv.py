@@ -1,7 +1,7 @@
 from django.http.request import HttpRequest
 from django.http import HttpResponse
 from rest_framework import status
-from api.models import TxV, BotAccess, PV_VARS
+from api.models import TxV, BotAccess, PV_VARS, PV_CODES_REGION, PV_CODES_MSK
 from django.forms.models import model_to_dict
 import json
 from datetime import datetime, timedelta
@@ -96,17 +96,45 @@ def get_txv(request):
             except: raise ValueError('pv_code is not integer')
         else: raise ValueError('pv_code is absent')
 
+        # Проверим глобальное разрешение работать
+        obj_prmission, _ = BotAccess.objects.get_or_create(name='ВСЕ боты ТХВ')
+        yes_work_all = obj_prmission.work
+
         # Отметимся что бот был и определим разрешено ли работать
         obj_visit, _ = BotAccess.objects.get_or_create(name=f'Бот ТХВ {pv_name}')
         obj_visit.last_visit = datetime.now()
         yes_work = obj_visit.work
         obj_visit.save()
 
-        if yes_work == True:
+        if yes_work_all == True and yes_work == True:
             tmp_txvs = TxV.objects.filter(pv_code=pv, status=0).order_by('-pub_date')[:5]
             # queryset в список словарей с преобразованием объекта модели в словарь
             txvs = [model_to_dict(row) for row in tmp_txvs]
-            data = json.dumps(txvs)
+            if pv == 10 or pv == 11:  # Мульти_регион
+                miti_txvs = {'querys': txvs}
+                accesses = []
+                PV_CODES = []
+                if pv == 10: PV_CODES = PV_CODES_REGION
+                elif pv == 11: PV_CODES = PV_CODES_MSK
+                for pvc in PV_CODES:
+                    try:
+                        name_access = f'Бот ТХВ {dct_pv.get(pvc)}'
+                        obj_access = BotAccess.objects.get(name=name_access)
+                        if obj_access.work == True:
+                            access = {
+                                'pv_code': pvc,
+                                'pv_name': dct_pv.get(pvc),
+                                'login': obj_access.login,
+                                'password': obj_access.password,
+                                'login_2': obj_access.login_2,
+                                'password_2': obj_access.password_2,
+                            }
+                            accesses.append(access)
+                    except: continue
+                miti_txvs['accesses'] = accesses
+                data = json.dumps(miti_txvs)
+            else:  # Рядовой бот ТхВ
+                data = json.dumps(txvs)
             for txv in tmp_txvs:
                 txv.status = 1
                 txv.save()

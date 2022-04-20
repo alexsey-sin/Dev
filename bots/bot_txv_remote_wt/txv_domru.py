@@ -263,6 +263,7 @@ def ordering_house(in_house: str):  # Преобразование строки 
         Если ошибка парсинга - ('', 'тип ошибки')
         
     '''
+    in_house = in_house.replace('-', ' ')
     in_house = in_house.strip()
     if len(in_house) == 0: return ('', 'Не задан номер')
     if in_house.isdigit(): return (in_house, in_house)
@@ -279,6 +280,8 @@ def ordering_house(in_house: str):  # Преобразование строки 
         if in_house[i].isalpha() and is_dig == True:
             is_dig = False
             lst_house.append(' ')
+        if not in_house[i].isdigit() and not in_house[i].isalpha():
+            lst_house.append(' ')
         lst_house.append(in_house[i])
     in_house = ''.join(lst_house)
     # Заменяем двойные пробелы на одинарные
@@ -290,6 +293,7 @@ def ordering_house(in_house: str):  # Преобразование строки 
     if len(lst_house) == 2: return (lst_house[0], in_house)
     # Остались корп, лит, буква
     lst_house = in_house.split(' ')
+    if len(lst_house) == 1: return (lst_house[0], lst_house[0])
     if len(lst_house) > 3: return ('', 'В номере много позиций')
     if len(lst_house) == 2:  # значит буква - склеиваем как 30А
         lst_house[1] = lst_house[1].lower()
@@ -480,10 +484,7 @@ def get_txv(data):
                 a_s = els_li[i].find_elements(By.TAG_NAME, 'a')
                 if len(a_s) > 0:
                     txt = a_s[0].text
-                    if lst_street[0] == '':
-                        if txt.find(lst_street[1]) >= 0: f_str.append((i, txt))
-                    else:
-                        if txt.find(lst_street[0]) >= 0 and txt.find(lst_street[1].lower()) >= 0: f_str.append((i, txt))
+                    if txt.find(lst_street[1].lower()) >= 0: f_str.append((i, txt))
                     
             if len(f_str) == 0: raise Exception(f'Ошибка Улица: {street} не найдена.')
             elif len(f_str) == 1:
@@ -491,13 +492,22 @@ def get_txv(data):
                 except: raise Exception('Ошибка действий 14')
                 f_ok = True
             else:
-                i_fnd = find_short_tup(f_str)
+                if lst_street[0] != '':
+                    # Название попало во множественный выбор, проверим на тип улицы
+                    f_str2 = []
+                    for st in f_str:
+                        if st[1].find(lst_street[0]) >= 0: f_str2.append(st)
+                    if len(f_str2) == 0: f_str2 = f_str
+                else:
+                    f_str2 = f_str
+                # тут 1 или более вариантов
+                i_fnd = find_short_tup(f_str2)
                 try: els_li[i_fnd].click()
                 except: raise Exception('Ошибка действий 15')
                 f_ok = True
             time.sleep(1)
 
-        if f_ok == False: raise Exception(f'Ошибка Улица: {street} не найдена')
+        if f_ok == False: raise Exception(f'Ошибка Улица: {street} не найдена2.')
         
         # Вводим дом
         els_house = el_addr.find_elements(By.XPATH, './/input[@id="house_id"]')
@@ -587,14 +597,14 @@ def get_txv(data):
         data['pv_address'] = address
         
         data['tarifs_all'] = ''
-        
+            
 
-        # #===========
-        # time.sleep(10)
-        # with open('out.html', 'w', encoding='utf-8') as outfile:
-            # outfile.write(driver.page_source)
-        # raise Exception('Финиш.')
-        # #===========
+            # #===========
+            # time.sleep(10)
+            # with open('out.html', 'w', encoding='utf-8') as outfile:
+                # outfile.write(driver.page_source)
+            # raise Exception('Финиш.')
+            # #===========
 
         
     except Exception as e:
@@ -796,7 +806,6 @@ def run_txv_domru(tlg_chat, tlg_token):
         print('TelegramMessage:', r)
     #================================================
 
-
 if __name__ == '__main__':
     # start_time = datetime.now()
     
@@ -811,17 +820,17 @@ if __name__ == '__main__':
         # 'id_lid': '1215557',
         
 
-        # # 'region': 'Республика Бурятия',           # город
-        # # 'city': 'Улан-Удэ',           # город
-        # # 'street': 'Смолина',         # улица
-        # # 'house': '61',          # дом
+        # # 'region': 'Воронежская область',           # город
+        # # 'city': 'Воронеж',           # город
+        # # 'street': 'Пирогова',         # улица
+        # # 'house': '35',          # дом
         # # 'apartment': '197',          # квартира
 
-        # # 'region': 'Республика Бурятия',           # город
-        # 'city': 'Донецк',           # город
-        # 'street': 'Смолина',         # улица
-        # 'house': '61',          # дом
-        # 'apartment': '197',          # квартира
+        # # 'region': 'Самарская область',           # город
+        # # 'city': 'Самара',           # город
+        # # 'street': 'Партизанская улица',         # улица
+        # # 'house': '206',          # дом
+        # # 'apartment': '10',          # квартира
 
         # # 'region': 'Омская область',           # город
         # # 'city': 'Омск',           # город
@@ -829,11 +838,11 @@ if __name__ == '__main__':
         # # 'house': '31',          # дом
         # # 'apartment': '10',          # квартира
 
-        # # 'region': 'Ярославская область',           # город
-        # # 'city': 'Ярославль',           # город
-        # # 'street': 'проспект Толбухина',         # улица
-        # # 'house': '43',          # дом
-        # # 'apartment': '5',          # квартира
+        # 'region': 'Санкт-Петербург',           # город
+        # 'city': 'Санкт-Петербург',           # город
+        # 'street': 'Шкапина',         # улица
+        # 'house': '9-11',          # дом
+        # 'apartment': '5',          # квартира
 
         # 'available_connect': '',
         # 'pv_address': '',
@@ -841,12 +850,19 @@ if __name__ == '__main__':
     # }
     
     
-    # e, data = get_txv(txv_dict)
-    # if e: print(e)
-    # print('available_connect:\n', data['available_connect'])
-    # print('pv_address:\n', data['pv_address'])
+    # # e, data = get_txv(txv_dict)
+    # # if e: print(e)
+    # # print('available_connect:\n', data['available_connect'])
+    # # print('pv_address:\n', data['pv_address'])
+    
+    # print(ordering_house('9-11'))
     
     
+            # if in_house[i].isdigit() and is_dig == False:
+            # is_dig = True
+            # lst_house.append(' ')
+        # if in_house[i].isalpha() and is_dig == True:
+
     # set_txv_to_dj_domconnect(pv_code)
     # rez, txv_list = get_txv_in_dj_domconnect(pv_code)
     # for txv_dict in txv_list:

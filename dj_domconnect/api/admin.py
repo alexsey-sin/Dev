@@ -13,6 +13,7 @@ class BotAccessAdmin(admin.ModelAdmin):
     list_filter = ('last_visit', 'name')
     empty_value_display = '-пусто-'
     date_hierarchy = 'last_visit'
+    ordering = ('name',)
 
 
 @admin.register(BidDomRu2)

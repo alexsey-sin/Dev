@@ -1,10 +1,7 @@
-import os
-import time
+import os, time, json, requests  # pip install requests
 from datetime import datetime
-import requests  # pip install requests
-from requests.auth import HTTPProxyAuth
-import json
 from selenium import webdriver  # $ pip install selenium
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
@@ -20,10 +17,19 @@ def ordering_street(in_street: str):  # Преобразование строк�
     '''
         разбиваем строку по запятым, и каждый фрагмент проверяем на
         изветсный тип улицы
-        выдаем список из бвух элементов: название и сокращенный тип улицы
+        выдаем список [тип_улицы, название]
         если известный тип не найден - возвращаем пустой список
+        
+        Список типов улицы имеет очередность в приоритете определения по убыванию
     '''
-    type_abbr = {
+    lst_type_raion = [
+        'микрорайон',
+        'район',
+        'станица',
+        'поселок',
+        'округ',
+    ]
+    dkt_type_street = {
         'улица': 'ул.',
         'проспект': 'просп.',
         'переулок': 'пер.',
@@ -35,22 +41,43 @@ def ordering_street(in_street: str):  # Преобразование строк�
         'площадь': 'пл.',
         'бульвар': 'бульв.',
     }
-    # Преобразуем ё к е
-    in_street = in_street.replace('ё', 'е')
-    
-    out_cort = []
-    lst = in_street.split(',')
-    for sub in lst:
-        rez = False
-        for ts in type_abbr.keys():
+    lst_street = in_street.split(',')
+    if len(lst_street) == 0: return []
+
+    # разобьем на известные типы районов, типы улиц, и просто выражения
+    lst_tr = []
+    lst_ts = []
+    lst_em = []
+    lst_tmp = []
+    # Отделим известные типы районов
+    for sub in lst_street:
+        not_rez = True
+        for ts in lst_type_raion:
             if sub.find(ts) >= 0:
-                rez = True
-                name = sub.replace(ts, '').strip()
-                out_cort.append(name)
-                out_cort.append(f'{type_abbr[ts]} {name}')
+                not_rez = False
+                lst_tr.append((ts, sub.replace(ts, '').strip()))
                 break
-        if rez: break
-    return out_cort
+        if not_rez: lst_tmp.append(sub.strip())
+
+    if len(lst_tmp) == 0:
+        if len(lst_tr) == 1: return lst_tr[0][0], lst_tr[0][1]
+        else: return []
+    
+    # Отделим известные типы улиц
+    lst_tmp2 = []
+    for sub in lst_tmp:
+        not_rez = True
+        for ts, sts in dkt_type_street.items():
+            if sub.find(ts) >= 0:
+                not_rez = False
+                lst_ts.append((sts, sub.replace(ts, '').strip()))
+                break
+        if not_rez: lst_tmp2.append(sub.strip())
+
+    if len(lst_tmp2) == 0:
+        if len(lst_ts) == 1: return lst_ts[0][0], lst_ts[0][1]
+        else: return []
+    else: return '', ' '.join(lst_tmp2)
 
 def ordering_house(in_house: str):  # Преобразование строки дом
     '''
@@ -132,7 +159,9 @@ def get_txv(data):
             base_url = f'https://{login}:{pass_1}@oao.mgts.ru'
 
             EXE_PATH = 'driver/chromedriver.exe'
-            driver = webdriver.Chrome(executable_path=EXE_PATH)
+            service = Service(EXE_PATH)
+            driver = webdriver.Chrome(service=service)
+
             time.sleep(1)
             driver.implicitly_wait(10)
             driver.get(base_url)
@@ -172,23 +201,28 @@ def get_txv(data):
         
         # ###################### Страница поиска адреса ######################  isElementPresent в цикле
         
-        # Разберем поле Улица
-        street = data.get('street')
-        if not street: raise Exception('Ошибка не заполнено поле улица')
-        c_street = ordering_street(street)
-        if not c_street: raise Exception(f'Ошибка {street} не распознано')
-        
         # Активируем поле ввода названия улицы
         els = driver.find_elements(By.XPATH, '//span[@aria-labelledby="select2-getStreet-container"]')
         if len(els) != 1: raise Exception('Ошибка нет поля улица')
         try: els[0].click()
         except: raise Exception('Ошибка активации поля ввода улица')
         time.sleep(1)
-        # Вводим улицу
         els = driver.find_elements(By.XPATH, '//input[@class="select2-search__field"]')
         if len(els) != 1: raise Exception('Ошибка нет поля ввода улица')
-        try: els[0].send_keys(c_street[0])
-        except: raise Exception('Ошибка ввода улица')
+        # Разберем поле Улица
+        street = data.get('street')
+        if not street: raise Exception('Ошибка не заполнено поле улица')
+        lst_street = ordering_street(street)
+        # print(lst_street)
+        if lst_street:  # если распознали по типу
+            try: els[0].send_keys(lst_street[1])
+            except: raise Exception('Ошибка ввода 7')
+        else:  # если нет - вводим как есть
+            try: els[0].send_keys(street)
+            except: raise Exception('Ошибка ввода 8')
+            lst_street = ('', street)
+        
+        # Вводим улицу
         time.sleep(3)
         # Смотрим подсказку
         els = driver.find_elements(By.XPATH, '//ul[@id="select2-getStreet-results"]')
@@ -196,19 +230,38 @@ def get_txv(data):
         els_li = els[0].find_elements(By.TAG_NAME, 'li')
         f_lst = []
         el_lst = []
+        f_ok = False
         for el_li in els_li:
             name_street = el_li.text
             # print(name_street)
-            if name_street == c_street[1]:
+            if name_street.find(lst_street[1]) >= 0:
                 el_lst.append(el_li)
                 f_lst.append(name_street)
-        if len(f_lst) == 0: raise Exception(f'Ошибка нет вариантов {street}')
+        if len(f_lst) == 0: raise Exception(f'Ошибка Улица: {street} не найдена.')
         if len(f_lst) == 1:
             try: el_lst[0].click()
             except: raise Exception('Ошибка выбора улица')
+            f_ok = True
         else:
-            # Множественный выбор
-            raise Exception(f'Ошибка много вариантов улица: {";".join(f_lst)}')
+            if lst_street[0] != '':
+                f_lst2 = []
+                el_lst2 = []
+                for i in range(len(f_lst)):
+                    if f_lst[i].find(lst_street[0]) >= 0:
+                        el_lst2.append(el_lst[i])
+                        f_lst2.append(f_lst[i])
+                if len(f_lst2) == 0:
+                    f_lst2 = f_lst
+                    el_lst2 = el_lst
+            else:
+                f_lst2 = f_lst
+                el_lst2 = el_lst
+            # тут 1 или более вариантов
+            i_fnd = find_short_tup(f_lst2)
+            try: el_lst2[i_fnd].click()
+            except: raise Exception('Ошибка действий 15')
+            f_ok = True
+        if f_ok == False: raise Exception(f'Ошибка Улица: {street} не найдена2.')
         time.sleep(3)
 
         # Разберем поле дом
@@ -526,7 +579,6 @@ def run_txv_mgts(tlg_chat, tlg_token):
         print('TelegramMessage:', r)
     #================================================
 
-
 if __name__ == '__main__':
     # start_time = datetime.now()
     
@@ -560,9 +612,9 @@ if __name__ == '__main__':
         # # 'house': '7/5 кор. 2',          # дом
         # # 'apartment': '6',          # квартира
         
-        # 'street': 'проезд Шокальского',         # улица
-        # 'house': '35',          # дом
-        # 'apartment': '6',          # квартира
+        # 'street': 'Удальцова',         # улица
+        # 'house': '79',          # дом
+        # 'apartment': '10',          # квартира
         
         # # 'street': 'Щёлковское шоссе',         # улица
         # # 'house': '95',          # дом
@@ -602,7 +654,6 @@ if __name__ == '__main__':
     # e, data = get_txv(txv_dict)
     # if e: print(e)
     # print('pv_address', data['pv_address'])
-    # # print(data['tarifs_all'])
     # print('available_connect', data['available_connect'])
     
     

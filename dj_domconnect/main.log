@@ -373,3 +373,9 @@ django.urls.exceptions.NoReverseMatch: Reverse for 'sources' not found. 'sources
 2022-04-19 09:17:39,031:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\views.py changed, reloading.
 2022-04-19 09:22:24,411:django.request:Not Found: /favicon.ico
 2022-04-19 09:22:38,646:domconnect.views:Site Source Service обновлены.
+2022-04-20 12:04:38,281:django.request:Not Found: /favicon.ico
+2022-04-20 12:18:23,569:django.utils.autoreload:C:\Dev\dj_domconnect\api\views_txv.py changed, reloading.
+2022-04-20 12:20:41,049:django.utils.autoreload:C:\Dev\dj_domconnect\api\views_txv.py changed, reloading.
+2022-04-20 12:21:47,515:django.utils.autoreload:C:\Dev\dj_domconnect\api\views_txv.py changed, reloading.
+2022-04-20 12:24:28,084:django.utils.autoreload:C:\Dev\dj_domconnect\api\views_txv.py changed, reloading.
+2022-04-20 12:26:42,288:django.utils.autoreload:C:\Dev\dj_domconnect\api\views_txv.py changed, reloading.
