@@ -522,6 +522,10 @@ def calculateSEO():
                 dct_source = calculate_source_table(calc_date, source_name, site_provider)
                 if len(dct_source) > 0:
                     empty_data_month = False
+                    # Костыль !!!
+                    if site_num == 4:  # сайт https://mtsru.ru/
+                        dct_cost = calculate_source_table(calc_date, source_name, '11')
+                        dct_source['cell_13'] = dct_cost['cell_12']
                     # Сохранение в кэш таблицы источника
                     save_cash(site_num, source_num, dct_source, calc_date)
                     lst_res_source.append(dct_source)
@@ -795,6 +799,8 @@ def calculate_site_table(lst_res_source):
     cell_24 = 0  # Посетители
     cell_25 = 0
     cell_26 = 0
+    cell_27 = 0  # Для костыля по МГТС
+    cost = False
 
     # Соберем суммы значений по источникам
     for src in lst_res_source:
@@ -808,6 +814,10 @@ def calculate_site_table(lst_res_source):
         cell_23 += src['cell_09']
         cell_25 += src['cell_05']
         cell_26 += src['cell_12']
+        val_cost = src.get('cell_13')
+        if val_cost != None:
+            cost = True
+            cell_27 += val_cost
 
     cell_25 = round(cell_25 / count_source)
 
@@ -870,6 +880,8 @@ def calculate_site_table(lst_res_source):
     out_dict['cell_24'] = cell_24
     out_dict['cell_25'] = cell_25
     out_dict['cell_26'] = cell_26
+    if cost:
+        out_dict['cell_27'] = cell_27
     return out_dict
 
 def make_seo_page():
@@ -979,6 +991,7 @@ def make_seo_page():
             # Добавляем дополнительные столбцы "График" и "Сравн. мес" и "месяц ФАКТ"
             col_fabula = {}  # Шаблон новых колонок
             for i in range(1, len(row_site_names)+1): col_fabula[i] = ''
+            if obj_site.num == 4: col_fabula[len(row_site_names)+1] = ''
             s_date = f'01.{cur_month}.{cur_year}'
             f_date = datetime.strptime(s_date, '%d.%m.%Y')
             obj_cur_month = DcCashSEO.objects.filter(val_date=f_date, num_site=obj_site.num, num_source=0)
@@ -1116,11 +1129,12 @@ def make_csv_text(in_data, fname):
         writer.writerow([])
 
         ##### Сводные таблицы сайтов
-        num_row_sites = len(row_site_names)
-        
         num_row_source = len(row_source_names)
 
         for site in in_data['data_sites']:
+            id_site = site.get('id')
+            if id_site == 4: num_row_sites = len(row_site_names) + 1
+            else: num_row_sites = len(row_site_names)
             url_site = site.get('url_site')
             writer.writerow([url_site,])
             writer.writerow(in_data['data_month'])
@@ -1137,9 +1151,17 @@ def make_csv_text(in_data, fname):
                         val = col.get(str(j+1))
                         if val: tbl_site[j][i] = val
             # Собираем строки
-            for j in range(len(tbl_site)):
-                row_name = row_site_names[j]
-                if j == len(tbl_site) - 1: row_name += f' {site.get("name_site")}'
+            len_tbl_site = len(tbl_site)  # количество строк в таблице
+            for j in range(len_tbl_site):
+                # Название строки
+                if id_site == 4:  # Костыль !!! МГТС
+                    if j == (len_tbl_site - 1): row_name = 'Сделки >50 МГТС'
+                    else: row_name = row_site_names[j]
+                    if j == (len_tbl_site - 2): row_name += f' {site.get("name_site")}'
+                else:
+                    row_name = row_site_names[j]
+                    if j == len_tbl_site - 1: row_name += f' {site.get("name_site")}'
+                # Добавляем содержимое ячеек строки
                 r_lst = [row_name,] + tbl_site[j]
                 writer.writerow(r_lst)
             writer.writerow([])

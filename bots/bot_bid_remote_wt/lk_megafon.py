@@ -1,6 +1,7 @@
 import os, json, time, requests  # pip install requests
 from datetime import datetime
 from selenium import webdriver  # $ pip install selenium
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 
 opsos = 'megafon'
@@ -46,15 +47,28 @@ def get_access_in_dj_domconnect(op_name):
         return 0, acc_dct
     return 2, {}
 
+def wait_spinner_points(driver):  # Ожидаем спинер с точками
+    driver.implicitly_wait(1)
+    while True:
+        time.sleep(1)
+        els = driver.find_elements(By.XPATH, '//div[contains(@class, "loader__frame")]')
+        if len(els):
+            pass
+            # print('loader__frame')
+        else: break
+    driver.implicitly_wait(10)
+    time.sleep(2)
+
 def run_lk_parsing(access):
     # https://b2blk.megafon.ru/login		9201337110	dkk3D2
     driver = None
     try:
         base_url = 'https://b2blk.megafon.ru'
         EXE_PATH = 'driver/chromedriver.exe'
-        driver = webdriver.Chrome(executable_path=EXE_PATH)
+        service = Service(EXE_PATH)
+        driver = webdriver.Chrome(service=service)
 
-        driver.implicitly_wait(20)
+        driver.implicitly_wait(10)
         driver.get(base_url + '/login')
         time.sleep(3)
 
@@ -62,28 +76,32 @@ def run_lk_parsing(access):
         password = access.get('password')  # 'dkk3D2'
         
         els = driver.find_elements(By.XPATH, '//input[@data-input-login="loginAuthform"]')
-        if len(els) != 1: raise Exception(1)
-        els[0].send_keys(login)
+        if len(els) != 1: raise Exception('Нет поля логин')
+        try: els[0].send_keys(login)
+        except: raise Exception('Ошибка действий 1')
         time.sleep(1)
 
         els = driver.find_elements(By.XPATH, '//input[@data-input-pwd="passwordAuthform"]')
-        if len(els) != 1: raise Exception(2)
-        els[0].send_keys(password)
+        if len(els) != 1: raise Exception('Нет поля пароль')
+        try: els[0].send_keys(password)
+        except: raise Exception('Ошибка действий 2')
         time.sleep(1)
         
         els = driver.find_elements(By.XPATH, '//button[@data-button="buttonSubmitAuthform"]')
-        if len(els) != 1: raise Exception(3)
-        els[0].click()
-        time.sleep(10)
+        if len(els) != 1: raise Exception('Нет кнопки вход')
+        try: els[0].click()
+        except: raise Exception('Ошибка действий 3')
+        
+        # Ждем спинер
+        wait_spinner_points(driver)
+        time.sleep(1)
 
         ###################### Главная страница ######################
-        # with open('out_file.html', 'w', encoding='utf-8') as outfile:
-            # outfile.write(driver.page_source)
         
         els = driver.find_elements(By.CLASS_NAME, 'widget-personal-account__current-balance')
-        if len(els) != 1: raise Exception(4)
+        if len(els) != 1: raise Exception('Определение баланса1')
         els1 = els[0].find_elements(By.CLASS_NAME, 'widget-personal-account__balance-text')
-        if len(els1) != 1: raise Exception(5)
+        if len(els1) != 1: raise Exception('Определение баланса2')
 
         str_balance = els1[0].text.strip().split()[0]
         data = {
@@ -91,22 +109,12 @@ def run_lk_parsing(access):
             'balance': str_balance,
             'numbers': [],
         }
-
+        
         # переходим на страницу абоненты
         driver.get(base_url + '/subscribers/mobile')
-        time.sleep(30)
+        time.sleep(10)
+
         ###################### Абоненты ######################
-        # need_rows = 18  # (кол-во номеров + строка заголовка)
-        # cnt = 0
-        # while(1):
-            # els = driver.find_elements(By.XPATH, '//div[@data-col-name="msisdn"]')
-            # if len(els) >= need_rows:
-                # break
-            # else:
-                # time.sleep(1)
-            # if cnt > 25: raise Exception(6)
-            # cnt += 1
-        
         els = driver.find_elements(By.XPATH, '//div[@data-col-name="msisdn"]')
         if len(els) < 2: raise Exception(6)
         dct_nums = {}
@@ -118,40 +126,46 @@ def run_lk_parsing(access):
         ###################### Перебираем страницы абонентов ######################
         for key, value in dct_nums.items():
             driver.get(value)  # value = типа: https://b2blk.megafon.ru/subscriber/info/124701207
-            driver.implicitly_wait(2)
+            
+            # Ждем спинер
+            wait_spinner_points(driver)
             time.sleep(5)
 
             str_number = key.strip().replace(' ','').replace('(', '').replace(')', '').replace('-', '').replace('+', '')
             number = {'number': str_number, }
+            
+            try:
+                # Ищем блок с опциями тарифного плана
+                driver.implicitly_wait(1)
+                els_block = driver.find_elements(By.XPATH, '//div[contains(@class, "subscriber-id-info__tariff-discounts")]')
+                if len(els_block) != 1: raise Exception()
 
-            els = driver.find_elements(By.XPATH, '//div[@id="discountsList"]')
-            if len(els) != 1: raise Exception(8)
-            els_dl = els[0].find_elements(By.TAG_NAME, 'dl')
-            if len(els_dl) == 0:
-                data['numbers'].append(number)  
-                continue
+                # Раскроем список
+                els_open = els_block[0].find_elements(By.XPATH, './/span[contains(@class, "eSRigz link")]')
+                if len(els_open) != 1: raise Exception()
+                try: driver.execute_script("arguments[0].click();", els_open[0])
+                except: raise Exception()
+                time.sleep(3)
 
-            for el_dl in els_dl:  # по блокам <dl>
-                dts = el_dl.find_elements(By.TAG_NAME, 'dt')
-                if len(dts) != 1: raise Exception(9)
-                label = dts[0].text
-                
-                if label.find('SMS') >= 0:  # блок с 'SMS'
-                    divs = el_dl.find_elements(By.TAG_NAME, 'div')
-                    for div in divs:
-                        dat = div.text
-                        if dat.find('доступно') >= 0:
-                            available = dat.split()[1]
-                            number['sms_available'] = available
-
-                elif label.find('Минут') >= 0:  # блок с 'Минут'
-                    divs = el_dl.find_elements(By.TAG_NAME, 'div')
-                    for div in divs:
-                        dat = div.text
-                        if dat.find('доступно') >= 0:
-                            available = dat.split()[1]
-                            number['mobile_available'] = available
-
+                # Переберем строки с опциями тарифа
+                els_opt = els_block[0].find_elements(By.XPATH, './/div[contains(@class, "fdmyUd")]')
+                for el_opt in els_opt:
+                    els_tit = el_opt.find_elements(By.XPATH, './/div[contains(@class, "cRCcFB")]')
+                    if len(els_tit) != 1: raise Exception()
+                    els_val = el_opt.find_elements(By.XPATH, './/div[contains(@class, "progress-bar__title-right")]')
+                    if len(els_val) != 1: raise Exception()
+                    
+                    str_tit = els_tit[0].text
+                    str_val = els_val[0].text
+                    if str_tit.find('Минут') >= 0:
+                        lst_val = str_val.split(' ')
+                        number['mobile_available'] = lst_val[0]
+                        number['mobile_total'] = lst_val[2]
+                    if str_tit.find('SMS') >= 0:
+                        lst_val = str_val.split(' ')
+                        number['sms_available'] = lst_val[0]
+                        number['sms_total'] = lst_val[2]
+            except: pass
             data['numbers'].append(number)
 
         ###################### Вывод ######################
@@ -173,18 +187,22 @@ def run_lk_parsing(access):
         for dct in nums:
             str_number = dct.get('number')
             str_avlb_min = dct.get('mobile_available')
+            str_totl_min = dct.get('mobile_total')
             str_avlb_sms = dct.get('sms_available')
+            str_totl_sms = dct.get('sms_total')
             try:
                 emj = ''
                 avlb_min = int(str_avlb_min)
+                totl_min = int(str_totl_min)
                 avlb_sms = int(str_avlb_sms)
+                totl_sms = int(str_totl_sms)
                 if avlb_min == 0 and avlb_sms == 0: continue
                 if avlb_min < 500: emj = emj_yellow_rhomb
                 if avlb_min < 100: emj = emj_red_rhomb
                 cnt_avlb_min += avlb_min
                 cnt_avlb_sms += avlb_sms
                 
-                buff += f'{emj}{str_number} [min {avlb_min}][sms {avlb_sms}]\n'
+                buff += f'{emj}{str_number} [min {avlb_min}/{totl_min}][sms {avlb_sms}/{totl_sms}]\n'
             except: continue
         buff += f'Итого: [min {cnt_avlb_min}][sms {cnt_avlb_sms}]\n'
         buff += f'Всего номеров: {cnt_nums}\n'
@@ -209,7 +227,9 @@ def run_lk_parsing(access):
             {
                 'number': '+7(961)161-25-00',
                 'mobile_available': '23',
+                'mobile_total': '467',
                 'sms_available': '0',
+                'sms_total': '0',
             },
             {
                 'number': '+7(961)161-17-00',

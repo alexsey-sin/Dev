@@ -139,6 +139,19 @@ def ordering_house(in_house: str):  # Преобразование строки 
     
     return ('', 'Номер не распознан')
 
+def find_short(f_lst):
+    '''
+        Поиск самой короткой фразы в списке и выдача её индекса
+    '''
+    l_min = 10000
+    i_min = 0
+    for i in range(len(f_lst)):
+        l_phr = len(f_lst[i])
+        if l_phr < l_min:
+            l_min = l_phr
+            i_min = i
+    return i_min
+
 def wait_spiner(driver):
     driver.implicitly_wait(0)
     while True:
@@ -257,7 +270,7 @@ def get_txv(data):
                 f_lst2 = f_lst
                 el_lst2 = el_lst
             # тут 1 или более вариантов
-            i_fnd = find_short_tup(f_lst2)
+            i_fnd = find_short(f_lst2)
             try: el_lst2[i_fnd].click()
             except: raise Exception('Ошибка действий 15')
             f_ok = True
@@ -598,63 +611,63 @@ if __name__ == '__main__':
 
 
 
-    # txv_dict = {
-        # 'pv_code': pv_code,
-        # 'login': 'ESubbotin',
-        # 'password': 'sr@8Cjmu',
-        # 'login_2': 'MChumakova',
-        # 'password_2': 'Qhvv@!4817',
+    txv_dict = {
+        'pv_code': pv_code,
+        'login': 'ESubbotin',
+        'password': 'sr@8Cjmu',
+        'login_2': 'MChumakova',
+        'password_2': 'Sjod@!5812',
         
-        # # 'id_lid': '1215557',
-        # 'city': 'Москва',           # город
+        # 'id_lid': '1215557',
+        'city': 'Москва',           # город
         
-        # # 'street': 'улица Винокурова',         # улица
-        # # 'house': '7/5 кор. 2',          # дом
-        # # 'apartment': '6',          # квартира
+        # 'street': 'улица Винокурова',         # улица
+        # 'house': '7/5 кор. 2',          # дом
+        # 'apartment': '6',          # квартира
         
-        # 'street': 'Удальцова',         # улица
-        # 'house': '79',          # дом
-        # 'apartment': '10',          # квартира
+        'street': 'Борисовский проезд',         # улица
+        'house': '9к3',          # дом
+        'apartment': '10',          # квартира
         
-        # # 'street': 'Щёлковское шоссе',         # улица
-        # # 'house': '95',          # дом
-        # # 'apartment': '6',          # квартира
+        # 'street': 'Щёлковское шоссе',         # улица
+        # 'house': '95',          # дом
+        # 'apartment': '6',          # квартира
         
-        # # 'street': 'Липовая аллея',         # улица
-        # # 'house': '16',          # дом
-        # # 'apartment': '6',          # квартира
+        # 'street': 'Липовая аллея',         # улица
+        # 'house': '16',          # дом
+        # 'apartment': '6',          # квартира
         
-        # # 'street': 'проезд Черепановых',         # улица
-        # # 'house': '38к1',          # дом
-        # # 'apartment': '6',          # квартира
+        # 'street': 'проезд Черепановых',         # улица
+        # 'house': '38к1',          # дом
+        # 'apartment': '6',          # квартира
         
-        # # 'street': 'Лужнецкая набережная',         # улица
-        # # 'house': '24с17',          # дом
-        # # 'apartment': '6',          # квартира
+        # 'street': 'Лужнецкая набережная',         # улица
+        # 'house': '24с17',          # дом
+        # 'apartment': '6',          # квартира
         
-        # # 'street': 'Биржевая площадь',         # улица
-        # # 'house': '1',          # дом
-        # # 'apartment': '6',          # квартира
+        # 'street': 'Биржевая площадь',         # улица
+        # 'house': '1',          # дом
+        # 'apartment': '6',          # квартира
         
-        # # 'street': 'Никитский бульвар',         # улица
-        # # 'house': '11/12с1',          # дом
-        # # 'apartment': '6',          # квартира
+        # 'street': 'Никитский бульвар',         # улица
+        # 'house': '11/12с1',          # дом
+        # 'apartment': '6',          # квартира
         
-        # # 'street': 'Зелёный проспект',         # улица
-        # # 'house': '44',          # дом
-        # # 'apartment': '6',          # квартира
+        # 'street': 'Зелёный проспект',         # улица
+        # 'house': '44',          # дом
+        # 'apartment': '6',          # квартира
         
 
-        # 'available_connect': '',  # Возможность подключения
-        # 'tarifs_all': '', # список названий тарифных планов
-        # 'pv_address': '',
-    # }
+        'available_connect': '',  # Возможность подключения
+        'tarifs_all': '', # список названий тарифных планов
+        'pv_address': '',
+    }
     
     
-    # e, data = get_txv(txv_dict)
-    # if e: print(e)
-    # print('pv_address', data['pv_address'])
-    # print('available_connect', data['available_connect'])
+    e, data = get_txv(txv_dict)
+    if e: print(e)
+    print('pv_address', data['pv_address'])
+    print('available_connect', data['available_connect'])
     
     
     # set_txv_to_dj_domconnect(pv_code)

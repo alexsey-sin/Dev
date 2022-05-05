@@ -5,7 +5,7 @@ import requests  # pip install requests
 import json
 from selenium import webdriver  # $ pip install selenium
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support import expected_conditions as EC
 
 
@@ -19,7 +19,8 @@ def set_bid(data):
         base_url = 'https://client.rt.ru/admin/uniapp'
         
         EXE_PATH = 'driver/chromedriver.exe'
-        driver = webdriver.Chrome(executable_path=EXE_PATH)
+        service = Service(EXE_PATH)
+        driver = webdriver.Chrome(service=service)
 
         driver.implicitly_wait(20)
         driver.get(base_url)
@@ -112,11 +113,11 @@ def set_bid(data):
         if len(els_div) != 1: raise Exception('Нет блока ввода ИНН/Организация')
         els_input = els_div[0].find_elements(By.TAG_NAME, 'input')
         if len(els_input) != 1: raise Exception('Ошибка поиска поля ввода ИНН/Организация')
-        els_input[0].send_keys(data['inn_organisation'])
-        time.sleep(5)
-        els_span = els_div[0].find_elements(By.TAG_NAME, 'span')
-        if len(els_span) > 0: els_span[0].click()
+        els_input[0].send_keys('ИП')
         time.sleep(1)
+        # els_span = els_div[0].find_elements(By.TAG_NAME, 'span')
+        # if len(els_span) > 0: els_span[0].click()
+        # time.sleep(1)
         # Дополнительная информация
         els_div = driver.find_elements(By.XPATH, '//div[@data-qaid="additionalInfo"]')
         if len(els_div) != 1: raise Exception('Нет блока ввода дополнительной информации')
@@ -136,16 +137,26 @@ def set_bid(data):
         els_btn = driver.find_elements(By.XPATH, '//button[@data-qaid="next_button_service"]')
         if len(els_btn) != 1: raise Exception('Нет кнопки далее')
         disabled = els_btn[0].get_attribute('disabled')
+        
         if disabled == 'true':
-            mess = ('После заполнения заявки кнопка Далее не активна.\n'
-            f'Возможно не корректен адрес: {data["address"]}\n'
-            f'или организация: {data["inn_organisation"]}')
+            mess = (f'Адрес: {data["address"]}\nНе распознан')
             raise Exception(mess)
         else: els_btn[0].click()
+        time.sleep(5)
         # Страница добавления услуг
         # Ищем кнопку + интернет
-        el_inet_plus = driver.find_element(By.XPATH, '//*[@id="6144362978"]/div/table/tbody/tr/td/div/order-connection/div/div[2]/section/div[1]/div[2]/div/div[3]/div/span[2]')
-        el_inet_plus.click()
+        els_div = driver.find_elements(By.XPATH, '//div[@class="order-connection__ServiceSelection__row order-connection__ServiceSelection__rowServices order-connection__ServiceSelection__w352"]')
+        f_ok = False
+        for el_div in els_div:
+            els_p = el_div.find_elements(By.TAG_NAME, 'p')
+            if len(els_p) < 1: continue
+            service = els_p[0].get_attribute('innerHTML')
+            if service.find('Интернет') >= 0:
+                els_plus = el_div.find_elements(By.XPATH, './/span[@class="order-connection__Counter__plus"]')
+                if len(els_plus) < 1: raise Exception('Нет кнопки добавить услугу')
+                els_plus[0].click()
+                f_ok = True
+        if f_ok == False: raise Exception('Ошибка добавления услуги интернет')
         time.sleep(1)
         
         # Ищем кнопку Зарегистрировать
@@ -165,16 +176,18 @@ def set_bid(data):
         els_span = els_div[0].find_elements(By.TAG_NAME, 'span')
         if len(els_span) != 1: raise Exception('Нет строки ответа регистрации заявки')
         answer = els_span[0].text
-        print(answer)
+        # print(answer)
         lst_answer = answer.split()
-        if len(lst_answer) != 4: raise Exception(f'Неивестный формат ответа регистрации заявки {answer}')
+        print(len(answer))
+        if len(lst_answer) != 4: raise Exception(answer)
         data['bid_number'] = lst_answer[2]
-        # print(data['bid_number'])
+        print(data['bid_number'])
         
         # time.sleep(10)
 
         # with open('out.html', 'w', encoding='utf-8') as outfile:
             # outfile.write(driver.page_source)
+        # raise Exception('Finish')
         
     except Exception as e:
         return str(e)[:200], data
@@ -350,20 +363,20 @@ if __name__ == '__main__':
     
     # rez, bid_list = get_did_in_dj_domconnect()
     # print(bid_list)
-    # data = {
-        # 'login': 'mos.domconnect@gmail.com',
-        # 'password': 'bvo[7dGr',
-        # 'id_lid': '1163386',
-        # 'firstname': 'Иван',
-        # 'patronymic': '',
-        # 'lastname': '',
-        # 'phone': '79111234567',
-        # 'address': 'Ярославль Попова д.22',
-        # 'inn_organisation': '7604350441',
-        # 'service': 'Интернет',
-        # 'comment': 'Тестовая заявка, просьба не обрабатывать',
-    # }
-    # rez, data = set_bid(data)
-    # if rez: print(rez)
+    data = {
+        'login': 'mos.domconnect@gmail.com',
+        'password': 'bvo[7dGr',
+        'id_lid': '1163386',
+        'firstname': 'Иван',
+        'patronymic': '',
+        'lastname': '',
+        'phone': '79111234567',
+        'address': 'санкт-петербург, наб. Матисова канала 1',
+        'inn_organisation': '772821163041 / ИП Ильченко Василий Иванович',
+        'service': 'Интернет',
+        'comment': 'Тестовая заявка, просьба не обрабатывать',
+    }
+    rez, data = set_bid(data)
+    if rez: print(rez)
     
     

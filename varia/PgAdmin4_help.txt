@@ -112,11 +112,15 @@ SET status = 0, bot_log = ''
 WHERE pv_code = 1 AND status = 2 AND pub_date > '2022-04-10 00:00:00'
 
 UPDATE public.api_txv
-SET status = 0, bot_log = '', password = 'm~|HqEu~VB}|P1QDrDX%'
-WHERE pv_code = 4 AND status = 2 AND bot_log LIKE '%Учетная запись пользователя заблокирована%'
+SET status = 0, bot_log = ''
+WHERE pv_code = 7 AND status = 2 AND bot_log LIKE '%Учетная запись пользователя заблокирована%'
 
 UPDATE public.api_txv
-SET status = 0, bot_log = '', password = 'm~|HqEu~VB}|P1QDrDX%'
+SET status = 0, bot_log = ''
+WHERE pv_code = 7 AND status = 2 AND bot_log LIKE '%Для продолжения работы Вам нужно ввести Имя и Пароль%'
+
+UPDATE public.api_txv
+SET status = 0, bot_log = ''
 WHERE pv_code = 4 AND status = 2 AND
 (bot_log LIKE '%Неверное имя пользователя или пароль%'
 OR bot_log LIKE '%Учетная запись пользователя заблокирована%'
@@ -216,6 +220,10 @@ WHERE
     AND a.pv_code = c.pv_code
     AND a.id < c.mid
 =========================================================
+
+
+
+
 
 
 

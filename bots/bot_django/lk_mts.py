@@ -183,7 +183,7 @@ def get_validity_info(token, msisdn, tarif):  # Получение остатк�
                         if tarPlan == None: continue
                         ipl = tarPlan.find(tarif)
                         if ipl >= 0:
-                            imin = tarPlan.find('мин')
+                            imin = tarPlan.find('(мин)')
                             if imin >= 0:
                                 prodSpecChr = prodSpec.get('productSpecCharacteristic')
                                 if type(prodSpecChr) != list: continue
@@ -202,7 +202,7 @@ def get_validity_info(token, msisdn, tarif):  # Получение остатк�
                                             try: val = int(val)
                                             except: raise Exception('Invalid answer 6')
                                             dct_info['mobile_available'] = int(val/60)
-                            imin = tarPlan.find('смс')
+                            imin = tarPlan.find('(смс)')
                             if imin >= 0:
                                 prodSpecChr = prodSpec.get('productSpecCharacteristic')
                                 if type(prodSpecChr) != list: continue
@@ -219,8 +219,11 @@ def get_validity_info(token, msisdn, tarif):  # Получение остатк�
                                             val = pscv.get('value')
                                             try: dct_info['sms_available'] = int(val)
                                             except: raise Exception('Invalid answer 8')
-                with open('validity_info2.json', 'w', encoding='utf-8') as out_file:
-                    json.dump(lst_answer, out_file, ensure_ascii=False, indent=4)
+                # if msisdn == '79109630404':
+                    # with open('validity_info2.json', 'w', encoding='utf-8') as out_file:
+                        # json.dump(lst_answer, out_file, ensure_ascii=False, indent=4)
+                # with open('validity_info2.json', 'w', encoding='utf-8') as out_file:
+                    # json.dump(lst_answer, out_file, ensure_ascii=False, indent=4)
                 # print(json.dumps(lst_answer, indent=2))
                 break
                         
@@ -299,30 +302,31 @@ def run_lk_mts(logger, tlg_chat, tlg_token):
         'numbers': [],
     }
     res_mess = f'Parsing {operator}:\n'
+    balance_mess = ''
+    numbers_mess = ''
     cnt_avlb_min = 0
     cnt_totl_min = 0
     cnt_avlb_sms = 0
     cnt_totl_sms = 0
+    balance = None
     
     # Проход по всем номерам
     for mob_num in mob_numbers:
-        # Возьмем баланс
-        e, balance = get_balance(token, mob_num)
-        if e:
-            mess = f'run_lk_{operator} ERROR: {e}'
-            send_telegram(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN, mess)
-            logger.error(mess)
-            return
-        time.sleep(5)
-        
-        if mob_num == mob_numbers[0]:
-            emj = ''
-            try:
-                bal = int(balance)
-                if bal < 100: emj = emj_yellow_ball
-                if bal <= 0: emj = emj_red_ball
-            except: pass
-            res_mess += f'{emj}balance: {balance}\n'
+        if balance == None:
+            # Возьмем баланс
+            e, balance = get_balance(token, mob_num)
+            if balance:
+                emj = ''
+                try:
+                    bal = int(balance)
+                    if bal < 100: emj = emj_yellow_ball
+                    if bal <= 0: emj = emj_red_ball
+                except: pass
+                balance_mess = f'{emj}balance: {balance}\n'
+            else:
+                print('get_balance:', e)
+            time.sleep(1)
+            
         # Возьмем тарифный план (пакет)
         e, plan = get_bill_plan_info(token, mob_num)
         if e:
@@ -330,7 +334,7 @@ def run_lk_mts(logger, tlg_chat, tlg_token):
             send_telegram(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN, mess)
             logger.error(mess)
             return
-        time.sleep(5)
+        time.sleep(1)
         
         # Возьмем остатки минут, смс
         e, dct_info = get_validity_info(token, mob_num, plan)
@@ -339,7 +343,7 @@ def run_lk_mts(logger, tlg_chat, tlg_token):
             send_telegram(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN, mess)
             logger.error(mess)
             return
-        time.sleep(5)
+        time.sleep(1)
         # Добавим в суммарные данные
         cnt_avlb_min += dct_info['mobile_available']
         cnt_totl_min += dct_info['mobile_total']
@@ -359,7 +363,9 @@ def run_lk_mts(logger, tlg_chat, tlg_token):
                 if mob < 500: emj = emj_yellow_rhomb
                 if mob < 100: emj = emj_red_rhomb
             except: pass
-            res_mess += f'{emj}{mob_num} [min {ma}/{mt}][sms {sa}/{st}]\n'
+            numbers_mess += f'{emj}{mob_num} [min {ma}/{mt}][sms {sa}/{st}]\n'
+    res_mess += balance_mess
+    res_mess += numbers_mess
     res_mess += f'Итого: [min {cnt_avlb_min}/{cnt_totl_min}][sms {cnt_avlb_sms}/{cnt_totl_sms}]\nВсего номеров: {len(mob_numbers)}'
     e = send_api(out_dict)
     if e:

@@ -2,6 +2,11 @@ import os, json, time, requests  # pip install requests
 from datetime import datetime
 from selenium import webdriver  # $ pip install selenium
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+# from selenium.webdriver.firefox.service import Service
+# from selenium.webdriver.firefox.options import Options
 
 opsos = 'beeline'
 
@@ -51,41 +56,54 @@ def run_lk_parsing(access):
     driver = None
     try:
         base_url = 'https://my.beeline.ru'
-        EXE_PATH = 'driver/chromedriver.exe'
+        EXE_PATH_Ch = 'driver/chromedriver.exe'
+        # EXE_PATH_Fx = 'driver/geckodriver.exe'
 
-        cnt = 5
-        while cnt:
-            cnt -= 1
-            try:
-                print(f'try: {5-cnt}')
-                time.sleep(1)
-                driver = webdriver.Chrome(executable_path=EXE_PATH)
-                driver.get(base_url)
-                time.sleep(3)
-                ###################### Login ######################
-                login = access.get('login')  # 'S715792964'
-                password = access.get('password')  # 'MuE8$lVGpo'
-                
-                els = driver.find_elements(By.ID, 'loginFormB2C:loginForm:login')
-                if len(els) != 1: continue
-                els[0].send_keys(login)
-                time.sleep(1)
+        # cnt = 5
+        # while cnt:
+            # cnt -= 1
+            # try:
+                # print(f'try: {5-cnt}')
+                # time.sleep(1)
+        # options = Options()
+        # options.binary_location = r'C:\Users\asinicin\AppData\Local\Mozilla Firefox\firefox.exe'
+        # options.binary_location = r'C:\Program Files\Mozilla Firefox\firefox.exe'
+        # driver = webdriver.Firefox(service=Service(EXE_PATH_Fx), options=options)
+        service = Service(EXE_PATH_Ch)
+        driver = webdriver.Chrome(service=service)
+        driver.implicitly_wait(10)
+        driver.get(base_url)
+        time.sleep(3)
+        ###################### Login ######################
+        login = access.get('login')  # 'S715792964'
+        password = access.get('password')  # 'MuE8$lVGpo'
+        
+        els = driver.find_elements(By.ID, 'loginFormB2C:loginForm:login')
+        # if len(els) != 1: continue
+        if len(els) != 1: raise Exception('login 1')
+        els[0].send_keys(login)
+        time.sleep(3)
 
-                els = driver.find_elements(By.ID, 'loginFormB2C:loginForm:passwordPwd')
-                if len(els) != 1: continue
-                els[0].send_keys(password)
-                time.sleep(3)
+        els = driver.find_elements(By.ID, 'loginFormB2C:loginForm:passwordPwd')
+        if len(els) != 1: raise Exception('login 2')
+        els[0].send_keys(password)
+        time.sleep(1)
+        els[0].send_keys(Keys.ENTER)
+        time.sleep(5)
 
-                els = driver.find_elements(By.ID, 'loginFormB2C:loginForm:j_idt218')
-                if len(els) != 1: continue
-                els[0].click()
-                time.sleep(5)
-                break
-            except: continue
+        # els = driver.find_elements(By.ID, 'loginFormB2C:loginForm:loginButton')
+        # if len(els) != 1: raise Exception('login 3')
+        # driver.execute_script("arguments[0].click();", els[0])
+        # # els[0].click()
+        # time.sleep(5)
+                # break
+            # except Exception as e:
+                # print(e)
+                # continue
         ###################### Главная страница ######################
 
         driver.get(base_url + '/b/info/abonents/catalog.xhtml')
-        time.sleep(3)
+        time.sleep(5)
         ###################### Абоненты страница ######################
 
         els_div = driver.find_elements(By.ID, 'mobileDataForm:abonents')
@@ -241,7 +259,12 @@ def run_lk_parsing(access):
     except Exception as e:
         return str(e)[:100], {}, ''
     finally:
-        if driver: driver.quit()
+        try: driver.quit()
+        except: pass
+
+        # with open('out.html', 'w', encoding='utf-8') as outfile:
+            # outfile.write(driver.page_source)
+        # raise Exception('Finish')
 
     ###################### Формируем POST запрос в базу данных ######################
     '''

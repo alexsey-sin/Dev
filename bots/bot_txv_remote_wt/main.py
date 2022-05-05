@@ -8,6 +8,7 @@ from txv_rostelecom import run_txv_rostelecom
 from txv_ttk import run_txv_ttk
 from txv_onlime import run_txv_onlime
 from txv_mgts import run_txv_mgts
+from txv_multi_regions import run_txv_multi_regions
 
 # личный бот @infra     TELEGRAM_CHAT_ID, TELEGRAM_TOKEN
 TELEGRAM_CHAT_ID = '1740645090'
@@ -32,6 +33,7 @@ if __name__ == '__main__':
     start_time_txv_ttk = dtn
     start_time_txv_onlime = dtn
     start_time_txv_mgts = dtn
+    start_time_multi_regions = dtn
     
     while True:
         time.sleep(PERIOD_BETWEEN)
@@ -149,6 +151,22 @@ if __name__ == '__main__':
                 th.start()
                 print(f'Bot: {thread_name} is running.')
                 start_time_txv_rostelecom = cur_time
+                time.sleep(0.2)
+
+        #===============================================#
+        # Скрипт Проверка ТхВ multi_regions
+        cur_time = datetime.now()
+        if (cur_time - start_time_multi_regions).seconds >= TIME_3_SECONDS:
+            thread_name = 'txv_multi_regions'
+            is_run = False
+            for thread in threading.enumerate():
+                if thread.getName() == thread_name: is_run = True; break
+            if is_run == False:
+                # th = threading.Thread(target=run_txv_rostelecom, name=thread_name, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
+                th = threading.Thread(target=run_txv_multi_regions, name=thread_name, args=(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN))
+                th.start()
+                print(f'Bot: {thread_name} is running.')
+                start_time_multi_regions = cur_time
                 time.sleep(0.2)
 
         #===============================================#
