@@ -946,7 +946,21 @@
                                         {% endif %}
                                     {% endfor %}
                                 </tr>
-                            {% endfor %}
+                                {% if site.id == 4 %}
+                                <tr>
+                                    <td style="font-weight: normal; min-width: 200px; max-width: 200px;">Сделки &gt;50 МГТС</td>
+                                    {% for col in source.months %}
+                                        {% if forloop.counter == col_grafic %} <!-- Колонка "График" -->
+                                            <td class="td_grafic" gr_data="{{ col.13 }}"></td>
+                                        {% elif forloop.counter == col_compare %} <!-- Колонка "Сравн. мес" -->
+                                            <td>{{ col.13|floatformat:0 }}%</td>
+                                        {% else %}
+                                            <td scope="col" {% if forloop.counter == cnt_month %} {{ color_forecast|safe }} {% endif %}>{{ col.13|floatformat:0 }}</td>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tr>
+                                {% endif %}
+                                {% endfor %}
                         </tbody>
                     </table>  
                 </div>

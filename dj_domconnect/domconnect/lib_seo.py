@@ -1129,8 +1129,6 @@ def make_csv_text(in_data, fname):
         writer.writerow([])
 
         ##### Сводные таблицы сайтов
-        num_row_source = len(row_source_names)
-
         for site in in_data['data_sites']:
             id_site = site.get('id')
             if id_site == 4: num_row_sites = len(row_site_names) + 1
@@ -1160,7 +1158,7 @@ def make_csv_text(in_data, fname):
                     if j == (len_tbl_site - 2): row_name += f' {site.get("name_site")}'
                 else:
                     row_name = row_site_names[j]
-                    if j == len_tbl_site - 1: row_name += f' {site.get("name_site")}'
+                    if j == (len_tbl_site - 1): row_name += f' {site.get("name_site")}'
                 # Добавляем содержимое ячеек строки
                 r_lst = [row_name,] + tbl_site[j]
                 writer.writerow(r_lst)
@@ -1172,6 +1170,8 @@ def make_csv_text(in_data, fname):
 
             source_tables = site.get('source_tables')  # []
             for source in source_tables:
+                if id_site == 4: num_row_source = len(row_source_names) + 1
+                else: num_row_source = len(row_source_names)
                 name_source = source.get('name_source')
                 writer.writerow([name_source,])
                 source_table = source.get('months')
@@ -1187,9 +1187,17 @@ def make_csv_text(in_data, fname):
                             val = col.get(str(j+1))
                             if val: tbl_source[j][i] = val
                 # Собираем строки
-                for j in range(len(tbl_source)):
-                    row_name = row_source_names[j]
-                    if j == len(tbl_source) - 1: row_name += f' {site.get("name_site")}'
+                len_tbl_source = len(tbl_source)  # количество строк в таблице
+                for j in range(len_tbl_source):
+                    # Название строки
+                    if id_site == 4:  # Костыль !!! МГТС
+                        if j == (len_tbl_source - 1): row_name = 'Сделки >50 МГТС'
+                        else: row_name = row_source_names[j]
+                        if j == (len_tbl_source - 2): row_name += f' {site.get("name_site")}'
+                    else:
+                        row_name = row_source_names[j]
+                        if j == (len_tbl_source - 1): row_name += f' {site.get("name_site")}'
+                    # Добавляем содержимое ячеек строки
                     r_lst = [row_name,] + tbl_source[j]
                     writer.writerow(r_lst)
                 writer.writerow([])
