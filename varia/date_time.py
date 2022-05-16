@@ -37,6 +37,12 @@ cur_year = now.year    # Номер текущего года
 cnt_days_in_cur_month = calendar.monthrange(cur_year, cur_month)[1] # Количество дней в текущем месяце
 # print(cur_day, cur_month, cur_year)
 
+# Получение следующего и прошлого месяца
+    # cur_date = datetime.today()
+    # to_date = datetime(cur_date.year, cur_date.month, 1)
+    # next_month = datetime.datetime(cur_date.year + int(cur_date.month / 12), ((cur_date.month % 12) + 1), 1)
+    # last_month = datetime(cur_date.year - (not cur_date.month - 1), (cur_date.month - 1 or 12), 1)
+
 
 '''
     %A  День недели как полное название локали. Среда
@@ -96,3 +102,19 @@ if not os.path.exists(folder_path): #Если пути не существует
 # with open(filename, 'w') as file: # Открываем фаил и пишем
     # file.write("этот текст создан автоматически")
 print(filename)
+
+import datetime
+
+delta = datetime.timedelta(days=0, 
+                           seconds=0, 
+                           microseconds=0, 
+                           milliseconds=0, 
+                           minutes=0, 
+                           hours=0, 
+                           weeks=0)
+
+    # cur_date = datetime.today()
+    to_date = datetime(cur_date.year, cur_date.month, 1).date()
+    from_date = datetime(cur_date.year - (not cur_date.month - 1), (cur_date.month - 1 or 12), 1).date()
+
+

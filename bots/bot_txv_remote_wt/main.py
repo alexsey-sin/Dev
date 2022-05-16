@@ -35,6 +35,16 @@ if __name__ == '__main__':
     start_time_txv_mgts = dtn
     start_time_multi_regions = dtn
     
+    thread_name_beeline = 'txv_beeline'
+    thread_name_mts = 'txv_mts'
+    thread_name_domru = 'txv_domru'
+    thread_name_ttk = 'txv_ttk'
+    thread_name_onlime = 'txv_onlime'
+    thread_name_mgts = 'txv_mgts'
+    thread_name_rostelecom = 'txv_rostelecom'
+    thread_name_multi_regions = 'txv_multi_regions'
+
+    
     while True:
         time.sleep(PERIOD_BETWEEN)
         # Рабочее время ботов с 6 до 23
@@ -45,15 +55,14 @@ if __name__ == '__main__':
         # Скрипт Проверка ТхВ beeline
         cur_time = datetime.now()
         if (cur_time - start_time_txv_beeline).seconds >= TIME_3_SECONDS:
-            thread_name = 'txv_beeline'
             is_run = False
             for thread in threading.enumerate():
-                if thread.getName() == thread_name: is_run = True; break
+                if thread.getName() == thread_name_beeline: is_run = True; break
             if is_run == False:
-                # th = threading.Thread(target=run_txv_beeline, name=thread_name, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
-                th = threading.Thread(target=run_txv_beeline, name=thread_name, args=(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN))
+                # th = threading.Thread(target=run_txv_beeline, name=thread_name_beeline, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
+                th = threading.Thread(target=run_txv_beeline, name=thread_name_beeline, args=(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN))
                 th.start()
-                print(f'Bot: {thread_name} is running.')
+                print(f'Bot: {thread_name_beeline} is running.')
                 start_time_txv_beeline = cur_time
                 time.sleep(0.2)
 
@@ -61,15 +70,14 @@ if __name__ == '__main__':
         # Скрипт Проверка ТхВ mts
         cur_time = datetime.now()
         if (cur_time - start_time_txv_mts).seconds >= TIME_3_SECONDS:
-            thread_name = 'txv_mts'
             is_run = False
             for thread in threading.enumerate():
-                if thread.getName() == thread_name: is_run = True; break
+                if thread.getName() == thread_name_mts: is_run = True; break
             if is_run == False:
-                # th = threading.Thread(target=run_txv_mts, name=thread_name, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
-                th = threading.Thread(target=run_txv_mts, name=thread_name, args=(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN))
+                # th = threading.Thread(target=run_txv_mts, name=thread_name_mts, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
+                th = threading.Thread(target=run_txv_mts, name=thread_name_mts, args=(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN))
                 th.start()
-                print(f'Bot: {thread_name} is running.')
+                print(f'Bot: {thread_name_mts} is running.')
                 start_time_txv_mts = cur_time
                 time.sleep(0.2)
 
@@ -77,15 +85,14 @@ if __name__ == '__main__':
         # Скрипт Проверка ТхВ domru
         cur_time = datetime.now()
         if (cur_time - start_time_txv_domru).seconds >= TIME_3_SECONDS:
-            thread_name = 'txv_domru'
             is_run = False
             for thread in threading.enumerate():
-                if thread.getName() == thread_name: is_run = True; break
+                if thread.getName() == thread_name_domru: is_run = True; break
             if is_run == False:
-                # th = threading.Thread(target=run_txv_domru, name=thread_name, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
-                th = threading.Thread(target=run_txv_domru, name=thread_name, args=(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN))
+                # th = threading.Thread(target=run_txv_domru, name=thread_name_domru, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
+                th = threading.Thread(target=run_txv_domru, name=thread_name_domru, args=(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN))
                 th.start()
-                print(f'Bot: {thread_name} is running.')
+                print(f'Bot: {thread_name_domru} is running.')
                 start_time_txv_domru = cur_time
                 time.sleep(0.2)
 
@@ -93,15 +100,14 @@ if __name__ == '__main__':
         # Скрипт Проверка ТхВ ttk
         cur_time = datetime.now()
         if (cur_time - start_time_txv_ttk).seconds >= TIME_3_SECONDS:
-            thread_name = 'txv_ttk'
             is_run = False
             for thread in threading.enumerate():
-                if thread.getName() == thread_name: is_run = True; break
+                if thread.getName() == thread_name_ttk: is_run = True; break
             if is_run == False:
-                # th = threading.Thread(target=run_txv_ttk, name=thread_name, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
-                th = threading.Thread(target=run_txv_ttk, name=thread_name, args=(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN))
+                # th = threading.Thread(target=run_txv_ttk, name=thread_name_ttk, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
+                th = threading.Thread(target=run_txv_ttk, name=thread_name_ttk, args=(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN))
                 th.start()
-                print(f'Bot: {thread_name} is running.')
+                print(f'Bot: {thread_name_ttk} is running.')
                 start_time_txv_ttk = cur_time
                 time.sleep(0.2)
 
@@ -109,15 +115,14 @@ if __name__ == '__main__':
         # Скрипт Проверка ТхВ onlime
         cur_time = datetime.now()
         if (cur_time - start_time_txv_onlime).seconds >= TIME_3_SECONDS:
-            thread_name = 'txv_onlime'
             is_run = False
             for thread in threading.enumerate():
-                if thread.getName() == thread_name: is_run = True; break
+                if thread.getName() == thread_name_onlime: is_run = True; break
             if is_run == False:
-                # th = threading.Thread(target=run_txv_onlime, name=thread_name, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
-                th = threading.Thread(target=run_txv_onlime, name=thread_name, args=(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN))
+                # th = threading.Thread(target=run_txv_onlime, name=thread_name_onlime, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
+                th = threading.Thread(target=run_txv_onlime, name=thread_name_onlime, args=(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN))
                 th.start()
-                print(f'Bot: {thread_name} is running.')
+                print(f'Bot: {thread_name_onlime} is running.')
                 start_time_txv_onlime = cur_time
                 time.sleep(0.2)
 
@@ -125,15 +130,14 @@ if __name__ == '__main__':
         # Скрипт Проверка ТхВ mgts
         cur_time = datetime.now()
         if (cur_time - start_time_txv_mgts).seconds >= TIME_3_SECONDS:
-            thread_name = 'txv_mgts'
             is_run = False
             for thread in threading.enumerate():
-                if thread.getName() == thread_name: is_run = True; break
+                if thread.getName() == thread_name_mgts: is_run = True; break
             if is_run == False:
-                th = threading.Thread(target=run_txv_mgts, name=thread_name, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
-                # th = threading.Thread(target=run_txv_mgts, name=thread_name, args=(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN))
+                # th = threading.Thread(target=run_txv_mgts, name=thread_name_mgts, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
+                th = threading.Thread(target=run_txv_mgts, name=thread_name_mgts, args=(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN))
                 th.start()
-                print(f'Bot: {thread_name} is running.')
+                print(f'Bot: {thread_name_mgts} is running.')
                 start_time_txv_mgts = cur_time
                 time.sleep(0.2)
 
@@ -141,15 +145,14 @@ if __name__ == '__main__':
         # Скрипт Проверка ТхВ rostelecom
         cur_time = datetime.now()
         if (cur_time - start_time_txv_rostelecom).seconds >= TIME_3_SECONDS:
-            thread_name = 'txv_rostelecom'
             is_run = False
             for thread in threading.enumerate():
-                if thread.getName() == thread_name: is_run = True; break
+                if thread.getName() == thread_name_rostelecom or thread.getName() == thread_name_multi_regions: is_run = True; break
             if is_run == False:
-                # th = threading.Thread(target=run_txv_rostelecom, name=thread_name, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
-                th = threading.Thread(target=run_txv_rostelecom, name=thread_name, args=(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN))
+                # th = threading.Thread(target=run_txv_rostelecom, name=thread_name_rostelecom, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
+                th = threading.Thread(target=run_txv_rostelecom, name=thread_name_rostelecom, args=(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN))
                 th.start()
-                print(f'Bot: {thread_name} is running.')
+                print(f'Bot: {thread_name_rostelecom} is running.')
                 start_time_txv_rostelecom = cur_time
                 time.sleep(0.2)
 
@@ -157,15 +160,14 @@ if __name__ == '__main__':
         # Скрипт Проверка ТхВ multi_regions
         cur_time = datetime.now()
         if (cur_time - start_time_multi_regions).seconds >= TIME_3_SECONDS:
-            thread_name = 'txv_multi_regions'
             is_run = False
             for thread in threading.enumerate():
-                if thread.getName() == thread_name: is_run = True; break
+                if thread.getName() == thread_name_multi_regions or thread.getName() == thread_name_rostelecom: is_run = True; break
             if is_run == False:
-                # th = threading.Thread(target=run_txv_rostelecom, name=thread_name, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
-                th = threading.Thread(target=run_txv_multi_regions, name=thread_name, args=(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN))
+                # th = threading.Thread(target=run_txv_rostelecom, name=thread_name_multi_regions, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
+                th = threading.Thread(target=run_txv_multi_regions, name=thread_name_multi_regions, args=(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN))
                 th.start()
-                print(f'Bot: {thread_name} is running.')
+                print(f'Bot: {thread_name_multi_regions} is running.')
                 start_time_multi_regions = cur_time
                 time.sleep(0.2)
 

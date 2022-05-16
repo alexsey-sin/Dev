@@ -231,6 +231,8 @@ SET status = 0, bot_log = ''
 WHERE pv_code = 7 AND status = 2 AND bot_log LIKE '%Учетная запись пользователя заблокирована%'
 
 UPDATE public.api_txv
-SET status = 0, bot_log = '', password_2 = 'Sjod@!5812'
-WHERE pv_code = 7 AND status = 0 AND bot_log LIKE '%Для продолжения работы Вам нужно ввести Имя и Пароль%'
+SET status = 0, bot_log = ''
+WHERE pv_code = 3 AND status = 2 AND bot_log LIKE '%Message: binary is not a Firefox executable%'
 
+SELECT count(*) FROM public.api_txv
+WHERE pv_code = 3 AND status = 2 AND bot_log LIKE '%Message: binary is not a Firefox executable%'

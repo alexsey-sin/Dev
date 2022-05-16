@@ -285,7 +285,7 @@ def send_crm_txv(txv_dict, opsos):
     available_connect = txv_dict.get('available_connect')
     mess_crm = available_connect
     pv_address = txv_dict.get('pv_address')
-    if pv_address: mess_crm += f'{\n\n{pv_address}\n'
+    if pv_address: mess_crm += f'\n\n{pv_address}\n'
 
     params = {
         'id': txv_dict.get('id_lid'),

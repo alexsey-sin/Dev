@@ -664,6 +664,7 @@ def send_crm_txv(txv_dict, opsos):
         params['fields[STATUS_ID]'] = '72'
         up_status = 'Статус обновлен.'
 
+    # Отсылаем данные в СРМ
     url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.update'
     try:
         responce = requests.post(url, headers=headers, params=params)
@@ -672,6 +673,26 @@ def send_crm_txv(txv_dict, opsos):
         # посмотреть результат https://crm.domconnect.ru/crm/lead/details/1215557/
     except Exception as e:
         return str(e), ''
+    
+    if upgrade_status:
+        # Запрос в СРМ на создание задачи на контент
+        url = 'https://crm.domconnect.ru/rest/371/exgy6kr03s1r1dsf/bizproc.workflow.start'
+        data = {
+            'TEMPLATE_ID': 407,
+            'DOCUMENT_ID':
+                [
+                    'crm',
+                    'CCrmDocumentLead',
+                    txv_dict.get('id_lid'),
+                ],
+        }
+        try:
+            responce = requests.post(url, headers=headers, json=data)
+            st_code = responce.status_code
+            if st_code != 200: return st_code, ''
+        except Exception as e:
+            return str(e), ''
+    
     return '', up_status
     
 def send_telegram(chat: str, token: str, text: str):
@@ -694,7 +715,7 @@ def run_txv_beeline(tlg_chat, tlg_token):
     
     rez, txv_list = get_txv_in_dj_domconnect(pv_code)
     if rez:
-        tlg_mess = 'Ошибка при загрузке запросов из domconnect.ru'
+        tlg_mess = f'ТхВ {opsos}: Ошибка при загрузке запросов из domconnect.ru'
         r = send_telegram(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN, tlg_mess)
         print(tlg_mess, '\nTelegramMessage:', r)
         return
@@ -743,62 +764,62 @@ if __name__ == '__main__':
         # print(val)
     
     # # Красногорск	Красногорский бульвар	8
-    data = {
-        'login': 'S01-181',
-        'login_2': '1999999222',
-        'password': '8GFysus@kffs7',
-        'pv_code': pv_code,
+    # data = {
+        # 'login': 'S01-181',
+        # 'login_2': '1999999222',
+        # 'password': '8GFysus@kffs7',
+        # 'pv_code': pv_code,
 
-        # 'city': 'Энгельс',8GFysus@kffs7 Липецк, ул Катукова д 24
-        # 'street': 'проспект Химиков',
-        # 'house': '3/1',
+        # # 'city': 'Энгельс',8GFysus@kffs7 Липецк, ул Катукова д 24
+        # # 'street': 'проспект Химиков',
+        # # 'house': '3/1',
+        # # 'apartment': '10',
+        
+        # # 'region': 'Московская область',
+        # # 'city': 'Химки',
+        # # 'street': 'микрорайон Левобережный, Совхозная улица',
+        # # 'house': '18',
+        # # 'apartment': '10',
+        
+        # 'region': 'Ленинградская область',
+        # 'city': 'Липецк',
+        # 'street': 'Катукова',  #
+        # 'house': '24',
         # 'apartment': '10',
         
-        # 'region': 'Московская область',
-        # 'city': 'Химки',
-        # 'street': 'микрорайон Левобережный, Совхозная улица',
-        # 'house': '18',
-        # 'apartment': '10',
+        # # 'region': 'Тверская область',
+        # # 'city': 'Тверь',
+        # # 'street': 'Волоколамский проспект',
+        # # 'house': '14',     # Есть договор
+        # # 'apartment': '10',
         
-        'region': 'Ленинградская область',
-        'city': 'Липецк',
-        'street': 'Катукова',  #
-        'house': '24',
-        'apartment': '10',
+        # # 'region': 'Ярославская область',
+        # # 'city': 'Ярославль',
+        # # 'street': 'посёлок Текстилей, Большая Донская улица',
+        # # 'house': '15',     # 
+        # # 'apartment': '10',
         
-        # 'region': 'Тверская область',
-        # 'city': 'Тверь',
-        # 'street': 'Волоколамский проспект',
-        # 'house': '14',     # Есть договор
-        # 'apartment': '10',
+        # # 'region': 'Мурманская область',
+        # # 'city': 'Мурманск',
+        # # 'street': 'Баумана',
+        # # 'house': '36',     # 
+        # # 'apartment': '10',
         
-        # 'region': 'Ярославская область',
-        # 'city': 'Ярославль',
-        # 'street': 'посёлок Текстилей, Большая Донская улица',
-        # 'house': '15',     # 
-        # 'apartment': '10',
+        # # 'region': 'Краснодарский край',
+        # # 'city': 'Красноярск',
+        # # 'street': 'проспект 60 лет Образования СССР',
+        # # 'house': '14',     # Дом подключен
+        # # 'apartment': '10',
         
-        # 'region': 'Мурманская область',
-        # 'city': 'Мурманск',
-        # 'street': 'Баумана',
-        # 'house': '36',     # 
-        # 'apartment': '10',
-        
-        # 'region': 'Краснодарский край',
-        # 'city': 'Красноярск',
-        # 'street': 'проспект 60 лет Образования СССР',
-        # 'house': '14',     # Дом подключен
-        # 'apartment': '10',
-        
-        'available_connect': '',  # Возможность подключения
-        'tarifs_all': '', # список названий тарифных планов
-        'pv_address': '',
-    }
-    rez, data = get_txv(data)
-    if rez: print(rez)
+        # 'available_connect': '',  # Возможность подключения
+        # 'tarifs_all': '', # список названий тарифных планов
+        # 'pv_address': '',
+    # }
+    # rez, data = get_txv(data)
+    # if rez: print(rez)
 
-    print('available_connect:', data['available_connect'])
-    print('pv_address:', data['pv_address'])
+    # print('available_connect:', data['available_connect'])
+    # print('pv_address:', data['pv_address'])
     
     # end_time = datetime.now()
     # time_str = '\nDuration: {}'.format(end_time - start_time)
@@ -841,3 +862,27 @@ if __name__ == '__main__':
             1010000101
             CgslU7tfFsK5w8
     '''
+    # user_agent_val = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36'
+
+    # headers = {
+        # 'Content-Type': 'application/json',
+        # 'Connection': 'Keep-Alive',
+        # 'User-Agent': user_agent_val,
+    # }
+    # url = 'https://crm.domconnect.ru/rest/371/exgy6kr03s1r1dsf/bizproc.workflow.start'
+    # # url = 'https://crm.domconnect.ru/rest/371/exgy6kr03s1r1dsf/bizproc.workflow.start?TEMPLATE_ID=407&DOCUMENT_ID[]=crm&DOCUMENT_ID[]=CCrmDocumentLead&DOCUMENT_ID[]=1439397'
+    # params = {
+        # 'TEMPLATE_ID': 407,
+        # # 'DOCUMENT_ID': ['crm', 'CCrmDocumentLead', txv_dict.get('id_lid')],
+        # 'DOCUMENT_ID[]': ['crm', 'CCrmDocumentLead', 1440564],
+    # }
+    # responce = requests.post(url, headers=headers, params=params)
+    # # responce = requests.post(url, headers=headers)
+    # st_code = responce.status_code
+    # print(st_code)
+    
+    
+    # https://crm.domconnect.ru/rest/371/exgy6kr03s1r1dsf/bizproc.workflow.start?TEMPLATE_ID=407&DOCUMENT_ID[]=crm&DOCUMENT_ID[]=CCrmDocumentLead&DOCUMENT_ID[]=1439397
+    
+    
+    

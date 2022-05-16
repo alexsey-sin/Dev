@@ -6,8 +6,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
 
-url_host = 'http://127.0.0.1:8000/'
-# url_host = 'http://django.domconnect.ru/'
+# url_host = 'http://127.0.0.1:8000/'
+url_host = 'http://django.domconnect.ru/'
 opsos = 'ТТК'
 pv_code = 5
 
@@ -588,7 +588,7 @@ def send_crm_txv(txv_dict, opsos):
         params['fields[STATUS_ID]'] = '72'
         up_status = 'Статус обновлен.'
 
-
+    # Отсылаем данные в СРМ
     url = 'https://crm.domconnect.ru/rest/371/ao3ct8et7i7viajs/crm.lead.update'
     try:
         responce = requests.post(url, headers=headers, params=params)
@@ -597,6 +597,26 @@ def send_crm_txv(txv_dict, opsos):
         # посмотреть результат https://crm.domconnect.ru/crm/lead/details/1215557/
     except Exception as e:
         return str(e), ''
+    
+    if upgrade_status:
+        # Запрос в СРМ на создание задачи на контент
+        url = 'https://crm.domconnect.ru/rest/371/exgy6kr03s1r1dsf/bizproc.workflow.start'
+        data = {
+            'TEMPLATE_ID': 407,
+            'DOCUMENT_ID':
+                [
+                    'crm',
+                    'CCrmDocumentLead',
+                    txv_dict.get('id_lid'),
+                ],
+        }
+        try:
+            responce = requests.post(url, headers=headers, json=data)
+            st_code = responce.status_code
+            if st_code != 200: return st_code, ''
+        except Exception as e:
+            return str(e), ''
+    
     return '', up_status
     
 def send_telegram(chat: str, token: str, text: str):
@@ -619,7 +639,7 @@ def run_txv_ttk(tlg_chat, tlg_token):
     
     rez, txv_list = get_txv_in_dj_domconnect(pv_code)
     if rez:
-        tlg_mess = 'Ошибка при загрузке запросов из domconnect.ru'
+        tlg_mess = f'ТхВ {opsos}: Ошибка при загрузке запросов из domconnect.ru'
         r = send_telegram(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN, tlg_mess)
         print(tlg_mess, '\nTelegramMessage:', r)
         return
