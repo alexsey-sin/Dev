@@ -348,8 +348,10 @@ def get_txv(data):
         if not house: raise Exception('Ошибка не задан дом')
         c_house = ordering_house(house)
         if not c_house[0]: raise Exception(f'Ошибка распознавания дома: {c_house[1]}: \"{house}\".')
+        # print(house, c_house)
         rez, houses = get_houses(token, street_code, c_house[0])
         if rez: raise Exception(rez)
+        # print(houses)
         house_code = 0
         if len(houses) == 1: house_code = houses[0].get('code')
         elif len(houses) == 0: raise Exception('Ошибка блока определения дома.')
@@ -376,10 +378,12 @@ def get_txv(data):
         
         # Получаем подъезды
         rez, entrances = get_entrances(token, house_code)
-        if rez: raise Exception(rez)
-        if len(entrances) == 0: raise Exception('Ошибка нет номеров подъездов.')
-        time.sleep(0.1)
+        # print('rez:', rez)
         # print('entrances:', entrances)
+        # if rez: raise Exception(rez)
+        # if len(entrances) == 0: raise Exception('Ошибка нет номеров подъездов.')
+        if len(entrances) == 0: entrances.append(1) # Подъезды не найдены, укажем первый
+        time.sleep(0.1)
 
         # Получаем ТхВ
         rez, ch_ptv = get_checkptv(token, house_code, entrances[0])
@@ -629,7 +633,7 @@ def run_txv_onlime(tlg_chat, tlg_token):
 
 
 if __name__ == '__main__':
-    start_time = datetime.now()
+    # start_time = datetime.now()
     
     # Документация: https://dealer.onlime.ru/beta/apidocs/
     # login: inetme12
@@ -643,13 +647,13 @@ if __name__ == '__main__':
         # 'id_lid': '1215557',
         
         # 'city': 'Москва',           # город
-        # 'street': 'улица Винокурова',         # улица
-        # # 'street': 'Волжский Бульвар 95',         # улица
+        # # 'street': 'Волжский бульвар',         # улица
+        # 'street': 'Самеда Вургуна',         # улица
         # # 'street': 'ffkjsnsycvbt',         # улица
         # # 'street': 'ул. Ленина',         # улица
         # # 'street': 'Ленина',         # улица
-        # 'house': '7/5 кор. 2',          # дом
-        # 'apartment': '6',          # квартира
+        # 'house': '11',          # дом
+        # 'apartment': '26',          # квартира
 
         # 'available_connect': '',  # Возможность подключения
         # 'tarifs_all': '', # список названий тарифных планов
@@ -690,25 +694,6 @@ if __name__ == '__main__':
     
     pass
     
-    end_time = datetime.now()
-    time_str = '\nDuration: {}'.format(end_time - start_time)
-    print(time_str)
-    # limit_request_line
-    # улица Винокурова 7/5 корпус 2; 17 корпус 3; 17 корпус 1; 17 корпус 4; 17 корпус 2; 7/5 корпус 3; 7/5 корпус 1
-    # Ошибка укажите улицу точнее. Возможны варианты:
-    # 4 (пос. Совхоза им. Ленина) микрорайон; Ленина (Балашиха) просп.; Ленина (Балашиха) ул.; Ленина (Внуково) улица; Ленина (Высоковск) улица; Ленина (дп Загорянский) улица; Ленина (Запрудня) улица; Ленина (Истра) улица; Ленина (Климовск) улица; Ленина (Коломна) улица; Ленина (Королёв) улица; Ленина (Красногорск) улица; Ленина (Лобня) улица; Ленина (Лосино-Петровский) улица; Ленина (Лыткарино) улица; Ленина (мкр.Климовск) улица; Ленина (мкр.Саввино) улица; Ленина (Ногинск) улица; Ленина (Озёры) улица; Ленина (Орехово-Зуево) улица; Ленина (Подольск) проспект; Ленина (пос. Большевик) улица; Ленина (пос. Минвнешторга) улица; Ленина (пос.Авсюнино) улица; Ленина (пос.Кокошкино) улица; Ленина (пос.Обухово) улица; Ленина (пос.Правдинский) улица; Ленина (пос.Сергиевский) улица; Ленина (Протвино) улица; Ленина (Реутов) ул.; Ленина (рп Октябрьский) улица; Ленина (село Красная Пахра) улица; Ленина (село Красная Пахра) улица; Ленина (Сергиев Пасад); Ленина (Сходня) улица; Ленина (Щёлково) улица; Ленина (Электрогорск) улица; Ленина (Электросталь) проспект; пос.Совхоза им.Ленина (Видное); ул. Ленина; ул. Ленина; ул. Ленина; улица Ленина (Кашира); улица Ленина (Клин); улица Ленина (Крюково) (Зеленоград)
-
-    # Duration: 0:00:00.866294
-
-    # c:\Dev\bots\bot_txv_remote_wt>python txv_onlime.py
-    # Ошибка укажите улицу точнее. Возможны варианты:
-    # ул. Ленина; ул. Ленина; ул. Ленина
-
-    # Duration: 0:00:00.825041
-
-    # c:\Dev\bots\bot_txv_remote_wt>python txv_onlime.py
-    # 501684 ул. Ленина
-    # 501239 ул. Ленина
-    # 502008 ул. Ленина
-    # Ошибка укажите улицу точнее. Возможны варианты:
-    # ул. Ленина; ул. Ленина; ул. Ленина
+    # end_time = datetime.now()
+    # time_str = '\nDuration: {}'.format(end_time - start_time)
+    # print(time_str)

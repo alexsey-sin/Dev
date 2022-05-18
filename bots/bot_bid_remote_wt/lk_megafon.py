@@ -138,22 +138,22 @@ def run_lk_parsing(access):
                 # Ищем блок с опциями тарифного плана
                 driver.implicitly_wait(1)
                 els_block = driver.find_elements(By.XPATH, '//div[contains(@class, "subscriber-id-info__tariff-discounts")]')
-                if len(els_block) != 1: raise Exception()
+                if len(els_block) != 1: raise Exception()  # 'Нет блока с опциями тарифного плана'
 
                 # Раскроем список
                 els_open = els_block[0].find_elements(By.XPATH, './/span[contains(@class, "eSRigz link")]')
-                if len(els_open) != 1: raise Exception()
+                if len(els_open) != 1: raise Exception('Нет списока с опциями тарифного плана')
                 try: driver.execute_script("arguments[0].click();", els_open[0])
-                except: raise Exception()
+                except: raise Exception('Раскрытие списка')
                 time.sleep(3)
 
                 # Переберем строки с опциями тарифа
-                els_opt = els_block[0].find_elements(By.XPATH, './/div[contains(@class, "fdmyUd")]')
+                els_opt = els_block[0].find_elements(By.XPATH, './/div[contains(@class, "subscriber-id-info__range")]')
                 for el_opt in els_opt:
-                    els_tit = el_opt.find_elements(By.XPATH, './/div[contains(@class, "cRCcFB")]')
-                    if len(els_tit) != 1: raise Exception()
+                    els_tit = el_opt.find_elements(By.XPATH, './/div[contains(@class, "arrow-tooltip__text")]')
+                    if len(els_tit) != 1: raise Exception('2')
                     els_val = el_opt.find_elements(By.XPATH, './/div[contains(@class, "progress-bar__title-right")]')
-                    if len(els_val) != 1: raise Exception()
+                    if len(els_val) != 1: raise Exception('3')
                     
                     str_tit = els_tit[0].text
                     str_val = els_val[0].text
@@ -165,7 +165,7 @@ def run_lk_parsing(access):
                         lst_val = str_val.split(' ')
                         number['sms_available'] = lst_val[0]
                         number['sms_total'] = lst_val[2]
-            except: pass
+            except Exception as e: print(e)
             data['numbers'].append(number)
 
         ###################### Вывод ######################

@@ -13,6 +13,10 @@ pv_crm_code = 3
 MY_TELEGRAM_CHAT_ID = '1740645090'
 MY_TELEGRAM_TOKEN = '2009560099:AAHtYot6EOHh_qr9EUoCoczQhjyRdulKHYo'
 
+# общий канал бот проверки сделок (ПВ)        PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN
+PV_TELEGRAM_CHAT_ID = '-654103882'
+PV_TELEGRAM_TOKEN = '526322367:AAEaw2vaeLl_f6Njfb952NopyxqCGRQXji8'
+
 access = {  # Доступы к ПВ
     'url': 'https://eissd.rt.ru/login',
     'login': 'sz_v_an',
@@ -26,6 +30,11 @@ status_rtk_srm = {  # Коды статусов: РТК = СРМ
     'Тест': 11,  # Служебный
     'Продажа оборудования': 2,  # Подключен
     'Самоинсталляция / Доставка оборудования курьером, 0/1': 2,  # Подключен
+}
+name_status_crm = {
+    2: 'Подключен',
+    11: 'Служебный',
+    'NEW': 'Ошибки',
 }
 status_for_comment = [  # Статусы РТК когда требуется взять коментарий из истории
     'Отказ',
@@ -70,6 +79,7 @@ def get_deals_crm(pv, from_data, to_date):
             if responce.status_code == 200:
                 answer = json.loads(responce.text)
                 result = answer.get('result')
+                # print(result)
                 go_next = answer.get('next')
                 go_total = answer.get('total')
                 out_lst += result
@@ -346,13 +356,20 @@ def run_check_deals(tlg_chat, tlg_token, by_days=60):
     for deal in lst_deal:
         status = deal.get('status')
         if status and status in status_rtk_srm:
-            print(deal.get('ID'), status, status_rtk_srm[status])
+            print(deal.get('ID'), status, name_status_crm[status_rtk_srm[status]])
             e = send_crm_deal_stage(deal, status_rtk_srm[status])
+            # e = False
             if e: 
                 tlg_mess = f'ПВ {provider}: Ошибка при обновлении статуса сделки в срм'
                 r = send_telegram(MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN, tlg_mess)
                 print(tlg_mess, '\nTelegramMessage:', r)
-            else: change += 1
+            else:
+                tlg_mess = f'ПВ {provider}:\n{deal.get("ID")}|{deal.get("num")}|{status} ==> {name_status_crm[status_rtk_srm[status]]}'
+                comment = deal.get('comment')
+                if comment: tlg_mess += f'|{comment}'
+                tlg_mess += '\n'
+                r = send_telegram(tlg_chat, tlg_token, tlg_mess)
+                change += 1
             time.sleep(1)
     
     tlg_mess = f'ПВ {provider}:\nСтатус сделок изменен\nв {change} из {len(lst_deal)}'
@@ -362,6 +379,7 @@ def run_check_deals(tlg_chat, tlg_token, by_days=60):
 
 if __name__ == '__main__':
     # run_check_deals(MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN, 1)
-    run_check_deals(MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN)
+    run_check_deals(PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN, 1)
+    # run_check_deals(MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN)
 
     pass

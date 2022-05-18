@@ -89,15 +89,16 @@ class BidBeeline2Admin(admin.ModelAdmin):
 
 @admin.register(BidRostelecom2)
 class BidRostelecom2Admin(admin.ModelAdmin):
-    def address(self):
-        return f'{self.address[:20]}'
-    address.short_description = 'Адрес'
-    def field_FIO(self):
-        return f'{self.firstname} {self.patronymic} {self.lastname}'
-    def b_log(self):
-        return f'{self.bot_log[:20]}...'
-    b_log.short_description = 'Лог'
-    list_display = ['id_lid', 'status', address, field_FIO, 'pub_date', b_log, 'phone']
+    # def address(self):
+    #     return f'{self.address[:20]}'
+    # address.short_description = 'Адрес'
+    # def field_FIO(self):
+    #     return f'{self.firstname} {self.patronymic} {self.lastname}'
+    # def b_log(self):
+    #     return f'{self.bot_log[:20]}...'
+    # b_log.short_description = 'Лог'
+    # list_display = ['id_lid', 'status', address, field_FIO, 'pub_date', b_log, 'phone']
+    list_display = [field.name for field in BidRostelecom2._meta.get_fields()]
     search_fields = ('id_lid',)  # Верхнее поле "Найти"
     list_filter = ('status', 'pub_date')
     empty_value_display = '-пусто-'
@@ -110,7 +111,7 @@ class BidRostelecom2Admin(admin.ModelAdmin):
 @admin.register(BidRostelecom)
 class BidRostelecomAdmin(admin.ModelAdmin):
     list_display = [field.name for field in BidRostelecom._meta.get_fields()]
-    search_fields = ('change_date',)
+    search_fields = ('id_lid',)  # Верхнее поле "Найти"
     list_filter = ('status', 'pub_date')
     empty_value_display = '-пусто-'
     date_hierarchy = 'pub_date'

@@ -1,5 +1,5 @@
 import os, time, threading
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time as dt_time
 
 from txv_beeline import run_txv_beeline
 from txv_mts import run_txv_mts
@@ -9,6 +9,7 @@ from txv_ttk import run_txv_ttk
 from txv_onlime import run_txv_onlime
 from txv_mgts import run_txv_mgts
 from txv_multi_regions import run_txv_multi_regions
+from pv_rostelecom import run_check_deals as run_pv_rostelecom
 
 # личный бот @infra     TELEGRAM_CHAT_ID, TELEGRAM_TOKEN
 TELEGRAM_CHAT_ID = '1740645090'
@@ -18,8 +19,19 @@ TELEGRAM_TOKEN = '2009560099:AAHtYot6EOHh_qr9EUoCoczQhjyRdulKHYo'
 BID_TELEGRAM_CHAT_ID = '-1001646764735'
 BID_TELEGRAM_TOKEN = '526322367:AAEaw2vaeLl_f6Njfb952NopyxqCGRQXji8'
 
+# общий канал бот проверки сделок (ПВ)        PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN
+PV_TELEGRAM_CHAT_ID = '-654103882'
+PV_TELEGRAM_TOKEN = '526322367:AAEaw2vaeLl_f6Njfb952NopyxqCGRQXji8'
+
 TIME_3_SECONDS = 3  # в секундах, 
-PERIOD_BETWEEN = 1  # в секундах, Пауза
+PERIOD_BETWEEN = 0.5  # в секундах, Пауза
+
+time_pv_rostelecom = {'h': 1, 'm': 0, 's': 0}
+
+def its_time(dct_time):
+    pv_t = time.localtime()
+    if pv_t.tm_hour == dct_time['h'] and pv_t.tm_min == dct_time['m'] and pv_t.tm_sec == dct_time['s']: return True
+    else: return False
 
 
 if __name__ == '__main__':
@@ -43,13 +55,28 @@ if __name__ == '__main__':
     thread_name_mgts = 'txv_mgts'
     thread_name_rostelecom = 'txv_rostelecom'
     thread_name_multi_regions = 'txv_multi_regions'
+    
+    thread_name_pv_rostelecom = 'pv_rostelecom'
 
     
     while True:
         time.sleep(PERIOD_BETWEEN)
         # Рабочее время ботов с 6 до 23
         cur_time = datetime.now()
-        if cur_time.hour < 6 or cur_time.hour >= 23: continue
+        
+        if cur_time.hour < 6 or cur_time.hour >= 23:
+            # Ночное время - работают боты ПВ
+            if its_time(time_pv_rostelecom):
+                is_run = False
+                for thread in threading.enumerate():
+                    if thread.getName() == thread_name_pv_rostelecom: is_run = True; break
+                if is_run == False:
+                    # th = threading.Thread(target=run_pv_rostelecom, name=thread_name_pv_rostelecom, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
+                    th = threading.Thread(target=run_pv_rostelecom, name=thread_name_pv_rostelecom, args=(PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN))
+                    th.start()
+                    print(f'Bot: {thread_name_pv_rostelecom} is running.')
+                time.sleep(1)
+            continue
         
         #===============================================#
         # Скрипт Проверка ТхВ beeline

@@ -46,9 +46,23 @@ def set_bid_rostelecom2(request):
             if len(phone) != 11: raise ValueError('phone bad length')
             bid.phone = phone
 
-            address = request.GET.get('address')
-            if address == None or len(address) == 0: raise ValueError('address is absent')
-            bid.address = address
+            region = request.GET.get('region')
+            if region or len(region) > 0: bid.region = region
+
+            city = request.GET.get('city')
+            if city == None or len(city) == 0: raise ValueError('city is absent')
+            bid.city = city
+
+            street = request.GET.get('street')
+            if street == None or len(street) == 0: raise ValueError('street is absent')
+            bid.street = street
+
+            house = request.GET.get('house')
+            if house == None or len(house) == 0: raise ValueError('house is absent')
+            bid.house = house
+
+            apartment = request.GET.get('apartment')
+            if apartment or len(apartment) > 0: bid.apartment = apartment
 
             inn_organisation = request.GET.get('inn_organisation')
             if inn_organisation == None or len(inn_organisation) == 0:

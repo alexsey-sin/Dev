@@ -402,86 +402,6 @@ class BidBeeline2(models.Model):
     )
 
 
-class BidRostelecom2(models.Model):
-    STATUS_VAR = (
-        (0, 'Заявка поступила'),
-        (1, 'Бот забрал заявку'),
-        (2, 'Ошибка отправки заявки, передано оператору'),
-        (3, 'Заявка принята Ростелеком'),
-    )
-    login = models.CharField(
-        verbose_name = 'Логин',
-        max_length = 200,
-    )
-    password = models.CharField(
-        verbose_name = 'Пароль',
-        max_length = 200,
-    )
-    id_lid = models.CharField(
-        max_length=50,
-        verbose_name = 'ID лида',
-    )
-    firstname = models.CharField(
-        max_length=100,
-        verbose_name = 'Имя',
-        default = '',
-        blank = True,
-    )
-    patronymic = models.CharField(
-        max_length=100,
-        verbose_name = 'Отчество',
-        default = '',
-        blank = True,
-    )
-    lastname = models.CharField(
-        max_length=100,
-        verbose_name = 'Фамилия',
-        default = '',
-        blank = True,
-    )
-    phone = models.CharField(
-        max_length=11,
-        verbose_name = 'Телефон',
-    )
-    address = models.CharField(
-        max_length=300,
-        verbose_name = 'Адрес',
-    )
-    inn_organisation = models.CharField(
-        max_length=100,
-        verbose_name = 'ИНН/Организация',
-    )
-    service = models.CharField(
-        max_length=100,
-        verbose_name = 'Услуга',
-    )
-    comment = models.TextField(
-        blank = True,
-        verbose_name='Комментарий',
-    )
-    bid_number = models.CharField(
-        max_length=100,
-        blank = True,
-        verbose_name = 'Номер заявки',
-    )
-    status = models.IntegerField(
-        choices = STATUS_VAR,
-        verbose_name = 'Статус',
-    )
-    change_date = models.DateTimeField(
-        auto_now=True,
-        verbose_name='Изменено',
-    )
-    pub_date = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name='Создано',
-    )
-    bot_log = models.TextField(
-        blank = True,
-        verbose_name='Лог бота',
-    )
-
-
 class BidRostelecom(models.Model):
     STATUS_VAR = (
         (0, 'Заявка поступила'),
@@ -596,6 +516,104 @@ class BidRostelecom(models.Model):
         verbose_name = 'Пакет каналов iTV',
         default = '',
         blank = True,
+    )
+    comment = models.TextField(
+        blank = True,
+        verbose_name='Комментарий',
+    )
+    bid_number = models.CharField(
+        max_length=100,
+        blank = True,
+        verbose_name = 'Номер заявки',
+    )
+    status = models.IntegerField(
+        choices = STATUS_VAR,
+        verbose_name = 'Статус',
+    )
+    change_date = models.DateTimeField(
+        auto_now=True,
+        verbose_name='Изменено',
+    )
+    pub_date = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Создано',
+    )
+    bot_log = models.TextField(
+        blank = True,
+        verbose_name='Лог бота',
+    )
+
+
+class BidRostelecom2(models.Model):
+    STATUS_VAR = (
+        (0, 'Заявка поступила'),
+        (1, 'Бот забрал заявку'),
+        (2, 'Ошибка отправки заявки, передано оператору'),
+        (3, 'Заявка принята Ростелеком'),
+    )
+    login = models.CharField(
+        verbose_name = 'Логин',
+        max_length = 200,
+    )
+    password = models.CharField(
+        verbose_name = 'Пароль',
+        max_length = 200,
+    )
+    id_lid = models.CharField(
+        max_length=50,
+        verbose_name = 'ID лида',
+    )
+    firstname = models.CharField(
+        max_length=100,
+        verbose_name = 'Имя',
+        default = '',
+        blank = True,
+    )
+    patronymic = models.CharField(
+        max_length=100,
+        verbose_name = 'Отчество',
+        default = '',
+        blank = True,
+    )
+    lastname = models.CharField(
+        max_length=100,
+        verbose_name = 'Фамилия',
+        default = '',
+        blank = True,
+    )
+    phone = models.CharField(
+        max_length=11,
+        verbose_name = 'Телефон',
+    )
+    region = models.CharField(
+        max_length=100,
+        verbose_name = 'Регион',
+        blank = True,
+    )
+    city = models.CharField(
+        max_length=100,
+        verbose_name = 'Город',
+    )
+    street = models.CharField(
+        max_length=100,
+        verbose_name = 'Улица',
+    )
+    house = models.CharField(
+        max_length=10,
+        verbose_name = 'Дом',
+    )
+    apartment = models.CharField(
+        max_length=10,
+        verbose_name = 'Квартира',
+        blank = True,
+    )
+    inn_organisation = models.CharField(
+        max_length=100,
+        verbose_name = 'ИНН/Организация',
+    )
+    service = models.CharField(
+        max_length=100,
+        verbose_name = 'Услуга',
     )
     comment = models.TextField(
         blank = True,

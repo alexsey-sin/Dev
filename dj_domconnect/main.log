@@ -16,3 +16,4 @@
 2022-05-06 09:41:41,036:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\lib_seo.py changed, reloading.
 2022-05-06 09:41:50,935:domconnect.lib_seo:Ошибка make_csv_text: try: unsupported operand type(s) for -: 'list' and 'int'
 2022-05-06 09:47:11,398:django.utils.autoreload:C:\Dev\dj_domconnect\domconnect\lib_seo.py changed, reloading.
+2022-05-18 15:46:20,615:django.request:Not Found: /favicon.ico

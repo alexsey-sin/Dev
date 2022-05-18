@@ -206,14 +206,16 @@ def set_did_to_dj_domconnect():
     }
     params = {
         'key': 'Q8kGM1HfWz',
-        'login': 'mos.domconnect@gmail.com',
-        'password': 'bvo[7dGr',
         'id_lid': '1163386',
         'firstname': 'андрей',
         'patronymic': '',
         'lastname': '',
         'phone': '79111234567',
-        'address': 'Ярославль Попова д.22',
+        'region': '',
+        'city': 'Ярославль',
+        'street': 'Попова',
+        'house': '24',
+        'apartment': '',
         'inn_organisation': '7604350441',
         'service': 'Интернет',
         'comment': 'Тестовая заявка, просьба не обрабатывать',
@@ -222,7 +224,7 @@ def set_did_to_dj_domconnect():
     try:
         responce = requests.get(url, headers=headers, params=params)
         print(responce.status_code)
-        print(responce.text)
+        # print(responce.text)
     except:
         pass
         print('Error: requests.get')
@@ -361,22 +363,25 @@ if __name__ == '__main__':
     # data = {'id': 1,}
     # set_bid_status(3, data)
     
-    # rez, bid_list = get_did_in_dj_domconnect()
-    # print(bid_list)
-    data = {
-        'login': 'mos.domconnect@gmail.com',
-        'password': 'bvo[7dGr',
-        'id_lid': '1163386',
-        'firstname': 'Иван',
-        'patronymic': '',
-        'lastname': '',
-        'phone': '79111234567',
-        'address': 'санкт-петербург, наб. Матисова канала 1',
-        'inn_organisation': '772821163041 / ИП Ильченко Василий Иванович',
-        'service': 'Интернет',
-        'comment': 'Тестовая заявка, просьба не обрабатывать',
-    }
-    rez, data = set_bid(data)
+    rez, bid_list = get_did_in_dj_domconnect()
     if rez: print(rez)
+    print(bid_list)
     
     
+    # data = {
+        # 'login': 'mos.domconnect@gmail.com',
+        # 'password': 'bvo[7dGr',
+        # 'id_lid': '1163386',
+        # 'firstname': 'Иван',
+        # 'patronymic': '',
+        # 'lastname': '',
+        # 'phone': '79111234567',
+        # 'address': 'санкт-петербург, наб. Матисова канала 1',
+        # 'inn_organisation': '772821163041 / ИП Ильченко Василий Иванович',
+        # 'service': 'Интернет',
+        # 'comment': 'Тестовая заявка, просьба не обрабатывать',
+    # }
+    # rez, data = set_bid(data)
+    # if rez: print(rez)
+    
+    # http://django.domconnect.ru/api/set_bid_rostelecom2?key=Q8kGM1HfWz

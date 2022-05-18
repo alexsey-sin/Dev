@@ -18,6 +18,8 @@ ORDER BY pub_date DESC
 DELETE FROM public.api_txv
 WHERE "pub_date" < '2022-02-15 00:00:00'
 
+SELECT * FROM public.api_bidrostelecom2
+
 
 SELECT count(*) as cnt FROM public.mobile_mobiledata
 
