@@ -47,7 +47,7 @@ def set_bid_rostelecom2(request):
             bid.phone = phone
 
             region = request.GET.get('region')
-            if region or len(region) > 0: bid.region = region
+            if region and len(region) > 0: bid.region = region
 
             city = request.GET.get('city')
             if city == None or len(city) == 0: raise ValueError('city is absent')
@@ -62,7 +62,7 @@ def set_bid_rostelecom2(request):
             bid.house = house
 
             apartment = request.GET.get('apartment')
-            if apartment or len(apartment) > 0: bid.apartment = apartment
+            if apartment and len(apartment) > 0: bid.apartment = apartment
 
             inn_organisation = request.GET.get('inn_organisation')
             if inn_organisation == None or len(inn_organisation) == 0:

@@ -518,14 +518,12 @@ def get_txv(data):
         driver.implicitly_wait(1)
         # Проверяем блок если есть активный договор
         els_er = driver.find_elements(By.XPATH, '//div[@ng-if="$abonCtrl.addressErrorMessage"]')
-        if els_er: data['available_connect'] = els_er[0].text
+        if els_er:
+            er_text = els_er[0].text
+            if er_text.find('есть активный договор') >= 0: data['available_connect'] = 'Есть ТхВ'
+            else: data['available_connect'] = er_text
         time.sleep(2)
         raise Exception('')  # Просто выход
-            # err_txt = els_er[0].text
-            # if err_txt.find('На адресе есть активный договор') >= 0:
-                # data['available_connect'] = 'На адресе уже есть активный договор\n'
-            # else: data['available_connect'] = err_txt
-        # time.sleep(3)
 
         # #===========
         # time.sleep(10)

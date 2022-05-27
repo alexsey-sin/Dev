@@ -13,3 +13,11 @@ with open('catalog.txt', 'w', encoding='utf-8') as out_file:
 with open('time_token.json', 'r', encoding='utf-8') as file:
     js = json.load(file)
 dt_old_str = js.get('time_create')
+
+
+
+
+print(json.dumps(lst_deal, sort_keys=True, indent=2, ensure_ascii=False))
+
+
+

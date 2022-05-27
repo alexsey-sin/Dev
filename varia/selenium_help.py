@@ -55,6 +55,12 @@ attr = els[0].get_attribute('value')
 # Взять значение внутри тэга у элемента
 attr = els[0].get_attribute('innerHTML')
 
+# По нормальному тэг svg selenium не находит
+els_svg = driver.find_elements(By.XPATH, '//*[local-name() = "svg"]')
+
+# По нескольким свойствам
+els_svg = driver.find_elements(By.XPATH, '//*[local-name() = "svg" and (@ng-click="ticket.expandedTicket()")]')
+els = driver.find_elements(By.XPATH, '//input[(@id="id_Start") and (@class = "blabla")]')
 
 # Кликнуть мышкой
 try: els[0].click()

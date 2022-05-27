@@ -1,10 +1,16 @@
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
+from rest_framework.response import Response
+from django.views.decorators.http import require_http_methods
+from api.serializers import PVResultSerializer
 from django.http import HttpResponse, FileResponse
 from django.shortcuts import get_object_or_404
 from app.models import LizaGroupPhrase, LizaPhrase, Name
 from app.models import NdzGroupPhrase, NdzPhrase, PzGroupPhrase, PzPhrase
-from api.models import BidDomRu2, BidBeeline, BidMTS, BidBeeline2
+from api.models import BidDomRu2, BidBeeline, BidMTS, BidBeeline2, PV_VARS
 from api.models import BidRostelecom2, BidRostelecom, BidDomRu, BidTtk
-from api.models import  BidOnlime, BidMGTS, TxV, BotAccess
+from api.models import  BidOnlime, BidMGTS, TxV, BotAccess, PVResult
 from django.contrib.auth import get_user_model
 from django.forms.models import model_to_dict
 import json
@@ -233,3 +239,62 @@ def get_lk_access(request):
 
         return HttpResponse(data, content_type='application/json; charset=utf-8')
     return HttpResponse('Use GET request, please.', content_type='text/plain; charset=utf-8')
+###############################################################################
+###############################################################################
+class SetPvResultViewSet(viewsets.ModelViewSet):
+    queryset = PVResult.objects.all()
+    permission_classes = [IsAuthenticated,]  # IsAuthenticated
+    serializer_class = PVResultSerializer
+    pagination_class = None
+
+    def create(self, request, *args, **kwargs):
+        many = isinstance(request.data, list)
+        serializer = self.get_serializer(data=request.data, many=many)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, headers=headers)
+
+
+@require_http_methods(['GET',])
+def get_pv_result(request, pv_code, from_date):
+    dct_pv = {k : v for k, v in PV_VARS}  # Преобразуем кортеж кортежей в словарь
+
+    try:
+        f_data = datetime.strptime(from_date, '%d.%m.%Y')
+    except Exception as e:
+        return HttpResponse(f'Ошибка преобразования даты \"{from_date}\"', content_type='text/plain; charset=utf-8')
+    
+    if pv_code not in dct_pv:
+        return HttpResponse(f'Код провайдера \"{pv_code}\" не корректен', content_type='text/plain; charset=utf-8')
+    
+    objs = PVResult.objects.filter(pv_code=pv_code, pub_date=f_data)
+    
+    str_f_date = f_data.strftime('%d.%m.%Y %H:%M:%S')
+    str_today = datetime.today().strftime('%d.%m.%Y %H:%M:%S')
+    mess = f'Результат работы бота ПВ {str_f_date} {from_date}\n\n'
+
+
+    print(pv_code, from_date)
+    # key = request.GET.get('key')
+    # if key != 'Q8kGM1HfWz':
+    #     HttpResponse('ERROR key.', status=status.HTTP_403_FORBIDDEN)
+
+    # lk_name = request.GET.get('lk_name')
+    # yes_work = False
+    # # Отметимся что бот был
+    # obj_visit, _ = BotAccess.objects.get_or_create(name=f'Парсер ЛК {lk_name}')
+    # obj_visit.last_visit = datetime.now()
+    # yes_work = obj_visit.work
+    # obj_visit.save()
+
+    # if yes_work == True:
+    #     access = {'login': obj_visit.login, 'password': obj_visit.password}
+    #     data = json.dumps(access)
+    # else: data = json.dumps({})
+
+    return HttpResponse('Уже в избранном',
+        status=status.HTTP_208_ALREADY_REPORTED,
+        content_type='text/plain; charset=utf-8'
+    )
+

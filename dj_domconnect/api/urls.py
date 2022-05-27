@@ -1,11 +1,36 @@
 # -*- encoding: utf-8 -*-
-from django.urls import path
+from django.urls import path, include
 from api import views, views_domru2, views_beeline, views_mts
 from api import views_beeline2, views_rostelecom2, views_rostelecom
 from api import views_domru, views_ttk, views_onlime, views_mgts, views_txv
+from rest_framework import permissions
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+from rest_framework.routers import DefaultRouter
+
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Схема API Fullstats",
+        default_version='v1',
+        description='''Возможности API позволяют зарегистрироваться в сервисе,
+            читать ленту новостей, отслеживать понравившиеся и избранные
+            новости, иметь возможность оценивать рейтинг новости и количество
+            просмотров, а также написать собственную статью.
+        ''',
+        terms_of_service="https://www.jaseci.org",
+        contact=openapi.Contact(email="jason@jaseci.org"),
+        license=openapi.License(name="Awesome IP"),
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+)
 
 
 app_name = 'api'
+
+router = DefaultRouter()
+router.register('set_pv_result', views.SetPvResultViewSet, basename='setpvresult')
 
 urlpatterns = [
     path('get_liza_phrases/<int:num_group>', views.get_liza_phrases, name='liza_phrases'),
@@ -63,4 +88,12 @@ urlpatterns = [
     path('get_bots_info/<str:from_date>', views.get_bots_info),
     path('get_bots_vizit', views.get_bots_vizit),
     path('get_lk_access', views.get_lk_access),
+
+    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0),
+        name='schema-redoc'),
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0),
+        name='schema-swagger-ui'),
+
+    path('get_pv_result/<int:pv_code>/<str:from_date>', views.get_pv_result),
+    path('', include(router.urls)),
 ]

@@ -1,0 +1,84 @@
+@host = localhost:8000
+# @host = django.domconnect.ru
+@token = Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjUzNzQxNzA3LCJqdGkiOiJhMDk1NmJkYzUxZWU0ZWQ5YWQ3MjlkYjBhNWM4NmYxNiIsInVzZXJfaWQiOjJ9.mAP1uxBmmh1_x5oE7Ljf4S-OSYIHSXmz28BykioZ-R0
+
+###
+# Создать пользователя
+POST http://{{host}}/auth/users/
+Content-Type: application/json
+
+{
+    "email": "user@mail.ru",
+    "username": "user",
+    "password": "User123456"
+}
+
+###
+# Получить токен
+POST http://{{host}}/auth/jwt/create/
+Content-Type: application/json
+
+{
+    "username": "user",
+    "password": "User123456"
+}
+
+###############################################################################
+###
+# Занести результаты работы бота ПВ одной сделки
+POST http://{{host}}/api/set_pv_result/
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+    "pv_code": "1",
+    "id_crm": "1445521",
+    "num_deal": "1456253214578954",
+    "pv_status": "ПВ статус",
+    "crm_status": "Новый СРМ статус1",
+    "date_connect": "date_connect",
+    "comment": "comment"
+}
+
+###
+# Занести результаты работы бота ПВ нескольких сделок
+POST http://{{host}}/api/set_pv_result/
+Authorization: {{token}}
+Content-Type: application/json
+
+[
+    {
+        "pv_code": "1",
+        "id_crm": "1445521",
+        "num_deal": "1456253214578954",
+        "pv_status": "ПВ статус",
+        "crm_status": "Новый СРМ статус1",
+        "date_connect": "date_connect",
+        "comment": "comment"
+    },
+    {
+        "pv_code": "1",
+        "id_crm": "1445521",
+        "num_deal": "1456253214578954",
+        "pv_status": "ПВ статус",
+        "crm_status": "Новый СРМ статус1",
+        "date_connect": "date_connect",
+        "comment": "comment"
+    }
+]
+
+
+###
+# Взять результаты работы бота ПВ
+GET http://{{host}}/api/get_pv_result/1/25.02.2021
+Authorization: {{token}}
+# Content-Type: application/json
+
+# {
+#     "email": "user@mail.ru"
+# }
+
+
+
+
+

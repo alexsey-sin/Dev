@@ -27,10 +27,17 @@ status_rtk_srm = {  # Коды статусов: РТК = СРМ
     'Отказ': 'NEW',  # Ошибки + коммент
     'Дубликат': 'NEW',  # Ошибки + коммент
     'Неверная заявка': 'NEW',  # Ошибки + коммент
+    'Заявка не найдена': 'NEW',  # Ошибки + коммент
     'Тест': 11,  # Служебный
     'Продажа оборудования': 2,  # Подключен
     'Самоинсталляция / Доставка оборудования курьером, 0/1': 2,  # Подключен
 }
+prioritet_status = [
+    'Домашний интернет',
+    'Интерактивное ТВ',
+    'Wink-ТВ-онлайн',
+    'Мобильная связь',
+]
 name_status_crm = {
     2: 'Подключен',
     11: 'Служебный',
@@ -199,7 +206,9 @@ def get_deal_status(lst_deal, access, status_for_comment):
             els = driver.find_elements(By.XPATH, '//div[contains(@class, "ju-popup ju-message attention")]')
             if len(els) == 1:
                 els_cont = els[0].find_elements(By.XPATH, './/div[@class="content"]')
-                if len(els_cont) > 0: deal['status'] = els_cont[0].text
+                if len(els_cont) > 0:
+                    deal['status'] = 'Заявка не найдена'
+                    deal['comment'] = els_cont[0].text
                 els_btn = els[0].find_elements(By.XPATH, './/input[contains(@class, "close")]')
                 if len(els_btn) > 0:
                     try: els_btn[0].click()
@@ -207,30 +216,53 @@ def get_deal_status(lst_deal, access, status_for_comment):
                 time.sleep(2)
                 continue
             # Посмотрим результат
-            status = ''
-            date_connect = ''  # Дата подключения
             els_div = driver.find_elements(By.XPATH, '//div[@id="filter_result"]')
             if len(els_div) == 0: raise Exception('Нет блока результатов поиска заявки')
             els_tbody = els_div[0].find_elements(By.TAG_NAME, 'tbody')
             if len(els_tbody) == 0: raise Exception('Нет таблицы результатов поиска заявки')
             els_tr = els_tbody[0].find_elements(By.TAG_NAME, 'tr')
             if len(els_tr) == 0: raise Exception('Нет строк таблицы результатов поиска заявки')
+            
+            print(num)
+            status = ''
+            date_connect = ''  # Дата подключения
+            varied_status = False  # Разные статусы
+            usluga_status = []  # список словарей: Услуга, статус, дата подключения
             for el_tr in els_tr:
                 els_td = el_tr.find_elements(By.TAG_NAME, 'td')
                 if len(els_td) != 14: raise Exception('Неправильный формат строки таблицы результатов поиска заявки')
-                # Сравниваем статусы по строкам
-                # В работу берем только если статусы по всем строкам одинаковые
+                # Собираем статусы по строкам
+                usluga_status.append({'usl': els_td[2].text, 'stat': els_td[7].text, 'data': els_td[8].text})
                 if status == '':
                     status = els_td[7].text
                     date_connect = els_td[8].text
                     continue
                 else:
-                    if status != els_td[7].text:  # Разные статусы по строкам
-                        status = 'varied status'
+                    if status != els_td[7].text: varied_status = True # Разные статусы по строкам
+
+            if varied_status:
+                # Проверим нет ли подключенных услуг
+                not_ok = True
+                for us_stat in usluga_status:
+                    if us_stat.get('stat') == 'Услуга подключена':
+                        deal['status'] = us_stat.get('stat')
+                        deal['date_connect'] = us_stat.get('data')
+                        not_ok = False
                         break
-                
-            if status: deal['status'] = status
-            if date_connect: deal['date_connect'] = date_connect
+                if not_ok:
+                    f_ok = False
+                    # Проход по приоритету статуса
+                    for pr_st in prioritet_status:
+                        for us_stat in usluga_status:
+                            if us_stat.get('usl') == pr_st:
+                                deal['status'] = us_stat.get('stat')
+                                deal['date_connect'] = us_stat.get('data')
+                                f_ok = True
+                                break
+                        if f_ok: break
+            else:
+                if status: deal['status'] = status
+                if date_connect: deal['date_connect'] = date_connect
             try:
                 if status in status_for_comment:
                     els_td = els_tr[0].find_elements(By.TAG_NAME, 'td')
@@ -321,9 +353,8 @@ def run_check_deals(tlg_chat, tlg_token, by_days=60):
     # Заберем сделки из СРМ по фильтру
     e, lst_deal = get_deals_crm(pv_crm_code, str(from_date), str(to_date))
     if e: 
-        tlg_mess = f'ПВ {provider}: Ошибка при загрузке сделок из срм'
-        r = send_telegram(MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN, tlg_mess)
-        print(tlg_mess, '\nTelegramMessage:', r)
+        tlg_mess = f'ПВ {provider}: Ошибка при загрузке сделок из срм: {e}'
+        send_telegram(tlg_chat, tlg_token, tlg_mess)
         return
     if len(lst_deal) == 0:
         cur_time = datetime.now().strftime('%H:%M:%S %d-%m-%Y')
@@ -346,10 +377,10 @@ def run_check_deals(tlg_chat, tlg_token, by_days=60):
     
     # Проверим статус сделок у ПВ
     e, lst_deal = get_deal_status(new_lst_deal, access, status_for_comment)
+    # print(json.dumps(lst_deal, sort_keys=True, indent=2, ensure_ascii=False))
     if e: 
         tlg_mess = f'ПВ {provider}: Ошибка при проверке статуса сделок: {e} '
-        r = send_telegram(MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN, tlg_mess)
-        print(tlg_mess, '\nTelegramMessage:', r)
+        send_telegram(tlg_chat, tlg_token, tlg_mess)
         return
     
     change = 0
@@ -361,25 +392,44 @@ def run_check_deals(tlg_chat, tlg_token, by_days=60):
             # e = False
             if e: 
                 tlg_mess = f'ПВ {provider}: Ошибка при обновлении статуса сделки в срм'
-                r = send_telegram(MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN, tlg_mess)
-                print(tlg_mess, '\nTelegramMessage:', r)
+                send_telegram(tlg_chat, tlg_token, tlg_mess)
             else:
-                tlg_mess = f'ПВ {provider}:\n{deal.get("ID")}|{deal.get("num")}|{status} ==> {name_status_crm[status_rtk_srm[status]]}'
+                tlg_mess = f'ПВ {provider}: {deal.get("ID")}|{deal.get("num")}|{status} ==> {name_status_crm[status_rtk_srm[status]]}'
+                date_connect = deal.get('date_connect')
+                if status_rtk_srm[status] == 2 and date_connect: tlg_mess += f'|{date_connect}'
                 comment = deal.get('comment')
                 if comment: tlg_mess += f'|{comment}'
-                tlg_mess += '\n'
-                r = send_telegram(tlg_chat, tlg_token, tlg_mess)
+                send_telegram(tlg_chat, tlg_token, tlg_mess)
                 change += 1
-            time.sleep(1)
+            time.sleep(0.5)
     
     tlg_mess = f'ПВ {provider}:\nСтатус сделок изменен\nв {change} из {len(lst_deal)}'
-    r = send_telegram(tlg_chat, tlg_token, tlg_mess)
-    print(tlg_mess, '\nTelegramMessage:', r)
+    send_telegram(tlg_chat, tlg_token, tlg_mess)
 
 
 if __name__ == '__main__':
     # run_check_deals(MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN, 1)
-    run_check_deals(PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN, 1)
+    # run_check_deals(PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN, 1)
     # run_check_deals(MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN)
+    
+    # lst_deal = []
+    # # # lst_deal.append({'ID': '157942', 'num': '1100298394828'})
+    # # lst_deal.append({'ID': '157942', 'num': '1100298314608'})
+    # # lst_deal.append({'ID': '157942', 'num': '1100298316713'})
+    # # lst_deal.append({'ID': '157942', 'num': '1100298319222'})
+    # # lst_deal.append({'ID': '157942', 'num': '1100298319853'})
+    # # lst_deal.append({'ID': '157942', 'num': '1100298320393'})
+    # lst_deal.append({'ID': '157942', 'num': '1100298323415'})
+    # lst_deal.append({'ID': '157942', 'num': '1100298338821'})
+    # lst_deal.append({'ID': '157942', 'num': '1100298344326'})
+    # lst_deal.append({'ID': '157942', 'num': '1100298364445'})
+    # lst_deal.append({'ID': '157942', 'num': '1100298365345'})
+    # e, lst_deal = get_deal_status(lst_deal, access, status_for_comment)
+    # if e: print(e)
+    
+    # print(json.dumps(lst_deal, sort_keys=True, indent=2, ensure_ascii=False))
+    
+    # if lst_deal[0]['status'] == 'Заявка не найдена':
+        # print(status_rtk_srm[lst_deal[0]['status']])
 
     pass

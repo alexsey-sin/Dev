@@ -1164,3 +1164,46 @@ class TxV(models.Model):
     class Meta:
         verbose_name = 'ТхВ'
         verbose_name_plural = 'ТхВ'
+
+
+class PVResult(models.Model):
+    pv_code = models.PositiveSmallIntegerField(
+        choices = PV_VARS,
+        verbose_name = 'Оператор',
+    )
+    id_crm = models.CharField(
+        max_length=50,
+        verbose_name = 'ID СРМ',
+    )
+    num_deal = models.CharField(
+        max_length=50,
+        verbose_name = 'Номер сделки',
+    )
+    pv_status = models.CharField(
+        max_length=50,
+        verbose_name = 'ПВ статус',
+        blank = True,
+    )
+    crm_status = models.CharField(
+        max_length=50,
+        verbose_name = 'Новый СРМ статус',
+        blank = True,
+    )
+    date_connect = models.CharField(
+        max_length=50,
+        blank = True,
+        verbose_name = 'Дата подключения',
+    )
+    comment = models.TextField(
+        blank = True,
+        verbose_name='Комментарий',
+    )
+    pub_date = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Создано',
+    )
+    class Meta:
+        verbose_name = 'Бот ПВ результат'
+        verbose_name_plural = 'Бот ПВ результат'
+    def __str__(self):
+        return self.num_deal

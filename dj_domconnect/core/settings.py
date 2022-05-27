@@ -20,8 +20,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'bootstrap_modal_forms',
     'rest_framework',
-    # 'rest_framework_simplejwt',
+    'rest_framework_swagger',
     'rest_framework.authtoken',
+    'rest_framework_simplejwt',
+    'django_filters',
+    'djoser',
+    'drf_yasg',
     'app',
     'api',
     'demo',
@@ -118,10 +122,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        # 'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
-        # 'rest_framework.authentication.BasicAuthentication',
-        # 'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
 }
 SIMPLE_JWT = {

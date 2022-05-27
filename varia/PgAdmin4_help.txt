@@ -92,14 +92,14 @@ ALTER TABLE django_content_type ADD COLUMN name character varying(50) NOT NULL D
 INSERT INTO public.django_migrations (app, name, applied) 
 VALUES ('mobile', '0001_initial', '2022-04-17 18:21:41.472674+03')
 =========================================================
-
+pv_code = 4  AND
 
 SELECT count(*) FROM public.api_txv
-WHERE pv_code = 4 AND status = 2 AND bot_log LIKE '%Нет ссылки Создать заявку ФЛ%'
+WHERE status = 2 AND bot_log LIKE '%This version of ChromeDriver only supports Chrome%'
 
 UPDATE public.api_txv
 SET status = 0, bot_log = ''
-WHERE pv_code = 4 AND status = 2 AND bot_log LIKE '%Нет ссылки Создать заявку ФЛ%'
+WHERE pv_code = 4 AND status = 2 AND bot_log LIKE '%This version of ChromeDriver only supports Chrome%'
 
 Исправляем статус в ТхВ МТС
 =========================================================
@@ -237,4 +237,4 @@ SET status = 0, bot_log = ''
 WHERE pv_code = 3 AND status = 2 AND bot_log LIKE '%Message: binary is not a Firefox executable%'
 
 SELECT count(*) FROM public.api_txv
-WHERE pv_code = 3 AND status = 2 AND bot_log LIKE '%Message: binary is not a Firefox executable%'
+WHERE pv_code = 1 AND bot_log LIKE '%активный договор%'

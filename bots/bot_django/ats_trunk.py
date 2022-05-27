@@ -1,5 +1,6 @@
 import requests  # pip install requests
-import json, copy
+import json, copy, time
+import logging
 
 
 
@@ -183,7 +184,7 @@ def checking_priorities(route_trunks, trunks_residue):
     out_mess = ''
 
     change_list = []
-    old_lst_trunks = []
+    new_lst_trunks = []
     for route_trunk in route_trunks:  # Проход по каждой группе транков
         route_id = route_trunk['id']
         trunks = route_trunk.get('trunks')
@@ -198,17 +199,18 @@ def checking_priorities(route_trunks, trunks_residue):
                     trunk['residue'] = tr_resd['residue']
                     trunk['cid'] = tr_resd['cid']
                     
-                    
-        old_lst_trunks.append(route_trunk)
-        
         # создадим глубокую копию списка
         new_trunks = copy.deepcopy(trunks)
         # отсортируем группу по доступным минутам (residue) по убыванию
         new_trunks.sort(key=lambda x: x['residue'], reverse=True)
+        new_route_trunk = copy.deepcopy(route_trunk)
         
         # проставим новые приоритеты
         for i in range(len(new_trunks)):
             new_trunks[i]['seq'] = str(i)
+            
+        new_route_trunk['trunks'] = new_trunks
+        new_lst_trunks.append(new_route_trunk)
         
         # Проверим на несовпадение направлений отсортированной группы и старого варианта
         for trunk in trunks:
@@ -223,7 +225,7 @@ def checking_priorities(route_trunks, trunks_residue):
                         new_seq['seq'] = new_trunk['seq']
                         change_list.append(new_seq)
     
-    return change_list, old_lst_trunks
+    return change_list, new_lst_trunks
 
 def change_seq(change_list):
     url = url_ats + 'cli/api_route_sequence.php'
@@ -263,6 +265,7 @@ def run_ats(logging):
     if rez:  # Если  что-то не так
         logging.error(f'ATS-TRUNK: get_trunks(): {rez_str}')
         return
+    time.sleep(0.5)
     
     # Запрашиваем доступные минуты
     rez, rez_str, trunks = get_residue_trunks(trunks)
@@ -273,21 +276,24 @@ def run_ats(logging):
     elif rez == 2:  # Предупреждение
         pass  # Убираем отладочную информацию
         # logging.info(f'get_residue_trunks(): {rez_str}')
+    time.sleep(0.5)
 
     # Запрашиваем список групп (ROUTE)
     rez, rez_str, routes = get_routes()
     if rez:  # Если  что-то не так
         logging.error(f'ATS-TRUNK: get_routes(): {rez_str}')
         return
+    time.sleep(0.5)
     
     # Запрашиваем текущее состояние настроек route_trunks
     rez, rez_str, route_trunks = get_route_trunks(routes)
     if rez:  # Если  что-то не так
         logging.error(f'ATS-TRUNK: get_route_trunks(): {rez_str}')
         return
+    time.sleep(0.5)
 
     # Проверим приоритеты транков
-    change_list, old_trunks = checking_priorities(route_trunks, trunks)
+    change_list, new_trunks = checking_priorities(route_trunks, trunks)
     
     # Меняем приоритеты транков
     rez = ''
@@ -300,10 +306,28 @@ def run_ats(logging):
         return
     if rez_str:  # Если  есть сообщение
         tlg_mess = f'ATS - смена приоритетов транков\n{rez_str}'
+        tlg_mess += '\n====== Новое состояние ======\n'
+        for route in new_trunks:
+            tlg_mess += f'ROUTE {route.get("name")}\n'
+            tranks = route.get("trunks")
+            for tr in tranks:
+                tlg_mess += f'\tseq: {tr.get("seq")} cid: {tr.get("cid")} min: {tr.get("residue")} \n'
         send_telegram(tlg_mess)
         logging.info(f'ATS-TRUNK: {rez_str}')
     else: logging.info(f'ATS-TRUNK: смены приоритетов транков не потребовалось')
+    
 
 if __name__ == '__main__':
+    logging.basicConfig(
+        level=logging.INFO,     # DEBUG, INFO, WARNING, ERROR и CRITICAL По возрастанию
+        filename='log_main.log',
+        datefmt='%d.%m.%Y %H:%M:%S',
+        format='%(asctime)s:%(levelname)s:\t%(message)s',  # %(name)s:
+    )
+    logger = logging.getLogger(__name__)
+    
+    run_ats(logging)
+    
+    
     pass
 

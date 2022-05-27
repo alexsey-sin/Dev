@@ -10,6 +10,8 @@ from txv_onlime import run_txv_onlime
 from txv_mgts import run_txv_mgts
 from txv_multi_regions import run_txv_multi_regions
 from pv_rostelecom import run_check_deals as run_pv_rostelecom
+from pv_beeline import run_check_deals as run_pv_beeline
+from pv_domru import run_check_deals as run_pv_domru
 
 # личный бот @infra     TELEGRAM_CHAT_ID, TELEGRAM_TOKEN
 TELEGRAM_CHAT_ID = '1740645090'
@@ -27,6 +29,8 @@ TIME_3_SECONDS = 3  # в секундах,
 PERIOD_BETWEEN = 0.5  # в секундах, Пауза
 
 time_pv_rostelecom = {'h': 1, 'm': 0, 's': 0}
+time_pv_beeline = {'h': 1, 'm': 30, 's': 0}
+time_pv_domru = {'h': 2, 'm': 0, 's': 0}
 
 def its_time(dct_time):
     pv_t = time.localtime()
@@ -57,6 +61,8 @@ if __name__ == '__main__':
     thread_name_multi_regions = 'txv_multi_regions'
     
     thread_name_pv_rostelecom = 'pv_rostelecom'
+    thread_name_pv_beeline = 'pv_beeline'
+    thread_name_pv_domru = 'pv_domru'
 
     
     while True:
@@ -76,6 +82,29 @@ if __name__ == '__main__':
                     th.start()
                     print(f'Bot: {thread_name_pv_rostelecom} is running.')
                 time.sleep(1)
+            
+            if its_time(time_pv_beeline):
+                is_run = False
+                for thread in threading.enumerate():
+                    if thread.getName() == thread_name_pv_beeline: is_run = True; break
+                if is_run == False:
+                    # th = threading.Thread(target=run_pv_beeline, name=thread_name_pv_beeline, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
+                    th = threading.Thread(target=run_pv_beeline, name=thread_name_pv_beeline, args=(PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN))
+                    th.start()
+                    print(f'Bot: {thread_name_pv_beeline} is running.')
+                time.sleep(1)
+            
+            if its_time(time_pv_domru):
+                is_run = False
+                for thread in threading.enumerate():
+                    if thread.getName() == thread_name_pv_domru: is_run = True; break
+                if is_run == False:
+                    # th = threading.Thread(target=run_pv_domru, name=thread_name_pv_domru, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
+                    th = threading.Thread(target=run_pv_domru, name=thread_name_pv_domru, args=(PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN))
+                    th.start()
+                    print(f'Bot: {thread_name_pv_domru} is running.')
+                time.sleep(1)
+            
             continue
         
         #===============================================#

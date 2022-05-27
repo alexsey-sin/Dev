@@ -99,7 +99,31 @@ def set_bid(data):
         
         els_input = els_div[0].find_elements(By.TAG_NAME, 'input')
         if len(els_input) != 1: raise Exception('Ошибка поиска поля ввода адреса')
-        els_input[0].send_keys(data['address'])
+        
+        # Соберем строку адреса
+        lst_input_address = []
+        lst_comment_address = []
+        region = data.get('region')
+        if region:
+            lst_comment_address.append(region)
+            lst_input_address.append(region)
+        city = data.get('city')
+        if city:
+            lst_comment_address.append(city)
+            lst_input_address.append(city)
+        street = data.get('street')
+        if street:
+            lst_comment_address.append(street)
+        house = data.get('house')
+        if house:
+            lst_comment_address.append(f'д.{house}')
+        apartment = data.get('apartment')
+        if apartment:
+            lst_comment_address.append(apartment)
+        input_address = ' '.join(lst_input_address)
+        comment_address = ' '.join(lst_comment_address)
+        
+        els_input[0].send_keys(input_address)
         time.sleep(5)
         els_li = els_div[0].find_elements(By.TAG_NAME, 'li')
         if len(els_li) > 0: els_li[0].click()
@@ -123,7 +147,7 @@ def set_bid(data):
         if len(els_div) != 1: raise Exception('Нет блока ввода дополнительной информации')
         els_textarea = els_div[0].find_elements(By.TAG_NAME, 'textarea')
         if len(els_textarea) != 2: raise Exception('Ошибка поиска поля ввода дополнительной информации')
-        dop_info = f'Адрес: {data["address"]}\n'
+        dop_info = f'Адрес: {comment_address}\n'
         comment =  data['comment']
         if comment: dop_info += f'{comment}\n'
         dop_info += f'Услуга: {data["service"]}\n'
@@ -139,7 +163,7 @@ def set_bid(data):
         disabled = els_btn[0].get_attribute('disabled')
         
         if disabled == 'true':
-            mess = (f'Адрес: {data["address"]}\nНе распознан')
+            mess = (f'Адрес: {input_address}\nНе распознан')
             raise Exception(mess)
         else: els_btn[0].click()
         time.sleep(5)
@@ -158,6 +182,9 @@ def set_bid(data):
                 f_ok = True
         if f_ok == False: raise Exception('Ошибка добавления услуги интернет')
         time.sleep(1)
+        
+        # raise Exception('Finish')
+        
         
         # Ищем кнопку Зарегистрировать
         els_btn = driver.find_elements(By.XPATH, '//button[@data-qaid="register_button_service"]')
@@ -205,26 +232,53 @@ def set_did_to_dj_domconnect():
         'User-Agent': 'Apache-HttpClient/4.1.1 (java 1.5)',
     }
     params = {
+        # 'key': 'Q8kGM1HfWz',
+        # 'id_lid': '1163386',
+        # 'firstname': 'андрей',
+        # 'patronymic': '',
+        # 'lastname': '',
+        # 'phone': '79111234567',
+        # # 'region': '',
+        # 'city': 'Ярославль',
+        # 'street': 'Попова',
+        # 'house': '24',
+        # # 'apartment': '',
+        # 'inn_organisation': '7604350441',
+        # 'service': 'Интернет',
+        # 'comment': 'Тестовая заявка, просьба не обрабатывать',
+        
+        # 'key': 'Q8kGM1HfWz',
+        # 'id_lid': '1451113',
+        # 'firstname': 'Любовь',
+        # 'patronymic': 'Петровна',
+        # 'lastname': '',
+        # 'phone': '79529311369',
+        # 'city': 'Новосибирск',
+        # 'street': 'ул В.Высоцкого',
+        # 'house': '39',
+        # 'inn_organisation': 'ТСЖ',
+        # 'service': 'Интернет',
+        # 'comment': '',
+        
         'key': 'Q8kGM1HfWz',
-        'id_lid': '1163386',
-        'firstname': 'андрей',
+        'id_lid': '1450899',
+        'firstname': '',
         'patronymic': '',
         'lastname': '',
-        'phone': '79111234567',
-        'region': '',
-        'city': 'Ярославль',
-        'street': 'Попова',
-        'house': '24',
-        'apartment': '',
-        'inn_organisation': '7604350441',
+        'phone': '79999685254',
+        'city': 'Москва',
+        'street': 'ул Строителей',
+        'house': '6',
+        'apartment': '6',
+        'inn_organisation': 'ООО НУТРИСОЛ КЛИНИКА',
         'service': 'Интернет',
-        'comment': 'Тестовая заявка, просьба не обрабатывать',
+        'comment': '',
     }
     
     try:
         responce = requests.get(url, headers=headers, params=params)
         print(responce.status_code)
-        # print(responce.text)
+        print(responce.text)
     except:
         pass
         print('Error: requests.get')
@@ -360,12 +414,12 @@ if __name__ == '__main__':
     pass
     # set_did_to_dj_domconnect()
     
-    # data = {'id': 1,}
-    # set_bid_status(3, data)
+    # data = {'id': 1941,}
+    # set_bid_status(0, data)
     
-    rez, bid_list = get_did_in_dj_domconnect()
-    if rez: print(rez)
-    print(bid_list)
+    # rez, bid_list = get_did_in_dj_domconnect()
+    # if rez: print(rez)
+    # print(bid_list)
     
     
     # data = {
@@ -376,7 +430,11 @@ if __name__ == '__main__':
         # 'patronymic': '',
         # 'lastname': '',
         # 'phone': '79111234567',
-        # 'address': 'санкт-петербург, наб. Матисова канала 1',
+        # 'region': '',
+        # 'city': 'Архангельск',
+        # 'street': 'ул Смольный Буян',
+        # 'house': '16 к 1',
+        # 'apartment': '5',
         # 'inn_organisation': '772821163041 / ИП Ильченко Василий Иванович',
         # 'service': 'Интернет',
         # 'comment': 'Тестовая заявка, просьба не обрабатывать',

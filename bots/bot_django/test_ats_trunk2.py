@@ -133,16 +133,16 @@ if __name__ == '__main__':
     
 
     # Проверим приоритеты транков
-    change_list, old_trunks = ats_trunk.checking_priorities(route_trunks, trunks)
-    out_file.write('\nПриоритеты транков старые.\n')
-    json.dump(old_trunks, out_file, ensure_ascii=False, indent=4)
+    change_list, new_trunks = ats_trunk.checking_priorities(route_trunks, trunks)
+    out_file.write('\nПриоритеты транков Новые.\n')
+    json.dump(new_trunks, out_file, ensure_ascii=False, indent=4)
     out_file.write('\nИзменения.\n')
     json.dump(change_list, out_file, ensure_ascii=False, indent=4)
 
     out_file.write('\n\n')
     out_file.write('==============================================================\n')
     out_file.write('Сводная таблица.\n')
-    for route in old_trunks:
+    for route in new_trunks:
         out_file.write(f'ROUTE {route.get("id")} {route.get("name")}\n')
         tranks = route.get("trunks")
         for tr in tranks:

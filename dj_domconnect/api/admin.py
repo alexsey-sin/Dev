@@ -1,7 +1,7 @@
 from django.contrib import admin
 from api.models import BidDomRu2, BidBeeline, BidMTS, BidBeeline2
 from api.models import BidRostelecom2, BidRostelecom, BidDomRu, BidTtk
-from api.models import  BidOnlime, BidMGTS, TxV, BotAccess
+from api.models import  BidOnlime, BidMGTS, TxV, BotAccess, PVResult
 from django.db import models
 from django.forms import NumberInput
 
@@ -183,6 +183,21 @@ class TxVAdmin(admin.ModelAdmin):
     # list_display = [field.name for field in TxvRostelecom._meta.get_fields()]
     search_fields = ('id_lid',)
     list_filter = ('pv_code', 'status', 'pub_date')
+    empty_value_display = '-пусто-'
+    date_hierarchy = 'pub_date'
+    formfield_overrides = {
+        models.IntegerField: {'widget': NumberInput(attrs={'size':'150'})},
+    }
+
+
+@admin.register(PVResult)
+class PVResultAdmin(admin.ModelAdmin):
+    def comment(self):
+        return u"%s..." % (self.comment[:30],)
+    list_display = ['pv_code', 'id_crm', 'num_deal', 'pv_status', 'crm_status', 'date_connect', 'pub_date', comment]
+    # list_display = [field.name for field in TxvRostelecom._meta.get_fields()]
+    search_fields = ('id_lid', 'num_deal')  # Верхнее поле поиска
+    list_filter = ('pv_code', 'crm_status', 'pub_date')  # Фильтр - колонка справа
     empty_value_display = '-пусто-'
     date_hierarchy = 'pub_date'
     formfield_overrides = {
