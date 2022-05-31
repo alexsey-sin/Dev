@@ -530,3 +530,6 @@ Traceback (most recent call last):
 AttributeError: 'PVResult' object has no attribute 'get'
 2022-05-28 08:50:00,818:django.utils.autoreload:C:\Dev\dj_domconnect\api\views.py changed, reloading.
 2022-05-28 08:58:42,377:django.utils.autoreload:C:\Dev\dj_domconnect\api\views.py changed, reloading.
+2022-05-31 08:21:23,657:django.request:Not Found: /favicon.ico
+2022-05-31 08:29:41,050:django.security.RequestDataTooBig:Request body exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE.
+2022-05-31 08:29:41,190:django.request:Bad Request: /admin/domconnect/dccrmlid/
