@@ -1180,12 +1180,12 @@ class PVResult(models.Model):
         verbose_name = 'Номер сделки',
     )
     pv_status = models.CharField(
-        max_length=50,
+        max_length=255,
         verbose_name = 'ПВ статус',
         blank = True,
     )
     crm_status = models.CharField(
-        max_length=50,
+        max_length=255,
         verbose_name = 'Новый СРМ статус',
         blank = True,
     )

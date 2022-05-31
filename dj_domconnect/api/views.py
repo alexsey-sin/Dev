@@ -268,14 +268,32 @@ def get_pv_result(request, pv_code, from_date):
     if pv_code not in dct_pv:
         return HttpResponse(f'Код провайдера \"{pv_code}\" не корректен', content_type='text/plain; charset=utf-8')
     
-    objs = PVResult.objects.filter(pv_code=pv_code, pub_date=f_data)
+    objs = PVResult.objects.filter(pv_code=pv_code, pub_date__date=f_data)
     
-    str_f_date = f_data.strftime('%d.%m.%Y %H:%M:%S')
-    str_today = datetime.today().strftime('%d.%m.%Y %H:%M:%S')
-    mess = f'Результат работы бота ПВ {str_f_date} {from_date}\n\n'
+    # str_f_date = f_data.strftime('%d.%m.%Y %H:%M:%S')
+    # str_today = datetime.today().strftime('%d.%m.%Y %H:%M:%S')
+    mess = f'Результат работы бота ПВ {dct_pv[pv_code]} {from_date}\n\n'
 
+    cnt_objs = len(objs)
+    new_crm = 0
+    if cnt_objs == 0: mess += f'Данных по {dct_pv[pv_code]} за {from_date} не найдено.\n'
+    else:
+        lst_mess = []
+        for obj in objs:
+            str_obj = f'ID: {obj.id_crm} сделка: {obj.num_deal}'
+            pv_status = obj.pv_status
+            if pv_status: str_obj += f' | ПВ: {pv_status}'
+            crm_status = obj.crm_status
+            if crm_status: str_obj += f' | СРМ: {crm_status}'; new_crm += 1
+            date_connect = obj.date_connect
+            if date_connect: str_obj += f' | Дата: {date_connect}'
+            comment = obj.comment
+            if comment: str_obj += f' | {comment}'
 
-    print(pv_code, from_date)
+            lst_mess.append(str_obj)
+        mess += '\n'.join(lst_mess)
+        if new_crm:
+            mess += f'\n\n Всего обновлен статус в СРМ у {new_crm} сделок.'
     # key = request.GET.get('key')
     # if key != 'Q8kGM1HfWz':
     #     HttpResponse('ERROR key.', status=status.HTTP_403_FORBIDDEN)
@@ -293,8 +311,8 @@ def get_pv_result(request, pv_code, from_date):
     #     data = json.dumps(access)
     # else: data = json.dumps({})
 
-    return HttpResponse('Уже в избранном',
-        status=status.HTTP_208_ALREADY_REPORTED,
+    return HttpResponse(mess,
+        status=status.HTTP_200_OK,
         content_type='text/plain; charset=utf-8'
     )
 

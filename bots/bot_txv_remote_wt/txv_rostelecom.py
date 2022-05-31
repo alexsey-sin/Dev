@@ -4,6 +4,7 @@ from datetime import datetime
 import requests  # pip install requests
 import json
 from selenium import webdriver  # $ pip install selenium
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
@@ -436,7 +437,8 @@ def get_txv(data):
         base_url = 'https://eissd.rt.ru/login'
         
         EXE_PATH = 'driver/chromedriver.exe'
-        driver = webdriver.Chrome(executable_path=EXE_PATH)
+        service = Service(EXE_PATH)
+        driver = webdriver.Chrome(service=service)
 
         # EXE_PATH = r'c:/Dev/bot_opsos/driver/firefoxdriver.exe'
         # driver = webdriver.Firefox(executable_path=EXE_PATH)
@@ -479,16 +481,31 @@ def get_txv(data):
         els = driver.find_elements(By.XPATH, '//div[@class="form-group error"]')
         if els: raise Exception(f'Ошибка {els[0].text}')  # Неверное имя пользователя или пароль
         driver.implicitly_wait(10)
+
+        # проверим всплывашки с Требованием сменить пароль
+        driver.implicitly_wait(5)
+        els = driver.find_elements(By.XPATH, '//div[contains(@class, "ju-popup ju-message")]')
+        if len(els) > 0:
+            mess = ''
+            for el in els:
+                mess += el.text
+                els_btn = el.find_elements(By.TAG_NAME, 'input')
+                try: driver.execute_script("arguments[0].click();", els_btn[0])
+                except: raise Exception('Ошибка закрытия окна всплывашки с рекламой')
+                time.sleep(1)
+            if mess.find('Требуется смена пароля') >= 0:
+                raise Exception(mess)
+        driver.implicitly_wait(10)
         ###################### Главная страница ######################
         els = driver.find_elements(By.XPATH, '//a[@href="/order/phys/edit"]')
         if len(els) < 2: raise Exception('Нет ссылки Создать заявку ФЛ')
         try: els[1].click()
         except: raise Exception('Ошибка клика ссылки перехода на страницу ввода заявки')
-        time.sleep(3)
+        time.sleep(5)
         ###################### Страница ввода заявки ######################
         # проверим всплывашки с рекламой
-        driver.implicitly_wait(2)
-        els = driver.find_elements(By.XPATH, '//div[@class="ju-popup ju-message user-messages-popup "]')
+        driver.implicitly_wait(5)
+        els = driver.find_elements(By.XPATH, '//div[contains(@class, "ju-popup ju-message")]')
         for el in els:
             els_btn = el.find_elements(By.TAG_NAME, 'input')
             try: driver.execute_script("arguments[0].click();", els_btn[0])
@@ -727,6 +744,7 @@ def get_txv(data):
             row_str = ''
             for el_td in els_td:
                 row_str += f'{el_td.text} '
+            if row_str.find('Wink-ТВ') >= 0: continue  # Пропускаем строку где есть 'Wink-ТВ'
             data['available_connect'] += f'{row_str}\n'
         # Тарифные планы не собираем потому как эже скрипт работает больше 2 мин. (2,07) 
         
@@ -994,62 +1012,62 @@ if __name__ == '__main__':
     # password: m~|HqEu~VB}|P1QDrDX%
 
     
-    # txv_dict = {
-        # # 'login': 'sz_v_an',
-        # # 'password': 'm~|HqEu~VB}|P1QDrDX%',
+    txv_dict = {
         # 'login': 'sz_v_an',
         # 'password': 'm~|HqEu~VB}|P1QDrDX%',
-        # 'id_lid': '1215557',
+        'login': 'sz_v_an',
+        'password': 'm~|HqEu~VB}|P1QDrDX%',
+        'id_lid': '1215557',
         
-        # # 'region': 'Республика Северная Осетия — Алания',
-        # # 'city': 'Владикавказ',
-        # # 'street': 'Братьев Темировых',
-        # # 'house': '69/4',          # дом
-        # # 'apartment': '255',          # квартира
+        # 'region': 'Республика Северная Осетия — Алания',
+        # 'city': 'Владикавказ',
+        # 'street': 'Братьев Темировых',
+        # 'house': '69/4',          # дом
+        # 'apartment': '255',          # квартира
         
-        # # 'region': 'Республика Алтай',
-        # # 'city': 'Горно-Алтайск',
-        # # 'street': 'Проточная улица',
-        # # 'house': '10/1к2',          # дом
-        # # 'apartment': '10',          # квартира
+        # 'region': 'Республика Алтай',
+        # 'city': 'Горно-Алтайск',
+        # 'street': 'Проточная улица',
+        # 'house': '10/1к2',          # дом
+        # 'apartment': '10',          # квартира
         
-        # # 'region': 'Приморский край',
-        # # 'city': 'Владивосток',
-        # # 'street': 'Гульбиновича',
-        # # 'house': '29/2',          # дом
-        # # 'apartment': '40',          # квартира
+        # 'region': 'Приморский край',
+        # 'city': 'Владивосток',
+        # 'street': 'Гульбиновича',
+        # 'house': '29/2',          # дом
+        # 'apartment': '40',          # квартира
         
-        # # 'region': 'Республика Марий Эл',
-        # # 'city': 'Йошкар-Ола',
-        # # 'street': 'Машиностроителей',
-        # # 'house': '4А',          # дом
-        # # 'apartment': '2',          # квартира
+        # 'region': 'Республика Марий Эл',
+        # 'city': 'Йошкар-Ола',
+        # 'street': 'Машиностроителей',
+        # 'house': '4А',          # дом
+        # 'apartment': '2',          # квартира
         
-        # # 'region': 'Республика Алтай',
-        # # 'city': 'село Усть-Кокса',
-        # # 'street': 'Ленина',
-        # # 'house': '20А',          # дом
-        # # 'apartment': '10',          # квартира
+        # 'region': 'Республика Алтай',
+        # 'city': 'село Усть-Кокса',
+        # 'street': 'Ленина',
+        # 'house': '20А',          # дом
+        # 'apartment': '10',          # квартира
         
-        # # 'region': 'Ростовская область',         # область или город областного значения
-        # # 'city': 'Ростов-на-Дону',           # город
-        # # 'street': 'садовое товарищество Садовод-Любитель, 2-й Хлопковый переулок',         # улица
-        # # 'house': '12',          # дом
-        # # 'apartment': '10',          # квартира
+        # 'region': 'Ростовская область',         # область или город областного значения
+        # 'city': 'Ростов-на-Дону',           # город
+        # 'street': 'садовое товарищество Садовод-Любитель, 2-й Хлопковый переулок',         # улица
+        # 'house': '12',          # дом
+        # 'apartment': '10',          # квартира
         
-        # 'region': 'Ярославская область',         # область или город областного значения
-        # 'city': 'Ярославль',           # город
-        # 'street': 'улица Труфанова',         # улица
-        # 'house': '29 корп 2',          # дом
-        # 'apartment': '63',          # квартира
+        'region': 'Ярославская область',         # область или город областного значения
+        'city': 'Ярославль',           # город
+        'street': 'улица Труфанова',         # улица
+        'house': '29 корп 2',          # дом
+        'apartment': '63',          # квартира
 
-        # 'available_connect': '',  # Возможность подключения
-        # 'tarifs_all': '', # список названий тарифных планов
-        # 'pv_address': '',
-    # }
+        'available_connect': '',  # Возможность подключения
+        'tarifs_all': '', # список названий тарифных планов
+        'pv_address': '',
+    }
     
-    # e, data = get_txv(txv_dict)
-    # if e: print(e)
+    e, data = get_txv(txv_dict)
+    if e: print(e)
     
     # print('pv_address:', data['pv_address'])
     # print('available_connect:')

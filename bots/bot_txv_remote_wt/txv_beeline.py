@@ -3,6 +3,7 @@ import time
 from datetime import datetime
 import requests  # pip install requests
 import json
+from selenium.webdriver.chrome.service import Service
 from selenium import webdriver  # $ pip install selenium
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -268,7 +269,8 @@ def get_txv(data):
         base_url = 'https://partnerweb.beeline.ru/'
         
         EXE_PATH = 'driver/chromedriver.exe'
-        driver = webdriver.Chrome(executable_path=EXE_PATH)
+        service = Service(EXE_PATH)
+        driver = webdriver.Chrome(service=service)
 
         # EXE_PATH = r'c:/Dev/bot_opsos/driver/firefoxdriver.exe'
         # driver = webdriver.Firefox(executable_path=EXE_PATH)

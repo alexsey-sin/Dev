@@ -513,3 +513,20 @@ Traceback (most recent call last):
   File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\middleware\common.py", line 87, in get_full_path_with_slash
     raise RuntimeError(
 RuntimeError: You called this URL via POST, but the URL doesn't end in a slash and you have APPEND_SLASH set. Django can't redirect to the slash URL while maintaining POST data. Change your form to point to 127.0.0.1:8000/api/set_pv_result/ (note the trailing slash), or set APPEND_SLASH=False in your Django settings.
+2022-05-28 08:45:19,102:django.request:Not Found: /favicon.ico
+2022-05-28 08:48:42,053:django.utils.autoreload:C:\Dev\dj_domconnect\api\views.py changed, reloading.
+2022-05-28 08:48:51,012:django.request:Internal Server Error: /api/get_pv_result/2/27.05.2022
+Traceback (most recent call last):
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\core\handlers\exception.py", line 34, in inner
+    response = get_response(request)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\core\handlers\base.py", line 115, in _get_response
+    response = self.process_exception_by_middleware(e, request)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\core\handlers\base.py", line 113, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "c:\Dev\dj_domconnect\venv\lib\site-packages\django\views\decorators\http.py", line 40, in inner
+    return func(request, *args, **kwargs)
+  File "C:\Dev\dj_domconnect\api\views.py", line 282, in get_pv_result
+    str_obj = f'ID: {obj.get("id_crm")} сделка: {obj.get("num_deal")}'
+AttributeError: 'PVResult' object has no attribute 'get'
+2022-05-28 08:50:00,818:django.utils.autoreload:C:\Dev\dj_domconnect\api\views.py changed, reloading.
+2022-05-28 08:58:42,377:django.utils.autoreload:C:\Dev\dj_domconnect\api\views.py changed, reloading.

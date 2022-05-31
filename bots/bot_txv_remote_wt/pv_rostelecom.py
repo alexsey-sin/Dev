@@ -7,8 +7,12 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
 
+# url_host = 'http://127.0.0.1:8000'
+url_host = 'http://django.domconnect.ru'
 provider = 'РТК'
-pv_crm_code = 3
+pv_crm_code = 3  # http://django.domconnect.ru/admin/domconnect/dccatalogproviderseo/
+pv_dc_code = 4  # код по моделям django.domconnect.ru
+
 # личный бот @infra
 MY_TELEGRAM_CHAT_ID = '1740645090'
 MY_TELEGRAM_TOKEN = '2009560099:AAHtYot6EOHh_qr9EUoCoczQhjyRdulKHYo'
@@ -20,7 +24,7 @@ PV_TELEGRAM_TOKEN = '526322367:AAEaw2vaeLl_f6Njfb952NopyxqCGRQXji8'
 access = {  # Доступы к ПВ
     'url': 'https://eissd.rt.ru/login',
     'login': 'sz_v_an',
-    'password': 'm~|HqEu~VB}|P1QDrDX%'
+    'password': 'LzJ*%D6dQ{'
 }
 status_rtk_srm = {  # Коды статусов: РТК = СРМ
     'Услуга подключена': 2,  # Подключен
@@ -181,7 +185,7 @@ def get_deal_status(lst_deal, access, status_for_comment):
 
         # проход по всем заявкам
         for deal in lst_deal:
-            deal['status'] = ''
+            deal['pv_status'] = ''
             num = deal.get('num')
             if not num: continue
             els = driver.find_elements(By.XPATH, '//input[@name="packetNum"]')
@@ -207,7 +211,7 @@ def get_deal_status(lst_deal, access, status_for_comment):
             if len(els) == 1:
                 els_cont = els[0].find_elements(By.XPATH, './/div[@class="content"]')
                 if len(els_cont) > 0:
-                    deal['status'] = 'Заявка не найдена'
+                    deal['pv_status'] = 'Заявка не найдена'
                     deal['comment'] = els_cont[0].text
                 els_btn = els[0].find_elements(By.XPATH, './/input[contains(@class, "close")]')
                 if len(els_btn) > 0:
@@ -245,7 +249,7 @@ def get_deal_status(lst_deal, access, status_for_comment):
                 not_ok = True
                 for us_stat in usluga_status:
                     if us_stat.get('stat') == 'Услуга подключена':
-                        deal['status'] = us_stat.get('stat')
+                        deal['pv_status'] = us_stat.get('stat')
                         deal['date_connect'] = us_stat.get('data')
                         not_ok = False
                         break
@@ -255,13 +259,13 @@ def get_deal_status(lst_deal, access, status_for_comment):
                     for pr_st in prioritet_status:
                         for us_stat in usluga_status:
                             if us_stat.get('usl') == pr_st:
-                                deal['status'] = us_stat.get('stat')
+                                deal['pv_status'] = us_stat.get('stat')
                                 deal['date_connect'] = us_stat.get('data')
                                 f_ok = True
                                 break
                         if f_ok: break
             else:
-                if status: deal['status'] = status
+                if status: deal['pv_status'] = status
                 if date_connect: deal['date_connect'] = date_connect
             try:
                 if status in status_for_comment:
@@ -342,6 +346,55 @@ def send_telegram(chat: str, token: str, text: str):
         return 600
     return r.status_code
 
+def get_dc_token():
+    url = url_host + '/auth/jwt/create/'
+    
+    headers = {
+        'Content-Type': 'application/json',
+    }
+    data = {
+        'username': 'user',
+        'password': 'User123456'
+    }
+    
+    try:
+        responce = requests.post(url, headers=headers, json=data)
+        answer = json.loads(responce.text)
+        return answer.get('access', '')
+    except: return ''
+
+def send_dj_domconnect_result(lst_deal):
+    dc_token = get_dc_token()
+    if not dc_token: return 'not_token'
+    
+    url = url_host + '/api/set_pv_result/'
+    
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {dc_token}',
+    }
+    data = []
+    for deal in lst_deal:
+        dct = {
+            'pv_code': pv_dc_code,
+            'id_crm': deal.get('ID', 'Не определен')[:50],
+            'num_deal': deal.get('num', 'Не определен')[:50],
+            'pv_status': deal.get('pv_status', '')[:255],
+            'crm_status': deal.get('crm_status', '')[:255],
+            'date_connect': deal.get('date_connect', '')[:50],
+            'comment': deal.get('comment', ''),
+        }
+        data.append(dct)
+    
+    try:
+        responce = requests.post(url, headers=headers, json=data)
+        if responce.status_code != 200:
+            return str(responce.text)[:100]
+    except Exception as e: return str(e)[:100]
+
+    return ''
+
+
 def run_check_deals(tlg_chat, tlg_token, by_days=60):
     tlg_mess = ''
 
@@ -365,6 +418,7 @@ def run_check_deals(tlg_chat, tlg_token, by_days=60):
     # Соберем нормальный список сделок
     new_lst_deal = []
     for dl in lst_deal:
+        # if len(new_lst_deal) > 4: break
         num = dl.get('UF_CRM_5903C16BDF7A7')
         id_d = dl.get('ID')
         l_sub = re.findall('\d{13}', str(num))
@@ -379,31 +433,32 @@ def run_check_deals(tlg_chat, tlg_token, by_days=60):
     e, lst_deal = get_deal_status(new_lst_deal, access, status_for_comment)
     # print(json.dumps(lst_deal, sort_keys=True, indent=2, ensure_ascii=False))
     if e: 
-        tlg_mess = f'ПВ {provider}: Ошибка при проверке статуса сделок: {e} '
+        tlg_mess = f'ПВ {provider}: Ошибка при проверке статуса сделок: {e}'
         send_telegram(tlg_chat, tlg_token, tlg_mess)
         return
     
     change = 0
     for deal in lst_deal:
-        status = deal.get('status')
+        status = deal.get('pv_status')
         if status and status in status_rtk_srm:
             print(deal.get('ID'), status, name_status_crm[status_rtk_srm[status]])
-            e = send_crm_deal_stage(deal, status_rtk_srm[status])
+            deal['crm_status'] = status_rtk_srm[status]
+            e = send_crm_deal_stage(deal, deal['crm_status'])
             # e = False
             if e: 
                 tlg_mess = f'ПВ {provider}: Ошибка при обновлении статуса сделки в срм'
                 send_telegram(tlg_chat, tlg_token, tlg_mess)
-            else:
-                tlg_mess = f'ПВ {provider}: {deal.get("ID")}|{deal.get("num")}|{status} ==> {name_status_crm[status_rtk_srm[status]]}'
-                date_connect = deal.get('date_connect')
-                if status_rtk_srm[status] == 2 and date_connect: tlg_mess += f'|{date_connect}'
-                comment = deal.get('comment')
-                if comment: tlg_mess += f'|{comment}'
-                send_telegram(tlg_chat, tlg_token, tlg_mess)
-                change += 1
+            else: change += 1
             time.sleep(0.5)
     
-    tlg_mess = f'ПВ {provider}:\nСтатус сделок изменен\nв {change} из {len(lst_deal)}'
+    e = send_dj_domconnect_result(lst_deal)
+    if e: 
+        tlg_mess = f'ПВ {provider}: Ошибка при архивировании сделки в dj_domconnect {e}'
+        send_telegram(tlg_chat, tlg_token, tlg_mess)
+    tlg_mess = f'ПВ {provider}:\nСтатус сделок изменен\nв {change} из {len(lst_deal)}\n'
+    str_today = datetime.today().strftime('%d.%m.%Y')
+    tlg_mess += f'http://django.domconnect.ru/api/get_pv_result/{pv_dc_code}/{str_today}'
+    
     send_telegram(tlg_chat, tlg_token, tlg_mess)
 
 

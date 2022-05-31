@@ -7,8 +7,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
 
-url_host = 'http://127.0.0.1:8000'
-# url_host = 'http://django.domconnect.ru'
+# url_host = 'http://127.0.0.1:8000'
+url_host = 'http://django.domconnect.ru'
 provider = 'ДомРу'
 pv_crm_code = 1  # http://django.domconnect.ru/admin/domconnect/dccatalogproviderseo/
 pv_dc_code = 2  # код по моделям django.domconnect.ru
@@ -351,11 +351,11 @@ def send_dj_domconnect_result(lst_deal):
     for deal in lst_deal:
         dct = {
             'pv_code': pv_dc_code,
-            'id_crm': deal.get('ID'),
-            'num_deal': deal.get('num'),
-            'pv_status': deal.get('pv_status', ''),
-            'crm_status': deal.get('crm_status', ''),
-            'date_connect': deal.get('date_connect', ''),
+            'id_crm': deal.get('ID', 'Не определен')[:50],
+            'num_deal': deal.get('num', 'Не определен')[:50],
+            'pv_status': deal.get('pv_status', '')[:255],
+            'crm_status': deal.get('crm_status', '')[:255],
+            'date_connect': deal.get('date_connect', '')[:50],
             'comment': deal.get('comment', ''),
         }
         data.append(dct)
@@ -388,17 +388,13 @@ def run_check_deals(tlg_chat, tlg_token, by_days=30):
         print(f'{cur_time} {provider}: Сделок нет')
         return
 
-    print('Исходный список:', len(lst_deal), 'шт.')
     # Соберем нормальный список сделок
     new_lst_deal = []
     for dl in lst_deal:
         id_d = dl.get('ID')
         num = dl.get('UF_CRM_5903C16BDF7A7').strip()
-        if num.isdigit(): new_lst_deal.append({'ID': id_d, 'num': num})
-        else:
-            tlg_mess = f'ПВ {provider}: {id_d}|Ошибка номера сделки \"{num}\"'
-            send_telegram(tlg_chat, tlg_token, tlg_mess)
-    print('Нормализованный список:', len(new_lst_deal), 'шт.')
+        new_lst_deal.append({'ID': id_d, 'num': num})
+    print('Получен список сделок:', len(new_lst_deal), 'шт.')
     
     # Проверим статус сделок у ПВ
     e, lst_deal = get_deal_status(new_lst_deal, access, status_for_comment)
@@ -408,33 +404,23 @@ def run_check_deals(tlg_chat, tlg_token, by_days=30):
         return
     
     change = 0
-    
     for deal in lst_deal:
         status = deal.get('pv_status')
         if status:
             # print(deal.get('ID'), status, name_status_crm[status_domru_srm[pv_status]])
             if status in status_domru_srm:
                 deal['crm_status'] = status_domru_srm[status]
-                # e = send_crm_deal_stage(deal, deal['crm_status'])
-                e = False
+                e = send_crm_deal_stage(deal, deal['crm_status'])
+                # e = False
                 if e: 
                     tlg_mess = f'ПВ {provider}: Ошибка при обновлении статуса сделки в срм'
                     send_telegram(tlg_chat, tlg_token, tlg_mess)
-                else:
-                    tlg_mess = f'ПВ {provider}: {deal.get("ID")}|{deal.get("num")}|{status} ==> {name_status_crm[deal["crm_status"]]}'
-                    date_connect = deal.get('date_connect')
-                    if status_domru_srm[status] == 2 and date_connect: tlg_mess += f'|{date_connect}'
-                    comment = deal.get('comment')
-                    if comment: tlg_mess += f'|{comment}'
-                    r = send_telegram(tlg_chat, tlg_token, tlg_mess)
-                    change += 1
-            # if status in status_only_telegramm:
-                # tlg_mess = f'ПВ {provider}: {deal.get("ID")}|{deal.get("num")}|{status}'
-                # comment = deal.get('comment')
-                # if comment: tlg_mess += f'|{comment}'
-                # send_telegram(tlg_chat, tlg_token, tlg_mess)
+                else: change += 1
             time.sleep(0.5)
-    send_dj_domconnect_result(lst_deal)
+    e = send_dj_domconnect_result(lst_deal)
+    if e: 
+        tlg_mess = f'ПВ {provider}: Ошибка при архивировании сделки в dj_domconnect'
+        send_telegram(tlg_chat, tlg_token, tlg_mess)
     tlg_mess = f'ПВ {provider}:\nСтатус сделок изменен\nв {change} из {len(lst_deal)}\n'
     str_today = datetime.today().strftime('%d.%m.%Y')
     tlg_mess += f'http://django.domconnect.ru/api/get_pv_result/{pv_dc_code}/{str_today}'
@@ -443,17 +429,13 @@ def run_check_deals(tlg_chat, tlg_token, by_days=30):
 
 
 if __name__ == '__main__':
-    run_check_deals(MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN, 1)
+    # run_check_deals(MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN, 1)
     # run_check_deals(PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN)
     # run_check_deals(MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN)
     
     # # print(json.dumps(lst_deal, sort_keys=True, indent=2, ensure_ascii=False))
     # lst_deal = []
     # # # # lst_deal.append({'ID': '157942', 'num': '1100298394828'})
-    # # lst_deal.append({'pv_code': pv_code, 'id_crm': '157942', 'num_deal': '1100298314608'})
-    # # lst_deal.append({'pv_code': pv_code, 'id_crm': '157932', 'num_deal': '1100298338821'})
-    # # lst_deal.append({'pv_code': pv_code, 'id_crm': '1579466', 'num_deal': '1100298323415'})
-    # # lst_deal.append({'pv_code': pv_code, 'id_crm': '157947', 'num_deal': '1100298365345'})
     # lst_deal.append({'ID': '157942', 'num': '1100298323415', 'status': 'Заявка выполнена', 'date_connect': '4f45d5d8r', 'comment': 'kkrjerhjdbbyer'})
     # lst_deal.append({'ID': '157942', 'num': '1100298338821'})
     # lst_deal.append({'ID': '157942', 'num': '1100298344326'})

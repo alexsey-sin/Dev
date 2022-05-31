@@ -6,6 +6,7 @@ import json
 from selenium import webdriver  # $ pip install selenium
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 
 
@@ -28,29 +29,37 @@ def set_bid(data):
         
         # ###################### Login ######################
         els = driver.find_elements(By.XPATH, '//input[@name="login-field"]')
-        if els[0]: els[0].send_keys(data['login'])
+        if els[0]: 
+            try: els[0].send_keys(data['login'])
+            except: raise Exception('Ошибка действий 1')
         else: raise Exception('Ошибка авторизации нет поля логин')
         time.sleep(1)
 
         els = driver.find_elements(By.XPATH, '//input[@name="pwd-field"]')
-        if els[0]: els[0].send_keys(data['password'])
+        if els[0]:
+            try: els[0].send_keys(data['password'])
+            except: raise Exception('Ошибка действий 2')
         else: raise Exception('Ошибка авторизации нет поля пароль')
         time.sleep(1)
 
         els = driver.find_elements(By.XPATH, '//input[@name="login"]')
-        if els[0]: els[0].click()
+        if els[0]:
+            try: els[0].click()
+            except: raise Exception('Ошибка действий 3')
         else: raise Exception('Ошибка авторизации нет кнопки Войти')
         time.sleep(3)
         ###################### Главная страница ######################
         els_btn = driver.find_elements(By.XPATH, '//button[@data-v-6a394f31=""]')
         if len(els_btn) != 1: raise Exception('Нет кнопки добавить')
-        els_btn[0].click()
+        try: els_btn[0].click()
+        except: raise Exception('Ошибка действий 4')
         time.sleep(1)
         
         els_li = driver.find_elements(By.XPATH, '//li[@id="6187630175"]')
         if len(els_li) != 1: raise Exception('Нет элемента меню заявка на подключение')
-        els_li[0].click()
-        time.sleep(5)
+        try: els_li[0].click()
+        except: raise Exception('Ошибка действий 5')
+        time.sleep(10)
         ###################### Страница ввода заявки ######################
         # Фамилия
         els_div = driver.find_elements(By.XPATH, '//div[@data-qaid="family"]')
@@ -60,14 +69,14 @@ def set_bid(data):
         lastname = data['lastname']
         if len(lastname) < 3: lastname = 'Клиентов'
         els_input[0].send_keys(lastname)
-        time.sleep(1)
+        time.sleep(3)
         # Телефон
         els_div = driver.find_elements(By.XPATH, '//div[@data-qaid="contact_phone"]')
         if len(els_div) != 1: raise Exception('Нет блока ввода телефона')
         els_input = els_div[0].find_elements(By.TAG_NAME, 'input')
         if len(els_input) != 1: raise Exception('Ошибка поиска поля ввода телефона')
         els_input[0].send_keys(data['phone'])
-        time.sleep(1)
+        time.sleep(3)
         # Имя
         els_div = driver.find_elements(By.XPATH, '//div[@data-qaid="first_name"]')
         if len(els_div) != 1: raise Exception('Нет блока ввода имени')
@@ -76,7 +85,7 @@ def set_bid(data):
         firstname = data['firstname']
         if len(firstname) < 3: firstname = 'Клиент'
         els_input[0].send_keys(firstname)
-        time.sleep(1)
+        time.sleep(3)
         # Отчество
         patronymic = data['patronymic']
         if patronymic:
@@ -85,17 +94,15 @@ def set_bid(data):
             els_input = els_div[0].find_elements(By.TAG_NAME, 'input')
             if len(els_input) != 1: raise Exception('Ошибка поиска поля ввода отчества')
             els_input[0].send_keys(patronymic)
-            time.sleep(1)
-        # Адрес
-        # Страница возможно сдвинулась и верхняя кнопка не видна, прокрутим страницу вниз
-        driver.execute_script('window.scrollTo(0, 500)')
-        time.sleep(1)
+            time.sleep(3)
 
+        # Адрес
         els_div = driver.find_elements(By.XPATH, '//div[@data-qaid="address"]')
         if len(els_div) != 1: raise Exception('Нет блока ввода адреса')
         els_section = els_div[0].find_elements(By.TAG_NAME, 'section')
         if len(els_section) != 1: raise Exception('Ошибка поиска секции меню адреса')
         els_section[0].click()
+        time.sleep(2)
         
         els_input = els_div[0].find_elements(By.TAG_NAME, 'input')
         if len(els_input) != 1: raise Exception('Ошибка поиска поля ввода адреса')
@@ -108,9 +115,10 @@ def set_bid(data):
             lst_comment_address.append(region)
             lst_input_address.append(region)
         city = data.get('city')
+        if region == None and city:
+            lst_input_address.append(city)
         if city:
             lst_comment_address.append(city)
-            lst_input_address.append(city)
         street = data.get('street')
         if street:
             lst_comment_address.append(street)
@@ -122,26 +130,22 @@ def set_bid(data):
             lst_comment_address.append(apartment)
         input_address = ' '.join(lst_input_address)
         comment_address = ' '.join(lst_comment_address)
+        data['address'] = input_address
         
         els_input[0].send_keys(input_address)
         time.sleep(5)
         els_li = els_div[0].find_elements(By.TAG_NAME, 'li')
         if len(els_li) > 0: els_li[0].click()
-        time.sleep(1)
-        # ИНН/Организация
-        # Страница возможно сдвинулась и верхняя кнопка не видна, прокрутим страницу вниз
-        driver.execute_script('window.scrollTo(0, document.body.scrollHeight)')
-        time.sleep(1)
+        time.sleep(3)
 
+        # ИНН/Организация
         els_div = driver.find_elements(By.XPATH, '//div[@data-qaid="organization_name"]')
         if len(els_div) != 1: raise Exception('Нет блока ввода ИНН/Организация')
         els_input = els_div[0].find_elements(By.TAG_NAME, 'input')
         if len(els_input) != 1: raise Exception('Ошибка поиска поля ввода ИНН/Организация')
         els_input[0].send_keys('ИП')
-        time.sleep(1)
-        # els_span = els_div[0].find_elements(By.TAG_NAME, 'span')
-        # if len(els_span) > 0: els_span[0].click()
-        # time.sleep(1)
+        time.sleep(3)
+
         # Дополнительная информация
         els_div = driver.find_elements(By.XPATH, '//div[@data-qaid="additionalInfo"]')
         if len(els_div) != 1: raise Exception('Нет блока ввода дополнительной информации')
@@ -152,15 +156,16 @@ def set_bid(data):
         if comment: dop_info += f'{comment}\n'
         dop_info += f'Услуга: {data["service"]}\n'
         els_textarea[0].send_keys(dop_info)
-        time.sleep(1)
-        
-        # Страница возможно сдвинулась и верхняя кнопка не видна, прокрутим страницу вниз
-        driver.execute_script('window.scrollTo(0, document.body.scrollHeight)')
-        time.sleep(1)
+        time.sleep(3)
+
         # Кнопка далее
         els_btn = driver.find_elements(By.XPATH, '//button[@data-qaid="next_button_service"]')
         if len(els_btn) != 1: raise Exception('Нет кнопки далее')
         disabled = els_btn[0].get_attribute('disabled')
+        
+        # time.sleep(20)
+        # raise Exception('Finish')
+        
         
         if disabled == 'true':
             mess = (f'Адрес: {input_address}\nНе распознан')
@@ -182,9 +187,6 @@ def set_bid(data):
                 f_ok = True
         if f_ok == False: raise Exception('Ошибка добавления услуги интернет')
         time.sleep(1)
-        
-        # raise Exception('Finish')
-        
         
         # Ищем кнопку Зарегистрировать
         els_btn = driver.find_elements(By.XPATH, '//button[@data-qaid="register_button_service"]')
@@ -426,16 +428,16 @@ if __name__ == '__main__':
         # 'login': 'mos.domconnect@gmail.com',
         # 'password': 'bvo[7dGr',
         # 'id_lid': '1163386',
-        # 'firstname': 'Иван',
+        # 'firstname': '',
         # 'patronymic': '',
         # 'lastname': '',
-        # 'phone': '79111234567',
-        # 'region': '',
-        # 'city': 'Архангельск',
-        # 'street': 'ул Смольный Буян',
-        # 'house': '16 к 1',
-        # 'apartment': '5',
-        # 'inn_organisation': '772821163041 / ИП Ильченко Василий Иванович',
+        # 'phone': '79127549060',
+        # 'region': 'Удмуртская Республика',
+        # 'city': 'посёлок Игра',
+        # 'street': 'Труда',
+        # 'house': '8',
+        # 'apartment': '',
+        # 'inn_organisation': 'ООО Игринская типография',
         # 'service': 'Интернет',
         # 'comment': 'Тестовая заявка, просьба не обрабатывать',
     # }
@@ -443,3 +445,8 @@ if __name__ == '__main__':
     # if rez: print(rez)
     
     # http://django.domconnect.ru/api/set_bid_rostelecom2?key=Q8kGM1HfWz
+    # Клиентов
+    # Клиент
+    # Удмуртская Республика посёлок Игра
+    # ИП
+    # Ярославская область Ярославль

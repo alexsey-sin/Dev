@@ -70,7 +70,7 @@ Content-Type: application/json
 
 ###
 # Взять результаты работы бота ПВ
-GET http://{{host}}/api/get_pv_result/1/25.02.2021
+GET http://{{host}}/api/get_pv_result/2/27.05.2022
 Authorization: {{token}}
 # Content-Type: application/json
 

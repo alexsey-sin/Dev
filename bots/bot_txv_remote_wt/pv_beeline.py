@@ -7,8 +7,12 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
 
+# url_host = 'http://127.0.0.1:8000'
+url_host = 'http://django.domconnect.ru'
 provider = 'Билайн'
-pv_crm_code = 'OTHER'
+pv_crm_code = 'OTHER'  # http://django.domconnect.ru/admin/domconnect/dccatalogproviderseo/
+pv_dc_code = 1  # код по моделям django.domconnect.ru
+
 # личный бот @infra
 MY_TELEGRAM_CHAT_ID = '1740645090'
 MY_TELEGRAM_TOKEN = '2009560099:AAHtYot6EOHh_qr9EUoCoczQhjyRdulKHYo'
@@ -186,7 +190,7 @@ def get_deal_status(acc_data):
             # проход по всем заявкам
             for deal in a_data['deals']:
                 num = deal.get('num')
-                if not num: continue
+                if not num or deal.get('pv_status') == 'deal_number_error': continue
                 els = driver.find_elements(By.XPATH, '//input[@placeholder="Введите номер"]')
                 if len(els) != 1: raise Exception('Нет поля ввода номера заявки')
                 els_btn = driver.find_elements(By.XPATH, '//button[contains(@ng-click, "applyFilterHander")]')
@@ -213,16 +217,16 @@ def get_deal_status(acc_data):
                     if len(els_td) != 9: raise Exception('Неправильный формат строки таблицы результатов поиска заявки')
                     status = els_td[3].text
                     # print(status)
+                    deal['pv_status'] = status
                     # Анализируем статус
                     for stat_b in status_beeline_srm.keys():
                         if status.find(stat_b) >= 0:
-                            deal['status'] = stat_b
-                            if deal['status'] == 'Подключен':
+                            if deal['pv_status'] == 'Подключен':
                                 deal['date_connect'] = status[len(stat_b):].strip()
                             break
 
                     
-                    cast_status = deal.get('status')
+                    cast_status = deal.get('pv_status')
                     if cast_status in status_for_comment:
                         time.sleep(2)
                         # Требуется взять комментарий
@@ -234,7 +238,10 @@ def get_deal_status(acc_data):
                         els_comm = driver.find_elements(By.XPATH, '//div[@ng-bind-html="comment.text"]')
                         if len(els_comm) > 0: deal['comment'] = els_comm[0].text
                     
-                else: continue
+                else:
+                    deal['pv_status'] = 'not_found'
+                    deal['comment'] = 'Заявка в ЛК не найдена'
+
             # with open('out.html', 'w', encoding='utf-8') as outfile:
                 # outfile.write(driver.page_source)
             # raise Exception('Финиш.')
@@ -296,6 +303,55 @@ def send_telegram(chat: str, token: str, text: str):
         return 600
     return r.status_code
 
+def get_dc_token():
+    url = url_host + '/auth/jwt/create/'
+    
+    headers = {
+        'Content-Type': 'application/json',
+    }
+    data = {
+        'username': 'user',
+        'password': 'User123456'
+    }
+    
+    try:
+        responce = requests.post(url, headers=headers, json=data)
+        answer = json.loads(responce.text)
+        return answer.get('access', '')
+    except: return ''
+
+def send_dj_domconnect_result(lst_deal):
+    dc_token = get_dc_token()
+    if not dc_token: return 'not_token'
+    
+    url = url_host + '/api/set_pv_result/'
+    
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {dc_token}',
+    }
+    data = []
+    for deal in lst_deal:
+        dct = {
+            'pv_code': pv_dc_code,
+            'id_crm': deal.get('ID', 'Не определен')[:50],
+            'num_deal': deal.get('num', 'Не определен')[:50],
+            'pv_status': deal.get('pv_status', '')[:255],
+            'crm_status': deal.get('crm_status', '')[:255],
+            'date_connect': deal.get('date_connect', '')[:50],
+            'comment': deal.get('comment', ''),
+        }
+        data.append(dct)
+    
+    try:
+        responce = requests.post(url, headers=headers, json=data)
+        if responce.status_code != 200:
+            return str(responce.text)[:100]
+    except Exception as e: return str(e)[:100]
+
+    return ''
+
+
 def run_check_deals(tlg_chat, tlg_token, by_days=60):
     tlg_mess = ''
 
@@ -326,9 +382,8 @@ def run_check_deals(tlg_chat, tlg_token, by_days=60):
         id_d = dl.get('ID')
         num_out = ''
         pw_code = dl.get('UF_CRM_595ED493B6E5C').strip()
-        if num.isdigit():  # Просто один номер
-            num_out = num
-        else:
+        dct = {'ID': id_d, 'num': num, 'pw_code': pw_code}
+        if not num.isdigit():  # Просто один номер
             error = False
             num_e = num.replace('/', ' ')
             num_e = num.replace('№', '')
@@ -336,19 +391,18 @@ def run_check_deals(tlg_chat, tlg_token, by_days=60):
             l_num = [int(n.strip()) for n in lst_num if n.strip().isdigit()]
             if len(l_num) == 0:
                 error = True
-            elif len(l_num) == 1: num_out = str(l_num[0])
+            elif len(l_num) == 1: dct['num'] = str(l_num[0])
             else:
                 l_num.sort()
                 error = True
                 for i in range(1, len(l_num)):
                     if (l_num[i-1] + 1) == l_num[i]:
-                        num_out = str(l_num[i-1])
+                        dct['num'] = str(l_num[i-1])
                         error = False
             if error:
-                tlg_mess = f'ПВ {provider}: {id_d}|Ошибка номера сделки \"{num}\"'
-                send_telegram(tlg_chat, tlg_token, tlg_mess)
-                continue
-        new_lst_deal.append({'ID': id_d, 'num': num_out, 'pw_code': pw_code})
+                dct['pv_status'] = 'deal_number_error'
+                dct['comment'] = 'Ошибка номера сделки'
+        new_lst_deal.append(dct)
     print('Нормализованный список:', len(new_lst_deal), 'шт.')
     
     # Составим списки сделок по PartnerWEB
@@ -371,43 +425,57 @@ def run_check_deals(tlg_chat, tlg_token, by_days=60):
     
     # Проверим статус на подлежащие изменению в СРМ
     change = 0
+    cnt_all = 0
     for partner in new_acc_data['partners']:
+        cnt_all += len(partner['deals'])
         for deal in partner['deals']:
-            status = deal.get('status')
+            status = deal.get('pv_status')
             if status and status in status_beeline_srm:
+                deal['crm_status'] = status_beeline_srm[status]
                 # print(deal.get('ID'), status, name_status_crm[status_beeline_srm[status]])
                 e = send_crm_deal_stage(deal, status_beeline_srm[status])
                 # e = False
                 if e: 
                     tlg_mess = f'ПВ {provider}: Ошибка при обновлении статуса сделки в срм'
                     send_telegram(tlg_chat, tlg_token, tlg_mess)
-                else:
-                    tlg_mess = f'ПВ {provider}: {deal.get("ID")}|{deal.get("num")}|{status} ==> {name_status_crm[status_beeline_srm[status]]}'
-                    date_connect = deal.get('date_connect')
-                    if status_beeline_srm[status] == 2 and date_connect: tlg_mess += f'|{date_connect}'
-                    comment = deal.get('comment')
-                    if comment: tlg_mess += f'|{comment}'
-                    send_telegram(tlg_chat, tlg_token, tlg_mess)
-                    change += 1
+                else: change += 1
                 time.sleep(0.5)
+        e = send_dj_domconnect_result(partner['deals'])
+        if e: 
+            tlg_mess = f'ПВ {provider}: Ошибка при архивировании сделки в dj_domconnect'
+            send_telegram(tlg_chat, tlg_token, tlg_mess)
     
-    tlg_mess = f'ПВ {provider}:\nСтатус сделок изменен\nв {change} из {len(lst_deal)}'
+    tlg_mess = f'ПВ {provider}:\nСтатус сделок изменен\nв {change} из {cnt_all}\n'
+    str_today = datetime.today().strftime('%d.%m.%Y')
+    tlg_mess += f'http://django.domconnect.ru/api/get_pv_result/{pv_dc_code}/{str_today}'
+
     send_telegram(tlg_chat, tlg_token, tlg_mess)
 
 
 if __name__ == '__main__':
-    # run_check_deals(MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN, 10)
+    # run_check_deals(MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN, 6)
     # run_check_deals(PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN)
     # acc_data = {  # Доступы к ПВ
         # 'url': 'https://partnerweb.beeline.ru/',
         # 'partners': [
-            # # {
-                # # 'code': '3002',     # (СПб и ЛО, БМ)
-                # # 'login': '0K23-181',
-                # # 'employee': '1010000101',
-                # # 'password': 'FudlU7tfFsK5g6',
-                # # 'deals': [],
-            # # },
+            # {
+                # 'code': '3002',     # (СПб и ЛО, БМ)
+                # 'login': '0K23-181',
+                # 'employee': '1010000101',
+                # 'password': 'FudlU7tfFsK5g6',
+                # 'deals': [
+                    # {
+                        # "ID": "158869",
+                        # "num": "244091891",
+                        # "pw_code": "3002",
+                    # },
+                    # {
+                        # "ID": "158582",
+                        # "num": "243608801",
+                        # "pw_code": "3002",
+                    # },
+                # ],
+            # },
             # # {
                 # # 'code': '3058',     # (МО и МСК)
                 # # 'login': 'S01-181',
@@ -415,19 +483,19 @@ if __name__ == '__main__':
                 # # 'password': '8GFysus@kffs7',
                 # # 'deals': [],
             # # },
-            # {
-                # 'code': '3003',     # (РФ)
-                # 'login': 'S24-61',
-                # 'employee': '1010000101',
-                # 'password': 'Ft&dhdk234hbs3',
-                # 'deals': [
-                    # {
-                        # "ID": "156853",
-                        # "num": "243756326",
-                        # "pw_code": "3003",
-                    # }
-                # ],
-            # },
+            # # {
+                # # 'code': '3003',     # (РФ)
+                # # 'login': 'S24-61',
+                # # 'employee': '1010000101',
+                # # 'password': 'Ft&dhdk234hbs3',
+                # # 'deals': [
+                    # # {
+                        # # "ID": "156853",
+                        # # "num": "243756326",
+                        # # "pw_code": "3003",
+                    # # }
+                # # ],
+            # # },
         # ]
     # }
 
