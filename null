@@ -1,0 +1,165 @@
+[1654058999.145][INFO]: Starting ChromeDriver 102.0.5005.61 (0e59bcc00cc4985ce39ad31c150065f159d95ad3-refs/branch-heads/5005@{#819}) on port 63552
+[1654058999.145][INFO]: Please see https://chromedriver.chromium.org/security-considerations for suggestions on keeping ChromeDriver safe.
+[1654058999.582][INFO]: [cb74116ed8b73eb9764491b39d55f6de] COMMAND InitSession {
+   "capabilities": {
+      "alwaysMatch": {
+         "browserName": "chrome",
+         "goog:chromeOptions": {
+            "args": [ "--remote-debugging-host=127.0.0.1", "--remote-debugging-port=63550", "--user-data-dir=C:\\Users\\al-si\\AppData\\Local\\Temp\\tmpxqd9e851", "--lang=ru-RU", "--no-default-browser-check", "--no-first-run", "--log-level=0" ],
+            "binary": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+            "debuggerAddress": "127.0.0.1:63550",
+            "extensions": [  ]
+         },
+         "pageLoadStrategy": "normal"
+      },
+      "firstMatch": [ {
+
+      } ]
+   },
+   "desiredCapabilities": {
+      "browserName": "chrome",
+      "goog:chromeOptions": {
+         "args": [ "--remote-debugging-host=127.0.0.1", "--remote-debugging-port=63550", "--user-data-dir=C:\\Users\\al-si\\AppData\\Local\\Temp\\tmpxqd9e851", "--lang=ru-RU", "--no-default-browser-check", "--no-first-run", "--log-level=0" ],
+         "binary": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+         "debuggerAddress": "127.0.0.1:63550",
+         "extensions": [  ]
+      },
+      "pageLoadStrategy": "normal"
+   }
+}
+[1654058999.628][INFO]: [cb74116ed8b73eb9764491b39d55f6de] RESPONSE InitSession {
+   "capabilities": {
+      "acceptInsecureCerts": false,
+      "browserName": "chrome",
+      "browserVersion": "102.0.5005.63",
+      "chrome": {
+         "chromedriverVersion": "102.0.5005.61 (0e59bcc00cc4985ce39ad31c150065f159d95ad3-refs/branch-heads/5005@{#819})"
+      },
+      "goog:chromeOptions": {
+         "debuggerAddress": "127.0.0.1:63550"
+      },
+      "pageLoadStrategy": "normal",
+      "platformName": "",
+      "proxy": {
+
+      },
+      "setWindowRect": false,
+      "strictFileInteractability": false,
+      "timeouts": {
+         "implicit": 0,
+         "pageLoad": 300000,
+         "script": 30000
+      },
+      "unhandledPromptBehavior": "dismiss and notify",
+      "webauthn:extension:credBlob": true,
+      "webauthn:extension:largeBlob": true,
+      "webauthn:virtualAuthenticators": true
+   },
+   "sessionId": "cb74116ed8b73eb9764491b39d55f6de"
+}
+[1654058999.630][INFO]: [cb74116ed8b73eb9764491b39d55f6de] COMMAND SetTimeouts {
+   "implicit": 20000
+}
+[1654058999.630][INFO]: [cb74116ed8b73eb9764491b39d55f6de] RESPONSE SetTimeouts
+[1654058999.631][INFO]: [cb74116ed8b73eb9764491b39d55f6de] COMMAND ExecuteScript {
+   "args": [  ],
+   "script": "\n            let objectToInspect = window,\n                result = [];\n            while(objectToInspect !== null)\n            { result = result.concat(Object.getOwnPropertyNames(objectToInspect));\n              objectToInspect = Object.getPrototypeOf(objectToInspect); }\n            return result.filter(i => i.match(/.+_.+_(Array|Promise|Symbol)/ig))\n            "
+}
+[1654058999.631][INFO]: Waiting for pending navigations...
+[1654058999.633][INFO]: Done waiting for pending navigations. Status: ok
+[1654058999.638][INFO]: Waiting for pending navigations...
+[1654058999.639][INFO]: Done waiting for pending navigations. Status: ok
+[1654058999.639][INFO]: [cb74116ed8b73eb9764491b39d55f6de] RESPONSE ExecuteScript [ "kyk_ukjsqcofbrggfiwcTXcqgy_Array", "kyk_ukjsqcofbrggfiwcTXcqgy_Promise", "kyk_ukjsqcofbrggfiwcTXcqgy_Symbol" ]
+[1654058999.641][INFO]: [cb74116ed8b73eb9764491b39d55f6de] COMMAND ExecuteCDP {
+   "cmd": "Page.addScriptToEvaluateOnNewDocument",
+   "params": {
+      "source": "\n                    let objectToInspect = window,\n                        result = [];\n                    while(objectToInspect !== null) \n                    { result = result.concat(Object.getOwnPropertyNames(objectToInspect));\n                      objectToInspect = Object.getPrototypeOf(objectToInspect); }\n                    result.forEach(p => p.match(/.+_.+_(Array|Promise|Symbol)/ig)\n                                        &&delete window[p]&&console.log('removed',p))\n                    "
+   }
+}
+[1654058999.641][INFO]: Waiting for pending navigations...
+[1654058999.642][INFO]: Done waiting for pending navigations. Status: ok
+[1654058999.642][INFO]: Waiting for pending navigations...
+[1654058999.643][INFO]: Done waiting for pending navigations. Status: ok
+[1654058999.643][INFO]: [cb74116ed8b73eb9764491b39d55f6de] RESPONSE ExecuteCDP {
+   "identifier": "2"
+}
+[1654058999.644][INFO]: [cb74116ed8b73eb9764491b39d55f6de] COMMAND Navigate {
+   "url": "https://urmdf.ssl.mts.ru/wd/hub"
+}
+[1654058999.644][INFO]: Waiting for pending navigations...
+[1654058999.645][INFO]: Done waiting for pending navigations. Status: ok
+[1654058999.786][INFO]: Waiting for pending navigations...
+[1654059000.813][INFO]: Done waiting for pending navigations. Status: ok
+[1654059000.813][INFO]: [cb74116ed8b73eb9764491b39d55f6de] RESPONSE Navigate
+[1654059010.818][INFO]: [cb74116ed8b73eb9764491b39d55f6de] COMMAND FindElements {
+   "using": "css selector",
+   "value": "[id=\"phone\"]"
+}
+[1654059010.847][INFO]: Waiting for pending navigations...
+[1654059010.849][INFO]: Done waiting for pending navigations. Status: ok
+[1654059010.874][INFO]: Waiting for pending navigations...
+[1654059010.875][INFO]: Done waiting for pending navigations. Status: ok
+[1654059010.875][INFO]: [cb74116ed8b73eb9764491b39d55f6de] RESPONSE FindElements [ {
+   "element-6066-11e4-a52e-4f735466cecf": "7ea06363-9ce1-41f8-bd6f-d14c24721bca"
+} ]
+[1654059010.877][INFO]: [cb74116ed8b73eb9764491b39d55f6de] COMMAND TypeElement {
+   "id": "7ea06363-9ce1-41f8-bd6f-d14c24721bca",
+   "text": "GRYURYEV",
+   "value": [ "G", "R", "Y", "U", "R", "Y", "E", "V" ]
+}
+[1654059010.877][INFO]: Waiting for pending navigations...
+[1654059010.878][INFO]: Done waiting for pending navigations. Status: ok
+[1654059010.967][INFO]: Waiting for pending navigations...
+[1654059010.971][INFO]: Done waiting for pending navigations. Status: ok
+[1654059010.971][INFO]: [cb74116ed8b73eb9764491b39d55f6de] RESPONSE TypeElement
+[1654059011.987][INFO]: [cb74116ed8b73eb9764491b39d55f6de] COMMAND FindElements {
+   "using": "css selector",
+   "value": "[id=\"password\"]"
+}
+[1654059011.987][INFO]: Waiting for pending navigations...
+[1654059011.990][INFO]: Done waiting for pending navigations. Status: ok
+[1654059012.013][INFO]: Waiting for pending navigations...
+[1654059012.014][INFO]: Done waiting for pending navigations. Status: ok
+[1654059012.014][INFO]: [cb74116ed8b73eb9764491b39d55f6de] RESPONSE FindElements [ {
+   "element-6066-11e4-a52e-4f735466cecf": "1963a1a0-480f-4c9e-8fc0-a5a5bfeed689"
+} ]
+[1654059012.016][INFO]: [cb74116ed8b73eb9764491b39d55f6de] COMMAND TypeElement {
+   "id": "1963a1a0-480f-4c9e-8fc0-a5a5bfeed689",
+   "text": "UcoTWY",
+   "value": [ "U", "c", "o", "T", "W", "Y" ]
+}
+[1654059012.016][INFO]: Waiting for pending navigations...
+[1654059012.017][INFO]: Done waiting for pending navigations. Status: ok
+[1654059012.086][INFO]: Waiting for pending navigations...
+[1654059012.091][INFO]: Done waiting for pending navigations. Status: ok
+[1654059012.091][INFO]: [cb74116ed8b73eb9764491b39d55f6de] RESPONSE TypeElement
+[1654059013.104][INFO]: [cb74116ed8b73eb9764491b39d55f6de] COMMAND FindElements {
+   "using": "css selector",
+   "value": "button"
+}
+[1654059013.105][INFO]: Waiting for pending navigations...
+[1654059013.107][INFO]: Done waiting for pending navigations. Status: ok
+[1654059013.135][INFO]: Waiting for pending navigations...
+[1654059013.138][INFO]: Done waiting for pending navigations. Status: ok
+[1654059013.138][INFO]: [cb74116ed8b73eb9764491b39d55f6de] RESPONSE FindElements [ {
+   "element-6066-11e4-a52e-4f735466cecf": "73cc4a16-a1d3-4d77-a43d-3aee7217ddf0"
+} ]
+[1654059013.142][INFO]: [cb74116ed8b73eb9764491b39d55f6de] COMMAND ClickElement {
+   "id": "73cc4a16-a1d3-4d77-a43d-3aee7217ddf0"
+}
+[1654059013.142][INFO]: Waiting for pending navigations...
+[1654059013.145][INFO]: Done waiting for pending navigations. Status: ok
+[1654059013.226][INFO]: Waiting for pending navigations...
+[1654059013.232][INFO]: Done waiting for pending navigations. Status: ok
+[1654059013.232][INFO]: [cb74116ed8b73eb9764491b39d55f6de] RESPONSE ClickElement
+[1654059018.250][INFO]: [cb74116ed8b73eb9764491b39d55f6de] COMMAND FindElements {
+   "using": "xpath",
+   "value": "//textarea[@data-testid=\"search\"]"
+}
+[1654059018.277][INFO]: Waiting for pending navigations...
+[1654059018.280][INFO]: Done waiting for pending navigations. Status: ok
+[1654059018.291][INFO]: Waiting for pending navigations...
+[1654059018.292][INFO]: Done waiting for pending navigations. Status: ok
+[1654059018.292][INFO]: [cb74116ed8b73eb9764491b39d55f6de] RESPONSE FindElements [ {
+   "element-6066-11e4-a52e-4f735466cecf": "65b02954-0225-4a82-abbd-bb84aee6a004"
+} ]

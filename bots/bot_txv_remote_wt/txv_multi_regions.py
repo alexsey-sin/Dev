@@ -88,10 +88,10 @@ def get_txv(query, accesses):
                     cur_query = copy.deepcopy(query)  # создадим глубокую копию словаря запроса
                     cur_query['pv_code'] = pv_code
                     cur_query['pv_name'] = access.get('pv_name')
-                    cur_query['login'] = access.get('login')
-                    cur_query['password'] = access.get('password')
-                    cur_query['login_2'] = access.get('login_2')
-                    cur_query['password_2'] = access.get('password_2')
+                    cur_query['login'] = access.get('login_2')
+                    cur_query['password'] = access.get('password_2')
+                    # cur_query['login_2'] = access.get('login_2')
+                    # cur_query['password_2'] = access.get('password_2')
                     thread = ThreadWithResult(target=get_txv_rostelecom, args=(cur_query,))
                     thread.start()  # Запустим поток
                     lst_threads.append(thread)

@@ -743,16 +743,16 @@ if __name__ == '__main__':
 
 
     # from_date = '2022-02-08T00:00:00'
-    e = get_catalog()
+    # e = get_catalog()
     # # e = get_source()
     # e, lst_deal = get_deals(from_date)
     # if e: print(e)
     
-    # e = get_user_status()
-    # if e: print(e)
-    # # if e:
-        # with open('deals_all_fields.json', 'w', encoding='utf-8') as out_file:
-            # json.dump(e, out_file, ensure_ascii=False, indent=4)
+    e = get_field_deals()
+    if e: print(e)
+    if e:
+        with open('deals_all_fields.json', 'w', encoding='utf-8') as out_file:
+            json.dump(e, out_file, ensure_ascii=False, indent=4)
 
     # cur_day = datetime.today().day
     # cur_month = datetime.today().month

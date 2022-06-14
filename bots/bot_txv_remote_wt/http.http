@@ -1,0 +1,107 @@
+@host = localhost:8000
+# # @host = django.domconnect.ru
+# @token = Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjUzNzQxNzA3LCJqdGkiOiJhMDk1NmJkYzUxZWU0ZWQ5YWQ3MjlkYjBhNWM4NmYxNiIsInVzZXJfaWQiOjJ9.mAP1uxBmmh1_x5oE7Ljf4S-OSYIHSXmz28BykioZ-R0
+
+###
+POST https://crm.domconnect.ru/rest/371/w95d249i00jagfkv/crm.deal.list
+Content-Type: application/json
+
+{
+    "start": 0,
+    "order": {"ID": "ASC"},  # Если нужно с сортировкой
+    "filter": {
+        ">=DATE_CREATE": "2021-10-01T00:00:00",
+        "<DATE_CREATE": "2021-10-01T00:00:00",
+        "UF_CRM_5903C16B84C55": 2,
+        "STAGE_ID": [1, 5],
+        "UF_CRM_595E343AA0EE2": 0
+    },
+    "select": [
+        "ID",
+        "DATE_CREATE",
+        "STAGE_ID",
+        "UF_CRM_5903C16BDF7A7",
+        "UF_CRM_595ED493B6E5C"
+    ]
+}
+
+###
+###
+###
+###
+# # Создать пользователя
+# POST http://{{host}}/auth/users/
+# Content-Type: application/json
+
+# {
+#     "email": "user@mail.ru",
+#     "username": "user",
+#     "password": "User123456"
+# }
+
+# ###
+# # Получить токен
+# POST http://{{host}}/auth/jwt/create/
+# Content-Type: application/json
+
+# {
+#     "username": "user",
+#     "password": "User123456"
+# }
+
+# ###############################################################################
+# ###
+# # Занести результаты работы бота ПВ одной сделки
+# POST http://{{host}}/api/set_pv_result/
+# Authorization: {{token}}
+# Content-Type: application/json
+
+# {
+#     "pv_code": "1",
+#     "id_crm": "1445521",
+#     "num_deal": "1456253214578954",
+#     "pv_status": "ПВ статус",
+#     "crm_status": "Новый СРМ статус1",
+#     "date_connect": "date_connect",
+#     "comment": "comment"
+# }
+
+# ###
+# # Занести результаты работы бота ПВ нескольких сделок
+# POST http://{{host}}/api/set_pv_result/
+# Authorization: {{token}}
+# Content-Type: application/json
+
+# [
+#     {
+#         "pv_code": "1",
+#         "id_crm": "1445521",
+#         "num_deal": "1456253214578954",
+#         "pv_status": "ПВ статус",
+#         "crm_status": "Новый СРМ статус1",
+#         "date_connect": "date_connect",
+#         "comment": "comment"
+#     },
+#     {
+#         "pv_code": "1",
+#         "id_crm": "1445521",
+#         "num_deal": "1456253214578954",
+#         "pv_status": "ПВ статус",
+#         "crm_status": "Новый СРМ статус1",
+#         "date_connect": "date_connect",
+#         "comment": "comment"
+#     }
+# ]
+
+
+# ###
+# # Взять результаты работы бота ПВ
+# GET http://{{host}}/api/get_pv_result/2/27.05.2022
+# Authorization: {{token}}
+# # Content-Type: application/json
+
+# # {
+# #     "email": "user@mail.ru"
+# # }
+
+

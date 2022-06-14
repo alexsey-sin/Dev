@@ -1,0 +1,5723 @@
+{
+    "ID": {
+        "type": "integer",
+        "isRequired": false,
+        "isReadOnly": true,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "ID"
+    },
+    "TITLE": {
+        "type": "string",
+        "isRequired": true,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Название"
+    },
+    "TYPE_ID": {
+        "type": "crm_status",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "statusType": "DEAL_TYPE",
+        "title": "Тип"
+    },
+    "CATEGORY_ID": {
+        "type": "crm_category",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": true,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Направление"
+    },
+    "STAGE_ID": {
+        "type": "crm_status",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "statusType": "DEAL_STAGE",
+        "title": "Стадия сделки"
+    },
+    "STAGE_SEMANTIC_ID": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": true,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Группа стадии"
+    },
+    "IS_NEW": {
+        "type": "char",
+        "isRequired": false,
+        "isReadOnly": true,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Новая сделка"
+    },
+    "IS_RECURRING": {
+        "type": "char",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Регулярная сделка"
+    },
+    "IS_RETURN_CUSTOMER": {
+        "type": "char",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Повторная сделка"
+    },
+    "IS_REPEATED_APPROACH": {
+        "type": "char",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Повторное обращение"
+    },
+    "PROBABILITY": {
+        "type": "integer",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Вероятность"
+    },
+    "CURRENCY_ID": {
+        "type": "crm_currency",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Валюта"
+    },
+    "OPPORTUNITY": {
+        "type": "double",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Сумма"
+    },
+    "IS_MANUAL_OPPORTUNITY": {
+        "type": "char",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "IS_MANUAL_OPPORTUNITY"
+    },
+    "TAX_VALUE": {
+        "type": "double",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Ставка налога"
+    },
+    "COMPANY_ID": {
+        "type": "crm_company",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Компания"
+    },
+    "CONTACT_ID": {
+        "type": "crm_contact",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "isDeprecated": true,
+        "title": "Контакт"
+    },
+    "CONTACT_IDS": {
+        "type": "crm_contact",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": true,
+        "isDynamic": false,
+        "title": "Контакты"
+    },
+    "QUOTE_ID": {
+        "type": "crm_quote",
+        "isRequired": false,
+        "isReadOnly": true,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Предложение"
+    },
+    "BEGINDATE": {
+        "type": "date",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Дата начала"
+    },
+    "CLOSEDATE": {
+        "type": "date",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Дата завершения"
+    },
+    "OPENED": {
+        "type": "char",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Доступна для всех"
+    },
+    "CLOSED": {
+        "type": "char",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Закрыта"
+    },
+    "COMMENTS": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Комментарий"
+    },
+    "ASSIGNED_BY_ID": {
+        "type": "user",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Ответственный"
+    },
+    "CREATED_BY_ID": {
+        "type": "user",
+        "isRequired": false,
+        "isReadOnly": true,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Кем создана"
+    },
+    "MODIFY_BY_ID": {
+        "type": "user",
+        "isRequired": false,
+        "isReadOnly": true,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Кем изменена"
+    },
+    "DATE_CREATE": {
+        "type": "datetime",
+        "isRequired": false,
+        "isReadOnly": true,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Дата создания"
+    },
+    "DATE_MODIFY": {
+        "type": "datetime",
+        "isRequired": false,
+        "isReadOnly": true,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Дата изменения"
+    },
+    "SOURCE_ID": {
+        "type": "crm_status",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "statusType": "SOURCE",
+        "title": "Источник"
+    },
+    "SOURCE_DESCRIPTION": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Дополнительно об источнике"
+    },
+    "LEAD_ID": {
+        "type": "crm_lead",
+        "isRequired": false,
+        "isReadOnly": true,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Лид"
+    },
+    "ADDITIONAL_INFO": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Дополнительная информация"
+    },
+    "LOCATION_ID": {
+        "type": "location",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Местоположение"
+    },
+    "ORIGINATOR_ID": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Внешний источник"
+    },
+    "ORIGIN_ID": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Идентификатор элемента во внешнем источнике"
+    },
+    "UTM_SOURCE": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Рекламная система"
+    },
+    "UTM_MEDIUM": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Тип трафика"
+    },
+    "UTM_CAMPAIGN": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Обозначение рекламной кампании"
+    },
+    "UTM_CONTENT": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Содержание кампании"
+    },
+    "UTM_TERM": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": false,
+        "title": "Условие поиска кампании"
+    },
+    "UF_CRM_5CE3E83DA95E3": {
+        "type": "double",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5CE3E83DA95E3",
+        "listLabel": "Длительность разговора(число)",
+        "formLabel": "Длительность разговора(число)",
+        "filterLabel": "Длительность разговора(число)"
+    },
+    "UF_CRM_5D42A3408A593": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5D42A3408A593",
+        "listLabel": "roistat",
+        "formLabel": "roistat",
+        "filterLabel": "roistat"
+    },
+    "UF_CRM_5DDFB244BB72A": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5DDFB244BB72A",
+        "listLabel": "Длительность разговора(строка)",
+        "formLabel": "Длительность разговора(строка)",
+        "filterLabel": "Длительность разговора(строка)"
+    },
+    "UF_CRM_5DEE33B44F0EE": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5DEE33B44F0EE",
+        "listLabel": "Время до первого исходящего звонка(минуты)",
+        "formLabel": "Время до первого исходящего звонка(минуты)",
+        "filterLabel": "Время до первого исходящего звонка(минуты)"
+    },
+    "UF_CRM_5DEE33B7AA946": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5DEE33B7AA946",
+        "listLabel": "Время до первого не успешного исходящего звонка(минуты)",
+        "formLabel": "Время до первого не успешного исходящего звонка(минуты)",
+        "filterLabel": "Время до первого не успешного исходящего звонка(минуты)"
+    },
+    "UF_CRM_5B716672F41A5": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5B716672F41A5",
+        "listLabel": "roistat_marker",
+        "formLabel": "roistat_marker",
+        "filterLabel": "roistat_marker"
+    },
+    "UF_CRM_5BC472F64E3C3": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5BC472F64E3C3",
+        "listLabel": "roistat_name",
+        "formLabel": "roistat_name",
+        "filterLabel": "roistat_name"
+    },
+    "UF_CRM_5F608A7498860": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "3227",
+                "VALUE": "NWT"
+            },
+            {
+                "ID": "3228",
+                "VALUE": "OA15"
+            },
+            {
+                "ID": "3229",
+                "VALUE": "OA30"
+            },
+            {
+                "ID": "3230",
+                "VALUE": "OA45"
+            },
+            {
+                "ID": "3231",
+                "VALUE": "OA60"
+            },
+            {
+                "ID": "3232",
+                "VALUE": "OA4h"
+            },
+            {
+                "ID": "3233",
+                "VALUE": "OA1d"
+            },
+            {
+                "ID": "3234",
+                "VALUE": "OC15"
+            },
+            {
+                "ID": "3235",
+                "VALUE": "OC30"
+            },
+            {
+                "ID": "3236",
+                "VALUE": "OC45"
+            },
+            {
+                "ID": "3237",
+                "VALUE": "OC60"
+            },
+            {
+                "ID": "3238",
+                "VALUE": "OC4h"
+            },
+            {
+                "ID": "3239",
+                "VALUE": "OC1d"
+            }
+        ],
+        "title": "UF_CRM_5F608A7498860",
+        "listLabel": "Тайминг2",
+        "formLabel": "Тайминг2",
+        "filterLabel": "Тайминг2"
+    },
+    "UF_CRM_5F608B952850D": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "3240",
+                "VALUE": "NWT"
+            },
+            {
+                "ID": "3241",
+                "VALUE": "OA15"
+            },
+            {
+                "ID": "3242",
+                "VALUE": "OA30"
+            },
+            {
+                "ID": "3243",
+                "VALUE": "OA45"
+            },
+            {
+                "ID": "3244",
+                "VALUE": "OA60"
+            },
+            {
+                "ID": "3245",
+                "VALUE": "OA4h"
+            },
+            {
+                "ID": "3246",
+                "VALUE": "OA1d"
+            },
+            {
+                "ID": "3247",
+                "VALUE": "OC15"
+            },
+            {
+                "ID": "3248",
+                "VALUE": "OC30"
+            },
+            {
+                "ID": "3249",
+                "VALUE": "OC45"
+            },
+            {
+                "ID": "3250",
+                "VALUE": "OC60"
+            },
+            {
+                "ID": "3251",
+                "VALUE": "OC4h"
+            },
+            {
+                "ID": "3252",
+                "VALUE": "OC1d"
+            }
+        ],
+        "title": "UF_CRM_5F608B952850D",
+        "listLabel": "Тайминг2",
+        "formLabel": "Тайминг2",
+        "filterLabel": "Тайминг2"
+    },
+    "UF_CRM_5F608BC5D3583": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "3253",
+                "VALUE": "NWT"
+            },
+            {
+                "ID": "3254",
+                "VALUE": "OA15"
+            },
+            {
+                "ID": "3255",
+                "VALUE": "OA30"
+            },
+            {
+                "ID": "3256",
+                "VALUE": "OA45"
+            },
+            {
+                "ID": "3257",
+                "VALUE": "OA60"
+            },
+            {
+                "ID": "3258",
+                "VALUE": "OA4h"
+            },
+            {
+                "ID": "3259",
+                "VALUE": "OA1d"
+            },
+            {
+                "ID": "3260",
+                "VALUE": "OC15"
+            },
+            {
+                "ID": "3261",
+                "VALUE": "OC30"
+            },
+            {
+                "ID": "3262",
+                "VALUE": "OC45"
+            },
+            {
+                "ID": "3263",
+                "VALUE": "OC60"
+            },
+            {
+                "ID": "3264",
+                "VALUE": "OC4h"
+            },
+            {
+                "ID": "3265",
+                "VALUE": "OC1d"
+            }
+        ],
+        "title": "UF_CRM_5F608BC5D3583",
+        "listLabel": "Тайминг2",
+        "formLabel": "Тайминг2",
+        "filterLabel": "Тайминг2"
+    },
+    "UF_CRM_5F608BCFD2520": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "3266",
+                "VALUE": "NWT"
+            },
+            {
+                "ID": "3267",
+                "VALUE": "OA15"
+            },
+            {
+                "ID": "3268",
+                "VALUE": "OA30"
+            },
+            {
+                "ID": "3269",
+                "VALUE": "OA45"
+            },
+            {
+                "ID": "3270",
+                "VALUE": "OA60"
+            },
+            {
+                "ID": "3271",
+                "VALUE": "OA4h"
+            },
+            {
+                "ID": "3272",
+                "VALUE": "OA1d"
+            },
+            {
+                "ID": "3273",
+                "VALUE": "OC15"
+            },
+            {
+                "ID": "3274",
+                "VALUE": "OC30"
+            },
+            {
+                "ID": "3275",
+                "VALUE": "OC45"
+            },
+            {
+                "ID": "3276",
+                "VALUE": "OC60"
+            },
+            {
+                "ID": "3277",
+                "VALUE": "OC4h"
+            },
+            {
+                "ID": "3278",
+                "VALUE": "OC1d"
+            }
+        ],
+        "title": "UF_CRM_5F608BCFD2520",
+        "listLabel": "Тайминг2",
+        "formLabel": "Тайминг2",
+        "filterLabel": "Тайминг2"
+    },
+    "UF_CRM_5F60A1561C175": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5F60A1561C175",
+        "listLabel": "ПросрочкаАО",
+        "formLabel": "ПросрочкаАО",
+        "filterLabel": "ПросрочкаАО"
+    },
+    "UF_CRM_5F60A40A59728": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5F60A40A59728",
+        "listLabel": "ПросрочкаOC",
+        "formLabel": "ПросрочкаOC",
+        "filterLabel": "ПросрочкаOC"
+    },
+    "UF_CRM_5F60A63A7FE2A": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5F60A63A7FE2A",
+        "listLabel": "ПросрочкаOC",
+        "formLabel": "ПросрочкаOC",
+        "filterLabel": "ПросрочкаOC"
+    },
+    "UF_CRM_5F60A7644C08D": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5F60A7644C08D",
+        "listLabel": "ПросрочкаOC",
+        "formLabel": "ПросрочкаOC",
+        "filterLabel": "ПросрочкаOC"
+    },
+    "UF_CRM_5F60A7E575F45": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5F60A7E575F45",
+        "listLabel": "ПросрочкаOC",
+        "formLabel": "ПросрочкаOC",
+        "filterLabel": "ПросрочкаOC"
+    },
+    "UF_CRM_5B8A33FE5836E": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": true,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "1591",
+                "VALUE": "NWT"
+            },
+            {
+                "ID": "1592",
+                "VALUE": "OA15"
+            },
+            {
+                "ID": "1593",
+                "VALUE": "OA30"
+            },
+            {
+                "ID": "1594",
+                "VALUE": "OA45"
+            },
+            {
+                "ID": "1595",
+                "VALUE": "OA60"
+            },
+            {
+                "ID": "1617",
+                "VALUE": "OA4h"
+            },
+            {
+                "ID": "1622",
+                "VALUE": "OA4h"
+            },
+            {
+                "ID": "1613",
+                "VALUE": "OA1d"
+            },
+            {
+                "ID": "1596",
+                "VALUE": "OC15"
+            },
+            {
+                "ID": "1597",
+                "VALUE": "OC30"
+            },
+            {
+                "ID": "1598",
+                "VALUE": "OC45"
+            },
+            {
+                "ID": "1599",
+                "VALUE": "OC60"
+            },
+            {
+                "ID": "1618",
+                "VALUE": "OC4h"
+            },
+            {
+                "ID": "1623",
+                "VALUE": "OC4h"
+            },
+            {
+                "ID": "1614",
+                "VALUE": "OC1d"
+            }
+        ],
+        "title": "UF_CRM_5B8A33FE5836E",
+        "listLabel": "Тайминг",
+        "formLabel": "Тайминг",
+        "filterLabel": "Тайминг"
+    },
+    "UF_CRM_5C441D3ED7B0C": {
+        "type": "employee",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5C441D3ED7B0C",
+        "listLabel": "Кто изменил последний",
+        "formLabel": "Кто изменил последний",
+        "filterLabel": "Кто изменил последний"
+    },
+    "UF_CRM_5B7D06A1E173E": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": true,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "1448",
+                "VALUE": "Реклама Yandex"
+            },
+            {
+                "ID": "1449",
+                "VALUE": "Реклама Yandex (elama-yandex)"
+            },
+            {
+                "ID": "1450",
+                "VALUE": "Реклама Yandex (ya-pik)"
+            },
+            {
+                "ID": "1451",
+                "VALUE": "Реклама Google"
+            },
+            {
+                "ID": "1473",
+                "VALUE": "Потенциалы"
+            },
+            {
+                "ID": "1567",
+                "VALUE": "G-Bee"
+            },
+            {
+                "ID": "1638",
+                "VALUE": "G-Bee_s"
+            },
+            {
+                "ID": "1568",
+                "VALUE": "Y-Bee"
+            },
+            {
+                "ID": "1639",
+                "VALUE": "Y-Bee_s"
+            },
+            {
+                "ID": "3007",
+                "VALUE": "Y-MTS"
+            },
+            {
+                "ID": "3010",
+                "VALUE": "G-MTS"
+            },
+            {
+                "ID": "3114",
+                "VALUE": "ga-mts"
+            },
+            {
+                "ID": "1569",
+                "VALUE": "L"
+            },
+            {
+                "ID": "1570",
+                "VALUE": "L-F"
+            },
+            {
+                "ID": "1571",
+                "VALUE": "L-S"
+            },
+            {
+                "ID": "1572",
+                "VALUE": "P"
+            },
+            {
+                "ID": "3022",
+                "VALUE": "inoinet"
+            },
+            {
+                "ID": "3040",
+                "VALUE": "mts-sale"
+            },
+            {
+                "ID": "3043",
+                "VALUE": "ya-ttk-di"
+            },
+            {
+                "ID": "3163",
+                "VALUE": "vk_yar"
+            },
+            {
+                "ID": "3164",
+                "VALUE": "inst_yar"
+            },
+            {
+                "ID": "3184",
+                "VALUE": "Y-2Bee"
+            },
+            {
+                "ID": "3185",
+                "VALUE": "G-2Bee"
+            },
+            {
+                "ID": "3384",
+                "VALUE": "Y-0Bee"
+            },
+            {
+                "ID": "3387",
+                "VALUE": "Y-Rsya-0Bee"
+            },
+            {
+                "ID": "3393",
+                "VALUE": "Y_Banner"
+            },
+            {
+                "ID": "3396",
+                "VALUE": "Y_MTS-ural"
+            },
+            {
+                "ID": "3399",
+                "VALUE": "Bee_sms"
+            },
+            {
+                "ID": "3470",
+                "VALUE": "Y-2-Bee-Di"
+            },
+            {
+                "ID": "3571",
+                "VALUE": "mytarget-mts-kontekst1"
+            },
+            {
+                "ID": "3572",
+                "VALUE": "mytarget-mts-kontekst2"
+            },
+            {
+                "ID": "3573",
+                "VALUE": "mytarget-mts-interesy1"
+            },
+            {
+                "ID": "3574",
+                "VALUE": "mytarget-beelineru-kontekst1"
+            },
+            {
+                "ID": "3575",
+                "VALUE": "mytarget-beelineru-kontekst2"
+            },
+            {
+                "ID": "3582",
+                "VALUE": "mytarget-ttk"
+            }
+        ],
+        "title": "UF_CRM_5B7D06A1E173E",
+        "listLabel": "Группы источников",
+        "formLabel": "Группы источников",
+        "filterLabel": "Группы источников"
+    },
+    "UF_CRM_5BB5E7E868348": {
+        "type": "integer",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5BB5E7E868348",
+        "listLabel": "Пропущенный звонок=1",
+        "formLabel": "Пропущенный звонок=1",
+        "filterLabel": "Пропущенный звонок=1"
+    },
+    "UF_CRM_5BC85051481B7": {
+        "type": "integer",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5BC85051481B7",
+        "listLabel": "Приоритет (0-100)",
+        "formLabel": "Приоритет (0-100)",
+        "filterLabel": "Приоритет (0-100)"
+    },
+    "UF_CRM_5BD00428D97D8": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": true,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "1602",
+                "VALUE": "БМ"
+            }
+        ],
+        "title": "UF_CRM_5BD00428D97D8",
+        "listLabel": "Территория",
+        "formLabel": "Территория",
+        "filterLabel": "Территория"
+    },
+    "UF_CRM_5BD00429B7602": {
+        "type": "integer",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5BD00429B7602",
+        "listLabel": "Приоритет начальный (0-100)",
+        "formLabel": "Приоритет начальный (0-100)",
+        "filterLabel": "Приоритет начальный (0-100)"
+    },
+    "UF_CRM_5BEA5C99B9DE3": {
+        "type": "integer",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5BEA5C99B9DE3",
+        "listLabel": "НДЗ (число попыток)",
+        "formLabel": "НДЗ (число попыток)",
+        "filterLabel": "НДЗ (число попыток)"
+    },
+    "UF_CRM_5B571029AC97C": {
+        "type": "iblock_element",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5B571029AC97C",
+        "listLabel": "тест СПИСОК ПАРТНЕРЫ",
+        "formLabel": "тест СПИСОК ПАРТНЕРЫ",
+        "filterLabel": "тест СПИСОК ПАРТНЕРЫ"
+    },
+    "UF_CRM_5904FB99E944B": {
+        "type": "datetime",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5904FB99E944B",
+        "listLabel": "Время для тек. статуса в календаре",
+        "formLabel": "Время для тек. статуса в календаре",
+        "filterLabel": "Время для тек. статуса в календаре"
+    },
+    "UF_CRM_5904FB99EEF8D": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5904FB99EEF8D",
+        "listLabel": "Коммент тек. стадии:",
+        "formLabel": "Коммент тек. стадии:",
+        "filterLabel": "Коммент тек. стадии:"
+    },
+    "UF_CRM_5FC79236C5E85": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5FC79236C5E85",
+        "listLabel": "[КК] Отправить на проверку",
+        "formLabel": "[КК] Отправить на проверку",
+        "filterLabel": "[КК] Отправить на проверку"
+    },
+    "UF_CRM_5FC792B7E46D2": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5FC792B7E46D2",
+        "listLabel": "[КК] Отправить на проверку",
+        "formLabel": "[КК] Отправить на проверку",
+        "filterLabel": "[КК] Отправить на проверку"
+    },
+    "UF_CRM_5FC792D16C19F": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5FC792D16C19F",
+        "listLabel": "[КК] Отправлен на проверку",
+        "formLabel": "[КК] Отправлен на проверку",
+        "filterLabel": "[КК] Отправлен на проверку"
+    },
+    "UF_CRM_60180688C8CEB": {
+        "type": "integer",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_60180688C8CEB",
+        "listLabel": "Приоритет распределения",
+        "formLabel": "Приоритет распределения",
+        "filterLabel": "Приоритет распределения"
+    },
+    "UF_CRM_601806F2075E6": {
+        "type": "integer",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_601806F2075E6",
+        "listLabel": "Приоритет распределения",
+        "formLabel": "Приоритет распределения",
+        "filterLabel": "Приоритет распределения"
+    },
+    "UF_CRM_602FCC31CD39D": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_602FCC31CD39D",
+        "listLabel": "Робот Лиза(текст)",
+        "formLabel": "Робот Лиза(текст)",
+        "filterLabel": "Робот Лиза(текст)"
+    },
+    "UF_CRM_604A23C373576": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_604A23C373576",
+        "listLabel": "Карты ФИАС",
+        "formLabel": "Карты ФИАС",
+        "filterLabel": "Карты ФИАС"
+    },
+    "UF_CRM_61A5D870D79E0": {
+        "type": "double",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_61A5D870D79E0",
+        "listLabel": "Просрочка_с",
+        "formLabel": "Просрочка_с",
+        "filterLabel": "Просрочка_с"
+    },
+    "UF_CRM_61A5D89D47CE7": {
+        "type": "double",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_61A5D89D47CE7",
+        "listLabel": "Просрочка_м",
+        "formLabel": "Просрочка_м",
+        "filterLabel": "Просрочка_м"
+    },
+    "UF_CRM_59C4497A1551A": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_59C4497A1551A",
+        "listLabel": "Менеджер П",
+        "formLabel": "Менеджер П",
+        "filterLabel": "Менеджер П"
+    },
+    "UF_CRM_5B2030C764090": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "1144",
+                "VALUE": "Бочагов Максим"
+            },
+            {
+                "ID": "1146",
+                "VALUE": "Качалова Алена"
+            },
+            {
+                "ID": "1147",
+                "VALUE": "Корпачева Альфия"
+            },
+            {
+                "ID": "1150",
+                "VALUE": "Сысоев Леонид"
+            },
+            {
+                "ID": "1455",
+                "VALUE": "Усанина Сюзанна"
+            },
+            {
+                "ID": "1152",
+                "VALUE": "Щегорцова Наталья"
+            },
+            {
+                "ID": "3055",
+                "VALUE": "Андрей Зимин"
+            },
+            {
+                "ID": "3157",
+                "VALUE": "Журавлева Валерия"
+            },
+            {
+                "ID": "3158",
+                "VALUE": "Шешков Артём"
+            },
+            {
+                "ID": "3280",
+                "VALUE": "Армен Мамоян"
+            },
+            {
+                "ID": "3372",
+                "VALUE": "Лобанов Валерий"
+            },
+            {
+                "ID": "3376",
+                "VALUE": "Арина Изотова"
+            },
+            {
+                "ID": "3377",
+                "VALUE": "Алёна Титова"
+            },
+            {
+                "ID": "3390",
+                "VALUE": "Мамоян Армен"
+            },
+            {
+                "ID": "3405",
+                "VALUE": "Бочагова Сюзанна"
+            },
+            {
+                "ID": "3439",
+                "VALUE": "Богомаз Ольга"
+            },
+            {
+                "ID": "1153",
+                "VALUE": "Другой"
+            }
+        ],
+        "title": "UF_CRM_5B2030C764090",
+        "listLabel": "Риелтор НИКАС",
+        "formLabel": "Риелтор НИКАС",
+        "filterLabel": "Риелтор НИКАС"
+    },
+    "UF_CRM_5B48E0AA767B4": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "1554",
+                "VALUE": "Волков Антон"
+            },
+            {
+                "ID": "1551",
+                "VALUE": "Голицына Алена"
+            },
+            {
+                "ID": "1298",
+                "VALUE": "Калинина Татьяна"
+            },
+            {
+                "ID": "1299",
+                "VALUE": "Крыжановский Антон"
+            },
+            {
+                "ID": "1300",
+                "VALUE": "Алина Кузьмичева"
+            },
+            {
+                "ID": "1460",
+                "VALUE": "Лебедева Анастасия"
+            },
+            {
+                "ID": "1301",
+                "VALUE": "Лебедева Татьяна"
+            },
+            {
+                "ID": "1302",
+                "VALUE": "Лучшева Дарья"
+            },
+            {
+                "ID": "1303",
+                "VALUE": "Новзнич Вероника"
+            },
+            {
+                "ID": "1304",
+                "VALUE": "Романовская Оксана"
+            },
+            {
+                "ID": "1305",
+                "VALUE": "Созонова Елизавета"
+            },
+            {
+                "ID": "1306",
+                "VALUE": "Шаверина Татьяна"
+            },
+            {
+                "ID": "1307",
+                "VALUE": "Юманова Любовь"
+            },
+            {
+                "ID": "1608",
+                "VALUE": "Юнок Ксения"
+            },
+            {
+                "ID": "2610",
+                "VALUE": "Анастасия Ворожейкина"
+            },
+            {
+                "ID": "3034",
+                "VALUE": "Громова Алина "
+            },
+            {
+                "ID": "3180",
+                "VALUE": "Илья Машарин"
+            },
+            {
+                "ID": "3564",
+                "VALUE": "Овчинников Руслан"
+            },
+            {
+                "ID": "1308",
+                "VALUE": "Другой"
+            }
+        ],
+        "title": "UF_CRM_5B48E0AA767B4",
+        "listLabel": "Риелтор ИМПУЛЬС",
+        "formLabel": "Риелтор ИМПУЛЬС",
+        "filterLabel": "Риелтор ИМПУЛЬС"
+    },
+    "UF_CRM_5B48EA7A44F6F": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "1311",
+                "VALUE": "Румянцев Артур"
+            },
+            {
+                "ID": "1312",
+                "VALUE": "Аверьянова Ирина"
+            },
+            {
+                "ID": "1313",
+                "VALUE": "Большакова Анастасия"
+            },
+            {
+                "ID": "1314",
+                "VALUE": "Бондарева Ирина"
+            },
+            {
+                "ID": "1315",
+                "VALUE": "Борисова Светлана"
+            },
+            {
+                "ID": "1316",
+                "VALUE": "Волкова Наталья"
+            },
+            {
+                "ID": "1317",
+                "VALUE": "Готка Ольга"
+            },
+            {
+                "ID": "1318",
+                "VALUE": "Живова Елена"
+            },
+            {
+                "ID": "1319",
+                "VALUE": "Иванова Мария"
+            },
+            {
+                "ID": "1320",
+                "VALUE": "Иванова Юлия"
+            },
+            {
+                "ID": "1321",
+                "VALUE": "Ионеско Анастасия"
+            },
+            {
+                "ID": "1322",
+                "VALUE": "Ирина Пульченко"
+            },
+            {
+                "ID": "1323",
+                "VALUE": "Калачева Татьяна"
+            },
+            {
+                "ID": "1324",
+                "VALUE": "Кибо Динара"
+            },
+            {
+                "ID": "1325",
+                "VALUE": "Липина Анна"
+            },
+            {
+                "ID": "1326",
+                "VALUE": "Мазаева Анна"
+            },
+            {
+                "ID": "1327",
+                "VALUE": "Макарова Софья"
+            },
+            {
+                "ID": "1328",
+                "VALUE": "Марина Ковырзанова"
+            },
+            {
+                "ID": "1329",
+                "VALUE": "Масленникова Надежда"
+            },
+            {
+                "ID": "1330",
+                "VALUE": "Мишнева Марина"
+            },
+            {
+                "ID": "1331",
+                "VALUE": "Попова Анастасия"
+            },
+            {
+                "ID": "1332",
+                "VALUE": "Пресняков Василий"
+            },
+            {
+                "ID": "1333",
+                "VALUE": "Соболева Элла"
+            },
+            {
+                "ID": "1334",
+                "VALUE": "Сорокина Ирина"
+            },
+            {
+                "ID": "1335",
+                "VALUE": "Староверова Елена"
+            },
+            {
+                "ID": "1336",
+                "VALUE": "Суслина Светлана"
+            },
+            {
+                "ID": "1337",
+                "VALUE": "Другой"
+            }
+        ],
+        "title": "UF_CRM_5B48EA7A44F6F",
+        "listLabel": "Риелтор АНК",
+        "formLabel": "Риелтор АНК",
+        "filterLabel": "Риелтор АНК"
+    },
+    "UF_CRM_5D5E4A74B6573": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "2623",
+                "VALUE": "Головкина Александра Алексеевна"
+            },
+            {
+                "ID": "2624",
+                "VALUE": "Другое"
+            }
+        ],
+        "title": "UF_CRM_5D5E4A74B6573",
+        "listLabel": "Риелтор AGENTS-YAR",
+        "formLabel": "Риелтор AGENTS-YAR",
+        "filterLabel": "Риелтор AGENTS-YAR"
+    },
+    "UF_CRM_5B1AAF34B8491": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "1117",
+                "VALUE": "Не предлагали подключение (Холодный звонок)"
+            },
+            {
+                "ID": "1118",
+                "VALUE": "Не заинтересовался подключением (Холодный звонок)"
+            },
+            {
+                "ID": "1119",
+                "VALUE": "Готов к подключению, ждет звонка (На консультацию)"
+            },
+            {
+                "ID": "1120",
+                "VALUE": "Выбрал тариф и провайдера (Отправить провайдеру)"
+            }
+        ],
+        "title": "UF_CRM_5B1AAF34B8491",
+        "listLabel": "Готовность клиента (тип заявки)",
+        "formLabel": "Готовность клиента (тип заявки)",
+        "filterLabel": "Готовность клиента (тип заявки)"
+    },
+    "UF_CRM_5B1AAF357C488": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": true,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "1121",
+                "VALUE": "В ближайшее время"
+            },
+            {
+                "ID": "1122",
+                "VALUE": "СРОЧНО"
+            },
+            {
+                "ID": "1123",
+                "VALUE": "Через 1 час"
+            },
+            {
+                "ID": "1124",
+                "VALUE": "Через 2 часа"
+            },
+            {
+                "ID": "1125",
+                "VALUE": "Утром"
+            },
+            {
+                "ID": "1126",
+                "VALUE": "Днем"
+            },
+            {
+                "ID": "1127",
+                "VALUE": "Вечером"
+            },
+            {
+                "ID": "1128",
+                "VALUE": "Завтра"
+            },
+            {
+                "ID": "1129",
+                "VALUE": "На следующей неделе"
+            },
+            {
+                "ID": "1130",
+                "VALUE": "Ближе к концу месяца"
+            },
+            {
+                "ID": "1131",
+                "VALUE": "Другое (указать в комментариях)"
+            }
+        ],
+        "title": "UF_CRM_5B1AAF357C488",
+        "listLabel": "Желаемое время звонка клиенту",
+        "formLabel": "Желаемое время звонка клиенту",
+        "filterLabel": "Желаемое время звонка клиенту"
+    },
+    "UF_CRM_6012B3A4B689F": {
+        "type": "double",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_6012B3A4B689F",
+        "listLabel": "DC_gmt",
+        "formLabel": "DC_gmt",
+        "filterLabel": "DC_gmt"
+    },
+    "UF_CRM_595F9C7C52516": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_595F9C7C52516",
+        "listLabel": "Организация / ИНН",
+        "formLabel": "Организация / ИНН",
+        "filterLabel": "Организация / ИНН"
+    },
+    "UF_CRM_611F80DA3E844": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "3414",
+                "VALUE": "Бот Лиза - некорректный перевод на оператора"
+            },
+            {
+                "ID": "3415",
+                "VALUE": "Бот Герман - некорректный перевод на оператора (мусор)"
+            }
+        ],
+        "title": "UF_CRM_611F80DA3E844",
+        "listLabel": "Создать задачу по ошибке",
+        "formLabel": "Создать задачу по ошибке",
+        "filterLabel": "Создать задачу по ошибке"
+    },
+    "UF_CRM_611F81B3D0C01": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "3423",
+                "VALUE": "Бот Лиза - некорректный перевод"
+            },
+            {
+                "ID": "3424",
+                "VALUE": "Бот Герман - некорректный перевод (мусор)"
+            }
+        ],
+        "title": "UF_CRM_611F81B3D0C01",
+        "listLabel": "Задачу по ошибке - ОК",
+        "formLabel": "Задачу по ошибке - ОК",
+        "filterLabel": "Задачу по ошибке - ОК"
+    },
+    "UF_CRM_5903C16BBCE6A": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5903C16BBCE6A",
+        "listLabel": "Улица дом-корпус",
+        "formLabel": "Улица дом-корпус",
+        "filterLabel": "Улица дом-корпус"
+    },
+    "UF_CRM_5903C16BC5F5A": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5903C16BC5F5A",
+        "listLabel": "Квартира",
+        "formLabel": "Квартира",
+        "filterLabel": "Квартира"
+    },
+    "UF_CRM_5903C16BB8247": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5903C16BB8247",
+        "listLabel": "Город",
+        "formLabel": "Город",
+        "filterLabel": "Город"
+    },
+    "UF_CRM_5CB03D52438C9": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5CB03D52438C9",
+        "listLabel": "Район города",
+        "formLabel": "Район города",
+        "filterLabel": "Район города"
+    },
+    "UF_CRM_5903C16BB2F06": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5903C16BB2F06",
+        "listLabel": "Область",
+        "formLabel": "Область",
+        "filterLabel": "Область"
+    },
+    "UF_CRM_5BACAFCD317E2": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5BACAFCD317E2",
+        "listLabel": "Страна",
+        "formLabel": "Страна",
+        "filterLabel": "Страна"
+    },
+    "UF_CRM_5CB03D54572CF": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5CB03D54572CF",
+        "listLabel": "Район области",
+        "formLabel": "Район области",
+        "filterLabel": "Район области"
+    },
+    "UF_CRM_5A375E3AF3C69": {
+        "type": "address",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5A375E3AF3C69",
+        "listLabel": "Адрес Google карты",
+        "formLabel": "Адрес Google карты",
+        "filterLabel": "Адрес Google карты"
+    },
+    "UF_CRM_5A375E3B85609": {
+        "type": "url",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5A375E3B85609",
+        "listLabel": "ссылка ТхВ на Domconnect:",
+        "formLabel": "ссылка ТхВ на Domconnect:",
+        "filterLabel": "ссылка ТхВ на Domconnect:"
+    },
+    "UF_CRM_5A375E3BDE761": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5A375E3BDE761",
+        "listLabel": "Краткий результат проверки DC",
+        "formLabel": "Краткий результат проверки DC",
+        "filterLabel": "Краткий результат проверки DC"
+    },
+    "UF_CRM_5B1FDD522993A": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5B1FDD522993A",
+        "listLabel": "DC ТхВ: Возможные провайдеры",
+        "formLabel": "DC ТхВ: Возможные провайдеры",
+        "filterLabel": "DC ТхВ: Возможные провайдеры"
+    },
+    "UF_CRM_5A38B784A877D": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5A38B784A877D",
+        "listLabel": "Адрес проверен (снять для повт. запроса)",
+        "formLabel": "Адрес проверен (снять для повт. запроса)",
+        "filterLabel": "Адрес проверен (снять для повт. запроса)"
+    },
+    "UF_CRM_5B1FDD52ABFCA": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5B1FDD52ABFCA",
+        "listLabel": "Разность во времени с клиентом (API DC: timeindex)",
+        "formLabel": "Разность во времени с клиентом (API DC: timeindex)",
+        "filterLabel": "Разность во времени с клиентом (API DC: timeindex)"
+    },
+    "UF_CRM_5903C16B84C55": {
+        "type": "crm_status",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "statusType": "INDUSTRY",
+        "title": "UF_CRM_5903C16B84C55",
+        "listLabel": "Провайдер",
+        "formLabel": "Провайдер",
+        "filterLabel": "Провайдер"
+    },
+    "UF_CRM_5A894313AAECF": {
+        "type": "crm_status",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "statusType": "INDUSTRY",
+        "title": "UF_CRM_5A894313AAECF",
+        "listLabel": "Резервный провайдер 1",
+        "formLabel": "Резервный провайдер 1",
+        "filterLabel": "Резервный провайдер 1"
+    },
+    "UF_CRM_5A89431432F8F": {
+        "type": "crm_status",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "statusType": "INDUSTRY",
+        "title": "UF_CRM_5A89431432F8F",
+        "listLabel": "Резервный провайдер 2",
+        "formLabel": "Резервный провайдер 2",
+        "filterLabel": "Резервный провайдер 2"
+    },
+    "UF_CRM_5A894314A7650": {
+        "type": "crm_status",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "statusType": "INDUSTRY",
+        "title": "UF_CRM_5A894314A7650",
+        "listLabel": "Резервный провайдер 3",
+        "formLabel": "Резервный провайдер 3",
+        "filterLabel": "Резервный провайдер 3"
+    },
+    "UF_CRM_5903C16B9B9D2": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5903C16B9B9D2",
+        "listLabel": "Проверка ТхВ",
+        "formLabel": "Проверка ТхВ",
+        "filterLabel": "Проверка ТхВ"
+    },
+    "UF_CRM_5903C16BCEE3A": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": true,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "191",
+                "VALUE": "Интернет"
+            },
+            {
+                "ID": "192",
+                "VALUE": "Цифровое ТВ"
+            },
+            {
+                "ID": "3381",
+                "VALUE": "Smart TV"
+            },
+            {
+                "ID": "196",
+                "VALUE": "СИМ-карта"
+            },
+            {
+                "ID": "197",
+                "VALUE": "Wi-Fi роутер"
+            },
+            {
+                "ID": "546",
+                "VALUE": "ПЕРЕЕЗД"
+            },
+            {
+                "ID": "193",
+                "VALUE": "Кабельное ТВ"
+            },
+            {
+                "ID": "195",
+                "VALUE": "Телефония"
+            },
+            {
+                "ID": "194",
+                "VALUE": "Спутниковое ТВ"
+            },
+            {
+                "ID": "3402",
+                "VALUE": "Видеонаблюдение"
+            },
+            {
+                "ID": "3561",
+                "VALUE": "Оборудование (продажа)"
+            }
+        ],
+        "title": "UF_CRM_5903C16BCEE3A",
+        "listLabel": "Услуги",
+        "formLabel": "Услуги",
+        "filterLabel": "Услуги"
+    },
+    "UF_CRM_5B967020CE6ED": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": true,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "1532",
+                "VALUE": "Аутентификация по Wi-Fi"
+            },
+            {
+                "ID": "1533",
+                "VALUE": "Витруальный ЦОД"
+            },
+            {
+                "ID": "1534",
+                "VALUE": "Видеонаблюдение"
+            },
+            {
+                "ID": "1535",
+                "VALUE": "Защита от DDOS"
+            },
+            {
+                "ID": "1536",
+                "VALUE": "Касса-онлайн ОФД"
+            },
+            {
+                "ID": "1537",
+                "VALUE": "Корпоративная частная сеть VPN-канал"
+            },
+            {
+                "ID": "1538",
+                "VALUE": "Междугородняя/Международная связь"
+            },
+            {
+                "ID": "1539",
+                "VALUE": "Мобильный интернет"
+            },
+            {
+                "ID": "1540",
+                "VALUE": "Мобильная связь"
+            },
+            {
+                "ID": "1541",
+                "VALUE": "Мобильное предприятие"
+            },
+            {
+                "ID": "1542",
+                "VALUE": "Номер 8800"
+            },
+            {
+                "ID": "1543",
+                "VALUE": "Облачная АТС"
+            },
+            {
+                "ID": "1544",
+                "VALUE": "Охрана"
+            },
+            {
+                "ID": "1545",
+                "VALUE": "Офис 365"
+            },
+            {
+                "ID": "1546",
+                "VALUE": "Таргетированная смс-рассылка"
+            },
+            {
+                "ID": "1547",
+                "VALUE": "ТВ для бизнеса с публичным показом"
+            },
+            {
+                "ID": "1548",
+                "VALUE": "Телефония VOIP"
+            },
+            {
+                "ID": "1531",
+                "VALUE": "Интернет"
+            }
+        ],
+        "title": "UF_CRM_5B967020CE6ED",
+        "listLabel": "Услуги для БИЗНЕСА",
+        "formLabel": "Услуги для БИЗНЕСА",
+        "filterLabel": "Услуги для БИЗНЕСА"
+    },
+    "UF_CRM_5903C16BD4C60": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5903C16BD4C60",
+        "listLabel": "Тариф",
+        "formLabel": "Тариф",
+        "filterLabel": "Тариф"
+    },
+    "UF_CRM_5A64E62E0D592": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5A64E62E0D592",
+        "listLabel": "Промокод (акция)",
+        "formLabel": "Промокод (акция)",
+        "filterLabel": "Промокод (акция)"
+    },
+    "UF_CRM_5903C16BDAA69": {
+        "type": "integer",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5903C16BDAA69",
+        "listLabel": "Сумма тарифа*",
+        "formLabel": "Сумма тарифа*",
+        "filterLabel": "Сумма тарифа*"
+    },
+    "UF_CRM_5B10E65FD8465": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5B10E65FD8465",
+        "listLabel": "Вознаграждение оператора",
+        "formLabel": "Вознаграждение оператора",
+        "filterLabel": "Вознаграждение оператора"
+    },
+    "UF_CRM_5B42D2B4765AC": {
+        "type": "employee",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5B42D2B4765AC",
+        "listLabel": "2й сотр. довёл до сделки (Календарь)",
+        "formLabel": "2й сотр. довёл до сделки (Календарь)",
+        "filterLabel": "2й сотр. довёл до сделки (Календарь)"
+    },
+    "UF_CRM_5B42D2B4CEE24": {
+        "type": "employee",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5B42D2B4CEE24",
+        "listLabel": "3й сотр. довёл до подключения (Ошибки)",
+        "formLabel": "3й сотр. довёл до подключения (Ошибки)",
+        "filterLabel": "3й сотр. довёл до подключения (Ошибки)"
+    },
+    "UF_CRM_5B42D2B526256": {
+        "type": "employee",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5B42D2B526256",
+        "listLabel": "4й сотр. довёл до оплаты (ФРОД)",
+        "formLabel": "4й сотр. довёл до оплаты (ФРОД)",
+        "filterLabel": "4й сотр. довёл до оплаты (ФРОД)"
+    },
+    "UF_CRM_5904FB99DBF0C": {
+        "type": "datetime",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5904FB99DBF0C",
+        "listLabel": "Дата подключения*",
+        "formLabel": "Дата подключения*",
+        "filterLabel": "Дата подключения*"
+    },
+    "UF_CRM_595ED493B6E5C": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "3002",
+                "VALUE": "0K23-181 (СПб и ЛО, БМ)"
+            },
+            {
+                "ID": "3058",
+                "VALUE": "S01-181 (МО и МСК)"
+            },
+            {
+                "ID": "3003",
+                "VALUE": "S24-61 (РФ)"
+            },
+            {
+                "ID": "534",
+                "VALUE": "почта"
+            },
+            {
+                "ID": "557",
+                "VALUE": "по звонку / через диспетчера"
+            },
+            {
+                "ID": "548",
+                "VALUE": "Плясунова"
+            },
+            {
+                "ID": "535",
+                "VALUE": "портал / МПЗ"
+            },
+            {
+                "ID": "556",
+                "VALUE": "гугл форма / табл"
+            },
+            {
+                "ID": "536",
+                "VALUE": "фрейм "
+            },
+            {
+                "ID": "549",
+                "VALUE": "МСК-онлайн Консультация"
+            },
+            {
+                "ID": "550",
+                "VALUE": "МСК-онлайн Заявка"
+            },
+            {
+                "ID": "551",
+                "VALUE": "Телекомза Консультация"
+            },
+            {
+                "ID": "1494",
+                "VALUE": "ИНЕТМИ CRM"
+            },
+            {
+                "ID": "531",
+                "VALUE": "F03 (Большая Москва)"
+            },
+            {
+                "ID": "533",
+                "VALUE": "S06 (РФ)"
+            },
+            {
+                "ID": "532",
+                "VALUE": "651-37 (МО и МСК)"
+            },
+            {
+                "ID": "2909",
+                "VALUE": "Билайн Казахстан"
+            }
+        ],
+        "title": "UF_CRM_595ED493B6E5C",
+        "listLabel": "PartnerWEB",
+        "formLabel": "PartnerWEB",
+        "filterLabel": "PartnerWEB"
+    },
+    "UF_CRM_5903C16BDF7A7": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5903C16BDF7A7",
+        "listLabel": "Номер заявки",
+        "formLabel": "Номер заявки",
+        "filterLabel": "Номер заявки"
+    },
+    "UF_CRM_5904FB99E2FC0": {
+        "type": "crm_status",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "statusType": "COMPANY_TYPE",
+        "title": "UF_CRM_5904FB99E2FC0",
+        "listLabel": "Создать СДЕЛКУ",
+        "formLabel": "Создать СДЕЛКУ",
+        "filterLabel": "Создать СДЕЛКУ"
+    },
+    "UF_CRM_59B40B8452FAD": {
+        "type": "datetime",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_59B40B8452FAD",
+        "listLabel": "Требуется КОНТРОЛЬ (указать ВРЕМЯ)",
+        "formLabel": "Требуется КОНТРОЛЬ (указать ВРЕМЯ)",
+        "filterLabel": "Требуется КОНТРОЛЬ (указать ВРЕМЯ)"
+    },
+    "UF_CRM_5A64E62E58180": {
+        "type": "crm_status",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "statusType": "DEAL_TYPE",
+        "title": "UF_CRM_5A64E62E58180",
+        "listLabel": "Тип сделки*",
+        "formLabel": "Тип сделки*",
+        "filterLabel": "Тип сделки*"
+    },
+    "UF_CRM_5A895E6401C2E": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": true,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "1014",
+                "VALUE": "Би F03 (КЛГ, КСМ, ИВН, ТРЬ, ТУЛ, СМЛ, ЯРЛ и обл.)"
+            },
+            {
+                "ID": "1015",
+                "VALUE": "Би F24 (МСК и обл.)"
+            },
+            {
+                "ID": "1016",
+                "VALUE": "Би S06 (ост. города РФ)"
+            },
+            {
+                "ID": "1017",
+                "VALUE": "Дом.ру РФ (кроме СПБ и ЯРЛ)"
+            },
+            {
+                "ID": "1018",
+                "VALUE": "Дом.ру ЯРЛ"
+            },
+            {
+                "ID": "1019",
+                "VALUE": "ТТК РФ"
+            },
+            {
+                "ID": "1020",
+                "VALUE": "МТС РФ"
+            },
+            {
+                "ID": "1021",
+                "VALUE": "РТК ЯРЛ (Плясунова)"
+            },
+            {
+                "ID": "1022",
+                "VALUE": "РТК МРФ Центр"
+            },
+            {
+                "ID": "1023",
+                "VALUE": "РТК МРФ Волга"
+            },
+            {
+                "ID": "1024",
+                "VALUE": "РТК МРФ Урал"
+            },
+            {
+                "ID": "1025",
+                "VALUE": "РТК МРФ Дальний Восток"
+            },
+            {
+                "ID": "1026",
+                "VALUE": "ЮЛ: Би РФ"
+            },
+            {
+                "ID": "1027",
+                "VALUE": "ЮЛ: Дом.ру ЯР"
+            },
+            {
+                "ID": "1028",
+                "VALUE": "ЮЛ: Дом.ру ВРЖ"
+            },
+            {
+                "ID": "1029",
+                "VALUE": "ЮЛ: РТК РФ"
+            },
+            {
+                "ID": "1030",
+                "VALUE": "МСКонлайн напрямую"
+            },
+            {
+                "ID": "1031",
+                "VALUE": "МСКонлайн конс."
+            },
+            {
+                "ID": "1032",
+                "VALUE": "МСКонлайн юр."
+            },
+            {
+                "ID": "1033",
+                "VALUE": "Телекомза конс."
+            },
+            {
+                "ID": "1034",
+                "VALUE": "X - ошибка в провайдере"
+            },
+            {
+                "ID": "1035",
+                "VALUE": "-"
+            }
+        ],
+        "title": "UF_CRM_5A895E6401C2E",
+        "listLabel": "ДОГОВОР с провайдером",
+        "formLabel": "ДОГОВОР с провайдером",
+        "filterLabel": "ДОГОВОР с провайдером"
+    },
+    "UF_CRM_5B4EC27F6134C": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5B4EC27F6134C",
+        "listLabel": "Создать повторный лид",
+        "formLabel": "Создать повторный лид",
+        "filterLabel": "Создать повторный лид"
+    },
+    "UF_CRM_5A895E646230F": {
+        "type": "crm_status",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "statusType": "INDUSTRY",
+        "title": "UF_CRM_5A895E646230F",
+        "listLabel": "Провайдер (по которому отправить СМС)",
+        "formLabel": "Провайдер (по которому отправить СМС)",
+        "filterLabel": "Провайдер (по которому отправить СМС)"
+    },
+    "UF_CRM_5A895E64BE98D": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": true,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "1036",
+                "VALUE": "Пакет"
+            },
+            {
+                "ID": "1037",
+                "VALUE": "Моно"
+            },
+            {
+                "ID": "1038",
+                "VALUE": "АКЦИЯ"
+            },
+            {
+                "ID": "1039",
+                "VALUE": "1 руб"
+            },
+            {
+                "ID": "1040",
+                "VALUE": "Новые тарифы"
+            },
+            {
+                "ID": "1041",
+                "VALUE": "Вы обращались к нам"
+            },
+            {
+                "ID": "1042",
+                "VALUE": "Техпод"
+            },
+            {
+                "ID": "1043",
+                "VALUE": "Не дозвонились"
+            },
+            {
+                "ID": "1044",
+                "VALUE": "Нет техвозможности и прочее"
+            },
+            {
+                "ID": "1045",
+                "VALUE": "Новострой"
+            },
+            {
+                "ID": "1046",
+                "VALUE": "Недоступность"
+            },
+            {
+                "ID": "1047",
+                "VALUE": "Еще не начали"
+            },
+            {
+                "ID": "1048",
+                "VALUE": "Массовая рассылка"
+            },
+            {
+                "ID": "1049",
+                "VALUE": "нет оплаты"
+            }
+        ],
+        "title": "UF_CRM_5A895E64BE98D",
+        "listLabel": "Тип СМС (можно указать неск.)",
+        "formLabel": "Тип СМС (можно указать неск.)",
+        "filterLabel": "Тип СМС (можно указать неск.)"
+    },
+    "UF_CRM_5A3FBE65B785A": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5A3FBE65B785A",
+        "listLabel": "Кому СМС",
+        "formLabel": "Кому СМС",
+        "filterLabel": "Кому СМС"
+    },
+    "UF_CRM_5A3FBE660BE6A": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5A3FBE660BE6A",
+        "listLabel": "Текст СМС к отправке",
+        "formLabel": "Текст СМС к отправке",
+        "filterLabel": "Текст СМС к отправке"
+    },
+    "UF_CRM_5A3FBE665A640": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5A3FBE665A640",
+        "listLabel": "СМС ОК -> Отправить",
+        "formLabel": "СМС ОК -> Отправить",
+        "filterLabel": "СМС ОК -> Отправить"
+    },
+    "UF_CRM_5A895E651F6E5": {
+        "type": "crm_status",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "statusType": "HONORIFIC",
+        "title": "UF_CRM_5A895E651F6E5",
+        "listLabel": "Способ отправки заявки",
+        "formLabel": "Способ отправки заявки",
+        "filterLabel": "Способ отправки заявки"
+    },
+    "UF_CRM_5A895E657C450": {
+        "type": "crm_status",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "statusType": "INDUSTRY",
+        "title": "UF_CRM_5A895E657C450",
+        "listLabel": "Провайдер (кому отправляем заявку)",
+        "formLabel": "Провайдер (кому отправляем заявку)",
+        "filterLabel": "Провайдер (кому отправляем заявку)"
+    },
+    "UF_CRM_5A89734053D8C": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5A89734053D8C",
+        "listLabel": "ДОБАВИТЬ информацию (коммент. к сообщ., номер заявки и пр.)",
+        "formLabel": "ДОБАВИТЬ информацию (коммент. к сообщ., номер заявки и пр.)",
+        "filterLabel": "ДОБАВИТЬ информацию (коммент. к сообщ., номер заявки и пр.)"
+    },
+    "UF_CRM_5A895E6629839": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5A895E6629839",
+        "listLabel": "Текст для отправки почты",
+        "formLabel": "Текст для отправки почты",
+        "filterLabel": "Текст для отправки почты"
+    },
+    "UF_CRM_5DCA63F571EF7": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5DCA63F571EF7",
+        "listLabel": "Проверка данных заявки (только просмотр, выполнится после установки ОК->Сохранить)",
+        "formLabel": "Проверка данных заявки (только просмотр, выполнится после установки ОК->Сохранить)",
+        "filterLabel": "Проверка данных заявки (только просмотр, выполнится после установки ОК->Сохранить)"
+    },
+    "UF_CRM_59B43EC3A7AF0": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_59B43EC3A7AF0",
+        "listLabel": "Письмо ОК -> Отправить",
+        "formLabel": "Письмо ОК -> Отправить",
+        "filterLabel": "Письмо ОК -> Отправить"
+    },
+    "UF_CRM_5A6431317F82F": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5A6431317F82F",
+        "listLabel": "Ошибка в адресе",
+        "formLabel": "Ошибка в адресе",
+        "filterLabel": "Ошибка в адресе"
+    },
+    "UF_CRM_5A643131C1CA8": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5A643131C1CA8",
+        "listLabel": "Ошибка на DC (ТхВ или в тарифе)",
+        "formLabel": "Ошибка на DC (ТхВ или в тарифе)",
+        "filterLabel": "Ошибка на DC (ТхВ или в тарифе)"
+    },
+    "UF_CRM_595E343AB0957": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": true,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "247",
+                "VALUE": "звонок прервался"
+            },
+            {
+                "ID": "248",
+                "VALUE": "не слышно собеседника"
+            },
+            {
+                "ID": "249",
+                "VALUE": "шумы"
+            },
+            {
+                "ID": "543",
+                "VALUE": "заикается / прерывается звук"
+            },
+            {
+                "ID": "250",
+                "VALUE": "не ставить, снять для отправки повторно - [письмо адм отпр.]"
+            }
+        ],
+        "title": "UF_CRM_595E343AB0957",
+        "listLabel": "Качество связи (заполняется в случаях сбоев при звонке)",
+        "formLabel": "Качество связи (заполняется в случаях сбоев при звонке)",
+        "filterLabel": "Качество связи (заполняется в случаях сбоев при звонке)"
+    },
+    "UF_CRM_59B40B8474D0A": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_59B40B8474D0A",
+        "listLabel": "Ошибка лида (заполняется рук-лем при отвале лида)",
+        "formLabel": "Ошибка лида (заполняется рук-лем при отвале лида)",
+        "filterLabel": "Ошибка лида (заполняется рук-лем при отвале лида)"
+    },
+    "UF_CRM_59B40B84998A0": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_59B40B84998A0",
+        "listLabel": "Ошибка исправлена (ставим галку, при разрешении отвала)",
+        "formLabel": "Ошибка исправлена (ставим галку, при разрешении отвала)",
+        "filterLabel": "Ошибка исправлена (ставим галку, при разрешении отвала)"
+    },
+    "UF_CRM_5AEC7BE1D0665": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": true,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "1054",
+                "VALUE": "Нет провайдера в Проверка ТхВ"
+            },
+            {
+                "ID": "1055",
+                "VALUE": "Статус Нет ТхВ при наличии провайдеров"
+            }
+        ],
+        "title": "UF_CRM_5AEC7BE1D0665",
+        "listLabel": "КОНТРОЛЬ лида",
+        "formLabel": "КОНТРОЛЬ лида",
+        "filterLabel": "КОНТРОЛЬ лида"
+    },
+    "UF_CRM_5A643132F211B": {
+        "type": "integer",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5A643132F211B",
+        "listLabel": "ID тарифа на Domconnect",
+        "formLabel": "ID тарифа на Domconnect",
+        "filterLabel": "ID тарифа на Domconnect"
+    },
+    "UF_CRM_5A643133417DE": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5A643133417DE",
+        "listLabel": "Техническое название тарифа на Domconnect",
+        "formLabel": "Техническое название тарифа на Domconnect",
+        "filterLabel": "Техническое название тарифа на Domconnect"
+    },
+    "UF_CRM_5A64313382775": {
+        "type": "integer",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5A64313382775",
+        "listLabel": "Вознаграждение оператору из базы Domconnect",
+        "formLabel": "Вознаграждение оператору из базы Domconnect",
+        "filterLabel": "Вознаграждение оператору из базы Domconnect"
+    },
+    "UF_CRM_5A643133D298F": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5A643133D298F",
+        "listLabel": "Адрес из Domconnect (полный ответ по Yandex картам)",
+        "formLabel": "Адрес из Domconnect (полный ответ по Yandex картам)",
+        "filterLabel": "Адрес из Domconnect (полный ответ по Yandex картам)"
+    },
+    "UF_CRM_611BACD6EEB37": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_611BACD6EEB37",
+        "listLabel": "Адрес с сайта (первичный)",
+        "formLabel": "Адрес с сайта (первичный)",
+        "filterLabel": "Адрес с сайта (первичный)"
+    },
+    "UF_CRM_611BAF0573BA0": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_611BAF0573BA0",
+        "listLabel": "Адрес ДК (первичный)",
+        "formLabel": "Адрес ДК (первичный)",
+        "filterLabel": "Адрес ДК (первичный)"
+    },
+    "UF_CRM_5903C16BC9F9F": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5903C16BC9F9F",
+        "listLabel": "Полный адрес",
+        "formLabel": "Полный адрес",
+        "filterLabel": "Полный адрес"
+    },
+    "UF_CRM_595E343AA0EE2": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_595E343AA0EE2",
+        "listLabel": "Юр. лицо",
+        "formLabel": "Юр. лицо",
+        "filterLabel": "Юр. лицо"
+    },
+    "UF_CRM_595E343AAD086": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_595E343AAD086",
+        "listLabel": "Дополнительно об источнике*",
+        "formLabel": "Дополнительно об источнике*",
+        "filterLabel": "Дополнительно об источнике*"
+    },
+    "UF_CRM_595E8E290DD54": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_595E8E290DD54",
+        "listLabel": "Исх_номер_тел",
+        "formLabel": "Исх_номер_тел",
+        "filterLabel": "Исх_номер_тел"
+    },
+    "UF_CRM_59A6DA9A3C1D2": {
+        "type": "crm_status",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "statusType": "SOURCE",
+        "title": "UF_CRM_59A6DA9A3C1D2",
+        "listLabel": "Источник**",
+        "formLabel": "Источник**",
+        "filterLabel": "Источник**"
+    },
+    "UF_CRM_59C9ED5115E52": {
+        "type": "datetime",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_59C9ED5115E52",
+        "listLabel": "Пред-е время",
+        "formLabel": "Пред-е время",
+        "filterLabel": "Пред-е время"
+    },
+    "UF_CRM_59C9ED51342AC": {
+        "type": "crm_status",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "statusType": "STATUS",
+        "title": "UF_CRM_59C9ED51342AC",
+        "listLabel": "Пред-й статус",
+        "formLabel": "Пред-й статус",
+        "filterLabel": "Пред-й статус"
+    },
+    "UF_CRM_5BB03632A5B72": {
+        "type": "crm_status",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "statusType": "DEAL_STAGE",
+        "title": "UF_CRM_5BB03632A5B72",
+        "listLabel": "Пред-я Стадия",
+        "formLabel": "Пред-я Стадия",
+        "filterLabel": "Пред-я Стадия"
+    },
+    "UF_CRM_5A6607C78CDC8": {
+        "type": "address",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5A6607C78CDC8",
+        "listLabel": "Адрес Google карты (пред-й)",
+        "formLabel": "Адрес Google карты (пред-й)",
+        "filterLabel": "Адрес Google карты (пред-й)"
+    },
+    "UF_CRM_5A86B2B62386B": {
+        "type": "double",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5A86B2B62386B",
+        "listLabel": "Telegram STOP Message (1-в работе отправлено, 2-лид сконвертирован)",
+        "formLabel": "Telegram STOP Message (1-в работе отправлено, 2-лид сконвертирован)",
+        "filterLabel": "Telegram STOP Message (1-в работе отправлено, 2-лид сконвертирован)"
+    },
+    "UF_CRM_5B516271BEFA2": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5B516271BEFA2",
+        "listLabel": "Сайт (откуда генерятся ID заказов)",
+        "formLabel": "Сайт (откуда генерятся ID заказов)",
+        "filterLabel": "Сайт (откуда генерятся ID заказов)"
+    },
+    "UF_CRM_5B51627247E7C": {
+        "type": "integer",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5B51627247E7C",
+        "listLabel": "ID заказа с сайта",
+        "formLabel": "ID заказа с сайта",
+        "filterLabel": "ID заказа с сайта"
+    },
+    "UF_CRM_5A64313418942": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5A64313418942",
+        "listLabel": "--- ДАЛЕЕ не исп-е ПОЛЯ ---",
+        "formLabel": "--- ДАЛЕЕ не исп-е ПОЛЯ ---",
+        "filterLabel": "--- ДАЛЕЕ не исп-е ПОЛЯ ---"
+    },
+    "UF_CRM_5903C16BEB1FF": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5903C16BEB1FF",
+        "listLabel": "ФИО для заявки",
+        "formLabel": "ФИО для заявки",
+        "filterLabel": "ФИО для заявки"
+    },
+    "UF_CRM_5903C16BF04DF": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5903C16BF04DF",
+        "listLabel": "Телефон1 для заявки",
+        "formLabel": "Телефон1 для заявки",
+        "filterLabel": "Телефон1 для заявки"
+    },
+    "UF_CRM_5903C16C01E67": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5903C16C01E67",
+        "listLabel": "Телефон2 для заявки",
+        "formLabel": "Телефон2 для заявки",
+        "filterLabel": "Телефон2 для заявки"
+    },
+    "UF_CRM_5903C16B911A5": {
+        "type": "crm_status",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "statusType": "INDUSTRY",
+        "title": "UF_CRM_5903C16B911A5",
+        "listLabel": "Тек. пров.",
+        "formLabel": "Тек. пров.",
+        "filterLabel": "Тек. пров."
+    },
+    "UF_CRM_5903C16BA1382": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "184",
+                "VALUE": "1"
+            },
+            {
+                "ID": "185",
+                "VALUE": "2"
+            },
+            {
+                "ID": "186",
+                "VALUE": "3"
+            },
+            {
+                "ID": "187",
+                "VALUE": "4 и более"
+            }
+        ],
+        "title": "UF_CRM_5903C16BA1382",
+        "listLabel": "Сколько ТВ",
+        "formLabel": "Сколько ТВ",
+        "filterLabel": "Сколько ТВ"
+    },
+    "UF_CRM_5903C16BA7145": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "188",
+                "VALUE": "Нужен"
+            },
+            {
+                "ID": "189",
+                "VALUE": "Не нужен"
+            },
+            {
+                "ID": "190",
+                "VALUE": "Есть свой"
+            }
+        ],
+        "title": "UF_CRM_5903C16BA7145",
+        "listLabel": "Wi-Fi роутер",
+        "formLabel": "Wi-Fi роутер",
+        "filterLabel": "Wi-Fi роутер"
+    },
+    "UF_CRM_5903C16B958E9": {
+        "type": "crm_status",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "statusType": "EMPLOYEES",
+        "title": "UF_CRM_5903C16B958E9",
+        "listLabel": "Откуда узнали",
+        "formLabel": "Откуда узнали",
+        "filterLabel": "Откуда узнали"
+    },
+    "UF_CRM_5903C16BAD9FD": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5903C16BAD9FD",
+        "listLabel": "Источник*",
+        "formLabel": "Источник*",
+        "filterLabel": "Источник*"
+    },
+    "UF_CRM_595E343AA6CDC": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "239",
+                "VALUE": "ИМПУЛЬС"
+            },
+            {
+                "ID": "240",
+                "VALUE": "НИКАС"
+            },
+            {
+                "ID": "241",
+                "VALUE": "СОРОКИН"
+            },
+            {
+                "ID": "242",
+                "VALUE": "КОЛЯ"
+            },
+            {
+                "ID": "243",
+                "VALUE": "КРИВИЦКИЙ"
+            },
+            {
+                "ID": "244",
+                "VALUE": "МОШКОВА"
+            },
+            {
+                "ID": "245",
+                "VALUE": "П.ПАСАД"
+            },
+            {
+                "ID": "246",
+                "VALUE": "ЧЕРНЯК"
+            }
+        ],
+        "title": "UF_CRM_595E343AA6CDC",
+        "listLabel": "Промокод (устар.)",
+        "formLabel": "Промокод (устар.)",
+        "filterLabel": "Промокод (устар.)"
+    },
+    "UF_CRM_5B5AC655E5634": {
+        "type": "crm",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5B5AC655E5634",
+        "listLabel": "тест ТЕСТОВЫЙ",
+        "formLabel": "тест ТЕСТОВЫЙ",
+        "filterLabel": "тест ТЕСТОВЫЙ"
+    },
+    "UF_CRM_5B5B0E71E864A": {
+        "type": "iblock_element",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5B5B0E71E864A",
+        "listLabel": "BITRIX_TEST",
+        "formLabel": "BITRIX_TEST",
+        "filterLabel": "BITRIX_TEST"
+    },
+    "UF_CRM_5CE285E772A60": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5CE285E772A60",
+        "listLabel": "Длительность разговора(секунды)",
+        "formLabel": "Длительность разговора(секунды)",
+        "filterLabel": "Длительность разговора(секунды)"
+    },
+    "UF_CRM_1562745590106": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": true,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "2243",
+                "VALUE": "Интернет"
+            },
+            {
+                "ID": "2612",
+                "VALUE": "Цифровое ТВ"
+            },
+            {
+                "ID": "2613",
+                "VALUE": "Кабельное ТВ"
+            },
+            {
+                "ID": "2614",
+                "VALUE": "Спутниковое ТВ"
+            },
+            {
+                "ID": "2615",
+                "VALUE": "Телефония"
+            },
+            {
+                "ID": "2616",
+                "VALUE": "СИМ-карта"
+            },
+            {
+                "ID": "2617",
+                "VALUE": "Wi-Fi роутер"
+            },
+            {
+                "ID": "2618",
+                "VALUE": "ПЕРЕЕЗД"
+            }
+        ],
+        "title": "UF_CRM_1562745590106",
+        "listLabel": "Услуги БУХ",
+        "formLabel": "Услуги БУХ",
+        "filterLabel": "Услуги БУХ"
+    },
+    "UF_CRM_1566322224240": {
+        "type": "resourcebooking",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": true,
+        "isDynamic": true,
+        "title": "UF_CRM_1566322224240",
+        "listLabel": "Массажист",
+        "formLabel": "Массажист",
+        "filterLabel": "Массажист"
+    },
+    "UF_CRM_5D67835F99EE1": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5D67835F99EE1",
+        "listLabel": "Контроль качества",
+        "formLabel": "Контроль качества",
+        "filterLabel": "Контроль качества"
+    },
+    "UF_CRM_5D67836274DB8": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5D67836274DB8",
+        "listLabel": "Контроль качества ,контролирующий,время контроля",
+        "formLabel": "Контроль качества ,контролирующий,время контроля",
+        "filterLabel": "Контроль качества ,контролирующий,время контроля"
+    },
+    "UF_CRM_5DB2A2E8A5447": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5DB2A2E8A5447",
+        "listLabel": "Провайдеры DC",
+        "formLabel": "Провайдеры DC",
+        "filterLabel": "Провайдеры DC"
+    },
+    "UF_CRM_5DBAD43423AA3": {
+        "type": "double",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5DBAD43423AA3",
+        "listLabel": "СМС НДЗ",
+        "formLabel": "СМС НДЗ",
+        "filterLabel": "СМС НДЗ"
+    },
+    "UF_CRM_5DBAD43759A8D": {
+        "type": "employee",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5DBAD43759A8D",
+        "listLabel": "Отправил в статус новое",
+        "formLabel": "Отправил в статус новое",
+        "filterLabel": "Отправил в статус новое"
+    },
+    "UF_CRM_5DCA63F8AF96F": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5DCA63F8AF96F",
+        "listLabel": "КонтрольКК",
+        "formLabel": "КонтрольКК",
+        "filterLabel": "КонтрольКК"
+    },
+    "UF_CRM_5DCA63FBB9DFB": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5DCA63FBB9DFB",
+        "listLabel": "[КК] Комментарий к задаче",
+        "formLabel": "[КК] Комментарий к задаче",
+        "filterLabel": "[КК] Комментарий к задаче"
+    },
+    "UF_CRM_5DCA63FEA0D62": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5DCA63FEA0D62",
+        "listLabel": "Результат ТхВ",
+        "formLabel": "Результат ТхВ",
+        "filterLabel": "Результат ТхВ"
+    },
+    "UF_CRM_5DCAC2FF2163D": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5DCAC2FF2163D",
+        "listLabel": "Рекламное СМС (ОК -> Отправить)",
+        "formLabel": "Рекламное СМС (ОК -> Отправить)",
+        "filterLabel": "Рекламное СМС (ОК -> Отправить)"
+    },
+    "UF_CRM_5DDD80F5ADCAD": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5DDD80F5ADCAD",
+        "listLabel": "СМС новые заявки",
+        "formLabel": "СМС новые заявки",
+        "filterLabel": "СМС новые заявки"
+    },
+    "UF_CRM_5DEA3D583F1ED": {
+        "type": "double",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5DEA3D583F1ED",
+        "listLabel": "ID CITY API DOMCONNECT",
+        "formLabel": "ID CITY API DOMCONNECT",
+        "filterLabel": "ID CITY API DOMCONNECT"
+    },
+    "UF_CRM_5DEA3D5B94E1A": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": true,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "2901",
+                "VALUE": "Билайн"
+            },
+            {
+                "ID": "2797",
+                "VALUE": "МГТС"
+            },
+            {
+                "ID": "2800",
+                "VALUE": "МТС"
+            },
+            {
+                "ID": "2902",
+                "VALUE": "ТТК"
+            },
+            {
+                "ID": "3111",
+                "VALUE": "Смайл"
+            },
+            {
+                "ID": "2782",
+                "VALUE": "Бизнес Телеком"
+            },
+            {
+                "ID": "2783",
+                "VALUE": "БИТ Онлайн"
+            },
+            {
+                "ID": "2786",
+                "VALUE": "Дом.ru"
+            },
+            {
+                "ID": "2787",
+                "VALUE": "Дом.ru - Телемир"
+            },
+            {
+                "ID": "2788",
+                "VALUE": "Дом.ru - ЯТС"
+            },
+            {
+                "ID": "2781",
+                "VALUE": "Атэл"
+            },
+            {
+                "ID": "2793",
+                "VALUE": "Интернет в частный дом"
+            },
+            {
+                "ID": "2794",
+                "VALUE": "Интернет на Дачу"
+            },
+            {
+                "ID": "2798",
+                "VALUE": "Медиа Дом"
+            },
+            {
+                "ID": "2804",
+                "VALUE": "Онлайн"
+            },
+            {
+                "ID": "2812",
+                "VALUE": "Телеком"
+            },
+            {
+                "ID": "2820",
+                "VALUE": "Электронный город"
+            },
+            {
+                "ID": "2823",
+                "VALUE": "Яр.com (IZET)"
+            },
+            {
+                "ID": "2824",
+                "VALUE": "Ярнет"
+            },
+            {
+                "ID": "2825",
+                "VALUE": "iFlat"
+            },
+            {
+                "ID": "2826",
+                "VALUE": "LiveComm"
+            },
+            {
+                "ID": "2827",
+                "VALUE": "MW Tech"
+            },
+            {
+                "ID": "2831",
+                "VALUE": "RiNet"
+            },
+            {
+                "ID": "2832",
+                "VALUE": "Runet"
+            },
+            {
+                "ID": "2834",
+                "VALUE": "SkyNet"
+            },
+            {
+                "ID": "2835",
+                "VALUE": "Sumtel"
+            },
+            {
+                "ID": "2837",
+                "VALUE": "Virgin Connect"
+            },
+            {
+                "ID": "2838",
+                "VALUE": "WIFIRE-NETBYNET"
+            },
+            {
+                "ID": "2906",
+                "VALUE": "Домконнект"
+            },
+            {
+                "ID": "2995",
+                "VALUE": "Билайн Казахстан"
+            },
+            {
+                "ID": "3015",
+                "VALUE": "ООО «РИТ»"
+            },
+            {
+                "ID": "3016",
+                "VALUE": "IT Time"
+            },
+            {
+                "ID": "3017",
+                "VALUE": "Окнет"
+            },
+            {
+                "ID": "3025",
+                "VALUE": "АКАДО Телеком"
+            },
+            {
+                "ID": "3283",
+                "VALUE": "Ростелеком"
+            }
+        ],
+        "title": "UF_CRM_5DEA3D5B94E1A",
+        "listLabel": "Провайдеры (для отправки почты)",
+        "formLabel": "Провайдеры (для отправки почты)",
+        "filterLabel": "Провайдеры (для отправки почты)"
+    },
+    "UF_CRM_5DEA3D5ED1044": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5DEA3D5ED1044",
+        "listLabel": "Отправить почту провайдерам?",
+        "formLabel": "Отправить почту провайдерам?",
+        "filterLabel": "Отправить почту провайдерам?"
+    },
+    "UF_CRM_5DEDD8472CE9C": {
+        "type": "double",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5DEDD8472CE9C",
+        "listLabel": " ID AREA API DOMCONNECT",
+        "formLabel": " ID AREA API DOMCONNECT",
+        "filterLabel": " ID AREA API DOMCONNECT"
+    },
+    "UF_CRM_5DEEB55BE1456": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5DEEB55BE1456",
+        "listLabel": "Рез. назв. дома",
+        "formLabel": "Рез. назв. дома",
+        "filterLabel": "Рез. назв. дома"
+    },
+    "UF_CRM_5DEEB55F60D66": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5DEEB55F60D66",
+        "listLabel": "Рез. назв. улицы",
+        "formLabel": "Рез. назв. улицы",
+        "filterLabel": "Рез. назв. улицы"
+    },
+    "UF_CRM_5DEEB562347B3": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5DEEB562347B3",
+        "listLabel": "streetname",
+        "formLabel": "streetname",
+        "filterLabel": "streetname"
+    },
+    "UF_CRM_5DEF64F3B28C5": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5DEF64F3B28C5",
+        "listLabel": "Провайдеры Телекомза",
+        "formLabel": "Провайдеры Телекомза",
+        "filterLabel": "Провайдеры Телекомза"
+    },
+    "UF_CRM_5DEF9C7A8CC70": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "2975",
+                "VALUE": "F"
+            },
+            {
+                "ID": "2976",
+                "VALUE": "N"
+            },
+            {
+                "ID": "2977",
+                "VALUE": "W"
+            },
+            {
+                "ID": "2978",
+                "VALUE": "A"
+            },
+            {
+                "ID": "2992",
+                "VALUE": "T"
+            },
+            {
+                "ID": "3029",
+                "VALUE": "J"
+            },
+            {
+                "ID": "3030",
+                "VALUE": "P"
+            }
+        ],
+        "title": "UF_CRM_5DEF9C7A8CC70",
+        "listLabel": "Статус ТхВ",
+        "formLabel": "Статус ТхВ",
+        "filterLabel": "Статус ТхВ"
+    },
+    "UF_CRM_5E1F0DD34BBD9": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5E1F0DD34BBD9",
+        "listLabel": "ID phone error",
+        "formLabel": "ID phone error",
+        "filterLabel": "ID phone error"
+    },
+    "UF_CRM_5E33D38E81908": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5E33D38E81908",
+        "listLabel": "Звонок?",
+        "formLabel": "Звонок?",
+        "filterLabel": "Звонок?"
+    },
+    "UF_CRM_5E34620418017": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5E34620418017",
+        "listLabel": "Без ТхВ",
+        "formLabel": "Без ТхВ",
+        "filterLabel": "Без ТхВ"
+    },
+    "UF_CRM_1583237732211": {
+        "type": "date",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_1583237732211",
+        "listLabel": "Дата ошибки",
+        "formLabel": "Дата ошибки",
+        "filterLabel": "Дата ошибки"
+    },
+    "UF_CRM_1583237863": {
+        "type": "employee",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_1583237863",
+        "listLabel": "Ответственный за ошибку",
+        "formLabel": "Ответственный за ошибку",
+        "filterLabel": "Ответственный за ошибку"
+    },
+    "UF_CRM_5E5E50573B12D": {
+        "type": "double",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5E5E50573B12D",
+        "listLabel": "Не ответивший",
+        "formLabel": "Не ответивший",
+        "filterLabel": "Не ответивший"
+    },
+    "UF_CRM_5E5E50632996C": {
+        "type": "double",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5E5E50632996C",
+        "listLabel": "Не ответивший",
+        "formLabel": "Не ответивший",
+        "filterLabel": "Не ответивший"
+    },
+    "UF_CRM_5EB92751D38E8": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "3051",
+                "VALUE": "Неизвестно"
+            },
+            {
+                "ID": "3052",
+                "VALUE": "Доступен"
+            },
+            {
+                "ID": "3053",
+                "VALUE": "Недоступен"
+            }
+        ],
+        "title": "UF_CRM_5EB92751D38E8",
+        "listLabel": "HLR-status",
+        "formLabel": "HLR-status",
+        "filterLabel": "HLR-status"
+    },
+    "UF_CRM_5EBBD69E8D3A1": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5EBBD69E8D3A1",
+        "listLabel": "Почта отправлена?",
+        "formLabel": "Почта отправлена?",
+        "filterLabel": "Почта отправлена?"
+    },
+    "UF_CRM_5ECD205732FC1": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "3085",
+                "VALUE": "Есть интернет"
+            },
+            {
+                "ID": "3086",
+                "VALUE": "Не работает"
+            },
+            {
+                "ID": "3087",
+                "VALUE": "Нет интернета"
+            },
+            {
+                "ID": "3088",
+                "VALUE": "Отказано"
+            }
+        ],
+        "title": "UF_CRM_5ECD205732FC1",
+        "listLabel": "Наличие/качество интернета",
+        "formLabel": "Наличие/качество интернета",
+        "filterLabel": "Наличие/качество интернета"
+    },
+    "UF_CRM_5ECD205F6A316": {
+        "type": "double",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5ECD205F6A316",
+        "listLabel": "Сумма тарифа сейчас",
+        "formLabel": "Сумма тарифа сейчас",
+        "filterLabel": "Сумма тарифа сейчас"
+    },
+    "UF_CRM_5ECD2065E567B": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": true,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "3089",
+                "VALUE": "Интернет"
+            },
+            {
+                "ID": "3090",
+                "VALUE": "Цифровое ТВ"
+            },
+            {
+                "ID": "3091",
+                "VALUE": "Кабельное ТВ"
+            },
+            {
+                "ID": "3092",
+                "VALUE": "Спутниковое ТВ"
+            },
+            {
+                "ID": "3093",
+                "VALUE": "Телефония"
+            },
+            {
+                "ID": "3094",
+                "VALUE": "СИМ-карта"
+            },
+            {
+                "ID": "3095",
+                "VALUE": "Wi-Fi роутер"
+            }
+        ],
+        "title": "UF_CRM_5ECD2065E567B",
+        "listLabel": "Услуги сейчас",
+        "formLabel": "Услуги сейчас",
+        "filterLabel": "Услуги сейчас"
+    },
+    "UF_CRM_5ECD21BD2258A": {
+        "type": "crm_status",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "statusType": "INDUSTRY",
+        "title": "UF_CRM_5ECD21BD2258A",
+        "listLabel": "Провайдер сейчас",
+        "formLabel": "Провайдер сейчас",
+        "filterLabel": "Провайдер сейчас"
+    },
+    "UF_CRM_5ED0EA5086FC6": {
+        "type": "double",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5ED0EA5086FC6",
+        "listLabel": "п/к (число попыток)",
+        "formLabel": "п/к (число попыток)",
+        "filterLabel": "п/к (число попыток)"
+    },
+    "UF_CRM_5ED0EA55C0094": {
+        "type": "double",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5ED0EA55C0094",
+        "listLabel": "ж/з (число попыток)",
+        "formLabel": "ж/з (число попыток)",
+        "filterLabel": "ж/з (число попыток)"
+    },
+    "UF_CRM_5ED116DE60855": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5ED116DE60855",
+        "listLabel": "На доработке",
+        "formLabel": "На доработке",
+        "filterLabel": "На доработке"
+    },
+    "UF_CRM_5ED11E1C06D2B": {
+        "type": "employee",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5ED11E1C06D2B",
+        "listLabel": "Ответственный (оператор)",
+        "formLabel": "Ответственный (оператор)",
+        "filterLabel": "Ответственный (оператор)"
+    },
+    "UF_CRM_5ED11E21B7508": {
+        "type": "employee",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5ED11E21B7508",
+        "listLabel": "Ответственный (фильтратор)",
+        "formLabel": "Ответственный (фильтратор)",
+        "filterLabel": "Ответственный (фильтратор)"
+    },
+    "UF_CRM_5ED11E26337FA": {
+        "type": "employee",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5ED11E26337FA",
+        "listLabel": "Ответственный (холодник)",
+        "formLabel": "Ответственный (холодник)",
+        "filterLabel": "Ответственный (холодник)"
+    },
+    "UF_CRM_5ED8F61F0FBEB": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5ED8F61F0FBEB",
+        "listLabel": "Не ответивший",
+        "formLabel": "Не ответивший",
+        "filterLabel": "Не ответивший"
+    },
+    "UF_CRM_5F43AE1A57E61": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "3175",
+                "VALUE": "ГП Билайн"
+            },
+            {
+                "ID": "3176",
+                "VALUE": "ГП МТС"
+            },
+            {
+                "ID": "3177",
+                "VALUE": "ГП Билайн и МТС"
+            },
+            {
+                "ID": "3178",
+                "VALUE": "ГП нет"
+            }
+        ],
+        "title": "UF_CRM_5F43AE1A57E61",
+        "listLabel": "Наличие ГП",
+        "formLabel": "Наличие ГП",
+        "filterLabel": "Наличие ГП"
+    },
+    "UF_CRM_5F883DD7D4E6B": {
+        "type": "double",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5F883DD7D4E6B",
+        "listLabel": "Оценка разговора (клиент)",
+        "formLabel": "Оценка разговора (клиент)",
+        "filterLabel": "Оценка разговора (клиент)"
+    },
+    "UF_CRM_5F883E5377913": {
+        "type": "double",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5F883E5377913",
+        "listLabel": "Оценка разговора (клиент)",
+        "formLabel": "Оценка разговора (клиент)",
+        "filterLabel": "Оценка разговора (клиент)"
+    },
+    "UF_CRM_5F883E80F2F1E": {
+        "type": "double",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5F883E80F2F1E",
+        "listLabel": "Оценка разговора (клиент)",
+        "formLabel": "Оценка разговора (клиент)",
+        "filterLabel": "Оценка разговора (клиент)"
+    },
+    "UF_CRM_5F883F15E7BE7": {
+        "type": "double",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5F883F15E7BE7",
+        "listLabel": "Оценка разговора (клиент)",
+        "formLabel": "Оценка разговора (клиент)",
+        "filterLabel": "Оценка разговора (клиент)"
+    },
+    "UF_CRM_5F883F31109AC": {
+        "type": "double",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5F883F31109AC",
+        "listLabel": "Оценка разговора (клиент)",
+        "formLabel": "Оценка разговора (клиент)",
+        "filterLabel": "Оценка разговора (клиент)"
+    },
+    "UF_CRM_5FAE912C98EA6": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5FAE912C98EA6",
+        "listLabel": "НДЗ календарь",
+        "formLabel": "НДЗ календарь",
+        "filterLabel": "НДЗ календарь"
+    },
+    "UF_CRM_5FAE93F9B8ED8": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5FAE93F9B8ED8",
+        "listLabel": "НДЗ календарь",
+        "formLabel": "НДЗ календарь",
+        "filterLabel": "НДЗ календарь"
+    },
+    "UF_CRM_5FAE9C4DD73E7": {
+        "type": "integer",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5FAE9C4DD73E7",
+        "listLabel": "Число попыток НДЗ календарь",
+        "formLabel": "Число попыток НДЗ календарь",
+        "filterLabel": "Число попыток НДЗ календарь"
+    },
+    "UF_CRM_5FAE9C8CB32D5": {
+        "type": "integer",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5FAE9C8CB32D5",
+        "listLabel": "Число попыток НДЗ календарь",
+        "formLabel": "Число попыток НДЗ календарь",
+        "filterLabel": "Число попыток НДЗ календарь"
+    },
+    "UF_CRM_5FAE9C9103D52": {
+        "type": "integer",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5FAE9C9103D52",
+        "listLabel": "Число попыток НДЗ календарь",
+        "formLabel": "Число попыток НДЗ календарь",
+        "filterLabel": "Число попыток НДЗ календарь"
+    },
+    "UF_CRM_5FAE9C974635B": {
+        "type": "integer",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5FAE9C974635B",
+        "listLabel": "Число попыток НДЗ календарь",
+        "formLabel": "Число попыток НДЗ календарь",
+        "filterLabel": "Число попыток НДЗ календарь"
+    },
+    "UF_CRM_60215A679D525": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_60215A679D525",
+        "listLabel": "Отказ от РТК",
+        "formLabel": "Отказ от РТК",
+        "filterLabel": "Отказ от РТК"
+    },
+    "UF_CRM_60215AF05210C": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_60215AF05210C",
+        "listLabel": "Отказ от РТК",
+        "formLabel": "Отказ от РТК",
+        "filterLabel": "Отказ от РТК"
+    },
+    "UF_CRM_604A23CEEC231": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_604A23CEEC231",
+        "listLabel": "ХБ",
+        "formLabel": "ХБ",
+        "filterLabel": "ХБ"
+    },
+    "UF_CRM_6051F0D39405C": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_6051F0D39405C",
+        "listLabel": "utm_source",
+        "formLabel": "utm_source",
+        "filterLabel": "utm_source"
+    },
+    "UF_CRM_6051F0F27C784": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_6051F0F27C784",
+        "listLabel": "utm_medium",
+        "formLabel": "utm_medium",
+        "filterLabel": "utm_medium"
+    },
+    "UF_CRM_6051F1045AA96": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_6051F1045AA96",
+        "listLabel": "utm_medium",
+        "formLabel": "utm_medium",
+        "filterLabel": "utm_medium"
+    },
+    "UF_CRM_6051F109E7272": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_6051F109E7272",
+        "listLabel": "utm_campaign",
+        "formLabel": "utm_campaign",
+        "filterLabel": "utm_campaign"
+    },
+    "UF_CRM_6051F119D6867": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_6051F119D6867",
+        "listLabel": "utm_campaign",
+        "formLabel": "utm_campaign",
+        "filterLabel": "utm_campaign"
+    },
+    "UF_CRM_6051F1263E946": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_6051F1263E946",
+        "listLabel": "utm_term",
+        "formLabel": "utm_term",
+        "filterLabel": "utm_term"
+    },
+    "UF_CRM_6051F13291C55": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_6051F13291C55",
+        "listLabel": "utm_term",
+        "formLabel": "utm_term",
+        "filterLabel": "utm_term"
+    },
+    "UF_CRM_6051F164C4B82": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_6051F164C4B82",
+        "listLabel": "utm_content",
+        "formLabel": "utm_content",
+        "filterLabel": "utm_content"
+    },
+    "UF_CRM_6141F6A6E8FA8": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "3433",
+                "VALUE": "Исх. ПЗ"
+            },
+            {
+                "ID": "3434",
+                "VALUE": "Исх. НДЗ"
+            },
+            {
+                "ID": "3436",
+                "VALUE": "Исх. К"
+            },
+            {
+                "ID": "3558",
+                "VALUE": "Исх. новые"
+            }
+        ],
+        "title": "UF_CRM_6141F6A6E8FA8",
+        "listLabel": "Автопрозвон",
+        "formLabel": "Автопрозвон",
+        "filterLabel": "Автопрозвон"
+    },
+    "UF_CRM_6141FB453E118": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_6141FB453E118",
+        "listLabel": "aimo_id",
+        "formLabel": "aimo_id",
+        "filterLabel": "aimo_id"
+    },
+    "UF_CRM_6172C25A43CA3": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "3461",
+                "VALUE": "0K23-181 [СпБ и ЛО + БМ, кроме МСК и МО]"
+            },
+            {
+                "ID": "3460",
+                "VALUE": "S01-181 [МСК и МО]"
+            },
+            {
+                "ID": "3463",
+                "VALUE": "S24-61 [ост Россия (Кроме БМ, МСК и МО, Спб и ЛО)]"
+            }
+        ],
+        "title": "UF_CRM_6172C25A43CA3",
+        "listLabel": "PW для автозаведения",
+        "formLabel": "PW для автозаведения",
+        "filterLabel": "PW для автозаведения"
+    },
+    "UF_CRM_6172C26E1ED19": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "3464",
+                "VALUE": "Интернет 100 Мбит"
+            },
+            {
+                "ID": "3467",
+                "VALUE": "Интернет 100 Мбит с ТВ"
+            }
+        ],
+        "title": "UF_CRM_6172C26E1ED19",
+        "listLabel": "Услуга автозаведения",
+        "formLabel": "Услуга автозаведения",
+        "filterLabel": "Услуга автозаведения"
+    },
+    "UF_CRM_6172C34360D6B": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_6172C34360D6B",
+        "listLabel": "БИ Отправить заявку",
+        "formLabel": "БИ Отправить заявку",
+        "filterLabel": "БИ Отправить заявку"
+    },
+    "UF_CRM_61933D82A6D5E": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": true,
+        "isDynamic": true,
+        "title": "UF_CRM_61933D82A6D5E",
+        "listLabel": "Комментарий для заявки РТК",
+        "formLabel": "Комментарий для заявки РТК",
+        "filterLabel": "Комментарий для заявки РТК"
+    },
+    "UF_CRM_61933D94C94C3": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "3474",
+                "VALUE": "Технологии выгоды (пакет)"
+            },
+            {
+                "ID": "3481",
+                "VALUE": "Технологии доступа 100 Мбит/с (моно)"
+            }
+        ],
+        "title": "UF_CRM_61933D94C94C3",
+        "listLabel": "Тариф РТК",
+        "formLabel": "Тариф РТК",
+        "filterLabel": "Тариф РТК"
+    },
+    "UF_CRM_61933DA5E7316": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_61933DA5E7316",
+        "listLabel": "РТК Отправить заявку",
+        "formLabel": "РТК Отправить заявку",
+        "filterLabel": "РТК Отправить заявку"
+    },
+    "UF_CRM_6193923B42084": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": true,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "3489",
+                "VALUE": "Билайн"
+            },
+            {
+                "ID": "3490",
+                "VALUE": "Ростелеком"
+            },
+            {
+                "ID": "3491",
+                "VALUE": "ТТК"
+            },
+            {
+                "ID": "3492",
+                "VALUE": "МТС"
+            },
+            {
+                "ID": "3493",
+                "VALUE": "Дом.ru"
+            }
+        ],
+        "title": "UF_CRM_6193923B42084",
+        "listLabel": "Автозаведение заявок",
+        "formLabel": "Автозаведение заявок",
+        "filterLabel": "Автозаведение заявок"
+    },
+    "UF_CRM_619392438EB9D": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": true,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "3494",
+                "VALUE": "Билайн"
+            },
+            {
+                "ID": "3495",
+                "VALUE": "Ростелеком"
+            },
+            {
+                "ID": "3496",
+                "VALUE": "ТТК"
+            },
+            {
+                "ID": "3497",
+                "VALUE": "МТС"
+            },
+            {
+                "ID": "3498",
+                "VALUE": "Дом.ru"
+            }
+        ],
+        "title": "UF_CRM_619392438EB9D",
+        "listLabel": "Автозаведение заявок",
+        "formLabel": "Автозаведение заявок",
+        "filterLabel": "Автозаведение заявок"
+    },
+    "UF_CRM_6197A59E92C7F": {
+        "type": "url",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_6197A59E92C7F",
+        "listLabel": "Разговор Яндекс БОТ",
+        "formLabel": "Разговор Яндекс БОТ",
+        "filterLabel": "Разговор Яндекс БОТ"
+    },
+    "UF_CRM_6197BF2ECBFEA": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_6197BF2ECBFEA",
+        "listLabel": "Разговор Яндекс БОТ",
+        "formLabel": "Разговор Яндекс БОТ",
+        "filterLabel": "Разговор Яндекс БОТ"
+    },
+    "UF_CRM_61A0A7E39509E": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_61A0A7E39509E",
+        "listLabel": "Экспресс-подключение",
+        "formLabel": "Экспресс-подключение",
+        "filterLabel": "Экспресс-подключение"
+    },
+    "UF_CRM_61A0A7F507937": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_61A0A7F507937",
+        "listLabel": "ЭП | Фамилия",
+        "formLabel": "ЭП | Фамилия",
+        "filterLabel": "ЭП | Фамилия"
+    },
+    "UF_CRM_61A0AB65052D0": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_61A0AB65052D0",
+        "listLabel": "ЭП | Имя",
+        "formLabel": "ЭП | Имя",
+        "filterLabel": "ЭП | Имя"
+    },
+    "UF_CRM_61A0AB79EC8A9": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_61A0AB79EC8A9",
+        "listLabel": "ЭП | Отчество",
+        "formLabel": "ЭП | Отчество",
+        "filterLabel": "ЭП | Отчество"
+    },
+    "UF_CRM_61A0AB8C137D8": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_61A0AB8C137D8",
+        "listLabel": "ЭП | Тариф",
+        "formLabel": "ЭП | Тариф",
+        "filterLabel": "ЭП | Тариф"
+    },
+    "UF_CRM_61A0AB9E39972": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_61A0AB9E39972",
+        "listLabel": "ЭП | Таймслот",
+        "formLabel": "ЭП | Таймслот",
+        "filterLabel": "ЭП | Таймслот"
+    },
+    "UF_CRM_61A5D6736A583": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": true,
+        "isDynamic": true,
+        "title": "UF_CRM_61A5D6736A583",
+        "listLabel": "ЭП | Результат",
+        "formLabel": "ЭП | Результат",
+        "filterLabel": "ЭП | Результат"
+    },
+    "UF_CRM_61A5D7DE1E6A9": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": true,
+        "isDynamic": true,
+        "title": "UF_CRM_61A5D7DE1E6A9",
+        "listLabel": "ЭП | ТхВ, ГП",
+        "formLabel": "ЭП | ТхВ, ГП",
+        "filterLabel": "ЭП | ТхВ, ГП"
+    },
+    "UF_CRM_61A5D8BBE575C": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_61A5D8BBE575C",
+        "listLabel": "Адрес (Лиза)",
+        "formLabel": "Адрес (Лиза)",
+        "filterLabel": "Адрес (Лиза)"
+    },
+    "UF_CRM_61A5D8D31D6F2": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_61A5D8D31D6F2",
+        "listLabel": "Появилось ТхВ",
+        "formLabel": "Появилось ТхВ",
+        "filterLabel": "Появилось ТхВ"
+    },
+    "UF_CRM_61A5D8E5B2A76": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_61A5D8E5B2A76",
+        "listLabel": "Без адреса",
+        "formLabel": "Без адреса",
+        "filterLabel": "Без адреса"
+    },
+    "UF_CRM_61A5D9071A179": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_61A5D9071A179",
+        "listLabel": "Лиза_ЧС",
+        "formLabel": "Лиза_ЧС",
+        "filterLabel": "Лиза_ЧС"
+    },
+    "UF_CRM_61A5D919018CC": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_61A5D919018CC",
+        "listLabel": "Автозвонок",
+        "formLabel": "Автозвонок",
+        "filterLabel": "Автозвонок"
+    },
+    "UF_CRM_61A5F122B6B8C": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_61A5F122B6B8C",
+        "listLabel": "ЭП | Отправлено",
+        "formLabel": "ЭП | Отправлено",
+        "filterLabel": "ЭП | Отправлено"
+    },
+    "UF_CRM_61ADCD5347A6F": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": true,
+        "isDynamic": true,
+        "title": "UF_CRM_61ADCD5347A6F",
+        "listLabel": "Полн. инфо о ТхВ",
+        "formLabel": "Полн. инфо о ТхВ",
+        "filterLabel": "Полн. инфо о ТхВ"
+    },
+    "UF_CRM_61B083639EF08": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": true,
+        "isDynamic": true,
+        "title": "UF_CRM_61B083639EF08",
+        "listLabel": "Информация о телефоне",
+        "formLabel": "Информация о телефоне",
+        "filterLabel": "Информация о телефоне"
+    },
+    "UF_CRM_61C480A3C89AE": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_61C480A3C89AE",
+        "listLabel": "utm_group",
+        "formLabel": "utm_group",
+        "filterLabel": "utm_group"
+    },
+    "UF_CRM_61DFF430491A5": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "3532",
+                "VALUE": "КЦ1 (Общий)"
+            },
+            {
+                "ID": "3533",
+                "VALUE": "КЦ2 (МТС)"
+            }
+        ],
+        "title": "UF_CRM_61DFF430491A5",
+        "listLabel": "Группа КЦ",
+        "formLabel": "Группа КЦ",
+        "filterLabel": "Группа КЦ"
+    },
+    "UF_CRM_61F2B00128147": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "3542",
+                "VALUE": "Билайн"
+            },
+            {
+                "ID": "3543",
+                "VALUE": "Ростелеком"
+            },
+            {
+                "ID": "3551",
+                "VALUE": "МТС"
+            },
+            {
+                "ID": "3552",
+                "VALUE": "Дом.ru"
+            },
+            {
+                "ID": "3553",
+                "VALUE": "Онлайм"
+            },
+            {
+                "ID": "3585",
+                "VALUE": "ТТК"
+            },
+            {
+                "ID": "3588",
+                "VALUE": "Мультипроверка (принуд)"
+            }
+        ],
+        "title": "UF_CRM_61F2B00128147",
+        "listLabel": "Автопроверка ТхВ",
+        "formLabel": "Автопроверка ТхВ",
+        "filterLabel": "Автопроверка ТхВ"
+    },
+    "UF_CRM_620BB7B90F7D7": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_620BB7B90F7D7",
+        "listLabel": "Срочный календарь",
+        "formLabel": "Срочный календарь",
+        "filterLabel": "Срочный календарь"
+    },
+    "UF_CRM_622338AE21CE8": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_622338AE21CE8",
+        "listLabel": "смс новые",
+        "formLabel": "смс новые",
+        "filterLabel": "смс новые"
+    },
+    "UF_CRM_623329C9CD365": {
+        "type": "employee",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_623329C9CD365",
+        "listLabel": "Ответственный (оператор КЦ2)",
+        "formLabel": "Ответственный (оператор КЦ2)",
+        "filterLabel": "Ответственный (оператор КЦ2)"
+    },
+    "UF_CRM_624AE7F7480D4": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_624AE7F7480D4",
+        "listLabel": "БП автораспледеление",
+        "formLabel": "БП автораспледеление",
+        "filterLabel": "БП автораспледеление"
+    },
+    "UF_CRM_624AE803507AF": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_624AE803507AF",
+        "listLabel": "БП автораспледеление",
+        "formLabel": "БП автораспледеление",
+        "filterLabel": "БП автораспледеление"
+    },
+    "UF_CRM_625803ABDB3AC": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_625803ABDB3AC",
+        "listLabel": "Ком. тех. стад (хэш)",
+        "formLabel": "Ком. тех. стад (хэш)",
+        "filterLabel": "Ком. тех. стад (хэш)"
+    },
+    "UF_CRM_5D259FD2D3534": {
+        "type": "integer",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5D259FD2D3534",
+        "listLabel": "Сумма тарифа БУХ",
+        "formLabel": "Сумма тарифа БУХ",
+        "filterLabel": "Сумма тарифа БУХ"
+    },
+    "UF_CRM_5D259FD53FBAD": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5D259FD53FBAD",
+        "listLabel": "Тариф БУХ",
+        "formLabel": "Тариф БУХ",
+        "filterLabel": "Тариф БУХ"
+    },
+    "UF_CRM_5D42A68AC05BE": {
+        "type": "datetime",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5D42A68AC05BE",
+        "listLabel": "Дата оплаты сделки БУХ",
+        "formLabel": "Дата оплаты сделки БУХ",
+        "filterLabel": "Дата оплаты сделки БУХ"
+    },
+    "UF_CRM_1564649143": {
+        "type": "datetime",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_1564649143",
+        "listLabel": "Дата оплаты сделки БУХ",
+        "formLabel": "Дата оплаты сделки БУХ",
+        "filterLabel": "Дата оплаты сделки БУХ"
+    },
+    "UF_CRM_5D25A3BB4D13A": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "2300",
+                "VALUE": "Нет"
+            },
+            {
+                "ID": "2301",
+                "VALUE": "Заведен"
+            },
+            {
+                "ID": "2302",
+                "VALUE": "Подключен"
+            },
+            {
+                "ID": "2303",
+                "VALUE": "Подключен. Оплачен"
+            },
+            {
+                "ID": "2304",
+                "VALUE": "Подключен. Не оплачен"
+            },
+            {
+                "ID": "2305",
+                "VALUE": "Не подключен"
+            },
+            {
+                "ID": "2306",
+                "VALUE": "Подключен. Не оплачен. Закрыт"
+            },
+            {
+                "ID": "2307",
+                "VALUE": "Не подключен. Закрыт"
+            }
+        ],
+        "title": "UF_CRM_5D25A3BB4D13A",
+        "listLabel": "Статус Интернет БУХ",
+        "formLabel": "Статус Интернет БУХ",
+        "filterLabel": "Статус Интернет БУХ"
+    },
+    "UF_CRM_5D25A5B24D248": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "2332",
+                "VALUE": "Нет"
+            },
+            {
+                "ID": "2333",
+                "VALUE": "Заведен"
+            },
+            {
+                "ID": "2334",
+                "VALUE": "Подключен"
+            },
+            {
+                "ID": "2335",
+                "VALUE": "Подключен. Оплачен"
+            },
+            {
+                "ID": "2336",
+                "VALUE": "Подключен. Не оплачен"
+            },
+            {
+                "ID": "2337",
+                "VALUE": "Не подключен"
+            },
+            {
+                "ID": "2338",
+                "VALUE": "Подключен. Не оплачен. Закрыт"
+            },
+            {
+                "ID": "2339",
+                "VALUE": "Не подключен. Закрыт"
+            }
+        ],
+        "title": "UF_CRM_5D25A5B24D248",
+        "listLabel": "Статус Цифровое ТВ БУХ",
+        "formLabel": "Статус Цифровое ТВ БУХ",
+        "filterLabel": "Статус Цифровое ТВ БУХ"
+    },
+    "UF_CRM_5D25A8591183E": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "2396",
+                "VALUE": "Нет"
+            },
+            {
+                "ID": "2397",
+                "VALUE": "Заведен"
+            },
+            {
+                "ID": "2398",
+                "VALUE": "Подключен"
+            },
+            {
+                "ID": "2399",
+                "VALUE": "Подключен. Оплачен"
+            },
+            {
+                "ID": "2400",
+                "VALUE": "Подключен. Не оплачен"
+            },
+            {
+                "ID": "2401",
+                "VALUE": "Не подключен"
+            },
+            {
+                "ID": "2402",
+                "VALUE": "Подключен. Не оплачен. Закрыт"
+            },
+            {
+                "ID": "2403",
+                "VALUE": "Не подключен. Закрыт"
+            }
+        ],
+        "title": "UF_CRM_5D25A8591183E",
+        "listLabel": "Статус Кабельное ТВ БУХ",
+        "formLabel": "Статус Кабельное ТВ БУХ",
+        "filterLabel": "Статус Кабельное ТВ БУХ"
+    },
+    "UF_CRM_5D25A85B566A8": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "2404",
+                "VALUE": "Нет"
+            },
+            {
+                "ID": "2405",
+                "VALUE": "Заведен"
+            },
+            {
+                "ID": "2406",
+                "VALUE": "Подключен"
+            },
+            {
+                "ID": "2407",
+                "VALUE": "Подключен. Оплачен"
+            },
+            {
+                "ID": "2408",
+                "VALUE": "Подключен. Не оплачен"
+            },
+            {
+                "ID": "2409",
+                "VALUE": "Не подключен"
+            },
+            {
+                "ID": "2410",
+                "VALUE": "Подключен. Не оплачен. Закрыт"
+            },
+            {
+                "ID": "2411",
+                "VALUE": "Не подключен. Закрыт"
+            }
+        ],
+        "title": "UF_CRM_5D25A85B566A8",
+        "listLabel": "Статус Спутниковое ТВ БУХ",
+        "formLabel": "Статус Спутниковое ТВ БУХ",
+        "filterLabel": "Статус Спутниковое ТВ БУХ"
+    },
+    "UF_CRM_5D25A85D47F96": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "2412",
+                "VALUE": "Нет"
+            },
+            {
+                "ID": "2413",
+                "VALUE": "Заведен"
+            },
+            {
+                "ID": "2414",
+                "VALUE": "Подключен"
+            },
+            {
+                "ID": "2415",
+                "VALUE": "Подключен. Оплачен"
+            },
+            {
+                "ID": "2416",
+                "VALUE": "Подключен. Не оплачен"
+            },
+            {
+                "ID": "2417",
+                "VALUE": "Не подключен"
+            },
+            {
+                "ID": "2418",
+                "VALUE": "Подключен. Не оплачен. Закрыт"
+            },
+            {
+                "ID": "2419",
+                "VALUE": "Не подключен. Закрыт"
+            }
+        ],
+        "title": "UF_CRM_5D25A85D47F96",
+        "listLabel": "Статус Телефония БУХ",
+        "formLabel": "Статус Телефония БУХ",
+        "filterLabel": "Статус Телефония БУХ"
+    },
+    "UF_CRM_5D25A85F56EC1": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "2420",
+                "VALUE": "Нет"
+            },
+            {
+                "ID": "2421",
+                "VALUE": "Заведен"
+            },
+            {
+                "ID": "2422",
+                "VALUE": "Подключен"
+            },
+            {
+                "ID": "2423",
+                "VALUE": "Подключен. Оплачен"
+            },
+            {
+                "ID": "2424",
+                "VALUE": "Подключен. Не оплачен"
+            },
+            {
+                "ID": "2425",
+                "VALUE": "Не подключен"
+            },
+            {
+                "ID": "2426",
+                "VALUE": "Подключен. Не оплачен. Закрыт"
+            },
+            {
+                "ID": "2427",
+                "VALUE": "Не подключен. Закрыт"
+            }
+        ],
+        "title": "UF_CRM_5D25A85F56EC1",
+        "listLabel": "Статус СИМ-карта БУХ",
+        "formLabel": "Статус СИМ-карта БУХ",
+        "filterLabel": "Статус СИМ-карта БУХ"
+    },
+    "UF_CRM_5D25A9BBCE7A2": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "2528",
+                "VALUE": "Нет"
+            },
+            {
+                "ID": "2529",
+                "VALUE": "Продажа"
+            },
+            {
+                "ID": "2530",
+                "VALUE": "Рассрочка"
+            },
+            {
+                "ID": "2531",
+                "VALUE": "Аренда"
+            }
+        ],
+        "title": "UF_CRM_5D25A9BBCE7A2",
+        "listLabel": "Статус Wi-Fi роутер БУХ",
+        "formLabel": "Статус Wi-Fi роутер БУХ",
+        "filterLabel": "Статус Wi-Fi роутер БУХ"
+    },
+    "UF_CRM_5D25A9BE62325": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "2532",
+                "VALUE": "Нет"
+            },
+            {
+                "ID": "2533",
+                "VALUE": "Заведен"
+            },
+            {
+                "ID": "2534",
+                "VALUE": "Подключен"
+            },
+            {
+                "ID": "2535",
+                "VALUE": "Подключен. Оплачен"
+            },
+            {
+                "ID": "2536",
+                "VALUE": "Подключен. Не оплачен"
+            },
+            {
+                "ID": "2537",
+                "VALUE": "Не подключен"
+            },
+            {
+                "ID": "2538",
+                "VALUE": "Подключен. Не оплачен. Закрыт"
+            },
+            {
+                "ID": "2539",
+                "VALUE": "Не подключен. Закрыт"
+            }
+        ],
+        "title": "UF_CRM_5D25A9BE62325",
+        "listLabel": "Статус ПЕРЕЕЗД БУХ",
+        "formLabel": "Статус ПЕРЕЕЗД БУХ",
+        "filterLabel": "Статус ПЕРЕЕЗД БУХ"
+    },
+    "UF_CRM_5D25A3BDC7D86": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "2308",
+                "VALUE": "Нет"
+            },
+            {
+                "ID": "2309",
+                "VALUE": "Заведен"
+            },
+            {
+                "ID": "2310",
+                "VALUE": "Подключен"
+            },
+            {
+                "ID": "2311",
+                "VALUE": "Подключен. Оплачен"
+            },
+            {
+                "ID": "2312",
+                "VALUE": "Подключен. Не оплачен"
+            },
+            {
+                "ID": "2313",
+                "VALUE": "Не подключен"
+            },
+            {
+                "ID": "2314",
+                "VALUE": "Подключен. Не оплачен. Закрыт"
+            },
+            {
+                "ID": "2315",
+                "VALUE": "Не подключен. Закрыт"
+            }
+        ],
+        "title": "UF_CRM_5D25A3BDC7D86",
+        "listLabel": "Статус Сделки БУХ",
+        "formLabel": "Статус Сделки БУХ",
+        "filterLabel": "Статус Сделки БУХ"
+    },
+    "UF_CRM_5D25A8613CAF5": {
+        "type": "double",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5D25A8613CAF5",
+        "listLabel": "Время разговора в (мин).",
+        "formLabel": "Время разговора в (мин).",
+        "filterLabel": "Время разговора в (мин)."
+    },
+    "UF_CRM_5A63988B5B298": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5A63988B5B298",
+        "listLabel": "Вопрос",
+        "formLabel": "Вопрос",
+        "filterLabel": "Вопрос"
+    },
+    "UF_CRM_5A63988B9AAFF": {
+        "type": "datetime",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5A63988B9AAFF",
+        "listLabel": "Дата и время создания",
+        "formLabel": "Дата и время создания",
+        "filterLabel": "Дата и время создания"
+    },
+    "UF_CRM_5A63988C1FE81": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5A63988C1FE81",
+        "listLabel": "Дополнительные города",
+        "formLabel": "Дополнительные города",
+        "filterLabel": "Дополнительные города"
+    },
+    "UF_CRM_5A63988C671E4": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5A63988C671E4",
+        "listLabel": "Дополнительные объекты",
+        "formLabel": "Дополнительные объекты",
+        "filterLabel": "Дополнительные объекты"
+    },
+    "UF_CRM_5A63988CAA09D": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5A63988CAA09D",
+        "listLabel": "Код пользователя в магазине",
+        "formLabel": "Код пользователя в магазине",
+        "filterLabel": "Код пользователя в магазине"
+    },
+    "UF_CRM_5A63988CE91F3": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5A63988CE91F3",
+        "listLabel": "Компания",
+        "formLabel": "Компания",
+        "filterLabel": "Компания"
+    },
+    "UF_CRM_5A63988D3BF04": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5A63988D3BF04",
+        "listLabel": "Магазин",
+        "formLabel": "Магазин",
+        "filterLabel": "Магазин"
+    },
+    "UF_CRM_5A63988D7DFDF": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5A63988D7DFDF",
+        "listLabel": "Новостройки/Вторичка",
+        "formLabel": "Новостройки/Вторичка",
+        "filterLabel": "Новостройки/Вторичка"
+    },
+    "UF_CRM_5A63988DD3353": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5A63988DD3353",
+        "listLabel": "Объект",
+        "formLabel": "Объект",
+        "filterLabel": "Объект"
+    },
+    "UF_CRM_5A63988E221C6": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5A63988E221C6",
+        "listLabel": "Параметры жилья",
+        "formLabel": "Параметры жилья",
+        "filterLabel": "Параметры жилья"
+    },
+    "UF_CRM_5A63988E69C8E": {
+        "type": "boolean",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5A63988E69C8E",
+        "listLabel": "Повторная заявка",
+        "formLabel": "Повторная заявка",
+        "filterLabel": "Повторная заявка"
+    },
+    "UF_CRM_5A63988EB91AA": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5A63988EB91AA",
+        "listLabel": "Свидетельство участника НИС",
+        "formLabel": "Свидетельство участника НИС",
+        "filterLabel": "Свидетельство участника НИС"
+    },
+    "UF_CRM_5A63988F04E25": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "items": [],
+        "title": "UF_CRM_5A63988F04E25",
+        "listLabel": "Тип контакта",
+        "formLabel": "Тип контакта",
+        "filterLabel": "Тип контакта"
+    },
+    "UF_CRM_5A63988F541BC": {
+        "type": "file",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5A63988F541BC",
+        "listLabel": "Фотография",
+        "formLabel": "Фотография",
+        "filterLabel": "Фотография"
+    },
+    "UF_CRM_1516517197": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_1516517197",
+        "listLabel": "Город",
+        "formLabel": "Город",
+        "filterLabel": "Город"
+    },
+    "UF_CRM_61B08379444A1": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": true,
+        "isDynamic": true,
+        "title": "UF_CRM_61B08379444A1",
+        "listLabel": "Информация о телефоне",
+        "formLabel": "Информация о телефоне",
+        "filterLabel": "Информация о телефоне"
+    },
+    "UF_CRM_5EECA3B0DC26F": {
+        "type": "enumeration",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": true,
+        "isDynamic": true,
+        "items": [
+            {
+                "ID": "3126",
+                "VALUE": "SEO"
+            },
+            {
+                "ID": "3127",
+                "VALUE": "Реклама"
+            },
+            {
+                "ID": "3128",
+                "VALUE": "П"
+            },
+            {
+                "ID": "3129",
+                "VALUE": "ХБ"
+            },
+            {
+                "ID": "3130",
+                "VALUE": "Другое"
+            }
+        ],
+        "title": "UF_CRM_5EECA3B0DC26F",
+        "listLabel": "Тип лида",
+        "formLabel": "Тип лида",
+        "filterLabel": "Тип лида"
+    },
+    "UF_CRM_5EECA3B76309E": {
+        "type": "date",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5EECA3B76309E",
+        "listLabel": "Дата лида",
+        "formLabel": "Дата лида",
+        "filterLabel": "Дата лида"
+    },
+    "UF_CRM_5DEE4A3D0B408": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": true,
+        "isDynamic": true,
+        "title": "UF_CRM_5DEE4A3D0B408",
+        "listLabel": "API TELEKOMZA RESULT",
+        "formLabel": "API TELEKOMZA RESULT",
+        "filterLabel": "API TELEKOMZA RESULT"
+    },
+    "UF_CRM_5DEF2D8709FDB": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": true,
+        "isDynamic": true,
+        "title": "UF_CRM_5DEF2D8709FDB",
+        "listLabel": "Проверка Телекомза",
+        "formLabel": "Проверка Телекомза",
+        "filterLabel": "Проверка Телекомза"
+    },
+    "UF_CRM_595F668191CB3": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_595F668191CB3",
+        "listLabel": "TW_Отдел",
+        "formLabel": "TW_Отдел",
+        "filterLabel": "TW_Отдел"
+    },
+    "UF_CRM_595F66819810C": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_595F66819810C",
+        "listLabel": "TW_Статус",
+        "formLabel": "TW_Статус",
+        "filterLabel": "TW_Статус"
+    },
+    "UF_CRM_595F66819DFF3": {
+        "type": "datetime",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_595F66819DFF3",
+        "listLabel": "TW_Дата_создания",
+        "formLabel": "TW_Дата_создания",
+        "filterLabel": "TW_Дата_создания"
+    },
+    "UF_CRM_595F6681A48CC": {
+        "type": "datetime",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_595F6681A48CC",
+        "listLabel": "TW_Дата_изменения",
+        "formLabel": "TW_Дата_изменения",
+        "filterLabel": "TW_Дата_изменения"
+    },
+    "UF_CRM_595F6681AAAA2": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_595F6681AAAA2",
+        "listLabel": "TW_Организация",
+        "formLabel": "TW_Организация",
+        "filterLabel": "TW_Организация"
+    },
+    "UF_CRM_595F6681B1009": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_595F6681B1009",
+        "listLabel": "TW_Провайдер",
+        "formLabel": "TW_Провайдер",
+        "filterLabel": "TW_Провайдер"
+    },
+    "UF_CRM_595F6681B7EAA": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_595F6681B7EAA",
+        "listLabel": "TW_Интернет",
+        "formLabel": "TW_Интернет",
+        "filterLabel": "TW_Интернет"
+    },
+    "UF_CRM_595F6681BF089": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_595F6681BF089",
+        "listLabel": "TW_ТВ",
+        "formLabel": "TW_ТВ",
+        "filterLabel": "TW_ТВ"
+    },
+    "UF_CRM_595F6681C4D9F": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_595F6681C4D9F",
+        "listLabel": "TW_Wi-Fi",
+        "formLabel": "TW_Wi-Fi",
+        "filterLabel": "TW_Wi-Fi"
+    },
+    "UF_CRM_595F6681CB70E": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_595F6681CB70E",
+        "listLabel": "TW_Телефония",
+        "formLabel": "TW_Телефония",
+        "filterLabel": "TW_Телефония"
+    },
+    "UF_CRM_595F6681D1660": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_595F6681D1660",
+        "listLabel": "TW_Адрес",
+        "formLabel": "TW_Адрес",
+        "filterLabel": "TW_Адрес"
+    },
+    "UF_CRM_595F6681D6CD3": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_595F6681D6CD3",
+        "listLabel": "TW_КЕ",
+        "formLabel": "TW_КЕ",
+        "filterLabel": "TW_КЕ"
+    },
+    "UF_CRM_595F6681DCFEB": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_595F6681DCFEB",
+        "listLabel": "TW_Откуда узнали",
+        "formLabel": "TW_Откуда узнали",
+        "filterLabel": "TW_Откуда узнали"
+    },
+    "UF_CRM_595F6681E1E01": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_595F6681E1E01",
+        "listLabel": "TW_Автор",
+        "formLabel": "TW_Автор",
+        "filterLabel": "TW_Автор"
+    },
+    "UF_CRM_5DDFBDE59579E": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5DDFBDE59579E",
+        "listLabel": "Время ожидания ответа(секунды)",
+        "formLabel": "Время ожидания ответа(секунды)",
+        "filterLabel": "Время ожидания ответа(секунды)"
+    },
+    "UF_CRM_5DE10E4E86EE6": {
+        "type": "double",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": false,
+        "isDynamic": true,
+        "title": "UF_CRM_5DE10E4E86EE6",
+        "listLabel": "Для_ТЕСТА_ПАВЕЛ_ЧИСЛО",
+        "formLabel": "Для_ТЕСТА_ПАВЕЛ_ЧИСЛО",
+        "filterLabel": "Для_ТЕСТА_ПАВЕЛ_ЧИСЛО"
+    },
+    "UF_CRM_5EC667B865FFC": {
+        "type": "string",
+        "isRequired": false,
+        "isReadOnly": false,
+        "isImmutable": false,
+        "isMultiple": true,
+        "isDynamic": true,
+        "title": "UF_CRM_5EC667B865FFC",
+        "listLabel": "АнтиДУБЛЬ",
+        "formLabel": "АнтиДУБЛЬ",
+        "filterLabel": "АнтиДУБЛЬ"
+    }
+}

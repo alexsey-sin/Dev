@@ -663,9 +663,7 @@ if __name__ == '__main__':
     
     # e, data = get_txv(txv_dict)
     # if e: print(e)
-    # print(data['pv_address'])
-    # print(data['available_connect'])
-    # print(data['tarifs_all'])
+    # print(data)
     
     
     # set_txv_to_dj_domconnect(pv_code)

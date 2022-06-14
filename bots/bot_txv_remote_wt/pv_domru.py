@@ -1,4 +1,4 @@
-import os, time, re, json
+import os, time, re, json, logging
 from datetime import datetime, timedelta
 import calendar, requests  # pip install requests
 from selenium import webdriver  # $ pip install selenium
@@ -104,7 +104,8 @@ def wait_spinner(driver):  # Ожидаем крутящийся спинер
     driver.implicitly_wait(10)
     time.sleep(2)
 
-def get_deal_status(lst_deal, access, status_for_comment):
+# =========================================================
+def get_deal_status(logger, lst_deal, access, status_for_comment):
     driver = None
     try:
         EXE_PATH = 'driver/chromedriver.exe'
@@ -165,17 +166,24 @@ def get_deal_status(lst_deal, access, status_for_comment):
         driver.switch_to.frame('mainFrame')  # Загружаем фрейм
         time.sleep(3)
         
+        # Отмечаем чек Выбрать все города
+        els = driver.find_elements(By.XPATH, '//input[@id="toggle_cities"]')
+        if len(els) == 0: raise Exception('Нет кнопки города')
+        try: els[0].click()
+        except: raise Exception('Ошибка действий 1')
+        time.sleep(1)
+        
         # Отмечаем чек Выбрать все шаги заявки
         els = driver.find_elements(By.XPATH, '//input[@id="head_cb_id"]')
         if len(els) == 0: raise Exception('Нет кнопки Выбрать все шаги заявки')
         try: els[0].click()
-        except: raise Exception('Ошибка действий 1')
+        except: raise Exception('Ошибка действий 2')
         time.sleep(1)
         # Показать
         els = driver.find_elements(By.XPATH, '//input[@id="reqs_btn"]')
         if len(els) == 0: raise Exception('Нет кнопки Выбрать все шаги заявки')
         try: els[0].click()
-        except: raise Exception('Ошибка действий 1')
+        except: raise Exception('Ошибка действий 3')
         time.sleep(1)
 
         # Подождем когда "Проявится" кнопка Показать
@@ -202,7 +210,7 @@ def get_deal_status(lst_deal, access, status_for_comment):
         lst_rez = []
         for el_tr in els_tr:
             els_td = el_tr.find_elements(By.TAG_NAME, 'td')
-            if len(els_td) != 9: raise Exception('Ошибка структуры таблицы результатов')
+            if len(els_td) != 10: raise Exception('Ошибка структуры таблицы результатов')
             dct = {
                 'num': els_td[2].text.strip(),
                 'usluga': els_td[4].text.strip(),
@@ -226,6 +234,8 @@ def get_deal_status(lst_deal, access, status_for_comment):
             if len(lst_fd) == 0:
                 deal['pv_status'] = 'not_found'
                 deal['comment'] = 'Заявка в ЛК не найдена'
+                log_mess = f'ПВ {provider}: {deal["ID"]}|{num}|{deal.get("pv_status", "")}|{deal.get("comment", "")}'
+                logger.info(log_mess)
                 continue
             # Если под этим номером только одна строка
             if len(lst_fd) == 1:
@@ -253,6 +263,8 @@ def get_deal_status(lst_deal, access, status_for_comment):
                 if status == 'Заявка выполнена' and data_connect: deal['date_connect'] = data_connect
                 if status in status_for_comment and comment: deal['comment'] = comment
 
+            log_mess = f'ПВ {provider}: {deal["ID"]}|{num}|{deal.get("pv_status", "")}|{deal.get("date_connect", "")}|{deal.get("comment", "")}'
+            logger.info(log_mess)
         # time.sleep(1)
         # with open('out.html', 'w', encoding='utf-8') as outfile:
             # outfile.write(driver.page_source)
@@ -354,7 +366,7 @@ def send_dj_domconnect_result(lst_deal):
             'id_crm': deal.get('ID', 'Не определен')[:50],
             'num_deal': deal.get('num', 'Не определен')[:50],
             'pv_status': deal.get('pv_status', '')[:255],
-            'crm_status': deal.get('crm_status', '')[:255],
+            'crm_status': deal.get('crm_status', ''),
             'date_connect': deal.get('date_connect', '')[:50],
             'comment': deal.get('comment', ''),
         }
@@ -369,8 +381,8 @@ def send_dj_domconnect_result(lst_deal):
     return ''
 
 
-def run_check_deals(tlg_chat, tlg_token, by_days=30):
-    tlg_mess = ''
+def run_check_deals(logger, tlg_chat, tlg_token, by_days=30):
+    logger.info(f'Старт ПВ: {provider}')
 
     # Определим диапазон дат для фильтра
     cur_date = datetime.today()
@@ -380,58 +392,77 @@ def run_check_deals(tlg_chat, tlg_token, by_days=30):
     # Заберем сделки из СРМ по фильтру
     e, lst_deal = get_deals_crm(pv_crm_code, str(from_date), str(to_date))
     if e: 
-        tlg_mess = f'ПВ {provider}: Ошибка при загрузке сделок из срм: {e}'
-        send_telegram(tlg_chat, tlg_token, tlg_mess)
+        log_mess = f'ПВ {provider}: загрузка сделок из срм: {e}'
+        logger.error(log_mess); print(log_mess)
+        send_telegram(tlg_chat, tlg_token, log_mess)
         return
     if len(lst_deal) == 0:
-        cur_time = datetime.now().strftime('%H:%M:%S %d-%m-%Y')
-        print(f'{cur_time} {provider}: Сделок нет')
+        log_mess = f'ПВ {provider}: Сделок нет'
+        logger.info(log_mess); print(log_mess)
         return
 
+    log_mess = f'ПВ {provider}: Исходный список: {len(lst_deal)} шт.'
+    logger.info(log_mess); print(log_mess)
+    # print(json.dumps(lst_deal, sort_keys=True, indent=2, ensure_ascii=False))
+    
     # Соберем нормальный список сделок
-    new_lst_deal = []
-    for dl in lst_deal:
-        id_d = dl.get('ID')
-        num = dl.get('UF_CRM_5903C16BDF7A7').strip()
-        new_lst_deal.append({'ID': id_d, 'num': num})
-    print('Получен список сделок:', len(new_lst_deal), 'шт.')
+    new_lst_deal = [{'ID': dl.get('ID'), 'num': dl.get('UF_CRM_5903C16BDF7A7')} for dl in lst_deal]
+    log_mess = f'ПВ {provider}: Нормализованный список: {len(new_lst_deal)} шт.'
+    logger.info(log_mess); print(log_mess)
     
     # Проверим статус сделок у ПВ
-    e, lst_deal = get_deal_status(new_lst_deal, access, status_for_comment)
+    e, lst_deal = get_deal_status(logger, new_lst_deal, access, status_for_comment)
     if e: 
-        tlg_mess = f'ПВ {provider}: Ошибка при проверке статуса сделок: {e} '
-        send_telegram(tlg_chat, tlg_token, tlg_mess)
+        log_mess = f'ПВ {provider}: Ошибка при проверке статуса сделок: {e}'
+        logger.info(log_mess); print(log_mess)
+        send_telegram(tlg_chat, tlg_token, log_mess)
         return
     
     change = 0
     for deal in lst_deal:
         status = deal.get('pv_status')
-        if status:
+        if status and status in status_domru_srm:
             # print(deal.get('ID'), status, name_status_crm[status_domru_srm[pv_status]])
-            if status in status_domru_srm:
-                deal['crm_status'] = status_domru_srm[status]
-                e = send_crm_deal_stage(deal, deal['crm_status'])
-                # e = False
-                if e: 
-                    tlg_mess = f'ПВ {provider}: Ошибка при обновлении статуса сделки в срм'
-                    send_telegram(tlg_chat, tlg_token, tlg_mess)
-                else: change += 1
+            deal['crm_status'] = status_domru_srm[status]
+            e = send_crm_deal_stage(deal, deal['crm_status'])
+            # e = False
+            if e: 
+                log_mess = f'ПВ {provider}: Ошибка при обновлении статуса сделки в срм: {e}'
+                logger.info(log_mess); print(log_mess)
+                send_telegram(tlg_chat, tlg_token, log_mess)
+            else: change += 1
             time.sleep(0.5)
     e = send_dj_domconnect_result(lst_deal)
-    if e: 
-        tlg_mess = f'ПВ {provider}: Ошибка при архивировании сделки в dj_domconnect'
-        send_telegram(tlg_chat, tlg_token, tlg_mess)
+    if e:
+        log_mess = f'ПВ {provider}: Ошибка при архивировании сделки в dj_domconnect: {e}'
+        logger.info(log_mess); print(log_mess)
+        send_telegram(tlg_chat, tlg_token, log_mess)
+
     tlg_mess = f'ПВ {provider}:\nСтатус сделок изменен\nв {change} из {len(lst_deal)}\n'
     str_today = datetime.today().strftime('%d.%m.%Y')
     tlg_mess += f'http://django.domconnect.ru/api/get_pv_result/{pv_dc_code}/{str_today}'
+    if e: tlg_mess += f'\nОшибка архивации: {e}'
     
-    send_telegram(tlg_chat, tlg_token, tlg_mess)
+    e = send_telegram(tlg_chat, tlg_token, tlg_mess)
+    logger.info(tlg_mess.replace('\n', ''))
+    logger.info(f'Финиш ПВ: {provider} {e}')
 
 
 if __name__ == '__main__':
-    # run_check_deals(MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN, 1)
-    # run_check_deals(PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN)
-    # run_check_deals(MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN)
+    os.system('cls')
+    logging.basicConfig(
+        level=logging.INFO,     # DEBUG, INFO, WARNING, ERROR и CRITICAL По возрастанию
+        filename='main_log.log',
+        datefmt='%d.%m.%Y %H:%M:%S',
+        format='%(asctime)s:%(levelname)s:\t%(message)s',  # %(name)s:
+    )
+    logging.getLogger('urllib3').setLevel(logging.CRITICAL)
+    logging.getLogger('undetected_chromedriver.patcher').setLevel(logging.CRITICAL)  # чтобы узнать кто постит в лог добавить в format :%(name)s:
+    logger = logging.getLogger(__name__)
+    
+    # run_check_deals(logger, MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN, 1)
+    run_check_deals(logger, PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN)
+    # run_check_deals(logger, MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN)
     
     # # print(json.dumps(lst_deal, sort_keys=True, indent=2, ensure_ascii=False))
     # lst_deal = []

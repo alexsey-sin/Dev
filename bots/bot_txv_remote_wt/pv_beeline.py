@@ -1,4 +1,4 @@
-import os, time, re, json
+import os, time, re, json, logging
 from datetime import datetime, timedelta
 import calendar, requests  # pip install requests
 from selenium import webdriver  # $ pip install selenium
@@ -138,7 +138,8 @@ def wait_spinner(driver):  # Ожидаем крутящийся спинер
     driver.implicitly_wait(10)
     time.sleep(2)
 
-def get_deal_status(acc_data):
+# =========================================================
+def get_deal_status(logger, acc_data):
     driver = None
     try:
         EXE_PATH = 'driver/chromedriver.exe'
@@ -190,7 +191,10 @@ def get_deal_status(acc_data):
             # проход по всем заявкам
             for deal in a_data['deals']:
                 num = deal.get('num')
-                if not num or deal.get('pv_status') == 'deal_number_error': continue
+                if not num or deal.get('pv_status') == 'deal_number_error':
+                    log_mess = f'ПВ {provider}: {deal["ID"]}|{num}|{deal.get("pv_status", "")}'
+                    logger.info(log_mess)
+                    continue
                 els = driver.find_elements(By.XPATH, '//input[@placeholder="Введите номер"]')
                 if len(els) != 1: raise Exception('Нет поля ввода номера заявки')
                 els_btn = driver.find_elements(By.XPATH, '//button[contains(@ng-click, "applyFilterHander")]')
@@ -242,6 +246,8 @@ def get_deal_status(acc_data):
                     deal['pv_status'] = 'not_found'
                     deal['comment'] = 'Заявка в ЛК не найдена'
 
+                log_mess = f'ПВ {provider}: {deal["ID"]}|{num}|{deal.get("pv_status", "")}|{deal.get("date_connect", "")}|{deal.get("comment", "")}'
+                logger.info(log_mess)
             # with open('out.html', 'w', encoding='utf-8') as outfile:
                 # outfile.write(driver.page_source)
             # raise Exception('Финиш.')
@@ -337,7 +343,7 @@ def send_dj_domconnect_result(lst_deal):
             'id_crm': deal.get('ID', 'Не определен')[:50],
             'num_deal': deal.get('num', 'Не определен')[:50],
             'pv_status': deal.get('pv_status', '')[:255],
-            'crm_status': deal.get('crm_status', '')[:255],
+            'crm_status': deal.get('crm_status', ''),
             'date_connect': deal.get('date_connect', '')[:50],
             'comment': deal.get('comment', ''),
         }
@@ -351,9 +357,8 @@ def send_dj_domconnect_result(lst_deal):
 
     return ''
 
-
-def run_check_deals(tlg_chat, tlg_token, by_days=60):
-    tlg_mess = ''
+def run_check_deals(logger, tlg_chat, tlg_token, by_days=60):
+    logger.info(f'Старт ПВ: {provider}')
 
     # Определим диапазон дат для фильтра
     cur_date = datetime.today()
@@ -365,16 +370,20 @@ def run_check_deals(tlg_chat, tlg_token, by_days=60):
     
     # Заберем сделки из СРМ по фильтру
     e, lst_deal = get_deals_crm(pv_crm_code, str(from_date), str(to_date), pw_code)
-    if e:
-        tlg_mess = f'ПВ {provider}: Ошибка при загрузке сделок из срм: {e}'
-        send_telegram(tlg_chat, tlg_token, tlg_mess)
+    if e: 
+        log_mess = f'ПВ {provider}: загрузка сделок из срм: {e}'
+        logger.error(log_mess); print(log_mess)
+        send_telegram(tlg_chat, tlg_token, log_mess)
         return
     if len(lst_deal) == 0:
-        cur_time = datetime.now().strftime('%H:%M:%S %d-%m-%Y')
-        print(f'{cur_time} {provider}: Сделок нет')
+        log_mess = f'ПВ {provider}: Сделок нет'
+        logger.info(log_mess); print(log_mess)
         return
+
+    log_mess = f'ПВ {provider}: Исходный список: {len(lst_deal)} шт.'
+    logger.info(log_mess); print(log_mess)
+    # print(json.dumps(lst_deal, sort_keys=True, indent=2, ensure_ascii=False))
     
-    print('Исходный список:', len(lst_deal), 'шт.')
     # Соберем нормальный список сделок
     new_lst_deal = []
     for dl in lst_deal:
@@ -403,7 +412,8 @@ def run_check_deals(tlg_chat, tlg_token, by_days=60):
                 dct['pv_status'] = 'deal_number_error'
                 dct['comment'] = 'Ошибка номера сделки'
         new_lst_deal.append(dct)
-    print('Нормализованный список:', len(new_lst_deal), 'шт.')
+    log_mess = f'ПВ {provider}: Нормализованный список: {len(new_lst_deal)} шт.'
+    logger.info(log_mess); print(log_mess)
     
     # Составим списки сделок по PartnerWEB
     for deal in new_lst_deal:
@@ -416,12 +426,12 @@ def run_check_deals(tlg_chat, tlg_token, by_days=60):
             print('pw_code is not:', deal.get('pw_code'))
     
     # Проверим статус сделок у ПВ
-    e, new_acc_data = get_deal_status(acc_data)
+    e, new_acc_data = get_deal_status(logger, acc_data)
     if e: 
-        tlg_mess = f'ПВ {provider}: Ошибка при проверке статуса сделок: {e} '
-        send_telegram(tlg_chat, tlg_token, tlg_mess)
-    # with open('deals_beeline_after.json', 'w', encoding='utf-8') as out_file:
-        # json.dump(new_acc_data, out_file, ensure_ascii=False, indent=4)
+        log_mess = f'ПВ {provider}: Ошибка при проверке статуса сделок: {e}'
+        logger.info(log_mess); print(log_mess)
+        send_telegram(tlg_chat, tlg_token, log_mess)
+        return
     
     # Проверим статус на подлежащие изменению в СРМ
     change = 0
@@ -436,25 +446,41 @@ def run_check_deals(tlg_chat, tlg_token, by_days=60):
                 e = send_crm_deal_stage(deal, status_beeline_srm[status])
                 # e = False
                 if e: 
-                    tlg_mess = f'ПВ {provider}: Ошибка при обновлении статуса сделки в срм'
-                    send_telegram(tlg_chat, tlg_token, tlg_mess)
+                    log_mess = f'ПВ {provider}: Ошибка при обновлении статуса сделки в срм: {e}'
+                    logger.info(log_mess); print(log_mess)
+                    send_telegram(tlg_chat, tlg_token, log_mess)
                 else: change += 1
                 time.sleep(0.5)
         e = send_dj_domconnect_result(partner['deals'])
-        if e: 
-            tlg_mess = f'ПВ {provider}: Ошибка при архивировании сделки в dj_domconnect'
-            send_telegram(tlg_chat, tlg_token, tlg_mess)
-    
-    tlg_mess = f'ПВ {provider}:\nСтатус сделок изменен\nв {change} из {cnt_all}\n'
+        if e:
+            log_mess = f'ПВ {provider}: Ошибка при архивировании сделки в dj_domconnect: {e}'
+            logger.info(log_mess); print(log_mess)
+            send_telegram(tlg_chat, tlg_token, log_mess)
+
+    tlg_mess = f'ПВ {provider}:\nСтатус сделок изменен\nв {change} из {len(lst_deal)}\n'
     str_today = datetime.today().strftime('%d.%m.%Y')
     tlg_mess += f'http://django.domconnect.ru/api/get_pv_result/{pv_dc_code}/{str_today}'
-
-    send_telegram(tlg_chat, tlg_token, tlg_mess)
+    if e: tlg_mess += f'\nОшибка архивации: {e}'
+    
+    e = send_telegram(tlg_chat, tlg_token, tlg_mess)
+    logger.info(tlg_mess.replace('\n', ''))
+    logger.info(f'Финиш ПВ: {provider} {e}')
 
 
 if __name__ == '__main__':
-    # run_check_deals(MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN, 6)
-    # run_check_deals(PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN)
+    os.system('cls')
+    logging.basicConfig(
+        level=logging.INFO,     # DEBUG, INFO, WARNING, ERROR и CRITICAL По возрастанию
+        filename='main_log.log',
+        datefmt='%d.%m.%Y %H:%M:%S',
+        format='%(asctime)s:%(levelname)s:\t%(message)s',  # %(name)s:
+    )
+    logging.getLogger('urllib3').setLevel(logging.CRITICAL)
+    logging.getLogger('undetected_chromedriver.patcher').setLevel(logging.CRITICAL)  # чтобы узнать кто постит в лог добавить в format :%(name)s:
+    logger = logging.getLogger(__name__)
+    
+    # run_check_deals(logger, MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN, 1)
+    # run_check_deals(logger, PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN)
     # acc_data = {  # Доступы к ПВ
         # 'url': 'https://partnerweb.beeline.ru/',
         # 'partners': [

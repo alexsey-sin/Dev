@@ -326,7 +326,8 @@ def wait_spinner(driver):  # Ожидаем крутящийся спинер
         time.sleep(1)
         els = driver.find_elements(By.XPATH, '//div[contains(@class, "ju-spinner")]')
         if len(els):
-            print('ju-spinner')
+            # print('ju-spinner')
+            pass
         else: break
     driver.implicitly_wait(10)
     time.sleep(2)
@@ -697,17 +698,17 @@ def get_txv(data):
         except: raise Exception('Ошибка выбора дома из списка')
         time.sleep(3)
         
-        # Вводим квартиру
-        apartment = data.get('apartment')
-        if apartment:
-            els_fieldset_addr = driver.find_elements(By.XPATH, '//fieldset[@class="form-1-fieldset addressConnectFs"]')
-            if len(els_fieldset_addr) == 0: raise Exception('Ошибка нет блока адреса5')
-            els = els_fieldset_addr[0].find_elements(By.XPATH, './/input[@data-field="flat"]')
-            if len(els) != 1: raise Exception('Ошибка нет поля ввода квартиры')
-            try: els[0].send_keys(apartment)
-            except: raise Exception('Ошибка ввода квартиры')
-            time.sleep(1)
-        time.sleep(3)
+        # # Вводим квартиру
+        # apartment = data.get('apartment')
+        # if apartment:
+            # els_fieldset_addr = driver.find_elements(By.XPATH, '//fieldset[@class="form-1-fieldset addressConnectFs"]')
+            # if len(els_fieldset_addr) == 0: raise Exception('Ошибка нет блока адреса5')
+            # els = els_fieldset_addr[0].find_elements(By.XPATH, './/input[@data-field="flat"]')
+            # if len(els) != 1: raise Exception('Ошибка нет поля ввода квартиры')
+            # try: els[0].send_keys(apartment)
+            # except: raise Exception('Ошибка ввода квартиры')
+            # time.sleep(1)
+        # time.sleep(3)
 
         # Возьмем определившийся адрес
         data['pv_address'] = ''
@@ -728,6 +729,17 @@ def get_txv(data):
         
         wait_spinner(driver)  # Подождем если есть спинер
 
+        # Закроем всплывающее окно с сообщением
+        driver.implicitly_wait(1)
+        els = driver.find_elements(By.XPATH, '//div[contains(@class, "ju-message")]')
+        if len(els) > 0:
+            els_btn = els[0].find_elements(By.XPATH, './/input[contains(@class, "close")]')
+            if len(els_btn) > 0:
+                try: els_btn[0].click()
+                except: raise Exception('Ошибка нажатия кнопки окно с сообщением')
+                time.sleep(1)
+        driver.implicitly_wait(10)
+       
         # Смотрим таблицу результатов проверки технической возможности
         els = driver.find_elements(By.XPATH, '//tbody[@id="recievedTpTableBody"]')
         if len(els) != 1: raise Exception('Ошибка нет таблицы результатов проверки технической возможности')
@@ -973,7 +985,7 @@ def run_txv_rostelecom(tlg_chat, tlg_token):
         if e:
             tlg_mess += crm_mess
             data['bot_log'] += crm_mess
-        address = f'{data.get("city")} {data.get("street")} д.{data.get("house")} кв.{data.get("apartment")}'
+        address = f'{data.get("city")} {data.get("street")} д.{data.get("house")}'
         tlg_mess += f'{opsos}: - Выполнен запрос ТхВ\n'
         tlg_mess += f'Адрес: {address}\n'
         djdc = ''
@@ -1007,29 +1019,29 @@ if __name__ == '__main__':
     # run_txv_rostelecom(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN)
     
     
-    # url: https://eissd.rt.ru/login
-    # login: sz_v_an
-    # password: m~|HqEu~VB}|P1QDrDX%
+    # 'url': 'https://eissd.rt.ru/login',
+    # 'login': 'sz_v_an',
+    # 'password': 'LzJ*%D6dQ{'
 
     
-    txv_dict = {
+    # txv_dict = {
+        # # 'login': 'sz_v_an',
+        # # 'password': 'm~|HqEu~VB}|P1QDrDX%',
         # 'login': 'sz_v_an',
-        # 'password': 'm~|HqEu~VB}|P1QDrDX%',
-        'login': 'sz_v_an',
-        'password': 'm~|HqEu~VB}|P1QDrDX%',
-        'id_lid': '1215557',
+        # 'password': 'LzJ*%D6dQ{',
+        # 'id_lid': '1215557',
         
-        # 'region': 'Республика Северная Осетия — Алания',
-        # 'city': 'Владикавказ',
-        # 'street': 'Братьев Темировых',
-        # 'house': '69/4',          # дом
-        # 'apartment': '255',          # квартира
+        # # 'region': 'Республика Северная Осетия — Алания',
+        # # 'city': 'Владикавказ',
+        # # 'street': 'Братьев Темировых',
+        # # 'house': '69/4',          # дом
+        # # 'apartment': '255',          # квартира
         
-        # 'region': 'Республика Алтай',
-        # 'city': 'Горно-Алтайск',
-        # 'street': 'Проточная улица',
-        # 'house': '10/1к2',          # дом
-        # 'apartment': '10',          # квартира
+        # # 'region': 'Республика Алтай',
+        # # 'city': 'Горно-Алтайск',
+        # # 'street': 'Проточная улица',
+        # # 'house': '10/1к2',          # дом
+        # # 'apartment': '10',          # квартира
         
         # 'region': 'Приморский край',
         # 'city': 'Владивосток',
@@ -1037,37 +1049,38 @@ if __name__ == '__main__':
         # 'house': '29/2',          # дом
         # 'apartment': '40',          # квартира
         
-        # 'region': 'Республика Марий Эл',
-        # 'city': 'Йошкар-Ола',
-        # 'street': 'Машиностроителей',
-        # 'house': '4А',          # дом
-        # 'apartment': '2',          # квартира
+        # # 'region': 'Республика Марий Эл',
+        # # 'city': 'Йошкар-Ола',
+        # # 'street': 'Машиностроителей',
+        # # 'house': '4А',          # дом
+        # # 'apartment': '2',          # квартира
         
-        # 'region': 'Республика Алтай',
-        # 'city': 'село Усть-Кокса',
-        # 'street': 'Ленина',
-        # 'house': '20А',          # дом
-        # 'apartment': '10',          # квартира
+        # # 'region': 'Республика Алтай',
+        # # 'city': 'село Усть-Кокса',
+        # # 'street': 'Ленина',
+        # # 'house': '20А',          # дом
+        # # 'apartment': '10',          # квартира
         
-        # 'region': 'Ростовская область',         # область или город областного значения
-        # 'city': 'Ростов-на-Дону',           # город
-        # 'street': 'садовое товарищество Садовод-Любитель, 2-й Хлопковый переулок',         # улица
-        # 'house': '12',          # дом
-        # 'apartment': '10',          # квартира
+        # # 'region': 'Ростовская область',         # область или город областного значения
+        # # 'city': 'Ростов-на-Дону',           # город
+        # # 'street': 'садовое товарищество Садовод-Любитель, 2-й Хлопковый переулок',         # улица
+        # # 'house': '12',          # дом
+        # # 'apartment': '10',          # квартира
         
-        'region': 'Ярославская область',         # область или город областного значения
-        'city': 'Ярославль',           # город
-        'street': 'улица Труфанова',         # улица
-        'house': '29 корп 2',          # дом
-        'apartment': '63',          # квартира
+        # # 'region': 'Ярославская область',         # область или город областного значения
+        # # 'city': 'Ярославль',           # город
+        # # 'street': 'улица Труфанова',         # улица
+        # # 'house': '29 корп 2',          # дом
+        # # 'apartment': '63',          # квартира
 
-        'available_connect': '',  # Возможность подключения
-        'tarifs_all': '', # список названий тарифных планов
-        'pv_address': '',
-    }
+        # 'available_connect': '',  # Возможность подключения
+        # 'tarifs_all': '', # список названий тарифных планов
+        # 'pv_address': '',
+    # }
     
-    e, data = get_txv(txv_dict)
-    if e: print(e)
+    # e, data = get_txv(txv_dict)
+    # if e: print(e)
+    # print(txv_dict)
     
     # print('pv_address:', data['pv_address'])
     # print('available_connect:')

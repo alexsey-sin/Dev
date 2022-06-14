@@ -1,4 +1,4 @@
-import os, time, threading
+import os, time, threading, logging
 from datetime import datetime, timedelta, time as dt_time
 
 from txv_beeline import run_txv_beeline
@@ -12,6 +12,8 @@ from txv_multi_regions import run_txv_multi_regions
 from pv_rostelecom import run_check_deals as run_pv_rostelecom
 from pv_beeline import run_check_deals as run_pv_beeline
 from pv_domru import run_check_deals as run_pv_domru
+from pv_mts import run_check_deals as run_pv_mts
+from pv_onlime import run_check_deals as run_pv_onlime
 
 # личный бот @infra     TELEGRAM_CHAT_ID, TELEGRAM_TOKEN
 TELEGRAM_CHAT_ID = '1740645090'
@@ -29,8 +31,21 @@ TIME_3_SECONDS = 3  # в секундах,
 PERIOD_BETWEEN = 0.5  # в секундах, Пауза
 
 time_pv_rostelecom = {'h': 1, 'm': 0, 's': 0}
-time_pv_beeline = {'h': 1, 'm': 30, 's': 0}
-time_pv_domru = {'h': 2, 'm': 0, 's': 0}
+time_pv_beeline = {'h': 1, 'm': 10, 's': 0}
+time_pv_domru = {'h': 1, 'm': 20, 's': 0}
+time_pv_mts = {'h': 1, 'm': 30, 's': 0}
+time_pv_onlime = {'h': 1, 'm': 40, 's': 0}
+
+logging.basicConfig(
+    level=logging.INFO,     # DEBUG, INFO, WARNING, ERROR и CRITICAL По возрастанию
+    filename='main_log.log',
+    datefmt='%d.%m.%Y %H:%M:%S',
+    format='%(asctime)s:%(levelname)s:\t%(message)s',  # %(name)s:
+)
+logging.getLogger('urllib3').setLevel(logging.CRITICAL)
+logging.getLogger('undetected_chromedriver.patcher').setLevel(logging.CRITICAL)  # чтобы узнать кто постит в лог добавить в format :%(name)s:
+logger = logging.getLogger(__name__)
+
 
 def its_time(dct_time):
     pv_t = time.localtime()
@@ -63,6 +78,8 @@ if __name__ == '__main__':
     thread_name_pv_rostelecom = 'pv_rostelecom'
     thread_name_pv_beeline = 'pv_beeline'
     thread_name_pv_domru = 'pv_domru'
+    thread_name_pv_mts = 'pv_mts'
+    thread_name_pv_onlime = 'pv_onlime'
 
     
     while True:
@@ -77,10 +94,10 @@ if __name__ == '__main__':
                 for thread in threading.enumerate():
                     if thread.getName() == thread_name_pv_rostelecom: is_run = True; break
                 if is_run == False:
-                    # th = threading.Thread(target=run_pv_rostelecom, name=thread_name_pv_rostelecom, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
-                    th = threading.Thread(target=run_pv_rostelecom, name=thread_name_pv_rostelecom, args=(PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN))
+                    logger.info(f'Start {thread_name_pv_rostelecom} thread')
+                    # th = threading.Thread(target=run_pv_rostelecom, name=thread_name_pv_rostelecom, args=(logger, TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
+                    th = threading.Thread(target=run_pv_rostelecom, name=thread_name_pv_rostelecom, args=(logger, PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN))
                     th.start()
-                    print(f'Bot: {thread_name_pv_rostelecom} is running.')
                 time.sleep(1)
             
             if its_time(time_pv_beeline):
@@ -88,10 +105,10 @@ if __name__ == '__main__':
                 for thread in threading.enumerate():
                     if thread.getName() == thread_name_pv_beeline: is_run = True; break
                 if is_run == False:
-                    # th = threading.Thread(target=run_pv_beeline, name=thread_name_pv_beeline, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
-                    th = threading.Thread(target=run_pv_beeline, name=thread_name_pv_beeline, args=(PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN))
+                    logger.info(f'Start {thread_name_pv_beeline} thread')
+                    # th = threading.Thread(target=run_pv_beeline, name=thread_name_pv_beeline, args=(logger, TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
+                    th = threading.Thread(target=run_pv_beeline, name=thread_name_pv_beeline, args=(logger, PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN))
                     th.start()
-                    print(f'Bot: {thread_name_pv_beeline} is running.')
                 time.sleep(1)
             
             if its_time(time_pv_domru):
@@ -99,10 +116,34 @@ if __name__ == '__main__':
                 for thread in threading.enumerate():
                     if thread.getName() == thread_name_pv_domru: is_run = True; break
                 if is_run == False:
-                    # th = threading.Thread(target=run_pv_domru, name=thread_name_pv_domru, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
-                    th = threading.Thread(target=run_pv_domru, name=thread_name_pv_domru, args=(PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN))
+                    logger.info(f'Start {thread_name_pv_domru} thread')
+                    # th = threading.Thread(target=run_pv_domru, name=thread_name_pv_domru, args=(logger, TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
+                    th = threading.Thread(target=run_pv_domru, name=thread_name_pv_domru, args=(logger, PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN))
                     th.start()
-                    print(f'Bot: {thread_name_pv_domru} is running.')
+                time.sleep(1)
+            
+            if its_time(time_pv_mts):
+                is_run = False
+                for thread in threading.enumerate():
+                    if thread.getName() == thread_name_pv_mts: is_run = True; break
+                if is_run == False:
+                    logger.info(f'Start {thread_name_pv_mts} thread')
+                    # th = threading.Thread(target=run_pv_mts, name=thread_name_pv_mts, args=(logger, TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
+                    th = threading.Thread(target=run_pv_mts, name=thread_name_pv_mts, args=(logger, PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN))
+                    th.start()
+                    print(f'Bot: {thread_name_pv_mts} is running.')
+                time.sleep(1)
+            
+            if its_time(time_pv_onlime):
+                is_run = False
+                for thread in threading.enumerate():
+                    if thread.getName() == thread_name_pv_onlime: is_run = True; break
+                if is_run == False:
+                    logger.info(f'Start {thread_name_pv_onlime} thread')
+                    # th = threading.Thread(target=run_pv_mts, name=thread_name_pv_onlime, args=(logger, TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
+                    th = threading.Thread(target=run_pv_mts, name=thread_name_pv_onlime, args=(logger, PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN))
+                    th.start()
+                    print(f'Bot: {thread_name_pv_onlime} is running.')
                 time.sleep(1)
             
             continue
@@ -203,7 +244,7 @@ if __name__ == '__main__':
         if (cur_time - start_time_txv_rostelecom).seconds >= TIME_3_SECONDS:
             is_run = False
             for thread in threading.enumerate():
-                if thread.getName() == thread_name_rostelecom or thread.getName() == thread_name_multi_regions: is_run = True; break
+                if thread.getName() == thread_name_rostelecom: is_run = True; break
             if is_run == False:
                 # th = threading.Thread(target=run_txv_rostelecom, name=thread_name_rostelecom, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
                 th = threading.Thread(target=run_txv_rostelecom, name=thread_name_rostelecom, args=(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN))
@@ -218,7 +259,7 @@ if __name__ == '__main__':
         if (cur_time - start_time_multi_regions).seconds >= TIME_3_SECONDS:
             is_run = False
             for thread in threading.enumerate():
-                if thread.getName() == thread_name_multi_regions or thread.getName() == thread_name_rostelecom: is_run = True; break
+                if thread.getName() == thread_name_multi_regions: is_run = True; break
             if is_run == False:
                 # th = threading.Thread(target=run_txv_rostelecom, name=thread_name_multi_regions, args=(TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
                 th = threading.Thread(target=run_txv_multi_regions, name=thread_name_multi_regions, args=(BID_TELEGRAM_CHAT_ID, BID_TELEGRAM_TOKEN))

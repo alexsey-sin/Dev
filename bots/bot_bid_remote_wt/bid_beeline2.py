@@ -1,6 +1,7 @@
 import os, time, json, requests, logging  # pip install requests
 from datetime import datetime
 from selenium import webdriver  # $ pip install selenium
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.common.keys import Keys
@@ -18,7 +19,8 @@ def set_bid(data):
         base_url = f'https://mk.beeline.ru/PartnProg/RefLink?key={parther_key}'
 
         EXE_PATH = 'driver/chromedriver.exe'
-        driver = webdriver.Chrome(executable_path=EXE_PATH)
+        service = Service(EXE_PATH)
+        driver = webdriver.Chrome(service=service)
 
         driver.implicitly_wait(10)
         driver.get(base_url)
@@ -30,21 +32,22 @@ def set_bid(data):
         except: raise Exception('Ошибка действий 1')
         time.sleep(2)
         
-        inn = data.get('client_inn')
-        if inn:
-            els = driver.find_elements(By.XPATH, '//input[@id="Inn"]')
-            if len(els) != 1: raise Exception('Ошибка нет поля ИНН')
-            try: els[0].send_keys(inn)
-            except: raise Exception('Ошибка действий 2')
-            time.sleep(1)
+        # Поля ИНН и Название компании не обязательные
+        # inn = data.get('client_inn')
+        # if inn and inn.isdigit() and (len(inn) == 10 or len(inn) == 12):
+            # els = driver.find_elements(By.XPATH, '//input[@id="Inn"]')
+            # if len(els) != 1: raise Exception('Ошибка нет поля ИНН')
+            # try: els[0].send_keys(inn)
+            # except: raise Exception('Ошибка действий 2')
+            # time.sleep(1)
         
-        client_name = data.get('client_name')
-        if client_name:
-            els = driver.find_elements(By.XPATH, '//input[@id="ClientName"]')
-            if len(els) != 1: raise Exception('Ошибка нет поля Название компании')
-            try: els[0].send_keys(client_name)
-            except: raise Exception('Ошибка действий 3')
-            time.sleep(1)
+        # client_name = data.get('client_name')
+        # if client_name:
+            # els = driver.find_elements(By.XPATH, '//input[@id="ClientName"]')
+            # if len(els) != 1: raise Exception('Ошибка нет поля Название компании')
+            # try: els[0].send_keys(client_name)
+            # except: raise Exception('Ошибка действий 3')
+            # time.sleep(1)
         
         contact_name = data.get('contact_name')
         if contact_name == None or len(contact_name) < 3: raise Exception('Ошибка не задан ФИО контактного лица')
@@ -52,16 +55,16 @@ def set_bid(data):
         if len(els) != 1: raise Exception('Ошибка нет поля ФИО')
         try: els[0].send_keys(contact_name)
         except: raise Exception('Ошибка действий 4')
-        time.sleep(2)
+        time.sleep(3)
         
         i_ph = data.get('phone')
         if not i_ph.isdigit() or len(i_ph) != 11: raise Exception('Ошибка в номере телефона')
-        phone = f'+7 ({i_ph[1:4]}) {i_ph[4:7]}-{i_ph[7:9]}-{i_ph[9:11]}'
+        # phone = f'+7 ({i_ph[1:4]}) {i_ph[4:7]}-{i_ph[7:9]}-{i_ph[9:11]}'
         els = driver.find_elements(By.XPATH, '//input[@id="PhoneNumberALL"]')
         if len(els) != 1: raise Exception('Ошибка нет поля Телефон')
         try: els[0].send_keys(i_ph[1:])
         except: raise Exception('Ошибка действий 5')
-        time.sleep(2)
+        time.sleep(3)
 
         comment = data.get('comment')
         if comment:
@@ -78,7 +81,9 @@ def set_bid(data):
             for el in els:
                 err_lst.append(el.text)
             raise Exception('\n'.join(err_lst))
-
+        
+        # raise Exception('Финиш.')
+        
         # Отправляем
         els = driver.find_elements(By.XPATH, '//input[@id="SubmitButton"]')
         if len(els) != 1: raise Exception('Ошибка нет кнопки отправить')
@@ -310,13 +315,13 @@ if __name__ == '__main__':
     # https://mk.beeline.ru/PartnProg/RefLink?key=AD8AE6EF4C084ED1    
     # data = {
         # 'parther_key': 'AD8AE6EF4C084ED1',
-        # # 'client_inn': '0000000000',
-        # 'client_name': 'ИП',
-        # 'contact_name': 'Татьяна',
-        # 'phone': '79529091696',
-        # # 'email': '',
-        # # 'comment': 'Тестовая заявка, просьба не обрабатывать',
-        # # 'products': 'Интернет',
+        # 'client_inn': 'ИНН  7734446063',
+        # 'client_name': 'ООО ДокДети Октябрьское поле',
+        # 'contact_name': 'Светлана',
+        # 'phone': '79169012390',
+        # 'email': '',
+        # 'comment': 'Тестовая заявка, просьба не обрабатывать',
+        # 'products': 'Интернет',
         
         
         # # 'parther_key': 'AD8AE6EF4C084ED1',
@@ -333,4 +338,6 @@ if __name__ == '__main__':
         # print(e)
         # exit(0)
     # print('rez:\n', data)
+    
+    
     pass

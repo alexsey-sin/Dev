@@ -2,8 +2,11 @@ import os, time, json, requests  # pip install requests
 from datetime import datetime
 from selenium import webdriver  # $ pip install selenium
 from selenium.webdriver.common.by import By
-from selenium.webdriver.firefox.service import Service
-from selenium.webdriver.firefox.options import Options
+# from selenium.webdriver.firefox.service import Service
+# from selenium.webdriver.firefox.options import Options
+import undetected_chromedriver as webdriver  # pip install undetected-chromedriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver import ChromeOptions
 
 # url_host = 'http://127.0.0.1:8000/'
 url_host = 'http://django.domconnect.ru/'
@@ -252,20 +255,29 @@ def ordering_house(in_house: str):  # Преобразование строки 
     
     return ('', 'Номер не распознан')
 
+def wait_spinner(driver):  # Ожидаем спинер
+    driver.implicitly_wait(1)
+    while True:
+        time.sleep(1)
+        els = driver.find_elements(By.XPATH, '//div[contains(@class, "LoaderMatrix_container__")]')
+        if len(els):
+            # print('ju-spinner')
+            pass
+        else: break
+    driver.implicitly_wait(10)
+    time.sleep(1)
+
+# =========================================================
 def get_txv(data):
     driver = None
     try:
-        base_url = 'https://urmdf.ssl.mts.ru'
+        base_url = 'https://urmdf.ssl.mts.ru/wd/hub'
+        # base_url = 'https://urmdf.ssl.mts.ru'
         
-        # EXE_PATH_Ch = 'driver/chromedriver.exe'
-        EXE_PATH_Fx = 'driver/geckodriver.exe'
+        EXE_PATH = 'driver/chromedriver.exe'
 
-        # driver = webdriver.Chrome(executable_path=EXE_PATH_Ch)
-
-        options = Options()
-        options.binary_location = r'C:\Users\asinicin2\AppData\Local\Mozilla Firefox\firefox.exe'
-        # options.binary_location = r'C:\Program Files\Mozilla Firefox\firefox.exe'
-        driver = webdriver.Firefox(service=Service(EXE_PATH_Fx), options=options)
+        service = Service(EXE_PATH)
+        driver = webdriver.Chrome(service=service)  # , service_log_path='webdriver.log' -- логирование сессии
 
         driver.implicitly_wait(20)
         driver.get(base_url)
@@ -296,6 +308,8 @@ def get_txv(data):
         except: raise Exception('Ошибка клика войти')
         time.sleep(5)
         ###################### Страница поиска адреса ######################
+        wait_spinner(driver)  # Ожидаем спинер
+        driver.fullscreen_window()
         # Ищем блок для ввода адреса
         els = driver.find_elements(By.XPATH, '//textarea[@data-testid="search"]')
         if len(els) != 1: raise Exception('Ошибка нет строки ввода адреса')
@@ -318,15 +332,15 @@ def get_txv(data):
         # Вводим адрес
         try: els[0].send_keys(address)
         except: raise Exception('Ошибка ввода адрес')
+        wait_spinner(driver)  # Ожидаем спинер
         
         # Возможны 3 варианта ответа
         # 1 нет ТхВ блок <div id="results"> .... Нет технической возможности! Проверьте введенный адрес.</div>
         # 2 Множественный выбор блок <div data-testid="suggestions" ....>
         # 3 Есть возможность блок <div id="results"> с перечнем возможностей
         
-        driver.implicitly_wait(1)
         while 1:
-            time.sleep(5)
+            time.sleep(3)
             
             els = driver.find_elements(By.XPATH, '//div[@id="results"]')
             if len(els) == 1:
@@ -346,14 +360,14 @@ def get_txv(data):
                 for el_btn in els_btn:
                     f_lst.append(el_btn.text)
                 i_fnd = find_short(f_lst)
-                try: driver.execute_script("arguments[0].click();", els_btn[i_fnd])
+                # try: driver.execute_script("arguments[0].click();", els_btn[i_fnd])
+                try: els_btn[i_fnd].click()
                 except: raise Exception('Ошибка клика выбора адреса')
                 continue
             
             raise Exception(f'Ошибка не распознан адрес: {address}')
         
         if data['available_connect'].find('Нет технической возможности') < 0:
-            driver.implicitly_wait(10)
             # Ищем кнопочку перехода
             els = driver.find_elements(By.XPATH, '//button[contains(@class, "SearchInput_Search__SubmitBtn")]')
             if len(els) == 0: raise Exception('Ошибка после адреса нет кнопки активации перехода')
@@ -613,80 +627,34 @@ if __name__ == '__main__':
 
     # run_bid_mts()
     
-    txv_dict = {
-        'pv_code': pv_code,
-        'login': 'GRYURYEV',
-        'password': 'UcoTWY',
-        'id_lid': '1215557',
+    # txv_dict = {
+        # 'pv_code': pv_code,
+        # 'login': 'GRYURYEV',
+        # 'password': 'UcoTWY',
+        # 'id_lid': '1502779',
         
-        # 'region': 'Калужская область',         # область или город областного значения
-        # 'city': 'Калуга',           # город
-        # 'street': 'улица Ленина',         # улица
-        # 'house': '31',          # дом
-        # 'apartment': '2',          # квартира
+        # # 'region': 'Смоленская область',         # область или город областного значения
+        # # 'city': 'Вязьма',           # город
+        # # 'street': 'Кронштадтская улица',         # улица
+        # # 'house': '111',          # дом
+        # # 'apartment': '10',          # квартира
         
-        # 'region': 'Владимирская область',         # область или город областного значения
-        # 'city': 'Владимир',           # город
-        # 'street': 'ул Фейгина',         # улица
-        # 'house': '10',          # дом
-        # 'apartment': '2',          # квартира
-        
-        # # 'region': 'Татарстан',         # область или город областного значения
-        # 'city': 'Казань',           # город
-        # 'street': 'ул Дружинная',         # улица
-        # 'house': '7',          # дом
-        # 'apartment': '2',          # квартира
-        
-        # 'region': 'Ярославская область',         # область или город областного значения
-        # 'city': 'Ярославль',           # город
-        # 'street': 'улица Звездная',         # улица
-        # 'house': '31/41',          # дом
-        # 'apartment': '61',          # квартира
-
-        # 'region': 'Нижегородская область',         # область или город областного значения
-        # 'city': 'Нижний Новгород',           # город
-        # 'street': 'Камчатский пер',         # улица
-        # 'house': '9',          # дом
-        # 'apartment': '10',          # квартира
-
-        # 'city': 'Реутов',           # город
-        # 'street': 'Носовихинское шоссе',         # улица
-        # 'house': '25',          # дом
-        # # 'apartment': '2',          # квартира
-        
-        # 'city': 'Смоленск',           # город
-        # 'street': 'пр-кт Гагарина',         # улица
-        # 'house': '14/2',          # дом
-        
-        # 'city': 'Ярославль',           # город
-        # 'street': 'ул Ньютона',         # улица
-        # 'house': '40',          # дом
-        # # 'apartment': '2',          # квартира
-        
-        # 'region': 'Смоленская область',         # область или город областного значения
-        # 'city': 'Вязьма',           # город
-        # 'street': 'Кронштадтская улица',         # улица
-        # 'house': '111',          # дом
+        # 'region': 'Вологодская область',         # область или город областного значения
+        # 'city': 'Вологда',           # город
+        # 'street': 'Леденцова',         # улица
+        # 'house': '5',          # дом
         # 'apartment': '10',          # квартира
         
-        'region': 'Республика Бурятия',         # область или город областного значения
-        'city': 'Улан-Удэ',           # город
-        'street': 'Цивилева',         # улица
-        'house': '42',          # дом
-        'apartment': '10',          # квартира
         
-        
-        'available_connect': '',  # Возможность подключения
-        'tarifs_all': '', # список названий тарифных планов
-        'pv_address': '',
-    }
+        # 'available_connect': '',  # Возможность подключения
+        # 'tarifs_all': '', # список названий тарифных планов
+        # 'pv_address': '',
+    # }
     
     
-    e, data = get_txv(txv_dict)
-    if e: print(e)
-    print('available_connect:\n', data['available_connect'])
-    print('tarifs_all:\n', data['tarifs_all'])
-    print('pv_address:\n', data['pv_address'])
+    # e, data = get_txv(txv_dict)
+    # if e: print(e)
+    # print(json.dumps(data, sort_keys=True, indent=2, ensure_ascii=False))
     
     
     # set_txv_to_dj_domconnect(pv_code)
