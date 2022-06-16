@@ -1,13 +1,9 @@
 import os, time, re, json, logging
 from datetime import datetime, timedelta
 import calendar, requests  # pip install requests
-# from selenium import webdriver  # $ pip install selenium
-import undetected_chromedriver as webdriver  # pip install undetected-chromedriver
+from selenium import webdriver  # $ pip install selenium
+# import undetected_chromedriver as webdriver  # pip install undetected-chromedriver
 from selenium.webdriver.chrome.service import Service
-from selenium.webdriver import ChromeOptions
-# from selenium.webdriver.chrome.options import Options
-# from selenium.webdriver.firefox.service import Service
-# from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
@@ -15,9 +11,9 @@ from selenium.webdriver.common.keys import Keys
 # url_host = 'http://127.0.0.1:8000'
 url_host = 'http://django.domconnect.ru'
 
-provider = 'МТС'
-pv_crm_code = 2  # http://django.domconnect.ru/admin/domconnect/dccatalogproviderseo/
-pv_dc_code = 3  # код по моделям django.domconnect.ru
+provider = 'ТТК'
+pv_crm_code = 4  # http://django.domconnect.ru/admin/domconnect/dccatalogproviderseo/
+pv_dc_code = 5  # код по моделям django.domconnect.ru
 
 # личный бот @infra
 MY_TELEGRAM_CHAT_ID = '1740645090'
@@ -28,20 +24,20 @@ PV_TELEGRAM_CHAT_ID = '-654103882'
 PV_TELEGRAM_TOKEN = '526322367:AAEaw2vaeLl_f6Njfb952NopyxqCGRQXji8'
 
 access = {  # Доступы к ПВ
-    'url': 'https://urmdf.ssl.mts.ru/wd/hub',
-    'login': 'GRYURYEV',
-    'password': 'UcoTWY'
+    'url': 'https://onyma-crm.ttk.ru:4443/onyma/',
+    'login': 'wd_dc_sg',
+    'password': '9zWxQjOh'
 }
-status_mts_srm = {  # Коды статусов: МТС = СРМ
-    'Успешное подключение': 2,  # Подключен
-    'FIX_Отказ.': 'NEW',  # Ошибки + коммент
+status_pv_srm = {  # Коды статусов: ТТК = СРМ
+    'Работы выполнены': 2,  # Подключен
+    'Абонент отказался': 'NEW',  # Ошибки + коммент
 }
 name_status_crm = {
     2: 'Подключен',
     11: 'Служебный',
     'NEW': 'Ошибки',
 }
-status_for_comment = [  # Статусы МТС когда требуется взять коментарий из истории
+status_for_comment = [  # Статусы ТТК когда требуется взять коментарий из истории
     'Отказ',
     'Дубликат',
     'Неверная заявка',
@@ -96,21 +92,33 @@ def get_deals_crm(pv, from_data, to_date):
             return 'Ошибка get_deals: try: requests.post', []
         time.sleep(1)
     return '', out_lst
-    # https://crm.domconnect.ru/rest/371/w95d249i00jagfkv/crm.deal.list?
-    # order[id]=DESC&filter[>DATE_CREATE]=2022-03-01&filter[UF_CRM_5903C16B84C55]=3&filter[STAGE_ID]=1&filter[UF_CRM_595E343AA0EE2]=0&select[]=UF_CRM_5903C16BDF7A7&select[]=STAGE_ID&select[]=DATE_CREATE&select[]=UF_CRM_595ED493B6E5C
-    pass
 
-def wait_spinner(driver):  # Ожидаем спинер
+def wait_spinner(driver):  # Ожидаем крутящийся спинер
     driver.implicitly_wait(1)
     while True:
         time.sleep(1)
-        els = driver.find_elements(By.XPATH, '//div[contains(@class, "LoaderMatrix_container__")]')
+        els = driver.find_elements(By.XPATH, '//span[@class="loader"]')
         if len(els):
-            # print('ju-spinner')
-            pass
+            attr_disp = els[0].get_attribute('style')
+            if attr_disp == '':
+                print('spinner')
+                continue
+            else: break
         else: break
     driver.implicitly_wait(10)
-    time.sleep(1)
+    time.sleep(2)
+
+def find_link(driver):
+    els_div = driver.find_elements(By.XPATH, '//div[@class="group"]')
+    for el_div in els_div:
+        els_h = el_div.find_elements(By.TAG_NAME, 'h2')
+        if els_h and els_h[0].text.strip() == 'WF. Список процессов':
+            els_a = el_div.find_elements(By.XPATH, './/a[contains(@href, "/onyma/system/search/locator/?id=")]')
+            if len(els_a) > 0:
+                for el_a in els_a:
+                    if el_a.text.find('[Управление услугами]') >= 0: return el_a
+
+    return None
 
 # =========================================================
 def get_deal_status(logger, lst_deal, access, status_for_comment):
@@ -121,148 +129,174 @@ def get_deal_status(logger, lst_deal, access, status_for_comment):
         service = Service(EXE_PATH)
         driver = webdriver.Chrome(service=service)  # , service_log_path='webdriver.log' -- логирование сессии
 
-        driver.implicitly_wait(20)
-        driver.get(access.get('url'))
-        time.sleep(10)
+        base_url = access.get('url')
+        driver.get(base_url)
+        time.sleep(5)
 
         ###################### Login ######################
-        els = driver.find_elements(By.ID, 'phone')
-        if len(els) != 1: raise Exception('Ошибка нет поля логин')
+        els = driver.find_elements(By.XPATH, '//input[@id="id_login"]')
+        if len(els) != 1: raise Exception('Ошибка Нет поля логин')
         login = access.get('login')
         try:
             if login: els[0].send_keys(login)
-            else: raise Exception('Ошибка не задан логин')
+            else: raise Exception('Ошибка не задано значение логин')
         except: raise Exception('Ошибка ввода логин')
         time.sleep(1)
 
-        els = driver.find_elements(By.ID, 'password')
-        if len(els) != 1: raise Exception('Ошибка нет поля пароль')
+        els = driver.find_elements(By.XPATH, '//input[@id="id_password"]')
+        if len(els) != 1: raise Exception('Ошибка Нет поля пароль')
         password = access.get('password')
         try:
             if password: els[0].send_keys(password)
-            else: raise Exception('Ошибка не задан пароль')
+            else: raise Exception('Ошибка не задано значение пароль')
         except: raise Exception('Ошибка ввода пароль')
         time.sleep(1)
 
-        els = driver.find_elements(By.TAG_NAME, 'button')
-        if len(els) != 1: raise Exception('Ошибка нет кнопки войти')
-        try: els[0].click()
-        except: raise Exception('Ошибка клика войти')
-        time.sleep(5)
-        ###################### Страница поиска адреса ######################
-        wait_spinner(driver)  # Ожидаем спинер
-        driver.fullscreen_window()
-        # Ищем ссылку на список заявок
-        els = driver.find_elements(By.XPATH, '//a[@href="/orders"]')
-        if len(els) != 2: raise Exception('Ошибка авторизации или нет ссылки на список заявок')
-        try: els[0].click()
-        except: raise Exception('Ошибка клика список заявок')
-        wait_spinner(driver)  # Ожидаем спинер
-
-        # проход по всем заявкам
-        first_pass = True
-        num_error = False
-        for deal in lst_deal:
-            driver.implicitly_wait(5)
-            num = deal.get('num').strip()
-
-            if num_error == False:
-                # Ищем кнопку ЕЩЁ
-                els = driver.find_elements(By.XPATH, '//div[@data-testid="order-list-show-filters"]')
-                if len(els) != 1: raise Exception('Ошибка кнопки ЕЩЁ')
-                try: els[0].click()
-                except: raise Exception('Ошибка клика кнопки ЕЩЁ')
+        els = driver.find_elements(By.XPATH, '//select[@id="id_realm"]')
+        if len(els) != 1: raise Exception('Ошибка Нет поля тип пользователя')
+        f_ok = False
+        els_opt = els[0].find_elements(By.TAG_NAME, 'option')
+        for el_opt in els_opt:
+            if el_opt.get_attribute('value') == 'ttk':
+                try: el_opt.click()
+                except: raise Exception('Ошибка клика ТТК')
                 time.sleep(1)
+                f_ok = True
+                break
+        if f_ok == False: raise Exception('Ошибка Пользователя ТТК нет в списке')
 
-            els_art = driver.find_elements(By.TAG_NAME, 'article')
-            if len(els_art) != 1: raise Exception('Ошибка нет блока фильтр')
+        els = driver.find_elements(By.XPATH, '//input[@type="submit"]')
+        if len(els) != 1: raise Exception('Ошибка Нет кнопки Войти')
+        try: els[0].click()
+        except: raise Exception('Ошибка клика Войти')
+        time.sleep(5)
 
-            if first_pass:
-                # Вводим дату поиска
-                els_div = els_art[0].find_elements(By.XPATH, './/div[contains(@class, "OrderFiltersModal_Filter__createdate")]')
-                if len(els_div) != 1: raise Exception('Ошибка нет блока createdate')
-                els_btn = els_div[0].find_elements(By.XPATH, './/button[@data-testid="date-range-block-toggle"]')
-                if len(els_btn) != 1: raise Exception('Ошибка кнопки дата поиска')
-                try: els_btn[0].click()
-                except: raise Exception('Ошибка клика кнопки раскрытия блока даты')
-                time.sleep(2)
-                # Определяем начальную дату
-                els_dt = els_art[0].find_elements(By.TAG_NAME, 'article')
-                if len(els_dt) != 1: raise Exception('Ошибка нет блока дата')
-                els_min = els_dt[0].find_elements(By.XPATH, './/button[@data-testid="date-range-calendar-month-minus"]')
-                if len(els_min) != 1: raise Exception('Ошибка нет кнопки месяц назад')
-                # отмотаем назад 3 месяца
-                try:
-                    els_min[0].click()
-                    time.sleep(0.5)
-                    els_min[0].click()
-                    time.sleep(0.5)
-                    els_min[0].click()
-                    time.sleep(0.5)
-                except: raise Exception('Ошибка клика листания календаря')
-                # Кликаем 1 число
-                els_btn = els_dt[0].find_elements(By.XPATH, './/button[@data-testid="date-calendar-choose-day-0"]')
-                if len(els_btn) == 0: raise Exception('Ошибка 1 число')
-                try: els_btn[0].click()
-                except: raise Exception('Ошибка клика кнопки 1 число')
-                time.sleep(2)
-
-            # Вводим номер заявки
-            els_num = els_art[0].find_elements(By.XPATH, './/input[@data-testid="order-filter-number"]')
-            if len(els_num) != 1: raise Exception('Ошибка нет поля номера заявки')
-            if first_pass == False:
-                try:
-                    els_num[0].send_keys(Keys.CONTROL + 'a')
-                    time.sleep(0.2)
-                    els_num[0].send_keys(Keys.DELETE)
-                    time.sleep(0.2)
-                except: raise Exception('Ошибка удаления номера заявки')
-            try: els_num[0].send_keys(num)
-            except: raise Exception('Ошибка ввода номера заявки')
-            time.sleep(2)
-
-            # Проверим на ошибки
-            driver.implicitly_wait(1)
-            els_err = els_art[0].find_elements(By.XPATH, './/span[@data-testid="error-text"]')
-            if len(els_err) > 0:
-                lst_err = []
-                for el_err in els_err:
-                    lst_err.append(el_err.text)
+        ###################### Страница Главная ######################
+        # проход по всем заявкам
+        for deal in lst_deal:
+            time.sleep(3)
+            num = deal.get('num')
+            if not num:
+                deal['num'] = 'Не определен'
                 deal['pv_status'] = 'deal_number_error'
-                deal['comment'] = ', '.join(lst_err)
-                num_error = True
+                deal['comment'] = 'Номер отсутствует'
+                continue
+            num = num.strip()
+
+            isok = re.fullmatch(r'^(?:A|А)-\d+', num)
+            if not isok:
+                deal['pv_status'] = 'deal_number_error'
+                deal['comment'] = 'Номер не корректен'
                 continue
 
-            # Кликаем применить фильтр
-            els_aplf = els_art[0].find_elements(By.XPATH, './/button[@data-testid="order-filter-apply"]')
-            if len(els_aplf) != 1: raise Exception('Ошибка нет кнопки применить фильтр')
-            try: els_aplf[0].click()
-            except: raise Exception('Ошибка клика кнопки применить фильтр')
-            wait_spinner(driver)  # Ожидаем спинер
-            first_pass = False
-            num_error = False
+            # Ищем поле поиска
+            els_f = driver.find_elements(By.XPATH, '//input[@class="w-text change_inited"]')
+            if len(els_f) == 0: raise Exception('нет поля поиска')
+            try: 
+                els_f[0].send_keys(Keys.CONTROL + 'a')
+                time.sleep(0.2)
+                els_f[0].send_keys(Keys.DELETE)
+                time.sleep(0.2)
+                els_f[0].send_keys(num)
+            except: raise Exception('Ошибка ввода номера заявки')
+            time.sleep(3)
 
-            # Смотрим результат
-            els_row = driver.find_elements(By.XPATH, '//div[contains(@class, "OrderList_OrderList__Table__Row__")]')
-            if len(els_row) == 0:
-                deal['pv_status'] = 'not_found'
-                deal['comment'] = 'Заявка в ЛК не найдена'
-            elif len(els_row) == 1:
-                els_td = els_row[0].find_elements(By.XPATH, './/div[contains(@class, "OrderList_OrderList__Table__Row_Item__")]')
-                if len(els_td) != 9: raise Exception('Ошибка формата строки таблицы')
-                mts_data = els_td[6].text
-                mts_comment = els_td[8].text
-                deal['pv_status'] = mts_comment
-                deal['comment'] = mts_comment
-                if mts_comment == 'Успешное подключение': deal['date_connect'] = mts_data
-                if mts_comment.find('FIX_Отказ.') >= 0: deal['pv_status'] = 'FIX_Отказ.'
-            else:
-                deal['pv_status'] = f'many_rows {len(els_row)}'
-                deal['comment'] = 'несколько заявок по 1 номеру'
-            log_mess = f'ПВ {provider}: {deal["ID"]}|{num}|{deal.get("pv_status", "")}|{deal.get("date_connect", "")}|{deal.get("comment", "")}'
-            logger.info(log_mess)
+            # Ищем ссылку управления услугами
+            el_a = find_link(driver)
+            if el_a == None:
+                # Отмечаем поиск в истории
+                els_ch = driver.find_elements(By.XPATH, '//input[@name="search_in_history"]')
+                if len(els_ch) == 0: raise Exception('нет чека истории')
+                try: els_ch[0].click()
+                except: raise Exception('Ошибка клика чека истории')
+                time.sleep(3)
+                el_a = find_link(driver)
+            
+            if el_a == None:
+                deal['pv_status'] = 'Заявка не найдена'
+                continue
+            try: el_a.click()
+            except: raise Exception('Ошибка клика ссылки на страницу заявки')
+            time.sleep(5)
 
+            # Страница заявки
+            # смотрим таблицу в шапке
+            els_tbl = driver.find_elements(By.XPATH, '//table[contains(@class, "listtable object-info control")]')
+            if len(els_tbl) == 0:
+                deal['pv_status'] = 'Ошибка парсинга'
+                deal['comment'] = 'Нет сводной таблицы'
+                continue
+            # Берем статус
+            els_s = els_tbl[0].find_elements(By.XPATH, './/td[@data-name="result"]')
+            if len(els_s) == 0:
+                deal['pv_status'] = 'Ошибка парсинга'
+                deal['comment'] = 'Нет ячейки статуса'
+                continue
+            status = els_s[0].text.strip()
+            if status == 'Новый':
+                # print(num, 'Новый, пропускаем')
+                deal['pv_status'] = 'Новый'
+                continue
+            elif status != 'Завершен':
+                deal['pv_status'] = status
+                deal['comment'] = 'Неизвестный статус, пропущено'
+                print(num, status, 'Неизвестный статус, пропущено')
+                continue
+            
+            # Берем дату окончания
+            els_d = els_tbl[0].find_elements(By.XPATH, './/td[@data-name="end_dt"]')
+            if len(els_d) == 0:
+                deal['pv_status'] = 'Ошибка парсинга'
+                deal['comment'] = 'Нет ячейки даты'
+                continue
+            deal['date_connect'] = els_d[0].text
+            
+            # Раскрываем выполненные задачи
+            els_a = driver.find_elements(By.XPATH, '//a[contains(@onclick, "Развернуть")]')
+            if len(els_a) == 0:
+                deal['pv_status'] = 'Ошибка парсинга'
+                deal['comment'] = 'Нет ссылки раскрыть'
+                continue
+            try: els_a[0].click()
+            except: raise Exception('Ошибка клика раскрыть')
             time.sleep(1)
+            
+            # Анализируем таблицу Выполненные задачи
+            els_tbl = driver.find_elements(By.XPATH, '//table[@class="flatten"]')
+            if len(els_a) == 0:
+                deal['pv_status'] = 'Ошибка парсинга'
+                deal['comment'] = 'Нет таблицы Выполненные задачи'
+                continue
+            els_tr = els_tbl[0].find_elements(By.TAG_NAME, 'tr')
+            pv_status = ''
+            for el_tr in els_tr:
+                els_td = el_tr.find_elements(By.TAG_NAME, 'td')
+                txt_st = els_td[3].text.strip()
+                if txt_st in status_pv_srm:
+                    pv_status = txt_st
+                    break
+            if pv_status == '':
+                deal['pv_status'] = 'Завершено'
+                deal['comment'] = 'Состояние завершения не определено'
+                continue
+            deal['pv_status'] = pv_status
+            
+            # Если отказ смотрим комментарий
+            if status_pv_srm[pv_status] == 'NEW':
+                els_apr = driver.find_elements(By.XPATH, '//a[@href="#remarks"]')
+                if len(els_apr) == 0:
+                    deal['comment'] = 'Ошибка: Нет ссылки комментарий'
+                    continue
+                try: els_apr[0].click()
+                except: raise Exception('Ошибка клика комментарий')
+                time.sleep(5)
+            
+                els_note = driver.find_elements(By.XPATH, '//td[(@class="note-body") and (@data-name="note")]')
+                if len(els_note) > 0: deal['comment'] = re.sub("\n|\r", ' ', els_note[-1].text)
+                else: deal['comment'] = 'Комментарий не найден'
+            
+            time.sleep(1)
+        
 
         #===========
         # time.sleep(10)
@@ -392,18 +426,17 @@ def run_check_deals(logger, tlg_chat, tlg_token, by_days=60):
         logger.info(log_mess); print(log_mess)
         return
 
-    log_mess = f'ПВ {provider}: Исходный список: {len(lst_deal)} шт.'
-    logger.info(log_mess); print(log_mess)
-    # print(json.dumps(lst_deal, sort_keys=True, indent=2, ensure_ascii=False))
-
     # Соберем нормальный список сделок
     new_lst_deal = [{'ID': dl.get('ID'), 'num': dl.get('UF_CRM_5903C16BDF7A7')} for dl in lst_deal]
-    log_mess = f'ПВ {provider}: Нормализованный список: {len(new_lst_deal)} шт.'
+    log_mess = f'ПВ {provider}: Исходный список: {len(new_lst_deal)} шт.'
     logger.info(log_mess); print(log_mess)
+    # print(json.dumps(lst_deal, sort_keys=True, indent=2, ensure_ascii=False))
 
     # Проверим статус сделок у ПВ
     e, lst_deal = get_deal_status(logger, new_lst_deal, access, status_for_comment)
     # print(json.dumps(lst_deal, sort_keys=True, indent=2, ensure_ascii=False))
+    # with open('lst_deal.json', 'w', encoding='utf-8') as out_file:
+        # json.dump(lst_deal, out_file, ensure_ascii=False, indent=4)
     if e:
         log_mess = f'ПВ {provider}: Ошибка при проверке статуса сделок: {e}'
         logger.info(log_mess); print(log_mess)
@@ -413,9 +446,9 @@ def run_check_deals(logger, tlg_chat, tlg_token, by_days=60):
     change = 0
     for deal in lst_deal:
         status = deal.get('pv_status')
-        if status and status in status_mts_srm:
-            # print(deal.get('ID'), status, name_status_crm[status_mts_srm[status]])
-            deal['crm_status'] = status_mts_srm[status]
+        if status and status in status_pv_srm:
+            # print(deal.get('ID'), status, name_status_crm[status_pv_srm[status]])
+            deal['crm_status'] = status_pv_srm[status]
             e = send_crm_deal_stage(deal, deal['crm_status'])
             # e = False
             if e:
@@ -452,24 +485,19 @@ if __name__ == '__main__':
     logging.getLogger('undetected_chromedriver.patcher').setLevel(logging.CRITICAL)  # чтобы узнать кто постит в лог добавить в format :%(name)s:
     logger = logging.getLogger(__name__)
 
-    run_check_deals(logger, MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN)
-    # run_check_deals(logger, MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN, 1)
+    # run_check_deals(logger, MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN, 10)
+    # run_check_deals(logger, MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN, 3)
     # run_check_deals(logger, PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN, 1)
     # run_check_deals(logger, PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN)
     # run_check_deals(logger, MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN)
-    # access = {  # Доступы к ПВ
-        # 'url': 'https://urmdf.ssl.mts.ru/wd/hub',
-        # 'login': 'GRYURYEV',
-        # 'password': 'UcoTWY'
-    # }
 
     # lst_deal = []
-    # lst_deal.append({'ID': '142632', 'num': '1-729819687456'})
-    # lst_deal.append({'ID': '142884', 'num': '1'})
-    # lst_deal.append({'ID': '142632', 'num': '1-729822687456'})
-    # lst_deal.append({'ID': '142884', 'num': '1'})
-    # lst_deal.append({'ID': '142632', 'num': '1-729819687336'})
-    # # lst_deal.append({'ID': '143114', 'num': '1'})
+    # lst_deal.append({'ID': '142632', 'num': 'А-65771557'})
+    # lst_deal.append({'ID': '142884', 'num': 'А-65772345'})
+    # lst_deal.append({'ID': '142884', 'num': 'А-65773445'})
+    # # lst_deal.append({'ID': '142632', 'num': 'А-657041994555'})
+    # # lst_deal.append({'ID': '142632', 'num': 'А-657041994555f'})
+    # # # lst_deal.append({'ID': '143114', 'num': '1'})
     # e, lst_deal = get_deal_status(logger, lst_deal, access, status_for_comment)
     # if e: print(e)
 

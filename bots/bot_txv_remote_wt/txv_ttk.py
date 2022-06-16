@@ -1,4 +1,4 @@
-import os, time, json, requests  # pip install requests
+import os, re, time, json, requests  # pip install requests
 from datetime import datetime
 from selenium import webdriver  # $ pip install selenium
 from selenium.webdriver.chrome.service import Service
@@ -180,11 +180,17 @@ def ordering_house(in_house: str):  # Преобразование строки 
         На входе строка с номером дома
         Заменяем двойные пробелы на одинарные и преобразуем в нижний регистр
         
-        
         На выходе кортеж (N, str_num) где N первая цифра дома,
         а str_num преобразованный полный номер
         Если ошибка парсинга - ('', 'тип ошибки')
         
+        >>> ordering_house('2')
+        ('2', '2')
+        
+        >>> ordering_house('A')
+        ('', 'Номер из одной буквы')
+        
+        Запуск теста: $> python -m doctest txv_ttk.py
     '''
     in_house = in_house.strip()
     if len(in_house) == 0: return ('', 'Не задан номер')
@@ -227,7 +233,19 @@ def ordering_house(in_house: str):  # Преобразование строки 
     
     return ('', 'Номер не распознан')
 
-def is_russian(s: str) -> bool:  # Проверка строки: Можно использовать буквы кириллического алфавита и символы “-” и пробел
+def is_russian(s: str) -> bool:  # Проверка строки на русские символы
+    """
+        Проверка входящей строки на наличие в ней только
+        букв кириллического алфавита и символы `-` и пробел
+        Запуск теста: $> python -m doctest txv_ttk.py
+    
+        >>> is_russian('абвгд')
+        True
+        
+        >>> is_russian('аовгкjkl')
+        False
+        
+    """
     return bool(re.fullmatch(r'(?i)[а-яё -]+', s))
 
 def wait_spinner(driver):  # Ожидаем крутящийся спинер

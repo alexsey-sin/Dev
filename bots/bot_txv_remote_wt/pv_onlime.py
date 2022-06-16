@@ -46,13 +46,6 @@ name_status_crm = {
     2: 'Подключен',
     'NEW': 'Ошибки',
 }
-status_for_comment = [  # Статусы когда требуется взять коментарий
-    'Новая',
-    'Отменена',
-    'Фин.недозвон',
-    'Возвращено',
-    'Ожидание ПТВ',
-]
 
 
 def get_deals_crm(pv, from_data, to_date):
@@ -159,7 +152,7 @@ def get_OrderStatus(token, num):
         return f'Ошибка get_OrderStatus: try: requests.get: {e}', []
 
 # =========================================================
-def get_deal_status(logger, lst_deal, access, status_for_comment):
+def get_deal_status(logger, lst_deal, access):
     try:
         # Получаем токен
         cnt_try = 5
@@ -180,6 +173,7 @@ def get_deal_status(logger, lst_deal, access, status_for_comment):
             l_sub = re.findall('(?:^|\D)1\d{6}(?:\D|$)', str(num))  # (?: начало строки | не цифра) номер с 1 всего 7 знаков (?: конец строки | не цифра)
             if len(l_sub) > 0: num = l_sub[0].strip()
             else:
+                if num == None: deal['num'] = 'отсутствует'
                 deal['pv_status'] = 'deal_number_error'
                 deal['comment'] = 'Номер заявки по шаблону не найден'
                 continue
@@ -342,7 +336,7 @@ def run_check_deals(logger, tlg_chat, tlg_token, by_days=60):
         # json.dump(new_lst_deal, out_file, ensure_ascii=False, indent=4)
 
     # Проверим статус сделок у ПВ
-    e, lst_deal = get_deal_status(logger, new_lst_deal, access, status_for_comment)
+    e, lst_deal = get_deal_status(logger, new_lst_deal, access)
     # print(json.dumps(lst_deal, sort_keys=True, indent=2, ensure_ascii=False))
     if e:
         log_mess = f'ПВ {provider}: Ошибка при проверке статуса сделок: {e}'
@@ -361,8 +355,8 @@ def run_check_deals(logger, tlg_chat, tlg_token, by_days=60):
         if status and status in status_pv_srm:
             print(deal.get('ID'), status, name_status_crm[status_pv_srm[status]])
             deal['crm_status'] = status_pv_srm[status]
-            e = send_crm_deal_stage(deal, deal['crm_status'])
-            # e = False
+            # e = send_crm_deal_stage(deal, deal['crm_status'])
+            e = False
             if e:
                 log_mess = f'ПВ {provider}: Ошибка при обновлении статуса сделки в срм: {e}'
                 logger.info(log_mess); print(log_mess)
@@ -379,7 +373,6 @@ def run_check_deals(logger, tlg_chat, tlg_token, by_days=60):
     tlg_mess = f'ПВ {provider}:\nСтатус сделок изменен\nв {change} из {len(lst_deal)}\n'
     str_today = datetime.today().strftime('%d.%m.%Y')
     tlg_mess += f'http://django.domconnect.ru/api/get_pv_result/{pv_dc_code}/{str_today}'
-    if e: tlg_mess += f'\nОшибка архивации: {e}'
 
     e = send_telegram(tlg_chat, tlg_token, tlg_mess)
     logger.info(tlg_mess.replace('\n', ''))
@@ -402,9 +395,9 @@ if __name__ == '__main__':
     logging.getLogger('undetected_chromedriver.patcher').setLevel(logging.CRITICAL)  # чтобы узнать кто постит в лог добавить в format :%(name)s:
     logger = logging.getLogger(__name__)
 
-    run_check_deals(logger, MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN, 3)
+    # run_check_deals(logger, MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN, 3)
     # run_check_deals(logger, PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN, 1)
-    # run_check_deals(logger, MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN)
+    run_check_deals(logger, MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN)
     # access = {  # Доступы к ПВ
         # 'url': 'https://urmdf.ssl.mts.ru/wd/hub',
         # 'login': 'GRYURYEV',
@@ -421,7 +414,7 @@ if __name__ == '__main__':
 
 
 
-    # e, lst_deal = get_deal_status(logger, lst_deal, access, status_for_comment)
+    # e, lst_deal = get_deal_status(logger, lst_deal, access)
     # if e: print(e)
 
     # print(json.dumps(lst_deal, sort_keys=True, indent=2, ensure_ascii=False))

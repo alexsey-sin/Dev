@@ -14,6 +14,7 @@ from pv_beeline import run_check_deals as run_pv_beeline
 from pv_domru import run_check_deals as run_pv_domru
 from pv_mts import run_check_deals as run_pv_mts
 from pv_onlime import run_check_deals as run_pv_onlime
+from pv_ttk import run_check_deals as run_pv_ttk
 
 # личный бот @infra     TELEGRAM_CHAT_ID, TELEGRAM_TOKEN
 TELEGRAM_CHAT_ID = '1740645090'
@@ -35,6 +36,7 @@ time_pv_beeline = {'h': 1, 'm': 10, 's': 0}
 time_pv_domru = {'h': 1, 'm': 20, 's': 0}
 time_pv_mts = {'h': 1, 'm': 30, 's': 0}
 time_pv_onlime = {'h': 1, 'm': 40, 's': 0}
+time_pv_ttk = {'h': 1, 'm': 50, 's': 0}
 
 logging.basicConfig(
     level=logging.INFO,     # DEBUG, INFO, WARNING, ERROR и CRITICAL По возрастанию
@@ -80,6 +82,7 @@ if __name__ == '__main__':
     thread_name_pv_domru = 'pv_domru'
     thread_name_pv_mts = 'pv_mts'
     thread_name_pv_onlime = 'pv_onlime'
+    thread_name_pv_ttk = 'pv_ttk'
 
     
     while True:
@@ -140,10 +143,22 @@ if __name__ == '__main__':
                     if thread.getName() == thread_name_pv_onlime: is_run = True; break
                 if is_run == False:
                     logger.info(f'Start {thread_name_pv_onlime} thread')
-                    # th = threading.Thread(target=run_pv_mts, name=thread_name_pv_onlime, args=(logger, TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
-                    th = threading.Thread(target=run_pv_mts, name=thread_name_pv_onlime, args=(logger, PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN))
+                    # th = threading.Thread(target=run_pv_onlime, name=thread_name_pv_onlime, args=(logger, TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
+                    th = threading.Thread(target=run_pv_onlime, name=thread_name_pv_onlime, args=(logger, PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN))
                     th.start()
                     print(f'Bot: {thread_name_pv_onlime} is running.')
+                time.sleep(1)
+            
+            if its_time(time_pv_ttk):
+                is_run = False
+                for thread in threading.enumerate():
+                    if thread.getName() == thread_name_pv_ttk: is_run = True; break
+                if is_run == False:
+                    logger.info(f'Start {thread_name_pv_ttk} thread')
+                    # th = threading.Thread(target=run_pv_ttk, name=thread_name_pv_ttk, args=(logger, TELEGRAM_CHAT_ID, TELEGRAM_TOKEN))
+                    th = threading.Thread(target=run_pv_ttk, name=thread_name_pv_ttk, args=(logger, PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN))
+                    th.start()
+                    print(f'Bot: {thread_name_pv_ttk} is running.')
                 time.sleep(1)
             
             continue

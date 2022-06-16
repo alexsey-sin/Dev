@@ -517,7 +517,6 @@ def run_check_deals(logger, tlg_chat, tlg_token, by_days=60):
     tlg_mess = f'ПВ {provider}:\nСтатус сделок изменен\nв {change} из {len(lst_deal)}\n'
     str_today = datetime.today().strftime('%d.%m.%Y')
     tlg_mess += f'http://django.domconnect.ru/api/get_pv_result/{pv_dc_code}/{str_today}'
-    if e: tlg_mess += f'\nОшибка архивации: {e}'
     
     e = send_telegram(tlg_chat, tlg_token, tlg_mess)
     logger.info(tlg_mess.replace('\n', ''))
