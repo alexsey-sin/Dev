@@ -571,8 +571,6 @@ def send_telegram(chat: str, token: str, text: str):
     return r.status_code
 
 def run_txv_mgts(tlg_chat, tlg_token):
-    tlg_mess = ''
-    
     # личный бот @infra
     TELEGRAM_CHAT_ID = '1740645090'
     TELEGRAM_TOKEN = '2009560099:AAHtYot6EOHh_qr9EUoCoczQhjyRdulKHYo'
@@ -590,6 +588,7 @@ def run_txv_mgts(tlg_chat, tlg_token):
 
     # Перелистываем список словарей с заявками
     for txv_dict in txv_list:
+        tlg_mess = ''
         rez, data = get_txv(txv_dict)
         data['bot_log'] = rez
         e, up_status = send_crm_txv(data, opsos)  # ответ в CRM
@@ -634,8 +633,8 @@ if __name__ == '__main__':
 
     txv_dict = {
         'pv_code': pv_code,
-        'login': 'ESubbotin',
-        'password': 'sr@8Cjmu',
+        'login': 'MChumakova',
+        'password': 'L4gi5cwJ',
         'login_2': 'MChumakova',
         'password_2': 'Sjod@!5812',
         
@@ -711,5 +710,5 @@ if __name__ == '__main__':
     # end_time = datetime.now()
     # time_str = '\nDuration: {}'.format(end_time - start_time)
     # print(time_str)
-    # limit_request_line
+    # limit_request_line  
 

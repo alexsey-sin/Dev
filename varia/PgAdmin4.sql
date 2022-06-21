@@ -228,7 +228,6 @@ WHERE
 
 
 
-UPDATE public.api_txv
 SET status = 0, bot_log = ''
 WHERE pv_code = 7 AND status = 2 AND bot_log LIKE '%Учетная запись пользователя заблокирована%'
 
@@ -237,4 +236,16 @@ SET status = 0, bot_log = ''
 WHERE pv_code = 3 AND status = 2 AND bot_log LIKE '%Message: binary is not a Firefox executable%'
 
 SELECT count(*) FROM public.api_txv
-WHERE pv_code = 1 AND bot_log LIKE '%активный договор%'
+WHERE pv_code = 7 AND status = 2 AND bot_log LIKE '%нет поля login/Ошибка%'
+
+
+UPDATE public.api_txv
+SET status = 0, bot_log = '', login = 'MChumakova', password = 'L4gi5cwJ'
+WHERE pv_code = 7 AND status = 2 AND bot_log LIKE '%нет поля login/Ошибка%'
+
+
+SELECT count(*) FROM public.api_txv
+WHERE available_connect = '' AND bot_log = ''
+
+
+

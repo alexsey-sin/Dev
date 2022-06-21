@@ -67,8 +67,13 @@ def set_txv(request):
             old_date = datetime.today() - timedelta(days=3)  # __lte <= ;  __gte >=
             old_txv = TxV.objects.filter(pv_code=txv.pv_code, region=region, city=city, street=street, house=house, apartment=apartment, pub_date__gte=old_date)
             if len(old_txv) > 0:
-                ans_mes = old_txv[0].available_connect
-                if len(ans_mes) == 0: ans_mes = old_txv[0].bot_log
+                old_status = old_txv[0].status
+                if old_status in [0,1]:
+                    ans_mes = 'Предыдущий запрос по этому адресу еще не обработан, сделайте запрос позднее'
+                else:
+                    ans_mes = old_txv[0].available_connect
+                    if len(ans_mes) == 0: ans_mes = old_txv[0].bot_log
+                    if len(ans_mes) == 0: ans_mes = 'Нет данных'
                 return HttpResponse(f'txv already exists: \n{ans_mes}.', status=status.HTTP_200_OK)
 
             txv.status = 0

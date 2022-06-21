@@ -9,3 +9,5 @@ for deal in lst_deal:
     if type(num_deal) != str: num_deal = str(num_deal)
     num_deal = num_deal[:50]
     print(num_deal)
+
+

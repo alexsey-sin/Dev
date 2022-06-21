@@ -163,34 +163,71 @@ def get_deal_status(logger, lst_deal, access, status_for_comment):
         first_pass = True
         num_error = False
         for deal in lst_deal:
-            driver.implicitly_wait(5)
-            num = deal.get('num').strip()
+            driver.implicitly_wait(20)
+            # Номер номер должен быть в формате: 1-112233445566
+            num = deal.get('num')
+            if not num:
+                deal['num'] = 'Не определен'
+                deal['pv_status'] = 'deal_number_error'
+                deal['comment'] = 'Номер отсутствует'
+                continue
+            num = num.strip()
+
+            isok = re.fullmatch(r'^1-\d{12}$', num)
+            if not isok:
+                deal['pv_status'] = 'deal_number_error'
+                deal['comment'] = 'Номер номер должен быть в формате: 1-112233445566'
+                continue
 
             if num_error == False:
                 # Ищем кнопку ЕЩЁ
                 els = driver.find_elements(By.XPATH, '//div[@data-testid="order-list-show-filters"]')
-                if len(els) != 1: raise Exception('Ошибка кнопки ЕЩЁ')
+                if len(els) != 1:
+                    deal['pv_status'] = 'Ошибка парсинга'
+                    deal['comment'] = 'Ошибка нет кнопки ЕЩЁ'
+                    continue
                 try: els[0].click()
-                except: raise Exception('Ошибка клика кнопки ЕЩЁ')
+                except:
+                    deal['pv_status'] = 'Ошибка парсинга'
+                    deal['comment'] = 'Ошибка клика кнопки ЕЩЁ'
+                    continue
                 time.sleep(1)
 
             els_art = driver.find_elements(By.TAG_NAME, 'article')
-            if len(els_art) != 1: raise Exception('Ошибка нет блока фильтр')
+            if len(els_art) != 1:
+                deal['pv_status'] = 'Ошибка парсинга'
+                deal['comment'] = 'Ошибка нет блока фильтр'
+                continue
 
             if first_pass:
                 # Вводим дату поиска
                 els_div = els_art[0].find_elements(By.XPATH, './/div[contains(@class, "OrderFiltersModal_Filter__createdate")]')
-                if len(els_div) != 1: raise Exception('Ошибка нет блока createdate')
+                if len(els_div) != 1:
+                    deal['pv_status'] = 'Ошибка парсинга'
+                    deal['comment'] = 'Ошибка нет блока createdate'
+                    continue
                 els_btn = els_div[0].find_elements(By.XPATH, './/button[@data-testid="date-range-block-toggle"]')
-                if len(els_btn) != 1: raise Exception('Ошибка кнопки дата поиска')
+                if len(els_btn) != 1:
+                    deal['pv_status'] = 'Ошибка парсинга'
+                    deal['comment'] = 'Ошибка кнопки дата поиска'
+                    continue
                 try: els_btn[0].click()
-                except: raise Exception('Ошибка клика кнопки раскрытия блока даты')
+                except:
+                    deal['pv_status'] = 'Ошибка парсинга'
+                    deal['comment'] = 'Ошибка клика кнопки раскрытия блока даты'
+                    continue
                 time.sleep(2)
                 # Определяем начальную дату
                 els_dt = els_art[0].find_elements(By.TAG_NAME, 'article')
-                if len(els_dt) != 1: raise Exception('Ошибка нет блока дата')
+                if len(els_dt) != 1:
+                    deal['pv_status'] = 'Ошибка парсинга'
+                    deal['comment'] = 'Ошибка нет блока дата'
+                    continue
                 els_min = els_dt[0].find_elements(By.XPATH, './/button[@data-testid="date-range-calendar-month-minus"]')
-                if len(els_min) != 1: raise Exception('Ошибка нет кнопки месяц назад')
+                if len(els_min) != 1:
+                    deal['pv_status'] = 'Ошибка парсинга'
+                    deal['comment'] = 'Ошибка нет кнопки месяц назад'
+                    continue
                 # отмотаем назад 3 месяца
                 try:
                     els_min[0].click()
@@ -199,26 +236,40 @@ def get_deal_status(logger, lst_deal, access, status_for_comment):
                     time.sleep(0.5)
                     els_min[0].click()
                     time.sleep(0.5)
-                except: raise Exception('Ошибка клика листания календаря')
+                except:
+                    deal['pv_status'] = 'Ошибка парсинга'
+                    deal['comment'] = 'Ошибка клика листания календаря'
+                    continue
                 # Кликаем 1 число
                 els_btn = els_dt[0].find_elements(By.XPATH, './/button[@data-testid="date-calendar-choose-day-0"]')
-                if len(els_btn) == 0: raise Exception('Ошибка 1 число')
+                if len(els_btn) == 0:
+                    deal['pv_status'] = 'Ошибка парсинга'
+                    deal['comment'] = 'Ошибка 1 число'
+                    continue
                 try: els_btn[0].click()
-                except: raise Exception('Ошибка клика кнопки 1 число')
+                except:
+                    deal['pv_status'] = 'Ошибка парсинга'
+                    deal['comment'] = 'Ошибка клика кнопки 1 число'
+                    continue
                 time.sleep(2)
+                first_pass = False
 
             # Вводим номер заявки
             els_num = els_art[0].find_elements(By.XPATH, './/input[@data-testid="order-filter-number"]')
-            if len(els_num) != 1: raise Exception('Ошибка нет поля номера заявки')
-            if first_pass == False:
-                try:
-                    els_num[0].send_keys(Keys.CONTROL + 'a')
-                    time.sleep(0.2)
-                    els_num[0].send_keys(Keys.DELETE)
-                    time.sleep(0.2)
-                except: raise Exception('Ошибка удаления номера заявки')
-            try: els_num[0].send_keys(num)
-            except: raise Exception('Ошибка ввода номера заявки')
+            if len(els_num) != 1:
+                deal['pv_status'] = 'Ошибка парсинга'
+                deal['comment'] = 'Ошибка нет поля номера заявки'
+                continue
+            try:
+                els_num[0].send_keys(Keys.CONTROL + 'a')
+                time.sleep(0.2)
+                els_num[0].send_keys(Keys.DELETE)
+                time.sleep(0.2)
+                els_num[0].send_keys(num)
+            except:
+                deal['pv_status'] = 'Ошибка парсинга'
+                deal['comment'] = 'Ошибка ввода номера заявки'
+                continue
             time.sleep(2)
 
             # Проверим на ошибки
@@ -233,13 +284,19 @@ def get_deal_status(logger, lst_deal, access, status_for_comment):
                 num_error = True
                 continue
 
+            driver.implicitly_wait(20)
             # Кликаем применить фильтр
             els_aplf = els_art[0].find_elements(By.XPATH, './/button[@data-testid="order-filter-apply"]')
-            if len(els_aplf) != 1: raise Exception('Ошибка нет кнопки применить фильтр')
+            if len(els_aplf) != 1:
+                deal['pv_status'] = 'Ошибка парсинга'
+                deal['comment'] = 'Ошибка нет кнопки применить фильтр'
+                continue
             try: els_aplf[0].click()
-            except: raise Exception('Ошибка клика кнопки применить фильтр')
+            except:
+                deal['pv_status'] = 'Ошибка парсинга'
+                deal['comment'] = 'Ошибка клика кнопки применить фильтр'
+                continue
             wait_spinner(driver)  # Ожидаем спинер
-            first_pass = False
             num_error = False
 
             # Смотрим результат
@@ -249,7 +306,10 @@ def get_deal_status(logger, lst_deal, access, status_for_comment):
                 deal['comment'] = 'Заявка в ЛК не найдена'
             elif len(els_row) == 1:
                 els_td = els_row[0].find_elements(By.XPATH, './/div[contains(@class, "OrderList_OrderList__Table__Row_Item__")]')
-                if len(els_td) != 9: raise Exception('Ошибка формата строки таблицы')
+                if len(els_td) != 9:
+                    deal['pv_status'] = 'Ошибка парсинга'
+                    deal['comment'] = 'Ошибка формата строки таблицы'
+                    continue
                 mts_data = els_td[6].text
                 mts_comment = els_td[8].text
                 deal['pv_status'] = mts_comment

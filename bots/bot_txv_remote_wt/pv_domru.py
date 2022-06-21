@@ -115,7 +115,7 @@ def get_deal_status(logger, lst_deal, access, status_for_comment):
         # EXE_PATH = r'c:/Dev/bot_opsos/driver/firefoxdriver.exe'
         # driver = webdriver.Firefox(executable_path=EXE_PATH)
 
-        driver.implicitly_wait(10)
+        driver.implicitly_wait(20)
         driver.get(access.get('url'))
         time.sleep(3)
         
@@ -164,7 +164,7 @@ def get_deal_status(logger, lst_deal, access, status_for_comment):
         driver.switch_to.default_content()  # Загружаем родительский фрейм
         time.sleep(1)
         driver.switch_to.frame('mainFrame')  # Загружаем фрейм
-        time.sleep(3)
+        time.sleep(5)
         
         # Отмечаем чек Выбрать все города
         els = driver.find_elements(By.XPATH, '//input[@id="toggle_cities"]')
@@ -223,6 +223,13 @@ def get_deal_status(logger, lst_deal, access, status_for_comment):
         # проход по всем заявкам
         for deal in lst_deal:
             num = deal.get('num')
+            if not num:
+                deal['num'] = 'Не определен'
+                deal['pv_status'] = 'deal_number_error'
+                deal['comment'] = 'Номер отсутствует'
+                continue
+            num = num.strip()
+            
             # Проход по полученному списку
             lst_fd = []  # сюда соберем найденные данные
             for rez in lst_rez:
@@ -460,8 +467,8 @@ if __name__ == '__main__':
     logger = logging.getLogger(__name__)
     
     # run_check_deals(logger, MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN, 1)
-    run_check_deals(logger, PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN)
-    # run_check_deals(logger, MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN)
+    # run_check_deals(logger, PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN)
+    run_check_deals(logger, MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN)
     
     # # print(json.dumps(lst_deal, sort_keys=True, indent=2, ensure_ascii=False))
     # lst_deal = []

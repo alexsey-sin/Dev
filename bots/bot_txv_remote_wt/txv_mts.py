@@ -8,8 +8,8 @@ import undetected_chromedriver as webdriver  # pip install undetected-chromedriv
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver import ChromeOptions
 
-# url_host = 'http://127.0.0.1:8000/'
-url_host = 'http://django.domconnect.ru/'
+url_host = 'http://127.0.0.1:8000/'
+# url_host = 'http://django.domconnect.ru/'
 opsos = 'МТС'
 pv_code = 3
 
@@ -575,8 +575,6 @@ def send_telegram(chat: str, token: str, text: str):
     return r.status_code
 
 def run_txv_mts(tlg_chat, tlg_token):
-    tlg_mess = ''
-    
     # личный бот @infra
     TELEGRAM_CHAT_ID = '1740645090'
     TELEGRAM_TOKEN = '2009560099:AAHtYot6EOHh_qr9EUoCoczQhjyRdulKHYo'
@@ -594,6 +592,7 @@ def run_txv_mts(tlg_chat, tlg_token):
 
     # Перелистываем список словарей с заявками
     for txv_dict in txv_list:
+        tlg_mess = ''
         rez, data = get_txv(txv_dict)
         data['bot_log'] = rez
         e, up_status = send_crm_txv(data, opsos)  # ответ в CRM
@@ -657,7 +656,7 @@ if __name__ == '__main__':
     # print(json.dumps(data, sort_keys=True, indent=2, ensure_ascii=False))
     
     
-    # set_txv_to_dj_domconnect(pv_code)
+    set_txv_to_dj_domconnect(pv_code)
     # rez, txv_list = get_txv_in_dj_domconnect(pv_code)
     # for txv_dict in txv_list:
         # for k, v in txv_dict.items():

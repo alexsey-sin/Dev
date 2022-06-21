@@ -314,8 +314,6 @@ def send_telegram(chat: str, token: str, text: str):
     return r.status_code
 
 def run_txv_multi_regions(tlg_chat, tlg_token):
-    tlg_mess = ''
-    
     # личный бот @infra
     TELEGRAM_CHAT_ID = '1740645090'
     TELEGRAM_TOKEN = '2009560099:AAHtYot6EOHh_qr9EUoCoczQhjyRdulKHYo'
@@ -345,6 +343,7 @@ def run_txv_multi_regions(tlg_chat, tlg_token):
 
     # Перелистываем список словарей с заявками
     for query in querys:
+        tlg_mess = ''
         rez, query = get_txv(query, accesses)
         if rez: query['bot_log'] = f'{rez}\n' + query['bot_log']
         e = send_crm_txv(query, pv_name)  # ответ в CRM

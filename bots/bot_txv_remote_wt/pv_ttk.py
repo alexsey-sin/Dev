@@ -31,6 +31,7 @@ access = {  # Доступы к ПВ
 status_pv_srm = {  # Коды статусов: ТТК = СРМ
     'Работы выполнены': 2,  # Подключен
     'Абонент отказался': 'NEW',  # Ошибки + коммент
+    'Отказ': 'NEW',  # Ошибки + коммент
 }
 name_status_crm = {
     2: 'Подключен',
@@ -117,7 +118,7 @@ def find_link(driver):
             if len(els_a) > 0:
                 for el_a in els_a:
                     if el_a.text.find('[Управление услугами]') >= 0: return el_a
-
+                return els_a[0]
     return None
 
 # =========================================================
@@ -191,33 +192,50 @@ def get_deal_status(logger, lst_deal, access, status_for_comment):
 
             # Ищем поле поиска
             els_f = driver.find_elements(By.XPATH, '//input[@class="w-text change_inited"]')
-            if len(els_f) == 0: raise Exception('нет поля поиска')
-            try: 
+            if len(els_f) == 0:
+                deal['pv_status'] = 'Ошибка парсинга'
+                deal['comment'] = 'Нет поля поиска'
+                continue
+            try:
+                els_f[0].click()
+                time.sleep(0.5)
                 els_f[0].send_keys(Keys.CONTROL + 'a')
-                time.sleep(0.2)
+                time.sleep(0.5)
                 els_f[0].send_keys(Keys.DELETE)
-                time.sleep(0.2)
+                time.sleep(0.5)
                 els_f[0].send_keys(num)
-            except: raise Exception('Ошибка ввода номера заявки')
-            time.sleep(3)
+            except:
+                deal['pv_status'] = 'Ошибка парсинга'
+                deal['comment'] = 'Ошибка ввода номера заявки'
+                continue
+            time.sleep(5)
 
             # Ищем ссылку управления услугами
             el_a = find_link(driver)
             if el_a == None:
                 # Отмечаем поиск в истории
                 els_ch = driver.find_elements(By.XPATH, '//input[@name="search_in_history"]')
-                if len(els_ch) == 0: raise Exception('нет чека истории')
+                if len(els_ch) == 0:
+                    deal['pv_status'] = 'Ошибка парсинга'
+                    deal['comment'] = 'нет чека истории'
+                    continue
                 try: els_ch[0].click()
-                except: raise Exception('Ошибка клика чека истории')
-                time.sleep(3)
+                except:
+                    deal['pv_status'] = 'Ошибка парсинга'
+                    deal['comment'] = 'Ошибка клика чека истории'
+                    continue
+                time.sleep(5)
                 el_a = find_link(driver)
             
             if el_a == None:
                 deal['pv_status'] = 'Заявка не найдена'
                 continue
             try: el_a.click()
-            except: raise Exception('Ошибка клика ссылки на страницу заявки')
-            time.sleep(5)
+            except:
+                deal['pv_status'] = 'Ошибка парсинга'
+                deal['comment'] = 'Ошибка клика ссылки на страницу заявки'
+                continue
+            time.sleep(10)
 
             # Страница заявки
             # смотрим таблицу в шапке
@@ -240,7 +258,7 @@ def get_deal_status(logger, lst_deal, access, status_for_comment):
             elif status != 'Завершен':
                 deal['pv_status'] = status
                 deal['comment'] = 'Неизвестный статус, пропущено'
-                print(num, status, 'Неизвестный статус, пропущено')
+                # print(num, status, 'Неизвестный статус, пропущено')
                 continue
             
             # Берем дату окончания
@@ -257,9 +275,15 @@ def get_deal_status(logger, lst_deal, access, status_for_comment):
                 deal['pv_status'] = 'Ошибка парсинга'
                 deal['comment'] = 'Нет ссылки раскрыть'
                 continue
-            try: els_a[0].click()
-            except: raise Exception('Ошибка клика раскрыть')
+            # Передвинем страницу чтоб элемент стал видимым
+            driver.execute_script('window.scrollBy(-100, -200)')
             time.sleep(1)
+            try: els_a[0].click()
+            except:
+                deal['pv_status'] = 'Ошибка парсинга'
+                deal['comment'] = 'Ошибка клика раскрыть'
+                continue
+            time.sleep(5)
             
             # Анализируем таблицу Выполненные задачи
             els_tbl = driver.find_elements(By.XPATH, '//table[@class="flatten"]')
@@ -287,9 +311,17 @@ def get_deal_status(logger, lst_deal, access, status_for_comment):
                 if len(els_apr) == 0:
                     deal['comment'] = 'Ошибка: Нет ссылки комментарий'
                     continue
+                # Передвинем страницу чтоб элемент стал видимым
+                driver.execute_script("arguments[0].scrollIntoView();", els_apr[0])
+                time.sleep(1)
+                driver.execute_script('window.scrollBy(0, -200)')
+                time.sleep(1)
                 try: els_apr[0].click()
-                except: raise Exception('Ошибка клика комментарий')
-                time.sleep(5)
+                except:
+                    deal['pv_status'] = 'Ошибка парсинга'
+                    deal['comment'] = 'Ошибка клика комментарий'
+                    continue
+                time.sleep(3)
             
                 els_note = driver.find_elements(By.XPATH, '//td[(@class="note-body") and (@data-name="note")]')
                 if len(els_note) > 0: deal['comment'] = re.sub("\n|\r", ' ', els_note[-1].text)
@@ -464,7 +496,7 @@ def run_check_deals(logger, tlg_chat, tlg_token, by_days=60):
         logger.info(log_mess); print(log_mess)
         send_telegram(tlg_chat, tlg_token, log_mess)
 
-    tlg_mess = f'ПВ {provider}:\nСтатус сделок изменен\nв {change} из {len(lst_deal)}\n'
+    tlg_mess = f'ПВ {provider}:\nСтатус сделок изменен \nв {change} из {len(lst_deal)}\n'
     str_today = datetime.today().strftime('%d.%m.%Y')
     tlg_mess += f'http://django.domconnect.ru/api/get_pv_result/{pv_dc_code}/{str_today}'
 
@@ -489,13 +521,13 @@ if __name__ == '__main__':
     # run_check_deals(logger, MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN, 3)
     # run_check_deals(logger, PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN, 1)
     # run_check_deals(logger, PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN)
-    # run_check_deals(logger, MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN)
+    run_check_deals(logger, MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN)
 
     # lst_deal = []
-    # lst_deal.append({'ID': '142632', 'num': 'А-65771557'})
-    # lst_deal.append({'ID': '142884', 'num': 'А-65772345'})
-    # lst_deal.append({'ID': '142884', 'num': 'А-65773445'})
-    # # lst_deal.append({'ID': '142632', 'num': 'А-657041994555'})
+    # lst_deal.append({'ID': '142632', 'num': 'А-64274101'})
+    # lst_deal.append({'ID': '142884', 'num': 'А-63928833'})
+    # # lst_deal.append({'ID': '142884', 'num': 'А-65597272'})
+    # # lst_deal.append({'ID': '142632', 'num': 'А-65607881'})
     # # lst_deal.append({'ID': '142632', 'num': 'А-657041994555f'})
     # # # lst_deal.append({'ID': '143114', 'num': '1'})
     # e, lst_deal = get_deal_status(logger, lst_deal, access, status_for_comment)

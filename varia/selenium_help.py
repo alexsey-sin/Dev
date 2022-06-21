@@ -87,7 +87,7 @@ driver.execute_script("arguments[0].click();", els[0])
 driver.execute_script("arguments[0].scrollIntoView();", els[0])
 time.sleep(1)
 # прокручивает страницу относительно её текущего положения
-driver.execute_script('window.scrollBy(-100, -100)')
+driver.execute_script('window.scrollBy(-100, -100)')  # x(по горизонтали), y(по вертикали)
 time.sleep(1)
 
 # Перемещение страницы на координаты левого верхнего угла
