@@ -187,7 +187,47 @@ def get_deal_status(logger, acc_data):
             try: els[0].click()
             except: raise Exception('Ошибка действий 04')
             time.sleep(5)
-            ###################### Главная страница ######################
+            
+            ###################### Меняем диапазон даты поиска ######################
+            els_div = driver.find_elements(By.XPATH, '//div[@ng-form="ticketsFilterStartDate"]')
+            if len(els_div) != 1: raise Exception('Нет поля старт дата')
+            els_spn = els_div[0].find_elements(By.XPATH, './/span[contains(@class, "input-datepicker-toggle")]')
+            if len(els_spn) != 1: raise Exception('Нет кнопки развернуть дату старт')
+            try: els_spn[0].click()
+            except: raise Exception('Ошибка действий 05')
+            time.sleep(1)
+            # Блок Дата старт
+            els_ul = driver.find_elements(By.XPATH, '//ul[contains(@class, "datepicker__dropdown-menu") and contains(@style, "display: block;")]')
+            if len(els_ul) != 1: raise Exception('Нет блока дата старт')
+            els_mv_b = els_ul[0].find_elements(By.XPATH, './/button[@ng-click="move(-1)"]')
+            if len(els_mv_b) != 1: raise Exception('Нет кнопки дата назад')
+            try: 
+                els_mv_b[0].click()
+                time.sleep(0.2)
+                els_mv_b[0].click()
+                time.sleep(0.2)
+                els_mv_b[0].click()
+                time.sleep(1)
+            except: raise Exception('Ошибка действий 06')
+            els_bn = els_ul[0].find_elements(By.XPATH, './/button[contains(@uib-is-class, "datepicker__button--active")]')
+            if len(els_bn) == 0: raise Exception('Нет кнопки чисел')
+            is_ok = False
+            for el_bn in els_bn:
+                if el_bn.text == '01':
+                    is_ok = True
+                    try: el_bn.click()
+                    except: raise Exception('Ошибка действий 07')
+                    break
+            if is_ok == False: raise Exception('Число 01 не найдено')
+            time.sleep(2)
+            # Закроем окно
+            els_cl = els_ul[0].find_elements(By.XPATH, './/a[@ng-click="closeDatepicker()"]')
+            if len(els_cl) != 1: raise Exception('Нет кнопки закрыть дату старт')
+            try: els_cl[0].click()
+            except: raise Exception('Ошибка действий 08')
+            time.sleep(1)
+
+            ###################### Поиск заявок ######################
             # проход по всем заявкам
             for deal in a_data['deals']:
                 num = deal.get('num')
@@ -196,9 +236,15 @@ def get_deal_status(logger, acc_data):
                     logger.info(log_mess)
                     continue
                 els = driver.find_elements(By.XPATH, '//input[@placeholder="Введите номер"]')
-                if len(els) != 1: raise Exception('Нет поля ввода номера заявки')
+                if len(els) != 1:
+                    deal['pv_status'] = 'Ошибка парсинга'
+                    deal['comment'] = 'Нет поля ввода номера заявки'
+                    continue
                 els_btn = driver.find_elements(By.XPATH, '//button[contains(@ng-click, "applyFilterHander")]')
-                if len(els_btn) != 1: raise Exception('Нет кнопки применить фильтр')
+                if len(els_btn) != 1:
+                    deal['pv_status'] = 'Ошибка парсинга'
+                    deal['comment'] = 'Нет кнопки применить фильтр'
+                    continue
                 # вводим номер заявки
                 try:
                     els[0].send_keys(Keys.CONTROL + 'a')
@@ -209,7 +255,10 @@ def get_deal_status(logger, acc_data):
                     time.sleep(1)
                     els_btn[0].click()
                     time.sleep(1)
-                except: raise Exception('Ошибка ввода номера заявки')
+                except:
+                    deal['pv_status'] = 'Ошибка парсинга'
+                    deal['comment'] = 'Ошибка ввода номера заявки'
+                    continue
                 time.sleep(2)
                 
                 # Посмотрим строку результата
@@ -218,7 +267,10 @@ def get_deal_status(logger, acc_data):
                 driver.implicitly_wait(10)
                 if len(els) > 0:
                     els_td = els[0].find_elements(By.TAG_NAME, 'td')
-                    if len(els_td) != 9: raise Exception('Неправильный формат строки таблицы результатов поиска заявки')
+                    if len(els_td) != 9:
+                        deal['pv_status'] = 'Ошибка парсинга'
+                        deal['comment'] = 'Неправильный формат строки таблицы результатов поиска заявки'
+                        continue
                     status = els_td[3].text
                     # print(status)
                     deal['pv_status'] = status
@@ -228,7 +280,6 @@ def get_deal_status(logger, acc_data):
                             if deal['pv_status'] == 'Подключен':
                                 deal['date_connect'] = status[len(stat_b):].strip()
                             break
-
                     
                     cast_status = deal.get('pv_status')
                     if cast_status in status_for_comment:
@@ -237,7 +288,10 @@ def get_deal_status(logger, acc_data):
                         # По нормальному тэг svg selenium не находит
                         els_svg = driver.find_elements(By.XPATH, '//*[local-name() = "svg" and (@ng-click="ticket.expandedTicket()")]')
                         try: els_svg[0].click()
-                        except: raise Exception('Ошибка раскрытия коментария')
+                        except:
+                            deal['pv_status'] = 'Ошибка парсинга'
+                            deal['comment'] = 'Ошибка раскрытия коментария'
+                            continue
 
                         els_comm = driver.find_elements(By.XPATH, '//div[@ng-bind-html="comment.text"]')
                         if len(els_comm) > 0: deal['comment'] = els_comm[0].text
@@ -424,6 +478,7 @@ def run_check_deals(logger, tlg_chat, tlg_token, by_days=60):
                 a_data['deals'].append(deal)
         if is_ok == False:
             print('pw_code is not:', deal.get('pw_code'))
+    # print(json.dumps(new_lst_deal, sort_keys=True, indent=2, ensure_ascii=False))
     
     # Проверим статус сделок у ПВ
     e, new_acc_data = get_deal_status(logger, acc_data)
@@ -478,29 +533,30 @@ if __name__ == '__main__':
     logging.getLogger('undetected_chromedriver.patcher').setLevel(logging.CRITICAL)  # чтобы узнать кто постит в лог добавить в format :%(name)s:
     logger = logging.getLogger(__name__)
     
-    # run_check_deals(logger, MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN, 1)
-    # run_check_deals(logger, PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN)
+    # run_check_deals(logger, MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN)
+    # run_check_deals(logger, MY_TELEGRAM_CHAT_ID, MY_TELEGRAM_TOKEN, 10)
+    run_check_deals(logger, PV_TELEGRAM_CHAT_ID, PV_TELEGRAM_TOKEN)
     # acc_data = {  # Доступы к ПВ
         # 'url': 'https://partnerweb.beeline.ru/',
         # 'partners': [
-            # {
-                # 'code': '3002',     # (СПб и ЛО, БМ)
-                # 'login': '0K23-181',
-                # 'employee': '1010000101',
-                # 'password': 'FudlU7tfFsK5g6',
-                # 'deals': [
-                    # {
-                        # "ID": "158869",
-                        # "num": "244091891",
-                        # "pw_code": "3002",
-                    # },
-                    # {
-                        # "ID": "158582",
-                        # "num": "243608801",
-                        # "pw_code": "3002",
-                    # },
-                # ],
-            # },
+            # # {
+                # # 'code': '3002',     # (СПб и ЛО, БМ)
+                # # 'login': '0K23-181',
+                # # 'employee': '1010000101',
+                # # 'password': 'FudlU7tfFsK5g6',
+                # # 'deals': [
+                    # # {
+                        # # "ID": "158869",
+                        # # "num": "244091891",
+                        # # "pw_code": "3002",
+                    # # },
+                    # # {
+                        # # "ID": "158582",
+                        # # "num": "243608801",
+                        # # "pw_code": "3002",
+                    # # },
+                # # ],
+            # # },
             # # {
                 # # 'code': '3058',     # (МО и МСК)
                 # # 'login': 'S01-181',
@@ -508,26 +564,36 @@ if __name__ == '__main__':
                 # # 'password': '8GFysus@kffs7',
                 # # 'deals': [],
             # # },
-            # # {
-                # # 'code': '3003',     # (РФ)
-                # # 'login': 'S24-61',
-                # # 'employee': '1010000101',
-                # # 'password': 'Ft&dhdk234hbs3',
-                # # 'deals': [
-                    # # {
-                        # # "ID": "156853",
-                        # # "num": "243756326",
-                        # # "pw_code": "3003",
-                    # # }
-                # # ],
-            # # },
+            # {
+                # 'code': '3003',     # (РФ)
+                # 'login': 'S24-61',
+                # 'employee': '1010000101',
+                # 'password': 'Ft&dhdk234hbs3',
+                # 'deals': [
+                    # {
+                        # "ID": "163750",
+                        # "num": "243154970",
+                        # "pw_code": "3003"
+                    # },
+                    # {
+                        # "ID": "163752",
+                        # "num": "243184804",
+                        # "pw_code": "3003"
+                    # },
+                    # {
+                        # "ID": "163754",
+                        # "num": "243298452",
+                        # "pw_code": "3003"
+                    # },
+                # ],
+            # },
         # ]
     # }
 
-    pass
-    # e, acc_data = get_deal_status(acc_data)
+    # e, acc_data = get_deal_status(logger, acc_data)
     # if e: print(e)
-    # print(acc_data)
+    # print(json.dumps(acc_data, sort_keys=True, indent=2, ensure_ascii=False))
+    pass
 
 
 

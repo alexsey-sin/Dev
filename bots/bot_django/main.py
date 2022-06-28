@@ -44,7 +44,7 @@ if __name__ == '__main__':
         time.sleep(PERIOD_1_SEC)
         # Рабочее время ботов с 6 до 23
         cur_time = datetime.now()
-        if cur_time.hour < 6 or cur_time.hour >= 23: continue
+        if (cur_time.hour < 6 and cur_time.minute < 30) or cur_time.hour >= 23: continue
         str_time = cur_time.strftime('%H:%M:%S %d.%m.%Y')
         
         #===============================================#

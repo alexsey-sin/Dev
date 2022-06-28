@@ -656,7 +656,7 @@ if __name__ == '__main__':
     # print(json.dumps(data, sort_keys=True, indent=2, ensure_ascii=False))
     
     
-    set_txv_to_dj_domconnect(pv_code)
+    # set_txv_to_dj_domconnect(pv_code)
     # rez, txv_list = get_txv_in_dj_domconnect(pv_code)
     # for txv_dict in txv_list:
         # for k, v in txv_dict.items():
